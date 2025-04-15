@@ -1,9 +1,10 @@
-import { connect } from "../utils/sequelize"
-
 export default defineNitroPlugin(async (nitro) => {
     try {
         const sequelize = await connect()
-        const ret = await sequelize.queryRaw("SELECT * FROM users limit 1")
+        await sequelize.queryRaw("SELECT * FROM users limit 1")
+
+        // load settings
+        await loadSettings()
     } catch (e) {
         console.error(e)
     }
