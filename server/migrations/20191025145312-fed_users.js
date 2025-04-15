@@ -1,21 +1,21 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('fed_users', {
     ap_id: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       primaryKey: true
     },
     object: {
-      type: Sequelize.JSON
+      type: DataTypes.JSON
     },
     createdAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     },
     updatedAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     }
   })
 }

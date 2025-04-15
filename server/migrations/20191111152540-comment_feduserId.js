@@ -1,8 +1,8 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.addColumn('comments', 'fedUserApId', {
-    type: Sequelize.STRING,
+    type: DataTypes.STRING,
     references: {
       table: 'fed_users',
       key: 'ap_id'

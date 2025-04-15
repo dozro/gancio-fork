@@ -1,9 +1,9 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('user_followers', {
     userId: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       references: {
         table: 'users',
         key: 'id'
@@ -15,7 +15,7 @@ export function up ({ context: queryInterface }) {
     },
     fedUserApId: {
       primaryKey: true,
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       references: {
         table: 'fed_users',
         key: 'ap_id'
@@ -23,8 +23,8 @@ export function up ({ context: queryInterface }) {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    createdAt: { type: Sequelize.DATE, allowNull: false },
-    updatedAt: { type: Sequelize.DATE, allowNull: false }
+    createdAt: { type: DataTypes.DATE, allowNull: false },
+    updatedAt: { type: DataTypes.DATE, allowNull: false }
   })
 }
 

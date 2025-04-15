@@ -1,4 +1,4 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('users',
@@ -7,35 +7,35 @@ export function up ({ context: queryInterface }) {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER
       },
       username: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         unique: { msg: 'error.nick_taken' },
         index: true,
         allowNull: false
       },
-      display_name: Sequelize.STRING,
-      settings: Sequelize.JSON,
+      display_name: DataTypes.STRING,
+      settings: DataTypes.JSON,
       email: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         unique: { msg: 'error.email_taken' },
         index: true,
         allowNull: false
       },
-      description: Sequelize.TEXT,
-      password: Sequelize.STRING,
-      recover_code: Sequelize.STRING,
-      is_admin: Sequelize.BOOLEAN,
-      is_active: Sequelize.BOOLEAN,
-      rsa: Sequelize.JSON,
+      description: DataTypes.TEXT,
+      password: DataTypes.STRING,
+      recover_code: DataTypes.STRING,
+      is_admin: DataTypes.BOOLEAN,
+      is_active: DataTypes.BOOLEAN,
+      rsa: DataTypes.JSON,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       }
     }
   )

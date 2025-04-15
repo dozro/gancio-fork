@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('comments',
@@ -9,12 +9,12 @@ export function up ({ context: queryInterface }) {
         autoIncrement: true
       },
       activitypub_id: {
-        type: Sequelize.STRING(18),
+        type: DataTypes.STRING(18),
         index: true,
         unique: true
       },
       eventId: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         references: {
           table: 'events',
           key: 'id'
@@ -22,14 +22,14 @@ export function up ({ context: queryInterface }) {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       },
-      data: Sequelize.JSON,
+      data: DataTypes.JSON,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       }
     })
   }

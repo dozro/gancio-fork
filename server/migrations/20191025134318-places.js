@@ -1,4 +1,4 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('places', {
@@ -6,22 +6,22 @@ export function up ({ context: queryInterface }) {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
-      type: Sequelize.INTEGER
+      type: DataTypes.INTEGER
     },
     name: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       unique: true,
       index: true,
       allowNull: false
     },
-    address: Sequelize.STRING,
+    address: DataTypes.STRING,
     createdAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     },
     updatedAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     }
   })
 }

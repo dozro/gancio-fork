@@ -1,17 +1,17 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('event_tags', {
     createdAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     },
     updatedAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     },
     eventId: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       references: {
         table: 'events',
@@ -22,7 +22,7 @@ export function up ({ context: queryInterface }) {
     },
     tagTag: {
       primaryKey: true,
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       references: {
         table: 'tags',
         key: 'tag'

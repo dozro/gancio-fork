@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('notifications', {

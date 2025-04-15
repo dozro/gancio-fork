@@ -1,5 +1,6 @@
-export function up ({ context: queryInterface }) {
-  return queryInterface.renameTable('comments', 'resources')
+export async function up ({ context: queryInterface }) {
+  console.error('dentro renameTable')
+  return await queryInterface.renameTable('comments', 'resources')
 }
 
 export function  down ({ context: queryInterface }) {

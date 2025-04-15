@@ -1,34 +1,33 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
-  console.error('sono qui dentro!!')
   return queryInterface.createTable('events', {
     id: {
       allowNull: false,
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
-    title: Sequelize.STRING,
-    slug: Sequelize.STRING,
-    description: Sequelize.TEXT,
-    multidate: Sequelize.BOOLEAN,
+    title: DataTypes.STRING,
+    slug: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    multidate: DataTypes.BOOLEAN,
     start_datetime: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       index: true
     },
     end_datetime: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       index: true
     },
-    image_path: Sequelize.STRING,
-    is_visible: Sequelize.BOOLEAN,
-    recurrent: Sequelize.JSON,
-    // parent: Sequelize.INTEGER
-    likes: { type: Sequelize.JSON, defaultValue: [] },
-    boost: { type: Sequelize.JSON, defaultValue: [] },
+    image_path: DataTypes.STRING,
+    is_visible: DataTypes.BOOLEAN,
+    recurrent: DataTypes.JSON,
+    // parent: DataTypes.INTEGER
+    likes: { type: DataTypes.JSON, defaultValue: [] },
+    boost: { type: DataTypes.JSON, defaultValue: [] },
     placeId: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       references: {
         table: 'places',
         key: 'id'
@@ -37,7 +36,7 @@ export function up ({ context: queryInterface }) {
       onDelete: 'SET NULL'
     },
     userId: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       references: {
         table: 'users',
         key: 'id'
@@ -47,11 +46,11 @@ export function up ({ context: queryInterface }) {
     },
     createdAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     },
     updatedAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     }
   })
 }

@@ -1,22 +1,22 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('settings', {
     key: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       primaryKey: true,
       allowNull: false,
       index: true
     },
-    value: Sequelize.JSON,
-    is_secret: Sequelize.BOOLEAN,
+    value: DataTypes.JSON,
+    is_secret: DataTypes.BOOLEAN,
     createdAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     },
     updatedAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     }
   })
 }
