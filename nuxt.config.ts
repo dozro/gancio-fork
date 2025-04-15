@@ -20,6 +20,9 @@ export default defineNuxtConfig({
     vuetifyOptions: './vuetify.options.js'
   },
   runtimeConfig: {
+    base_url: process.env.BASE_URL,
+    db_dialect: process.env.DB_DIALECT,
+    db_storage: process.env.DB_STORAGE,
     public: {
       version
     }
