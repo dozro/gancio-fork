@@ -52,7 +52,7 @@ export async function connect() {
     })
     await sequelize.authenticate()
     await runMigrations(sequelize).catch(e => { console.error(e)})
-    await sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection]);
+    await sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Resource])
     return sequelize
 }
 
@@ -426,3 +426,23 @@ InferCreationAttributes<Collection>
     declare isTop: boolean
 }
 
+
+@Table({
+    tableName: 'resources',
+    timestamps: false
+})
+export class Resource extends Model<
+InferAttributes<Resource>,
+InferCreationAttributes<Resource>
+> {
+    
+    @Attribute(DataTypes.STRING)
+    @PrimaryKey
+    declare activitypub_id: string
+    
+    @Attribute(DataTypes.BOOLEAN)
+    declare hidden: boolean
+    
+    @Attribute(DataTypes.JSON)
+    declare data: any
+}
