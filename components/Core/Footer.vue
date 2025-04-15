@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import type { APUser } from '~/server/utils/sequelize'
+import type { FooterLink } from '~/types/settings.js'
 
 const { Settings } = useSettings()
 
-const showFollowMe = ref(false)
+const showFollowMe = ref<boolean>(false)
 
 const { data: trusted_instances } = await useFetch<APUser[]>('/api/ap_users/trusted')
-const { data: footerLinks } = await useFetch('/api/settings/footerLinks')
+const { data: footerLinks } = await useFetch<FooterLink[]>('/api/settings/footerLinks')
 
 </script>
 <template>
     <v-footer id='footer' aria-label='Footer'>
-        <v-dialog >v-model='showFollowMe' destroy-on-close max-width='700px' :fullscreen='$vuetify.breakpoint.xsOnly'>
+        <v-dialog v-model='showFollowMe' destroy-on-close max-width='700px' :fullscreen='$vuetify.display?.mobile'>
             <!-- <FollowMe @close='showFollowMe=false' is-dialog /> -->
         </v-dialog>
-       
+
         <v-btn v-for="link in footerLinks" :key="link?.label" color="primary" flat class="ml1"
             :href="link?.href" :to="link?.to" :target="link?.href && '_blank'">{{ link?.label }}</v-btn>
 
