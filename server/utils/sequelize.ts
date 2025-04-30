@@ -52,7 +52,7 @@ export async function connect() {
     })
     await sequelize.authenticate()
     await runMigrations(sequelize).catch(e => { console.error(e)})
-    await sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Resource])
+    await sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Resource, Page])
     return sequelize
 }
 
@@ -346,7 +346,7 @@ type APUserObject = {
     icon: { url: string },
     summary?: string,
     preferredUsername: string,
-    
+    url?: string
 }
 
 @Table({
@@ -444,5 +444,34 @@ InferCreationAttributes<Resource>
     declare hidden: boolean
     
     @Attribute(DataTypes.JSON)
-    declare data: any
+    declare data: any // @todo
+}
+
+@Table({
+    tableName: 'pages',
+    timestamps: false
+})
+export class Page extends Model<
+InferAttributes<Page>,
+InferCreationAttributes<Page>
+> {
+    @Attribute(DataTypes.INTEGER.UNSIGNED)
+    @PrimaryKey
+    @AutoIncrement
+    declare readonly id: CreationOptional<number>
+
+    @Attribute(DataTypes.STRING)
+    declare title: string
+    
+    @Attribute(DataTypes.TEXT)
+    declare content: string
+
+
+    @Attribute(DataTypes.BOOLEAN)
+    declare visible: boolean
+    
+    @Attribute(DataTypes.STRING)
+    @Index
+    @Unique
+    declare slug: string
 }
