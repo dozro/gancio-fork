@@ -1,24 +1,23 @@
 <script setup lang="ts">
-const { Settings } = useSettings()
-const route = useRoute()
+  const { Settings } = useSettings()
 </script>
 <template>
-    <nav>
-      <NavHeader />
-  
-      <!-- title -->
-      <div class="text-center">
-        <nuxt-link id="title" v-text="Settings.title" to="/" />
-        <div
-          class="text-body-1 font-weight-light pb-3"
-          v-text="Settings?.description" />
-      </div>
-  
-      <NavSearch />
-      <NavBar /> 
-      <!-- v-if="!['event-slug','e-slug'].includes(route?.name ?? '')"/> -->
-    </nav>
-  </template>
+  <nav>
+    <NavHeader />
+
+    <!-- title -->
+    <component :is='$route.name === "index" ? "h1" : "div"' class="text-center">
+      <nuxt-link id="title" v-text="Settings?.title ?? 'Gancio'" to="/" />
+      <div
+        class="text-body-1 font-weight-light pb-3"
+        v-html="Settings?.description ?? 'a shared agenda for local communities'"
+      />
+    </component>
+
+    <NavSearch />
+    <NavBar v-if="!['event-slug','e-slug'].includes($route?.name)"/> 
+  </nav>
+</template>
   <!-- <script>
   import { mapState } from 'vuex'
   import NavHeader from './NavHeader.vue'
@@ -31,14 +30,14 @@ const route = useRoute()
     computed: mapState(['settings']),
   }
   </script> -->
-  <style>
+<style>
   nav {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(20, 20, 20, 0.7)),
+    background-image: linear-gradient(rgba(50, 50, 50, 0.8), rgba(250, 250, 250, 0.7)),
       url(/headerimage.png);
     background-position: center center;
     background-size: cover;
   }
-  
+
   .theme--light nav {
     background-image: linear-gradient(
         to bottom,
@@ -54,5 +53,5 @@ const route = useRoute()
     font-weight: 600;
     text-decoration: none;
   }
-  </style>
+</style>
   
