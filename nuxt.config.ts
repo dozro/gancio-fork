@@ -15,7 +15,7 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
-  modules: ["vuetify-nuxt-module", '@nuxtjs/i18n'],
+  modules: ["vuetify-nuxt-module", '@nuxtjs/i18n', 'nuxt-auth-utils'],
   vuetify: {
     vuetifyOptions: './vuetify.options.js'
   },

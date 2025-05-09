@@ -1,0 +1,60 @@
+<script setup>
+import get from 'lodash/get'
+const form = ref()
+const email = ref()
+
+const loading = ref(false)
+const user = reactive({ email:'', password: '', description: '' })
+const valid = ref(false)
+const { $notify } = useNuxtApp()
+const router = useRouter()
+
+const register = async () => {
+  const valid = form.value.validate()
+  if (!valid) { return }
+  try {
+    loading.value = true
+    const createdUser = await $fetch('/user/register', { method: 'POST',  body: user.value })
+    // this is the first user registered
+    const isFirstUser = createdUser && createdUser.is_admin && createdUser.is_active
+    $notify(isFirstUser ? "register.first_user" : "register.complete")
+    navigateTo('/')
+  } catch (e) {
+    const error = get(e, "response.data.errors[0].message", String(e))
+    $notify(error, 'error')
+  }
+  loading.value = false
+}
+</script>
+<template>
+  <v-container class="pa-0 pa-md-3">
+    <v-row class="mt-md-5 ma-0" align="center" justify="center">
+      <v-col class="pa-0 pa-md-3" cols="12" md="6" lg="5" xl="4">
+        <v-form ref="form" v-model="valid" @submit.prevent="register">
+          <v-card>
+            <v-card-title>{{ $t("common.register") }}</v-card-title>
+
+            <v-card-text>
+              <p v-html="$t('register.description')" />
+              <v-text-field ref="email" v-model="user.email" type="email" :rules="$valid.email"
+                :label="$t('common.email')" autocomplete="email" />
+
+              <v-text-field v-model="user.password" type="password" :rules="$valid.password"
+                :label="$t('common.password')" />
+
+              <v-textarea v-model="user.description" :rules="[$valid.required($t('common.description'))]"
+                :label="$t('common.description')" />
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer />
+              <v-btn type="submit" outlined  append-icon="mdi-chevron-right" :disabled="!valid || loading" :loading="loading"
+                color="primary">{{ $t("common.send") }}
+              </v-btn>
+            </v-card-actions>
+        </v-card>
+        </v-form>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>

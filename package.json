@@ -69,6 +69,7 @@
     "happy-dom": "^17.4.6",
     "jsdom": "^26.1.0",
     "linkifyjs": "^4.3.1",
+    "mitt": "^3.0.1",
     "nitro-test-utils": "^0.9.2",
     "nitropack": "^2.11.11",
     "playwright-core": "^1.52.0",

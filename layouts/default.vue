@@ -10,14 +10,11 @@ await loadSettings()
 <template>
     <v-app>
         <CoreAppBar />
-        <!-- <CoreSideBar v-model="openSidebar" /> -->
-        <!-- <CoreNavBar @toggleSidebar="openSidebar = !openSidebar" /> -->
         <v-main>
             <NuxtPage />
         </v-main>
         <!-- <CoreDialog /> -->
-        <!-- <CoreNotification /> -->
-         <CoreFooter />
+        <CoreNotification />
+        <CoreFooter />
     </v-app>
 </template>
-
