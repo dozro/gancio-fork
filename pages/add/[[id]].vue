@@ -2,7 +2,6 @@
 
  -->
 <script setup lang="ts">
-import { Tag } from '#build/types/nitro-imports';
 
 const event = ref({ title: '', tags: [], place: {} })
 const date = ref()
@@ -13,17 +12,19 @@ const loading = ref(false)
 const openImportDialog = ref(false)
 const searchTag = ref('')
 
-const { data: tags, status: statusTags } = await useFetch<Tag[]>('/api/tags', { params: { query: searchTag }})
+const { data: tags, status: statusTags } = await useFetch<Tag[]>('/api/tags', { params: { query: searchTag } })
 
-function done () {
-
+function done() {
+  const formData = new FormData()
+  formData.append('title', event.value.title )
+  $fetch("/api/events", { method: 'POST', body: formData })
 }
 </script>
 <template>
   <v-container class="pa-0 pa-md-3">
     <v-card>
       <v-card-title>
-        <v-btn class='float-right' color='primary' @click='openImportDialog = true' prepend-icon="mdi-file-import">{{$t('common.import')}}</v-btn>
+        <v-btn class='float-right' color='primary' @click='openImportDialog = true' prepend-icon="mdi-file-import">{{$t('common.import') }}</v-btn>
         <h4>{{ edit ? $t('common.edit_event') : $t('common.add_event') }}</h4>
       </v-card-title>
       <v-dialog v-model='openImportDialog' :fullscreen='$vuetify.display.mobile'>
@@ -42,8 +43,7 @@ function done () {
               <v-col cols=12>
                 <!-- @change='v => event?.title = v'
                 :value = 'event?.title' -->
-                <v-text-field v-model="event.title"
-                  prepend-icon='mdi-format-title'
+                <v-text-field v-model="event.title" prepend-icon='mdi-format-title' 
                   :label="$t('common.title')"
                   :rules="[$valid.required('common.title')]"
                   autofocus ref='title' />
@@ -59,18 +59,11 @@ function done () {
 
               <!-- TAGS -->
               <v-col cols=12 md=6>
-                <span>{{tags}} - {{ searchTag }} - {{ statusTags}}</span>
-                <v-combobox
-                  v-model:search="searchTag"
-                  v-model="event.tags"
-                  prepend-icon="mdi-tag-multiple"
-                  chips small-chips multiple deletable-chips hide-no-data hide-selected persistent-hint
-                  cache-items
-                  :loading="statusTags === 'pending'"
-                  :delimiters="[',', ';']"
-                  :items="tags"
-                  :menu-props="{ maxWidth: 400, eager: true }"
-                  :label="$t('common.tags')">
+                <span>{{ tags }} - {{ searchTag }} - {{ statusTags }}</span>
+                <v-combobox v-model:search="searchTag" v-model="event.tags" prepend-icon="mdi-tag-multiple" chips
+                  small-chips multiple deletable-chips hide-no-data hide-selected persistent-hint cache-items
+                  :loading="statusTags === 'pending'" :delimiters="[',', ';']" :items="[]"
+                  :menu-props="{ maxWidth: 400, eager: true }" :label="$t('common.tags')">
                   <!-- <template v-slot:selection="{ item, on, attrs, selected, parent }">
                     <v-chip v-bind="attrs" close :close-icon='mdiCloseCircle' @click:close='parent.selectItem(item)'
                       :input-value="selected" label small>{{ item }}</v-chip>
@@ -79,14 +72,15 @@ function done () {
               </v-col>
 
 
-            </v-row>            
+            </v-row>
           </v-container>
         </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn @click='done' :loading='loading' :disabled='!valid || loading' outlined color='primary'>{{ edit ? $t('common.save') : $t('common.send') }}</v-btn>
+        <v-btn @click='done' :loading='loading' :disabled='!valid || loading' outlined color='primary'>{{ edit ?
+          $t('common.save') : $t('common.send') }}</v-btn>
       </v-card-actions>
     </v-card>
-</v-container>
+  </v-container>
 </template>
