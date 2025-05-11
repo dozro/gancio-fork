@@ -1,5 +1,6 @@
 <script setup lang="ts">
-const $auth = { loggedIn: true, user: { is_admin: true, role: 'admin', is_editor: true } }
+// const $auth = { loggedIn: true, user: { is_admin: true, role: 'admin', is_editor: true } }
+const { loggedIn, session, user, clear, fetch } = useUserSession()
 
 import { useTheme } from 'vuetify'
 
@@ -8,7 +9,7 @@ const theme = useTheme()
 const { locale, locales, setLocale } = useI18n()
 
 function logout () {
-  
+  clear()
 }
 
 function toggleDark () {
@@ -50,7 +51,7 @@ function toggleDark () {
       
       <!-- auth menu -->
       <client-only>
-        <v-menu v-if='$auth.loggedIn' offset-y transition="slide-y-transition">
+        <v-menu v-if='loggedIn' offset-y transition="slide-y-transition">
           <template v-slot:activator="{ props }">
             <v-btn variant="text" class='mr-0' large icon="mdi-dots-vertical" v-bind='props' title='Menu' aria-label='Menu' />
           </template>
@@ -65,9 +66,9 @@ function toggleDark () {
               <v-list-item-title v-text="$t('common.my_events')"/>
             </v-list-item>
             
-            <v-list-item v-if='$auth.user.is_admin || $auth.user.is_editor' nuxt to='/admin'>
+            <v-list-item v-if='user.is_admin || user.is_editor' nuxt to='/admin'>
               <template v-slot:prepend><v-icon icon='mdi-account' /></template>
-              <v-list-item-title v-text="$t(`common.${$auth.user.role}`)" />
+              <v-list-item-title v-text="$t(`common.${user.role}`)" />
             </v-list-item>
             
             <v-list-item @click='logout'>
@@ -77,12 +78,12 @@ function toggleDark () {
           </v-list>
         </v-menu>
         <template #placeholder>
-          <v-btn variant="text" v-if='$auth.loggedIn' large icon="mdi-dots-vertical" aria-label='Menu' title='Menu' />
+          <v-btn variant="text" v-if='loggedIn' large icon="mdi-dots-vertical" aria-label='Menu' title='Menu' />
         </template>
       </client-only>
       
       <!-- login button -->
-      <v-btn variant="text" class='mr-0' v-if='!$auth.loggedIn' icon="mdi-login" nuxt  to='/login' :title='$t("common.login")' :aria-label='$t("common.login")' />
+      <v-btn variant="text" class='mr-0' v-if='!loggedIn' icon="mdi-login" nuxt  to='/login' :title='$t("common.login")' :aria-label='$t("common.login")' />
     </div>
   </div>
 </template>

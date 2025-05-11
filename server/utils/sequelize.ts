@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt'
+import crypto from 'crypto'
 import { Umzug, SequelizeStorage } from 'umzug'
 import {
     Sequelize,
@@ -102,6 +103,7 @@ InferCreationAttributes<Event>
     @AutoIncrement
     declare readonly id: CreationOptional<number>
     
+    /**  title of the event */
     @Attribute(DataTypes.STRING)
     @NotNull
     declare title: string
@@ -238,6 +240,10 @@ InferCreationAttributes<User>
     @UpdatedAt
     declare readonly updatedAt: CreationOptional<Date>;
     
+    async generateRecoverCode() {
+        this.recover_code = crypto.randomBytes(16).toString('hex')
+        await this.save()
+    }
     
     async comparePassword(pwd: string) {
         if (!this.password) { return false }

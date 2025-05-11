@@ -10,7 +10,6 @@ export const settingSchema = z.object({
     value: z.union([z.string(), z.boolean()])
 })
 
-
 export type SettingType = z.infer<typeof settingSchema>
 
 export const publicSettings:KeyValueType = {}

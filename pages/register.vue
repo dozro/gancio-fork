@@ -14,7 +14,7 @@ const register = async () => {
   if (!valid) { return }
   try {
     loading.value = true
-    const createdUser = await $fetch('/user/register', { method: 'POST',  body: user.value })
+    const createdUser = await $fetch('/api/user/register', { method: 'POST',  body: user })
     // this is the first user registered
     const isFirstUser = createdUser && createdUser.is_admin && createdUser.is_active
     $notify(isFirstUser ? "register.first_user" : "register.complete")

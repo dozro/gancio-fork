@@ -1,8 +1,16 @@
 <script setup lang="ts">
+definePageMeta({ middleware: ['authenticated'] })
 const { loadSettings } = useSettings()
 loadSettings()
 const { isAdmin } = useAuth()
 const selectedTab = ref('')
+
+const { data: users } = await useFetch('/api/users')
+const { data: events } = await useFetch('/event/unconfirmed')
+console.error(events.value)
+const unconfirmedEvents = events?.events
+const unconfirmedOldEvents = events?.oldEvents
+
 </script>
 <template>
     <v-container>
@@ -29,9 +37,18 @@ const selectedTab = ref('')
             
             <v-card-text>
                 <v-tabs-window v-model="selectedTab">
-                    <v-tabs-window-item value="settings">
-                        <AdminSettings />
-                    </v-tabs-window-item>
+                  <v-tabs-window-item value="settings">
+                      <AdminSettings />
+                  </v-tabs-window-item>
+                  <v-tabs-window-item value="users">
+                    <AdminUsers :users='users' />
+                  </v-tabs-window-item>
+                  <v-tabs-window-item value="events">
+                    <AdminEvents :unconfirmedEvents='unconfirmedEvents' :unconfirmedOldEvents='unconfirmedOldEvents'
+                      @confirmed='id => { unconfirmedEvents = unconfirmedEvents.filter(e => e.id !== id); unconfirmedOldEvents = unconfirmedOldEvents.filter(e => e.id !== id)}'
+                      @removed='id => { unconfirmedEvents = unconfirmedEvents.filter(e => e.id !== id); unconfirmedOldEvents = unconfirmedOldEvents.filter(e => e.id !== id)}' />
+
+                  </v-tabs-window-item>
                 </v-tabs-window>
             </v-card-text>
         </v-card>

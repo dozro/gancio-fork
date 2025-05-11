@@ -20,8 +20,8 @@
     */
     
     export default defineEventHandler(async event => {
-      // isAuth()
-      return false
+      const { user } = await requireUserSession(event)
+      return user
     })
     
     // api.get('/ping', (_req, res) => res.sendStatus(200))

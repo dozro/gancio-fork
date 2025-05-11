@@ -51,9 +51,13 @@ return {
         variant: 'flat',
         ripple: 0
       },
+      VTextArea: {
+        autocomplete: 'off',
+        clearable: true,
+        variant: 'underlined'        
+      },
       VTextField: {
         autocomplete: 'off',
-        density: 'compact',
         clearable: true,
         variant: 'underlined'
       },
@@ -93,6 +97,15 @@ return {
       },
       VDataTableItem: {
         density: 'compact'
+      },
+      VMenu: {
+        background: 'red',
+        color: 'red',
+        border: 'start'
+      },
+      VCard: {
+        border: 1,
+        variant: 'outlined'
       }
     },    
   }
