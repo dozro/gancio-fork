@@ -1,6 +1,7 @@
 import { Statuses } from "~/types/settings"
 
 export default defineNuxtPlugin((nuxtApp) => {
+  console.error('dialog!')
   const { $once, $emit } = useNuxtApp() // nuxtApp
   
   function confirm (msg: string) {
