@@ -1,6 +1,8 @@
 import { version } from './package.json'
 import locales from './i18n/locales/index'
 
+import config from './config.json'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devServer: {
@@ -25,9 +27,11 @@ export default defineNuxtConfig({
     vuetifyOptions: './vuetify.options.js'
   },
   runtimeConfig: {
-    base_url: process.env.BASE_URL,
-    db_dialect: process.env.DB_DIALECT,
-    db_storage: process.env.DB_STORAGE,
+    base_url: config?.baseurl ?? process.env.BASE_URL,
+    db_dialect: config?.db?.dialect ?? process.env.DB_DIALECT,
+    db_storage: config?.db?.storage ?? process.env.DB_STORAGE,
+    user_locale_path: config?.user_locale ?? process.env.USER_LOCALE_PATH,
+    // TODO
     public: {
       version
     }

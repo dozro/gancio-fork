@@ -36,7 +36,7 @@ const show_collections_bar = true  // TODO
                 <v-card>
                   <v-card-text>
                     <v-row dense>
-                        <v-col v-if="1 || Settings.allow_recurrent_event">
+                        <v-col v-if="settings.allow_recurrent_event">
                             <input type='checkbox' v-model='params.show_recurrent' />
                             <v-switch class="mt-0" v-model="params.show_recurrent"
                                 hide-details :label="$t('event.show_recurrent')" inset />
