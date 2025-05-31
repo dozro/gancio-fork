@@ -1,7 +1,7 @@
 <template>
     <v-tooltip top>
-        <template v-slot:activator="{ on, attrs}">
-            <v-btn v-bind="attrs" :to='to' :large="large" :small="small" text icon v-on="on" @click='$emit("click")' :color='color'>
+        <template #activator="{ on, attrs}">
+            <v-btn v-bind="attrs" :icon='icon' :to='to' :large="large" :small="small" text :color='color' v-on="on" @click='$emit("click")'>
                 <slot />
             </v-btn>
         </template>
@@ -15,6 +15,7 @@ export default {
         tooltip: String,
         color: String,
         to: String,
+        icon: String,
         large: { type: Boolean, default: false },
         small: { type: Boolean, default: false }
     }

@@ -1,9 +1,10 @@
 // const minifyTheme = require('minify-css-string').default
+// import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import { ca, cs, de, en, es, fr, it, nl, pl, pt, tr, sk, sv, ro, ru, zhHans  } from 'vuetify/lib/locale/index.mjs'
 // import { ca, cs, de, en, es, eu, fr, gl, it, nb, nl, pl, pt, tr, sk, sv, ro, ru, zhHans  } from 'vuetify/lib/locale'
 
-import { aliases, mdi } from 'vuetify/iconsets/mdi'
-export default (ctx) => {
+import { aliases, md } from 'vuetify/iconsets/md'
+export default () => {
 
 //   const settings = process.server ? (res.locals.settings || {}) : nuxtState.state.settings || {}
 //   const is_dark = nuxtState?.state?.localSettings['theme.is_dark'] ?? settings['theme.is_dark']
@@ -18,10 +19,10 @@ return {
         // minifyTheme,
       },
       icons: {
-        defaultSet: 'mdi',
+        defaultSet: 'md',
         aliases,
         sets: {
-          mdi,
+          md,
         },
       },
       // dark: is_dark,
@@ -32,6 +33,7 @@ return {
     },
     defaults: {
       global: {
+        // variant: 'underlined',
         elevation: 0,
         // rounded: 0,
       },
@@ -48,7 +50,6 @@ return {
       },
       VBtn: {
         elevation: 0,
-        variant: 'flat',
         ripple: 0
       },
       VTextArea: {
@@ -61,7 +62,8 @@ return {
         clearable: true,
         variant: 'underlined'
       },
-      VComboBox: {
+      VCombobox: {
+        variant: 'underlined',
         autocomplete: 'off',
         density: 'compact',
         clearable: true
@@ -73,7 +75,8 @@ return {
         },
         autocomplete: 'off',
         density: 'compact',
-        clearable: true
+        clearable: true,
+        variant: 'underlined'
       },
       VAlert: {
         border: 'start',
@@ -85,9 +88,6 @@ return {
         density: 'compact',
         inset: true,
         color: 'indigo'
-      },
-      VSelect: { 
-        density: 'compact'
       },
       VDataTableServer: {
         density: 'compact',
@@ -105,7 +105,7 @@ return {
       },
       VCard: {
         border: 1,
-        variant: 'outlined'
+        variant: 'flat'
       }
     },    
   }

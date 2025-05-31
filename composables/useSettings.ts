@@ -1,16 +1,25 @@
 
-export const useSettings = () => {
+// export const useSettings = (refresh = false) => {
+//   const settings = useState('settings', () => [])
   
-  const Settings = useState<KeyValueType>('settings', () => reactive({ }))
+//   // Only fetch if not already fetched or if refresh
+//   if (!settings.value || refresh) {
+//     $fetch('/api/settings').then(r => settings.value =  r)
+//   }
+
+//   return settings
+// }
+
+// //   const Settings = useState<KeyValueType>('settings', () => reactive({ }))
   
-  const loadSettings = async () => {
-    Settings.value = await $fetch('/api/settings')
-  }
+// //   const loadSettings = async () => {
+// //     Settings.value = await $fetch('/api/settings')
+// //   }
   
-  const saveSetting = async (key: string, value: string) => {
-    Settings.value[key] = value
-    await $fetch(`/api/settings`, { method: 'PUT', body: { key, value } })
-  }
+// //   const saveSetting = async (key: string, value: string) => {
+// //     Settings.value[key] = value
+// //     await $fetch(`/api/settings`, { method: 'PUT', body: { key, value } })
+// //   }
   
-  return { Settings, saveSetting, loadSettings }
-}
+// //   return { Settings, saveSetting, loadSettings }
+// // }

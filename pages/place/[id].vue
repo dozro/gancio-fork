@@ -1,12 +1,10 @@
 s<script setup lang="ts">
 import type { Place } from '#build/types/nitro-imports';
-import useSettings from '~/composables/useSettings';
 
 const { Settings } = useSettings()
 
-
 const route = useRoute()
-const { data: place } = await useFetch<Place>(`/api/place/${route.params.place}`)
+const { data: place } = await useFetch<Place>(`/api/events/place/${route.params.id}`)
   if (!place) {
     throw createError({ status: 404, statusMessage: 'Place not found'})
 }

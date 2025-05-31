@@ -173,7 +173,7 @@
         "recurrent_1m_days": "El día {days} de cada mes",
         "recurrent_2m_days": "El día {days} cada dos meses",
         "recurrent_1m_ordinal": "Cada {n} {days} del mes",
-        "recurrent_2m_ordinal": "Cada {n} {días} un mes de cada dos",
+        "recurrent_2m_ordinal": "Cada {n} {days} un mes de cada dos",
         "each_week": "Cada semana",
         "each_2w": "Cada dos semanas",
         "each_month": "Cada mes",

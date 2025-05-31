@@ -1,10 +1,8 @@
+import type { Event } from "#build/types/nitro-imports"
 import { describe, expect, it } from "vitest"
 import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
 
 const base_url = 'http://localhost:13120'
-import path from 'path'
-import type { Event } from "#build/types/nitro-imports"
-import { headers } from "happy-dom/lib/PropertySymbol.js"
 
 await setup({ host: base_url })
 

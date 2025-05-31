@@ -1,5 +1,6 @@
 <script setup lang="ts">
-  const { Settings } = useSettings()
+const settings = useState('settings')
+
 </script>
 <template>
   <nav>
@@ -7,10 +8,10 @@
 
     <!-- title -->
     <component :is='$route.name === "index" ? "h1" : "div"' class="text-center">
-      <nuxt-link id="title" v-text="Settings?.title ?? 'Gancio'" to="/" />
+      <nuxt-link id="title" v-text="settings?.title ?? 'Gancio'" to="/" />
       <div
         class="text-body-1 font-weight-light pb-3"
-        v-html="Settings?.description ?? 'a shared agenda for local communities'"
+        v-html="settings?.description ?? 'a shared agenda for local communities'"
       />
     </component>
 
@@ -18,18 +19,6 @@
     <NavBar v-if="!['event-slug','e-slug'].includes($route?.name)"/> 
   </nav>
 </template>
-  <!-- <script>
-  import { mapState } from 'vuex'
-  import NavHeader from './NavHeader.vue'
-  import NavBar from './NavBar.vue'
-  import NavSearch from './NavSearch.vue'
-  
-  export default {
-    name: 'Appbar',
-    components: { NavHeader, NavBar, NavSearch },
-    computed: mapState(['settings']),
-  }
-  </script> -->
 <style>
   nav {
     background-image: linear-gradient(rgba(50, 50, 50, 0.8), rgba(250, 250, 250, 0.7)),

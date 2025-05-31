@@ -1,8 +1,11 @@
 <script setup>
-import get from 'lodash/get'
+import { Statuses } from "~/types/settings"
+const { $notify, $confirm } = useNuxtApp()
+const { t } = useI18n()
 
-const props = defineProps({ users: { type: Array, default: () => [] } })
+// const props = defineProps({ users: { type: Array, default: () => [] } })
 
+const { data: users, refresh } = await useFetch('/api/users')
 const search = ref('')
 const newUserDialog = ref(false)
 const changeRoleDialog = ref(false)
@@ -11,12 +14,7 @@ const valid = ref(false)
 const loading = ref(false)
 const userForm = ref()
 
-const {  $confirm } = useNuxtApp()
-const { t } = useI18n()
-const newUser = reactive({
-  email: '',
-  is_admin: false
-})
+let newUser = reactive({})
 
 const headers = [
   { value: 'email', text: t('common.email'), width: 150 },
@@ -48,8 +46,8 @@ async function deleteUser (user) {
     $notify('admin.user_remove_ok')
     $emit('update')
   } catch (e) {
-    const err = get(e, 'response.data.errors[0].message', e)
-    $notify(t(err), { color: 'error' })
+    const err = response.data.errors?.[0]?.message ?? e
+    $notify(err, { color: 'error' })
     loading.value = false
   }
 }
@@ -77,14 +75,15 @@ async function deleteUser (user) {
     try {
       loading.value = true
       await $fetch('/api/user', { method: 'POST', body: newUser })
-      newUser = { email: '', is_admin: false }
-      $notify('admin.user_create_ok', { color: 'success' })
-      $emit('update')
+      newUser = { }
+      $notify('admin.user_create_ok', Statuses.SUCCESS)
+      refresh()
       loading.value = false
       newUserDialog.value = false
     } catch (e) {
-      const err = get(e, 'response.data.errors[0].message', e)
-      $notify(this.$t(err), { color: 'error' })
+      console.error('sono qui')
+      console.error(e)
+      $notify(e?.statusMessage ?? e?.message ?? e, Statuses.ERROR)
       loading.value = false
     }
   }
@@ -95,7 +94,7 @@ async function deleteUser (user) {
   <v-container>
     <v-card-title>
       {{$t('common.users')}}
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-text-field
         v-model="search"
         append-icon="mdi-magnify"
@@ -104,12 +103,12 @@ async function deleteUser (user) {
         :label="$t('common.search')"
         single-line
         hide-details
-      ></v-text-field>
+      />
     </v-card-title>
 
-    <v-btn color="primary" text @click="newUserDialog = true" icon='mdi-plus'>
+    <v-btn color="primary" text @click="newUserDialog = true" append-icon='mdi-plus'>
       {{$t('common.new_user')}}
-    </v-btn>
+    </v-btn> 
 
     <!-- ADD NEW USER -->
     <v-dialog v-model="newUserDialog" :fullscreen="$vuetify.display?.mobile">
@@ -119,28 +118,28 @@ async function deleteUser (user) {
           <v-form v-model="valid" ref="userForm" lazy-validation @submit.prevent="createUser">
             <v-col>
               <v-text-field
-                class="col-4"
                 v-model="newUser.email"
+                class="col-4"
                 :label="$t('common.email')"
-                :rules="$validators.email"
-              ></v-text-field>
+                :rules="$valid.email"
+              />
             </v-col>
             <v-col>
               <v-select
-                class="col-4"
                 v-model="newUser.role"
+                class="col-4"
                 :label="$t('common.role')"
                 :items="['admin', 'editor', 'user']"
-              ></v-select>
+              />
             </v-col>
             <v-text-field
               v-model="newUser.description"
               :label="$t('common.description')"
-            ></v-text-field>
+            />
           </v-form>
           <v-alert type="info" :closable="false" icon="mdi-information">{{$t('admin.user_add_help')}}</v-alert>
           <v-card-actions>
-            <v-spacer></v-spacer>
+            <v-spacer/>
             <v-btn @click="newUserDialog=false" color="error" outlined>{{$t('common.cancel')}}</v-btn>
             <v-btn @click="createUser" :disabled="!valid" color="primary" outlined>{{$t('common.send')}}</v-btn>
           </v-card-actions>
@@ -167,13 +166,13 @@ async function deleteUser (user) {
         </template>
         <template v-slot:item.to_notify="{item}">
           <v-switch 
-            :input-value="item.to_notify" 
             v-if="item.role!=='user'" 
+            :input-value="item.to_notify" 
             readonly 
             @click.native.prevent="toggle_to_notify(item)" 
             inset
             hide-details
-          ></v-switch>
+          />
         </template>
         <template v-slot:item.role="{item}">
           <v-menu offset-y>
@@ -204,10 +203,10 @@ async function deleteUser (user) {
         </template>
         <template v-slot:item.actions="{item}">
           <t-btn 
-            @click="deleteUser(item)"
             color="error" 
             :tooltip="$t('admin.delete_user')"
             icon='mdi-delete-forever'
+            @click="deleteUser(item)"
           />
         </template>
       </v-data-table>

@@ -75,7 +75,7 @@ async function remove (event) {
         v-icon(v-text='mdiDeleteForever') --> 
   
 </v-container>
-  <!-- //v-navigation-drawer(v-model='openModeration' :fullscreen='$vuetify.breakpoint.xsOnly' fixed top right width=400 temporary)
+  <!-- //v-navigation-drawer(v-model='openModeration' :fullscreen='$vuetify.display?.mobile' fixed top right width=400 temporary)
   //  EventModeration(:event='selectedEvent' v-if='openModeration' @close='openModeration=false')
 
 

@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import type { Collection } from '#build/types/nitro-imports';
-
-const { Settings } = useSettings()
+const settings = useState('settings')
+const { currentMonth, currentYear, startMonth } = useTime()
+const params = useState('params', () => ({ query: '', show_recurrent: false, start: startMonth(currentYear(),  currentMonth()) }))
 
 const route = useRoute()
 
-const show_recurrent = ref()
-const query = ref()
-
-const show_calendar = computed(() => !Settings.value.show_calendar && ['index'].includes(route.name))
+const show_calendar = computed(() => !settings.value.show_calendar && ['index'].includes(route.name))
 const show_search_bar = computed(() => ['index'].includes(route.name))
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections/home')
 
 const show_collections_bar = true  // TODO
 
-function setFilter (query: string) { 
-    console.error('set filter', query)
-}
+// function updateShowRecurrent (v) {
+//     console.error('update show recurrent')
+//     console.error(v)
+//     params.value.show_recurrent = !!v
+// }
+
 </script>
 
 <template>
@@ -25,19 +26,19 @@ function setFilter (query: string) {
         <div class="mx-2">
             <v-menu v-if='show_search_bar' offset="y" :close-on-content-click="false" tile>
                 <template v-slot:activator="{ props }">
-                    <v-text-field hide-details variant="outlined" v-model="query" :placeholder="$t('common.search')" @click:clear="setFilter(['query', null])"
-                        @keypress:enter="setFilter(['query', query])" clearable>
+                    <v-text-field hide-details variant="outlined" v-model="params.query" :placeholder="$t('common.search')" clearable>
                         <template v-slot:append>
-                            <v-icon class="mr-2" v-if="query" icon="mdi-magnify" @click="setFilter(['query', query])"/>
-                            <v-icon v-if='Settings.allow_recurrent_event || Settings.allow_multidate_event' icon='mdi-cog' v-bind='props' />
+                            <v-icon class="mr-2" v-if="params.query" icon="mdi-magnify" />
+                            <v-icon v-if='settings.allow_recurrent_event || settings.allow_multidate_event' icon='mdi-cog' v-bind='props' />
                         </template>
                     </v-text-field>
                 </template>
                 <v-card>
-                <v-card-text>
+                  <v-card-text>
                     <v-row dense>
-                        <v-col v-if="Settings.allow_recurrent_event">
-                            <v-switch class="mt-0" v-model="show_recurrent" @change="v => setFilter(['show_recurrent', v])"
+                        <v-col v-if="1 || Settings.allow_recurrent_event">
+                            <input type='checkbox' v-model='params.show_recurrent' />
+                            <v-switch class="mt-0" v-model="params.show_recurrent"
                                 hide-details :label="$t('event.show_recurrent')" inset />
                             </v-col>
                         </v-row>
@@ -55,6 +56,7 @@ function setFilter (query: string) {
             </span>
             
             <!-- Calendar -->
+            <CoreCalendar />
             
         </div>
     </div> 

@@ -1,17 +1,14 @@
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import { Umzug, SequelizeStorage } from 'umzug'
-import {
-    Sequelize,
-    type HasManyCreateAssociationMixin,
-    type InferAttributes,
-    type InferCreationAttributes,
-    type Options,
-} from "@sequelize/core"
+import { useLogger } from './useLogger'
 
 import {
+    Sequelize,
     DataTypes,
     Model,
+    type InferAttributes,
+    type InferCreationAttributes,
     type CreationOptional,
     type NonAttribute,
 } from "@sequelize/core"
@@ -25,39 +22,52 @@ import {
     UpdatedAt,
     PrimaryKey,
     AutoIncrement,
-    BeforeCreate,
-    BeforeUpsert,
+    // BeforeCreate,
+    // BeforeUpsert,
     Index,
     Unique,
     BeforeSave,
-    AllowNull,
+    // AllowNull,
     BelongsToMany,
-    BelongsTo,
+    // BelongsTo,
     Default,
 } from "@sequelize/core/decorators-legacy"
 
-// import type { SqliteDialect } from "@sequelize/sqlite3";
+import { SqliteDialect } from "@sequelize/sqlite3"
+
+const log = useLogger('sequelize')
 //   import bcrypt from "bcrypt";
-const environment = process.env.NODE_ENV || "development";
+// const environment = process.env.NODE_ENV || "development";
 
 //   const options = config[environment as keyof typeof config];
 //   export const sequelize = new Sequelize({
 //     ...options,
 //   } as Options<SqliteDialect>);
+let config
+if (typeof useRuntimeConfig === 'function') {
+  config = useRuntimeConfig()
+} else {
+  config = await import('../config.js')
+}
+
+export let sequelize
 export async function connect() {
-    const config = useRuntimeConfig()
-    console.error('connect!')
-    const sequelize = new Sequelize({
-        dialect: config.db_dialect,
-        storage: config.db_storage
-    })
-    await sequelize.authenticate()
-    await runMigrations(sequelize).catch(e => { console.error(e)})
-    await sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Resource, Page])
-    return sequelize
+  log.info('connect')
+  if (sequelize) { return sequelize }
+  log.info('connect')
+  sequelize = new Sequelize({
+      dialect: SqliteDialect || config?.db_dialect,
+      storage: config?.db_storage ?? './gancio.sqlite'
+  })
+  await sequelize.authenticate()
+  await runMigrations(sequelize).catch(e => { console.error(e)})
+  sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Resource, Page])
+  log.warn('add models ok!')
+  return sequelize
 }
 
 export async function runMigrations(sequelize: Sequelize) {
+  log.warn('running migrations!')
     const umzug = new Umzug({
         storage: new SequelizeStorage({ sequelize }),
         migrations: { glob: './server/migrations/*.js'},
@@ -198,8 +208,7 @@ InferCreationAttributes<Place>
 type Role = "admin" | "editor" | "user"
 
 @Table({
-    tableName: "users",
-    indexes: [{ fields: ["email"], unique: true }],
+    tableName: "users"
 })
 export class User extends Model<
 InferAttributes<User>,
@@ -215,17 +224,18 @@ InferCreationAttributes<User>
     
     @Attribute(DataTypes.STRING)
     @NotNull
+    @Index
+    @Unique
     declare email: string;
     
     @Attribute(DataTypes.STRING)
-    @NotNull
     declare password: string
     
     @Attribute(DataTypes.STRING)
     declare recover_code: string
     
     @Attribute(DataTypes.BOOLEAN)
-    declare is_active: Boolean
+    declare is_active: boolean
     
     @Attribute(DataTypes.STRING)
     declare description: string

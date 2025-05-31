@@ -281,7 +281,7 @@
         "disable_admin_user_confirm": "Voulez-vous vraiment retirer les droits d'administration pour <strong>{user}<strong> ?",
         "smtp_port": "Port SMTP",
         "smtp_secure": "Port SMTP sécurisé (TLS ou STARTTLS)",
-        "wrong_domain_warning": "La propriété baseurl configurée dans le fichier config.json <b>{{baseurl}}</b> diffère de celle que vous consultez <b>{{url}}</b>",
+        "wrong_domain_warning": "La propriété baseurl configurée dans le fichier config.json <b>{baseurl}</b> diffère de celle que vous consultez <b>{url}</b>",
         "smtp_use_sendmail": "Utiliser sendmail",
         "edit_collection": "Modifier la collection",
         "sender_email": "E-mail de l'envoyeur",

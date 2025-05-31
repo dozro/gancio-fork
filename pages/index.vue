@@ -3,22 +3,72 @@ HOMEPAGE
 The homepage shows future events by default.
 -->
 <script setup lang="ts">
+import { DateTime } from 'luxon'
 import type { Announcement, Event } from '#build/types/nitro-imports'
 
+// const settings = useState('settings')
+// console.error(settings)
+// definePageMeta({
+//   head: {
+//     title: settings.value?.title
+//   }
+// })
+
+const { nowUnix } = useTime()
+const now = nowUnix()
+
+const params = useState('params')
+const selectedDate = useState<Date|null>('selectedDate', () => null)
+// const attributes = useState('attributes')
+const isCurrentMonth = computed(() => {
+  return false
+})
+
+
+const { data: events } = useFetch('/api/events', {
+  key: 'events' + JSON.stringify(params),
+  params,
+  // onResponse: (res) => {
+    // console.error('on response', res.response)
+    // console.error(res.response._data)
+    // attributes.value = useAttributesFromEvents(res.response._data)
+    // return res
+  // }
+})
+
+
+const visibleEvents = computed(() => {
+  if (selectedDate.value) {
+    const min = DateTime.fromJSDate(selectedDate?.value)?.startOf('day')?.toUnixInteger()
+    const max = DateTime.fromJSDate(selectedDate?.value)?.endOf('day')?.toUnixInteger()
+    return events.value?.filter(e => (e.start_datetime <= max && (e.end_datetime || (e.start_datetime + 1)) > min))
+  } else if (isCurrentMonth.value && !query) {
+    return events.value?.filter(e => {
+      const max_datetime = Math.max(e.start_datetime, e.end_datetime)
+      return (e.end_datetime ? max_datetime >= now : e.start_datetime + 3 * 60 * 60 >= now)
+    })
+  } else {
+    return events.value //?.filter(e => showRecurrent || !e.parentId)
+  }
+})
+
+
 const { data: announcements } = await useFetch<Announcement[]>('/api/announcements')
-const { data: events } = await useFetch<Event[]>('/api/events')
+
+// const { data } = await useFetch<Event[]>('/api/events')
+// events.value = data.value || []
 </script>
 <template>
-  <v-container class='px-2 px-sm-6 pt-0' id='home'>
+  <v-container id='home' class='px-2 px-sm-6 pt-0'>
 
     <!-- Announcements -->
-    <section id='announcements' class='mt-2 mt-sm-4' v-if='announcements?.length'>
+    <section v-if='announcements?.length' id='announcements' class='mt-2 mt-sm-4'>
       <Announcement v-for='announcement in announcements' :key='announcement.id' :announcement='announcement' />
     </section>
     
     <!-- Events -->
     <section id='events' class='mt-sm-4 mt-2'>
-      <EventCard v-for='(event, idx) in events' :key='event.id' :event='event' :lazy='idx>9' />
+      <EventCard v-for='(event, idx) in visibleEvents' :key='event.id' :event='event' :lazy='idx>9' />
       <!-- <v-lazy class='event v-card' 
         v-for='(event, idx) in events' :key='event.id'
         :options="{ threshold: .5, rootMargin: '500px' }">

@@ -1,4 +1,17 @@
-export default defineI18nLocale(locale => $fetch(`api/locale/${locale}`))
+import { ca, cs, da, de, en, es, fi, fr, hr, it, nl, pl, pt, tr, sl, sk, sv, srLatn, srCyrl, ro, ru, zhHans } from 'vuetify/locale'
+
+const vuetifyLocales: Record<string, any> = {
+  ca, cs, da, de, en, es, fi, fr, hr, it, nl,
+  pl, pt, tr, sl, sk, sv, srLatn, srCyrl, ro, ru, zhHans
+}
+export default defineI18nLocale(async locale => {
+  console.error('sono dentro loader di ', locale)
+  const messages = await $fetch(`/api/locale/${locale}`).catch(() => {})
+  console.error('trovo i messages: ', messages)
+  const vuetifyLocale = vuetifyLocales[locale]
+  return { ...messages, $vuetify: vuetifyLocale }
+
+})
 
 // export default async (context: any, locale: string) => {
 //   try {

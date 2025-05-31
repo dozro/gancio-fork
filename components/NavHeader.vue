@@ -1,15 +1,16 @@
 <script setup lang="ts">
-// const $auth = { loggedIn: true, user: { is_admin: true, role: 'admin', is_editor: true } }
-const { loggedIn, session, user, clear, fetch } = useUserSession()
-
 import { useTheme } from 'vuetify'
+import { Statuses } from '~/types/settings'
 
+const { loggedIn, user, clear } = useUserSession()
+const { $notify } = useNuxtApp()
 const theme = useTheme()
 
 const { locale, locales, setLocale } = useI18n()
 
 function logout () {
   clear()
+  $notify('common.logout_ok', Statuses.SUCCESS)
 }
 
 function toggleDark () {
@@ -32,12 +33,12 @@ function toggleDark () {
       <!-- language selection menu -->
       <client-only>
         <v-menu offset-y transition="slide-y-transition">
-          <template v-slot:activator="{ props }">
-            <v-btn variant="text" icon large v-bind='props' aria-label='Language' v-text="locale" />
+          <template #activator="{ props }">
+            <v-btn variant="text" icon large v-bind='props' aria-label='Language'>{{locale}}</v-btn>
           </template>
           <v-list dense max-height="300" width="200">
-            <v-list-item v-for='locale in locales' @click.prevent.stop="setLocale(locale.code)" :key='locale.code'>
-              <v-list-item-title v-text='locale.language' />
+            <v-list-item v-for='l in locales' :key='l.code' @click.prevent.stop="setLocale(l.code)">
+              <v-list-item-title>{{l.language}}</v-list-item-title>
             </v-list-item>
             <v-list-item nuxt target='_blank' href='https://hosted.weblate.org/engage/gancio/'>
               <v-list-item-subtitle v-text='$t("common.help_translate")' />
@@ -65,8 +66,7 @@ function toggleDark () {
               <template v-slot:prepend><v-icon icon='mdi-calendar-account'></v-icon></template>
               <v-list-item-title v-text="$t('common.my_events')"/>
             </v-list-item>
-            
-            <v-list-item v-if='user.is_admin || user.is_editor' nuxt to='/admin'>
+            <v-list-item v-if='user?.role === "admin" || user?.role === "editor"' nuxt to='/admin'>
               <template v-slot:prepend><v-icon icon='mdi-account' /></template>
               <v-list-item-title v-text="$t(`common.${user.role}`)" />
             </v-list-item>

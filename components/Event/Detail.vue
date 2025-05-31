@@ -1,16 +1,17 @@
 <script setup lang="ts">
 defineProps({ event: { type: Object, default: () => ({})} })
+const { time } = useTime()
 </script>
 <template>
     <v-card outlined>
         <v-container class="eventDetails">
             <!-- v-icon.float-right(v-if='event.parentId' color='success' v-text='mdiRepeat') -->
             <!-- <time datetime="" class="dt-start"></time> (:datetime='$time.unixFormat(event.start_datetime, "yyyy-MM-dd HH:mm")' itemprop="startDate" :content='$time.unixFormat(event.start_datetime, "yyyy-MM-dd\'T\'HH:mm")') -->
-            <span class="ml-2 text-uppercase">{{ $formatter.time(event.start_datetime) }}</span>
+            <span class="ml-2 text-uppercase">{{ time(event.start_datetime) }}</span>
 
             <div class="p-location h-adr" itemprop="location" itemscope itemtype="https://schema.org/Place">
                 <v-icon icon="mdi-calendar"/>
-                <nuxt-link class="vcard ml-2 p-name text-decoration-none text-uppercase" :to='`/place/${encodeURIComponent(event?.place?.name)}`'>
+                <nuxt-link class="vcard ml-2 p-name text-decoration-none text-uppercase" :to='`/place/${event?.place?.id}`'>
                     <span itemprop='name'>{{event?.place?.name}}</span>
                     <div class="font-weight-light p-street-address" v-if='event?.place?.name !=="online"' itemprop='address'>{{event?.place?.address}}</div>
                     </nuxt-link>
@@ -25,7 +26,7 @@ defineProps({ event: { type: Object, default: () => ({})} })
             <!-- online -->
             <v-list nav density="compact">
                 <v-list-item v-for="(item, index) in event.online_locations" target="_blank" :href="item" :key="index">
-                    <v-list-item-icon><v-icon icon='mdi-monitor-account'/></v-list-item-icon>
+                    <!-- <v-list-item-icon><v-icon icon='mdi-monitor-account'/></v-list-item-icon> -->
                     <!-- <v-list-item-content class="py-0"> -->
                     <v-list-item-title class="text-caption" v-text="item" />
                     <!-- </v-list-item-content> -->

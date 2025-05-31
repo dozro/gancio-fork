@@ -1,4 +1,4 @@
-s<script setup lang="ts">
+<script setup lang="ts">
 
 const { Settings } = useSettings()
 

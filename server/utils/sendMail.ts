@@ -1,12 +1,11 @@
 
-import Email from 'email-templates'
-import path from 'path'
-import { DateTime } from 'luxon'
+// import Email from 'email-templates'
+// import path from 'path'
+// import { DateTime } from 'luxon'
 // const locales = require('../../locales')
 
-const log = useLogger('mail')
-
-export function mail(addresses: string | string[], template: string, locals: any, locale: string = publicSettings.instance_locale, bcc: boolean) {
+export function sendMail(addresses: string | string[], template: string, locals: any, locale: string, bcc: boolean) {
+  const log = useLogger('mail')
   locale = locale ?? publicSettings.instance_locale
   if (process.env.NODE_ENV === 'production' && (!publicSettings.admin_email || !publicSettings.smtp)) {
     log.error(`Cannot send any email: SMTP Email configuration not completed!`)
@@ -20,7 +19,7 @@ export function mail(addresses: string | string[], template: string, locals: any
     //   args: [addresses, template, locals, locale, bcc]
     // })
     // TaskManager.add(task)
-  }
+}
 
 //   _send (addresses, template, locals, locale, bcc=false) {
 //     // this hack is needed because there are more standards to indicate language code

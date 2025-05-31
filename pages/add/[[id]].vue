@@ -3,6 +3,8 @@
  -->
 <script setup lang="ts">
 
+const { loggedIn } = useUserSession()
+
 const event = ref({ title: '', tags: [], place: {} })
 const date = ref()
 const valid = ref(false)
@@ -35,7 +37,7 @@ function done() {
           <v-container>
             <v-row>
               <!-- Not logged event -->
-              <v-col v-if='!$auth?.loggedIn' cols=12>
+              <v-col v-if='!loggedIn' cols=12>
                 <p v-html="$t('event.anon_description')" />
               </v-col>
 
@@ -51,6 +53,7 @@ function done() {
 
               <!-- Where -->
               <v-col cols=12>
+                <span>MODEL: {{event.place}} -</span>
                 <WhereInput ref='where' v-model='event.place' :event='event' />
               </v-col>
 
@@ -78,7 +81,7 @@ function done() {
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn @click='done' :loading='loading' :disabled='!valid || loading' outlined color='primary'>{{ edit ?
+        <v-btn :loading='loading' :disabled='!valid || loading' outlined color='primary' @click='done'>{{ edit ?
           $t('common.save') : $t('common.send') }}</v-btn>
       </v-card-actions>
     </v-card>

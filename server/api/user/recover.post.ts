@@ -7,9 +7,18 @@ export default defineEventHandler(async (event) => {
     log.error('User not found')
     return
   }
-
+  
   await user.generateRecoverCode()
   // mail(user.email, 'recover', { user, config })
-  sendMail(user.email, 'recover', { user, config: publicSettings })
+  // sendMail(user.email, 'recover', { user, config: publicSettings })
+  // const { $queue } = useNuxtApp()
+  console.error('dentro recover!')
+  
+  await usePushQueue("email", {
+    template: 'recover',
+    to: "user@example.com",
+    subject: "Hello",
+    body: "Welcome to our app!",
+  })
 
 })

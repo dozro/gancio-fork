@@ -15,7 +15,12 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
-  modules: ["vuetify-nuxt-module", '@nuxtjs/i18n', 'nuxt-auth-utils'],
+  modules: [
+    "vuetify-nuxt-module",
+    '@nuxtjs/i18n',
+    'nuxt-auth-utils',
+    '@nuxt/eslint',
+  ],
   vuetify: {
     vuetifyOptions: './vuetify.options.js'
   },
@@ -28,27 +33,43 @@ export default defineNuxtConfig({
     }
   },
   i18n: {
-    bundle: {
-      optimizeTranslationDirective: false
-    },
     locales: Object.keys(locales).map((key: string) => ({
       code: key,
       // name: locales[key],
       file: `./${key}.json`,// 'loader.ts',
+      // file: 'loader.ts',
       language: key
     })),
     langDir: 'locales',
     lazy: true,
     strategy: 'no_prefix',
     skipSettingLocaleOnNavigate: true,
-
+    defaultLocale: 'en',
+    // vueI18n: './i18n.config.ts',
     compilation: {
-      strictMessage: false // allow HTML in locales
+      // allow HTML in locales
+      strictMessage: false
     }
   },
+  vite: {
+    clearScreen: false,
+    define: {
+      'process.env.DEBUG': false,
+    },
+    build: {
+      target: 'esnext',
+    },
+  },
   nitro: {
+    storage: {
+      uploads: {
+        driver: "fs",
+        base: "./uploads",
+      },
+    },
     esbuild: {
       options: {
+        target: 'esnext',
         tsconfigRaw: {
           // See https://github.com/nuxt/nuxt/issues/14126
           //     https://github.com/unjs/nitro/issues/273

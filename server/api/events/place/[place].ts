@@ -1,10 +1,16 @@
 import { getPlaceEvents } from "~/server/utils/place"
-
+/**
+* 
+*/
+import { z } from 'zod'
+const schema = z.object({
+  placeId: z.coerce.number()
+})
 export default defineEventHandler(async event => {
-    const place = event.context.params?.place
-    if (place) {
-        getPlaceEvents(place)
-    } else {
-        throw createError({ status: 404, message: 'Not found' })
-    }
+  const { placeId } = await getValidatedRouterParams(event, schema.parse)
+  if (placeId) {
+      getPlaceEvents(placeId)
+  } else {
+      throw createError({ status: 404, message: 'Not found' })
+  }
 })

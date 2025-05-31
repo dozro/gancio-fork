@@ -1,6 +1,5 @@
 s<script setup lang="ts">
 import type { Tag } from '#build/types/nitro-imports';
-import useSettings from '~/composables/useSettings'
 
 const { Settings } = useSettings()
 

@@ -1,3 +1,0 @@
-- [ ] queue manager
-- [ ] authentication
-- [ ] ics need auth

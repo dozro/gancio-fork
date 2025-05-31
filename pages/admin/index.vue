@@ -1,13 +1,11 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ['authenticated'] })
-const { loadSettings } = useSettings()
-loadSettings()
-const { isAdmin } = useAuth()
+// const { loadSettings } = useSettings()
+// loadSettings()
 const selectedTab = ref('')
 
-const { data: users } = await useFetch('/api/users')
+// const { data: users } = await useFetch('/api/users')
 const { data: events } = await useFetch('/event/unconfirmed')
-console.error(events.value)
 const unconfirmedEvents = events?.events
 const unconfirmedOldEvents = events?.oldEvents
 
@@ -17,7 +15,7 @@ const unconfirmedOldEvents = events?.oldEvents
         <v-card>
             
             <!-- admin alert -->
-            <AdminSetupAlert v-if="isAdmin" />
+            <!-- <AdminSetupAlert v-if="isAdmin" /> -->
             <v-tabs v-model="selectedTab" show-arrows bg-color="primary">
                 <!-- <v-tab href="#settings" v-if="isAdmin" value="settings"> {{ $t('common.settings') }}</v-tab> -->
                 <v-tab href="#settings" value="settings"> {{ $t('common.settings') }}</v-tab>
@@ -41,7 +39,7 @@ const unconfirmedOldEvents = events?.oldEvents
                       <AdminSettings />
                   </v-tabs-window-item>
                   <v-tabs-window-item value="users">
-                    <AdminUsers :users='users' />
+                    <AdminUsers />
                   </v-tabs-window-item>
                   <v-tabs-window-item value="events">
                     <AdminEvents :unconfirmedEvents='unconfirmedEvents' :unconfirmedOldEvents='unconfirmedOldEvents'

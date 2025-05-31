@@ -2,7 +2,7 @@ import mitt from "mitt"
 const emitter = mitt()
 
 export default defineNuxtPlugin( () => ({
-  provide: {
+  provide: ({
     on: emitter.on,
     emitt: emitter.emit,
     emit: emitter.emit,
@@ -13,5 +13,5 @@ export default defineNuxtPlugin( () => ({
       }
       emitter.on(type, fn)
     }
-  }
+  })
 }))

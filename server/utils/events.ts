@@ -4,12 +4,12 @@ import { Op, literal, col, where, fn } from '@sequelize/core'
 
 import { z } from 'zod'
 export const eventQuerySchema = z.object({
-  start: z.number().default(DateTime.local().toUnixInteger()),
-  end: z.number().optional(),
+  start: z.coerce.number().default(DateTime.local().toUnixInteger()),
+  end: z.coerce.number().optional(),
   query: z.string().optional(),
   tags: z.string().default('').optional().transform( t => t?.split(',').map(t => t.trim())),
   places: z.string().optional(),
-  show_recurrent: z.boolean().default(false),
+  show_recurrent: z.string().default("false").transform(a => a !== "true"),
   show_multidate: z.boolean().default(false),
   limit: z.number().optional(),
   page: z.number().optional(),
@@ -39,32 +39,32 @@ export async function getEvents(args: EventQueryType) {
 
     }
 
-    if (args.user_id) {
-      condition.userId = args.user_id
-    }
+    // if (args.user_id) {
+    //   condition.userId = args.user_id
+    // }
 
-    if (args.include_parent !== true) {
-      // do not include _parent_ recurrent event
-      condition.recurrent = null
-    }
+    // if (args.include_parent !== true) {
+    //   // do not include _parent_ recurrent event
+    //   condition.recurrent = null
+    // }
 
-    if (args.include_unconfirmed !== true) {
-      // confirmed event only
-      condition.is_visible = true
-    }
+    // if (args.include_unconfirmed !== true) {
+    //   // confirmed event only
+    //   condition.is_visible = true
+    // }
 
-    // // include recurrent events?
-    if (!args.show_recurrent) {
-      condition.parentId = null
-    }
+    // // // include recurrent events?
+    // if (!args.show_recurrent) {
+    //   condition.parentId = null
+    // }
 
-    if (!args.show_multidate) {
-      condition.multidate = { [Op.not]: true }
-    }
+    // if (!args.show_multidate) {
+    //   condition.multidate = { [Op.not]: true }
+    // }
 
-    if (args.end) {
-      condition.start_datetime = { [args.older ? Op.gte : Op.lte]: args.end }
-    }
+    // if (args.end) {
+    //   condition.start_datetime = { [args.older ? Op.gte : Op.lte]: args.end }
+    // }
 
     // // normalize tags
     // // if (args.tags) {
@@ -103,7 +103,6 @@ export async function getEvents(args: EventQueryType) {
       }
     }
 
-    console.error(condition)
     const events = await Event.findAll({
       where: condition,
     //   attributes: {

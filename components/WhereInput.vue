@@ -1,20 +1,23 @@
-<script setup lang="ts">
+<script setup lang='ts'>
 const { Settings } = useSettings()
 interface Place {
   name: string,
   address: string
 }
 
+const whereInputAdvancedDialog = ref(false)
 const search = ref('')
-const value = defineModel<Place>({ default: { name: '', address: '' }})
+const place = defineModel<Place>({ default: { name: '', address: '' }})
+
+const isOnLine = computed(() => Settings.allow_online_event && place.value.name === 'online')
+//       return this.settings.allow_online_event && this.place.name === 'online'
 
 const { data: places = [] } = await useFetch<Place[]>('/api/places', { params: { query: search }})
 </script>
 <template>
 <v-row class="mb-4">
   <v-col cols="12" md="4">
-    <span>{{ search }}</span>
-    <v-combobox ref="place" :rules="[$valid.required('common.where')]" :label="$t('common.where')" :hint="$t('event.where_description')"
+    <v-combobox ref="place" :rules="[$valid.required('common.where')]" :label="$t('common.where')" :hint="$t('event.where_description')" v-model='place.name'
       prepend-icon="mdi-map-marker" hide-no-data v-model:search="search" persistent-hint :items="places" item-title="name" item-value="id">
       <!-- <template v-slot:item="{ item, attrs, on }">
         <v-list-item v-bind="attrs" v-on="on">
@@ -32,22 +35,22 @@ const { data: places = [] } = await useFetch<Place[]>('/api/places', { params: {
       </template> -->
     </v-combobox>
   </v-col>
-  <!-- <v-col cols="12" :md="Settings.allow_online_event?5:8" v-if="!isOnLine">
-    <v-text-field class="mr-4" ref="address" v-model="value.address" :prepend-icon="mdiMap" :disabled="disableAddress" :rules="[ v => disableAddress ? true : $validators.required('common.address')(v)]" :label="$t('common.address')" :hint="$t('event.address_description')" persistent-hint="persistent-hint">
-      <template v-slot:append v-if="showAdvancedDialogButton">
-        <TBtn @click="whereInputAdvancedDialog = true" tooltip="admin.geolocation" small="small">
-          <v-icon v-text="mdiMapSearch"></v-icon>
-        </TBtn>
+  <v-col cols="12" :md="Settings.allow_online_event?5:8" v-if="!isOnLine">
+    <v-text-field class="mr-4" ref="address" v-model="place.address" :prepend-icon="mdiMap" :disabled="disableAddress" 
+      :rules="[ v => disableAddress ? true : $valid.required('common.address')(v)]" :label="$t('common.address')"
+      :hint="$t('event.address_description')" persistent-hint>
+      <template v-if="showAdvancedDialogButton" #append>
+        <t-btn tooltip="admin.geolocation" small="small" icon='mdi-map-search' @click="whereInputAdvancedDialog = true" />
       </template>
     </v-text-field>
-  </v-col> -->
-  <!-- <v-col cols="12" :md="isOnLine?8:3" v-if="Settings.allow_online_event">
+  </v-col>
+  <v-col cols="12" :md="isOnLine?8:3" v-if="Settings.allow_online_event">
     <v-combobox class="mr-4" v-model="onlineLocations" :prepend-icon="mdiLink" :hint="$t('event.online_locations_help')" :label="$t('event.online_locations')" :rules="isOnLine ? [$validators.required('event.online_locations')] : []" clearable="clearable" chips="chips" small-chips="small-chips" multiple="multiple" deletable-chips="deletable-chips" hide-no-data="hide-no-data" hide-selected="hide-selected" persistent-hint="persistent-hint" :delimiters="[',', ';', '; ']" :items="onlineLocations" @change="selectLocations">
       <template v-slot:selection="{ item, index, on, attrs, selected, parent }">
         <v-chip v-bind="attrs" :outlined="index !== 0" close="close" :close-icon="mdiCloseCircle" @click:close="parent.selectItem(item)" :input-value="selected" label="label" small="small">{{ item }}</v-chip>
       </template>
     </v-combobox>
-  </v-col> -->
+  </v-col>
   <!-- <v-dialog v-model="whereInputAdvancedDialog" destroy-on-close="destroy-on-close" max-width="700px" :fullscreen="$vuetify.display.mobile" dense="dense">
     <WhereInputAdvanced ref="whereAdvanced" :place.sync="value" :event="event" @close="whereInputAdvancedDialog = false && this.$refs.address.blur()" :onlineLocations.sync="onlineLocations" @update:onlineLocations="selectLocations"></WhereInputAdvanced>
   </v-dialog> -->

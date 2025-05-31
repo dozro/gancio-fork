@@ -2,7 +2,7 @@
 import { Statuses } from '~/types/settings'
 
 const { loggedIn, user, fetch: refreshSession } = useUserSession()
-const { Settings } = useSettings()
+const settings = useState('settings')
 const { $notify } = useNuxtApp()
 
 const credentials = reactive({
@@ -22,8 +22,9 @@ async function login() {
     // refresh the session on client-side and redirect to the home page
     await refreshSession()
     await navigateTo('/')
+    $notify('login.ok', Statuses.SUCCESS)
   })
-  .catch(() => $notify('Bad credentials', Statuses.ERROR))
+  .catch(() => $notify('login.error', Statuses.ERROR))
 }
 
 async function forgot () {
@@ -32,10 +33,11 @@ async function forgot () {
   }
   loading.value = true
   try {
-    await $fetch('/user/recover', { method: 'POST', body: { email: credentials.email } })
+    await $fetch('/api/user/recover', { method: 'POST', body: { email: credentials.email } })
     $notify('login.check_email')
   } catch (e) {
-    $notify(e, Statuses.ERROR)
+    console.error(e)
+    $notify(String(e), Statuses.ERROR)
   }
   loading.value = false
 }
@@ -44,35 +46,29 @@ async function forgot () {
   <v-container class='pa-0 pa-md-3'>
     <v-row class="mt-md-5 ma-0" justify='center'>
       <v-col class='pa-0 pa-md-3' cols='12' md="6" lg="5" xl="4">
-        <v-form v-model='valid' ref='form' lazy-validation @submit.prevent='login'>
+        <v-form ref='form' v-model='valid' validate-on='lazy' @submit.prevent='login'>
           <v-card>
             <v-card-title>{{$t('common.login')}}</v-card-title>
             <v-card-subtitle v-text="$t('login.description')" />
             <v-card-text>
-                <v-text-field v-model='credentials.email' validate-on-blur :rules='$valid.email'
+              <v-text-field v-model='credentials.email' validate-on-blur 
+                :rules='$valid.email'
                 autofocus :label='$t("common.email")' />
                 
-                <v-text-field v-model='credentials.password' :rules='$valid.password'
+              <v-text-field v-model='credentials.password' 
+                :rules='[$valid.password]'
                 type='password' :label='$t("common.password")' />
             </v-card-text>
             
             <v-card-actions>
-              <v-btn text
-              tabindex="1"
-              @click='forgot' small>{{$t('login.forgot_password')}}</v-btn>
+              <v-btn text tabindex="1" @click='forgot' small>{{$t('login.forgot_password')}}</v-btn>
             </v-card-actions>
             
             <v-card-actions>
               <v-spacer/>
-              
-              <v-btn v-if='Settings?.allow_registration'
-              to='/register'
-              text
-              color='orange'>{{$t('login.not_registered')}}</v-btn>
-              
-              <v-btn color='success'
-              type='submit' outlined
-              :disabled='!valid || loading' :loading='loading'>{{$t('common.login')}}</v-btn>
+              <div>{{valid}}</div>
+              <v-btn v-if='settings?.allow_registration' to='/register' text color='orange'>{{$t('login.not_registered')}}</v-btn>
+              <v-btn color='success' type='submit' outlined :disabled='!valid || loading' :loading='loading'>{{$t('common.login')}}</v-btn>
             </v-card-actions>
           </v-card>
           
