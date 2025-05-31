@@ -39,7 +39,7 @@ const register = async () => {
               <v-text-field ref="email" v-model="user.email" type="email" :rules="$valid.email"
                 :label="$t('common.email')" autocomplete="email" />
 
-              <v-text-field v-model="user.password" type="password" :rules="$valid.password"
+              <v-text-field v-model="user.password" type="password" :rules="[$valid.password]"
                 :label="$t('common.password')" />
 
               <v-textarea v-model="user.description" :rules="[$valid.required($t('common.description'))]"

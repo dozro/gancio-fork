@@ -2,7 +2,6 @@
 
 export default defineEventHandler( async event => {
   const { user } = await getUserSession(event)
-  const log = useLogger('settings')
   if (user?.role === 'admin') {
     return publicSettings
   }
