@@ -3,8 +3,7 @@
 export default defineEventHandler( async event => {
   const { user } = await getUserSession(event)
   const log = useLogger('settings')
-  log.warn('in settings', user)
-  if (user.role === 'admin') {
+  if (user?.role === 'admin') {
     return publicSettings
   }
     // const publicSettings = await Setting.findAll({ where: { is_secret: false }})
