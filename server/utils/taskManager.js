@@ -1,0 +1,215 @@
+/**
+ * Task manager
+ * 
+ */
+
+import { Duration } from 'luxon'
+import { useLogger } from './useLogger'
+const log = useLogger('queue')
+
+// const placeHelpers = require('./helpers/place')
+// const tagHelpers = require('./helpers/tag')
+// const apHelpers = require('./helpers/ap.js')
+// const notifier = require('./notifier')
+
+
+const loopInterval = 1 // process.env.NODE_ENV === 'production' ? 1 : 1
+const minute = 6 * loopInterval
+const hour = minute * 60
+const day = hour * 24
+
+
+// Singleton instance
+let instance
+export function useTaskManager() {
+  if (!instance) {
+    instance = new TaskManager()
+  }
+  return instance
+}
+
+export class Task {
+  constructor ({ name, repeat = false, repeatDelay = 1, callAtStart = false, retries = [2, 5], method, args = [] }) {
+    this.name = name
+    this.method = method
+    this.args = args
+    
+  this.repeat = repeat
+    this.repeatDelay = repeatDelay
+    this.processInNTick = callAtStart ? 0 : repeatDelay
+    // retries on non-repeatable task only
+    this.retries = !repeat && retries
+  }
+
+  handleError (e) {
+    log.error(`TASK ERROR [${this?.name}]: ${e} ${e.stack}`)
+    if (!this.repeat) {
+      this.processInNTick = this.retries?.shift()
+      if (this.processInNTick) {
+        log.info('Retring in', this.processInNTick)
+      } else {
+        log.info('This was the last try processing this task')
+      }
+    }
+  }
+  
+  process () {
+    this.processInNTick--
+    log.info(`process ${this.name} in ${this.processInNTick} `)
+    if (this.processInNTick > 0) {
+      return
+    }
+    log.info(`[TASK] Process ${this.name}`)
+    this.processInNTick = this.repeatDelay
+    try {
+      const ret = this.method.apply(this, this.args)
+      if (ret && typeof ret.catch === 'function') {
+        ret.catch(this.handleError.bind(this))
+        return ret
+      }
+      return ret
+    } catch (e) {
+      console.error(e)
+      this.handleError(e)
+    }
+  }
+}
+
+/**
+ * Manage tasks:
+ * - Send emails
+ * - Send AP notifications
+ * - Create recurrent events
+ * - Sync AP federation profiles
+ * - Remove unused tags/places
+ * - Remove past federated events and related resources
+ * - Remove unused ap actors
+ */
+ 
+export class TaskManager {
+  constructor () {
+    this.tasks = []
+    this.interval = 1
+    this.timeout = null
+  }
+
+  start (interval = loopInterval) {
+    // const eventController = require('./api/controller/event')
+    log.info('Inside start')
+    // test task
+    // this.add(new Task({
+    //   name: 'test',
+    //   method: () => {
+    //     console.error('dentro task')
+    //     throw new Error('error inside task')
+    //   }
+    // }))
+
+    // create and clean recurrent events
+    // this.add(new Task({
+    //   name: 'CREATE_RECURRENT_EVENT',
+    //   method: eventController._createRecurrent,
+    //   repeatDelay: hour / 2, // check each half an hour
+    //   repeat: true
+    // }))
+    
+    // remove unrelated places
+    // this.add(new Task({
+    //   name: 'CLEAN_UNUSED_PLACES',
+    //   method: placeHelpers._cleanUnused,
+    //   repeatDelay: day,
+    //   repeat: true,
+    //   callAtStart: true
+    // }))
+    
+    // this.add(new Task({
+    //   name: 'CLEAN_UNUSED_TAGS',
+    //   method: tagHelpers._cleanUnused,
+    //   repeatDelay: day+minute,
+    //   repeat: true,
+    //   callAtStart: true
+    // }))
+
+    // this.add(new Task({
+    //   name: 'CLEAN_FEDIVERSE_PAST_EVENT',
+    //   method: apHelpers._cleanPastEvents,
+    //   repeatDelay: 6*hour+5*minute,
+    //   repeat: true,
+    //   callAtStart: true
+    // }))
+
+    // this.add(new Task({
+    //   name: 'CLEAN_FEDIVERSE_AP_USERS',
+    //   method: apHelpers._cleanUnusedAPUser,
+    //   repeatDelay: day+10*minute,
+    //   repeat: true,
+    //   callAtStart: true
+    // }))
+
+    log.info(`START TASK MANAGER WITH LOOP INTERVAL OF ${interval} seconds`)
+    this.interval = interval
+    this.timeout = setTimeout(this.tick.bind(this), interval * 1000)
+  }
+
+  stop () {
+    if (this.timeout) {
+      log.info('STOP TASKMANAGER')
+      clearTimeout(this.timeout)
+      this.timeout = false
+    }
+  }
+
+  add ({ name, repeat = false, repeatDelay = 1, callAtStart = false, retries = [2, 5], method, args = [] }) {
+    log.info(`[TASK] Add ${name} (${Duration.fromMillis(repeatDelay * this.interval * 1000).rescale().toHuman({ listStyle: "long" })})`)
+    const task = new Task({ name, repeat, repeatDelay, callAtStart, retries, method, args })
+    this.tasks.push(task)
+  }
+
+  process () {
+    if (!this.tasks.length) {
+      return
+    }
+
+    // process all tasks
+    const tasks = this.tasks.map(t => t.process())
+
+    // only keep tasks that are either repeating or have retries left
+    // completed tasks are removed from the queue
+    this.tasks = this.tasks.filter(t => t.repeat || (t.retries && t.processInNTick))
+
+    return Promise.allSettled(tasks)
+  }
+
+  async tick () {
+    await this.process()
+    this.timeout = setTimeout(this.tick.bind(this), this.interval * 1000)
+  }
+}
+
+
+// daily morning notification
+// TS.add(new Task({
+//   name: 'NOTIFICATION',
+//   method: notifier._daily,
+//   repeatEach: 1
+// }))
+
+// AP users profile sync
+// TaskManager.add(new Task({
+//   name: 'AP_PROFILE_SYNC',
+//   method: federation._sync,
+//   repeatEach: 60 * 24
+// }))
+
+// Search for places position via nominatim
+// TaskManager.add(new Task({
+//   name: 'NOMINATIM_QUERY',
+//   method: places._nominatimQuery,
+//   repeatEach: 60
+// }))
+//
+
+// TS.start()
+// TS.add(new Task({ name: 'removable #1', method: daje, args: ['removable #1'], removable: true }))
+// TS.add(new Task({ name: 'non removable #2', method: daje, args: ['non removable #2'] }))
+// TS.add(new Task({ name: 'non removable and repeat each #2', method: daje, args: ['nn rm and rpt #5'], repeatEach: 5 }))
