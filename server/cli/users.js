@@ -83,9 +83,9 @@ async function list () {
   await sequelize.connect()
   // await _initializeDB()
   // const { User } = require('../api/models/models')
-  // const users = await User.findAll()
+  const users = await User.findAll()
   console.log('dentro list')
-  // users.forEach(u => console.log(`${u.id}\trole: ${u.role}\tenabled: ${u.is_active}\temail: ${u.email}`))
+  users.forEach(u => console.log(`${u.id}\trole: ${u.role}\tenabled: ${u.is_active}\temail: ${u.email}`))
   // console.log()
   // await db.close()
 }

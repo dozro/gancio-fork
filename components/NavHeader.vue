@@ -20,7 +20,7 @@ function toggleDark () {
 <template>
   <div class='d-flex pa-4'>
     <v-btn icon nuxt to='/' variant="text">
-      <img src='/static/logo.png' height='40' />
+      <img src='/static/logo.png' height='40'>
     </v-btn>
     
     <v-spacer/>
@@ -31,25 +31,20 @@ function toggleDark () {
       <v-btn variant="text" icon="mdi-contrast-circle" @click='toggleDark' />
 
       <!-- language selection menu -->
-      <client-only>
-        <v-menu offset-y transition="slide-y-transition">
-          <template #activator="{ props }">
-            <v-btn variant="text" icon large v-bind='props' aria-label='Language'>{{locale}}</v-btn>
-          </template>
-          <v-list dense max-height="300" width="200">
-            <v-list-item v-for='l in locales' :key='l.code' @click.prevent.stop="setLocale(l.code)">
-              <v-list-item-title>{{l.language}}</v-list-item-title>
-            </v-list-item>
-            <v-list-item nuxt target='_blank' href='https://hosted.weblate.org/engage/gancio/'>
-              <v-list-item-subtitle v-text='$t("common.help_translate")' />
-            </v-list-item>
-          </v-list>
-        </v-menu>
-        <template #fallback>
-          <v-btn variant="text" large  icon arial-label='Language'>{{locale}}</v-btn>
+      <v-menu offset-y transition="slide-y-transition">
+        <template #activator="{ props }">
+          <v-btn variant="text" icon large v-bind='props' aria-label='Language'>{{locale}}</v-btn>
         </template>
-      </client-only> 
-      
+        <v-list dense max-height="300" width="200">
+          <v-list-item v-for='l in locales' :key='l.code' @click.prevent.stop="setLocale(l.code)">
+            <v-list-item-title>{{l.language}}</v-list-item-title>
+          </v-list-item>
+          <v-list-item nuxt target='_blank' href='https://hosted.weblate.org/engage/gancio/'>
+            <v-list-item-subtitle v-text='$t("common.help_translate")' />
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    
       <!-- auth menu -->
       <client-only>
         <v-menu v-if='loggedIn' offset-y transition="slide-y-transition">

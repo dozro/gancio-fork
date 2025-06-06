@@ -6,6 +6,13 @@ export default defineNitroPlugin(async () => {
     await connect()
     log.info('Loading settings')
     await loadSettings()
+
+    log.info('Loading task manager')
+    useTaskManager().start()
+    
+    log.info('Loading plugins')
+    
+
   } catch (e) {
     log.error(`Error connecting to database`)
     log.error(e)

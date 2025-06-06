@@ -4,8 +4,8 @@
     @todo sendmail
   */
 export default defineEventHandler(async event => {
-  const log = useLogger('user')
   await requireAdminSession(event)
+  const log = useLogger('user')
     
   const newUser = await readBody(event)
   log.info(newUser)
@@ -22,7 +22,7 @@ export default defineEventHandler(async event => {
     } else {
       newUser.recover_code = crypto.randomUUID() //.toString('hex')
       // const user = await User.withScope('withRecover').create(newUser)
-      const user = await User.create(newUser)
+      const user = await User.withScope('withPassword').create(newUser)
       // sendMail(user.email, 'user_confirm', { user, config }, res.locals.locale)
       return user
     }

@@ -1,7 +1,6 @@
 import { version } from './package.json'
-import locales from './i18n/locales/index'
-
 import config from './config.json'
+import locales from './i18n/locales/index'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -18,41 +17,40 @@ export default defineNuxtConfig({
     },
   },
   modules: [
-    "vuetify-nuxt-module",
     '@nuxtjs/i18n',
+    "vuetify-nuxt-module",
     'nuxt-auth-utils',
     '@nuxt/eslint',
   ],
   vuetify: {
     vuetifyOptions: './vuetify.options.js'
   },
+  i18n: {
+    lazy: true,            // enable lazy loading
+    // langDir: 'locales/',   // must be set, but won’t be used for actual loading
+    // types: 'composition',
+    // pages: undefined,
+    locales: Object.keys(locales).map(key => ({
+      code: key,
+      name: locales[key],
+      language: locales[key]
+    })),
+    skipSettingLocaleOnNavigate: true,// 
+    bundle: {
+      optimizeTranslationDirective: false
+    },
+    strategy: 'no_prefix',
+    defaultLocale: 'en',
+    vueI18n: 'i18n.config.js'
+  },  
   runtimeConfig: {
-    base_url: config?.baseurl ?? process.env.BASE_URL,
+    baseurl: config?.baseurl ?? process.env.BASE_URL,
     db_dialect: config?.db?.dialect ?? process.env.DB_DIALECT,
     db_storage: config?.db?.storage ?? process.env.DB_STORAGE,
     user_locale_path: config?.user_locale ?? process.env.USER_LOCALE_PATH,
     // TODO
     public: {
       version
-    }
-  },
-  i18n: {
-    locales: Object.keys(locales).map((key: string) => ({
-      code: key,
-      // name: locales[key],
-      file: `./${key}.json`,// 'loader.ts',
-      // file: 'loader.ts',
-      language: key
-    })),
-    langDir: 'locales',
-    lazy: true,
-    strategy: 'no_prefix',
-    skipSettingLocaleOnNavigate: true,
-    defaultLocale: 'en',
-    // vueI18n: './i18n.config.ts',
-    compilation: {
-      // allow HTML in locales
-      strictMessage: false
     }
   },
   vite: {

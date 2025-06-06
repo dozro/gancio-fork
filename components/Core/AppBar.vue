@@ -21,13 +21,12 @@ const settings = useState('settings')
 </template>
 <style>
   nav {
-    background-image: linear-gradient(rgba(50, 50, 50, 0.8), rgba(250, 250, 250, 0.7)),
-      url(/headerimage.png);
+    background-image: linear-gradient(rgba(0,0,0,.8),hsla(0,0%,8%,.7)),url(/headerimage.png);
     background-position: center center;
     background-size: cover;
   }
 
-  .theme--light nav {
+  .v-theme--light nav {
     background-image: linear-gradient(
         to bottom,
         rgba(230, 230, 230, 0.95),

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FooterLink } from '~/types/settings.js'
 
-const settings = useState('settings')
+const settings = useState<Settings>('settings')
 
 const config = useRuntimeConfig()
 const { t } = useI18n()
@@ -21,7 +21,7 @@ const { data: footerLinks } = await useFetch<FooterLink[]>('/api/settings/footer
 
 </script>
 <template>
-  <v-footer class='bg-black' id='footer' aria-label='Footer'>
+  <v-footer color='surface' border id='footer' aria-label='Footer' class="flex-grow-0 py-3" >
     
     <!-- follow me dialog -->
     <v-dialog v-model='showFollowMe' destroy-on-close max-width='700px' :fullscreen='$vuetify.display?.mobile'>
@@ -29,16 +29,18 @@ const { data: footerLinks } = await useFetch<FooterLink[]>('/api/settings/footer
     </v-dialog>
     
     <!-- footer links -->
-    <v-btn v-for="link in footerLinks" :key="link?.label" color="primary" flat class="ml-1"
+    <v-btn
+      v-for="link in footerLinks" :key="link?.label" color="primary" class="ml-1"
       :href="link?.href" :to="link?.to" :target="link?.href && '_blank'">{{ $t(link?.label) }}</v-btn>
     
     <!-- trusted sources -->
-    <v-menu v-if="settings.enable_federation && trusted_sources?.length"
-      offset="left bottom" open-on-hover transition="slide-y-transition">
-      <template v-slot:activator="{ props }">
-        <v-btn class="ml-1" v-bind="props" color="primary" flat>{{ settings.trusted_sources_label || $t('admin.trusted_sources_label_default') }}</v-btn>
+    <v-menu
+      v-if="settings.enable_federation && trusted_sources?.length"
+      offset-y transition="slide-y-transition">
+      <template #activator="{ props }">
+        <v-btn class="ml-1" v-bind="props" color="primary">{{ settings.trusted_sources_label || $t('admin.trusted_sources_label_default') }}</v-btn>
       </template>
-      <v-list lines="two" max-width="550">
+      <v-list lines="two" max-height="300" max-width="550">
         <v-list-item lines="two" v-for='instance in trusted_sources' :key="instance.ap_id" target="_blank" :href="instance?.object.url ?? instance?.ap_id">
           <v-avatar>
             <v-img :src="instance.object?.icon.url" />
@@ -49,8 +51,8 @@ const { data: footerLinks } = await useFetch<FooterLink[]>('/api/settings/footer
       </v-list>
     </v-menu>
   
-    <v-btn class="ml-1" v-if="settings.enable_federation" color="primary" flat rel="me" @click.prevent="showFollowMe=true">{{ $t('event.interact_with_me') }}</v-btn>
+    <v-btn class="ml-1" v-if="settings.enable_federation" color="primary" rel="me" @click.prevent="showFollowMe=true">{{ $t('event.interact_with_me') }}</v-btn>
     <v-spacer />
-    <v-btn color="primary" flat href="https://gancio.org" target="_blank" rel="noopener"> Gancio <small>{{ config.public.version }}</small></v-btn>
+    <v-btn color="primary" href="https://gancio.org" target="_blank" rel="noopener"> Gancio <small>{{ config.public.version }}</small></v-btn>
   </v-footer>
 </template>

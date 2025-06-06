@@ -11,7 +11,12 @@ export default () => {
 
 return {
     // lang: { locales: { ca, cs, de, en, es, eu, fr, gl, it, nb, nl, pl, pt, sk, sv, tr, ro, ru, zhHans } },
-    lang: { locales: { ca, cs, de, en, es, fr, it, nl, pl, pt, sk, sv, tr, ro, ru, zhHans } },
+    // lang: { locales: { ca, cs, de, en, es, fr, it, nl, pl, pt, sk, sv, tr, ro, ru, zhHans } },
+    // locales: { ca, cs, it, en },
+    locale: {
+      fallback: 'en',
+      messages: { en, it }
+    },
     theme: {
       options: {
         customProperties: false,
@@ -26,16 +31,23 @@ return {
         },
       },
       // dark: is_dark,
-    //   themes: {
+      themes: {
     //     dark: settings.dark_colors,
-    //     light: settings.light_colors
-    //   }
+        light: {
+          colors: {
+            surface: '#f8f8f8'
+          }
+        }
+      }
     },
     defaults: {
       global: {
         // variant: 'underlined',
-        elevation: 0,
+        // elevation: 0,
         // rounded: 0,
+      },
+      VContainer: {
+        maxWidth: 1400
       },
       VDialog: {
         maxWidth: '800',
@@ -52,7 +64,7 @@ return {
         elevation: 0,
         ripple: 0
       },
-      VTextArea: {
+      VTextarea: {
         autocomplete: 'off',
         clearable: true,
         variant: 'underlined'        
@@ -98,15 +110,14 @@ return {
       VDataTableItem: {
         density: 'compact'
       },
-      VMenu: {
-        background: 'red',
-        color: 'red',
-        border: 'start'
-      },
       VCard: {
-        border: 1,
-        variant: 'flat'
+        variant: 'tonal'
+      },
+      VFooter: {
+        VBtn: {
+          variant: 'text'
+        }
       }
-    },    
+    },  
   }
 }

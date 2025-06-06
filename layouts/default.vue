@@ -1,20 +1,18 @@
-<script setup>
-
+<!-- <script setup> -->
 // const { serviceConfig } = useAuth()
 // const { loadSettings } = useSettings()
-const openSidebar = ref()
-const config = useRuntimeConfig()
+// const openSidebar = ref()
+// const config = useRuntimeConfig()
 // await loadSettings()
-
-</script>
+<!-- </script> -->
 <template>
-    <v-app>
-        <CoreAppBar />
-        <v-main>
-          <CoreDialog />
-          <NuxtPage />
-        </v-main>
-        <CoreNotification />
-        <CoreFooter />
-    </v-app>
+  <v-app>
+    <CoreAppBar />
+    <v-main>
+      <CoreDialog />
+      <NuxtPage />
+    </v-main>
+    <CoreNotification />
+    <CoreFooter />
+  </v-app>
 </template>

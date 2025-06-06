@@ -56,7 +56,7 @@ const show_collections_bar = true  // TODO
             </span>
             
             <!-- Calendar -->
-            <CoreCalendar />
+            <CoreCalendar v-if='show_calendar' />
             
         </div>
     </div> 

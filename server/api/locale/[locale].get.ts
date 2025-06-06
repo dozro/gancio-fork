@@ -1,4 +1,4 @@
-import locales from '~/i18n/locales/index'
+// import locales from '~/i18n/locales/index'
 import fs from 'fs'
 export default defineEventHandler(async event => {
   const log = useLogger('locale')
@@ -14,6 +14,8 @@ export default defineEventHandler(async event => {
   //   return res.sendStatus(404)
   // }
   // const defaultLocaleMessages = await import(`../../locales/${locale}.json`, { with: { type: "json" }}) ;
+  setHeader(event, 'Content-Type', 'application/json')
+  
   const fileContent = fs.readFileSync(`./i18n/locales/${locale}.json`, 'utf-8');
   return fileContent
   // return defaultLocaleMessages

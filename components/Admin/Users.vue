@@ -17,13 +17,13 @@ const userForm = ref()
 let newUser = reactive({})
 
 const headers = [
-  { value: 'email', text: t('common.email'), width: 150 },
-  { value: 'description', text: t('common.description') },
-  { value: 'is_active', text: t('common.enabled'), width: 50 },
-  { value: 'to_notify', text: t('admin.receive_confirm_notification'), width: 50 },
-  { value: 'role', text: t('common.role'), width: 150 },
+  { key: 'email', title: t('common.email'), width: 150 },
+  { key: 'description', title: t('common.description') },
+  { key: 'is_active', title: t('common.enabled'), width: 50 },
+  { key: 'to_notify', title: t('admin.receive_confirm_notification'), width: 50 },
+  { key: 'role', title: t('common.role'), width: 150 },
   // { value: 'is_editor', text: t('common.editor') },
-  { value: 'actions', text: t('common.actions'), align: 'right', width: 100, sortable: false }
+  { key: 'actions', title: t('common.actions'), align: 'right', width: 100, sortable: false }
 ]
 
 async function toggle (user) {
@@ -81,8 +81,6 @@ async function deleteUser (user) {
       loading.value = false
       newUserDialog.value = false
     } catch (e) {
-      console.error('sono qui')
-      console.error(e)
       $notify(e?.statusMessage ?? e?.message ?? e, Statuses.ERROR)
       loading.value = false
     }
@@ -159,31 +157,30 @@ async function deleteUser (user) {
           <v-switch 
             :input-value="item.is_active" 
             readonly 
-            @click.native.prevent="toggle(item)" 
+            @click.prevent="toggle(item)" 
             inset 
             hide-details
-          ></v-switch>
+          />
         </template>
         <template v-slot:item.to_notify="{item}">
           <v-switch 
             v-if="item.role!=='user'" 
             :input-value="item.to_notify" 
             readonly 
-            @click.native.prevent="toggle_to_notify(item)" 
+            @click.prevent="toggle_to_notify(item)" 
             inset
             hide-details
           />
         </template>
         <template v-slot:item.role="{item}">
           <v-menu offset-y>
-            <template v-slot:activator="{ on, attrs }">
+            <template v-slot:activator="{ props }">
               <v-btn 
                 :color="roleColors[item.role]" 
-                outlined 
-                v-bind="attrs" 
-                v-on="on" 
-                icon='mdi-chevron-down'
-                small 
+                variant='outlined'
+                v-bind="props" 
+                append-icon='mdi-chevron-down'
+                size='small'
                 label
               >
                 {{ item.role }}
@@ -201,7 +198,7 @@ async function deleteUser (user) {
             </v-list>
           </v-menu>
         </template>
-        <template v-slot:item.actions="{item}">
+        <template #[`item.actions`]="{item}">
           <t-btn 
             color="error" 
             :tooltip="$t('admin.delete_user')"

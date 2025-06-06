@@ -1,8 +1,51 @@
 import { z } from 'zod'
 
+export type Settings = {
+  title: string,
+  description: string,
+  baseurl: string,
+  hostname: string,
+  instance_timezone: string,
+  instance_locale: string,
+  instance_name: string,
+  allow_registration: boolean,
+  allow_anon_event: boolean,
+  allow_multidate_event: boolean,
+  allow_recurrent_event: boolean,
+  allow_event_without_end_time: boolean,
+  allow_online_event: boolean,
+  show_download_media: boolean,
+  enable_moderation: boolean,
+  enable_report: boolean,
+  recurrent_event_visible: boolean,
+  allow_geolocation: boolean,
+  geocoding_provider_type: string
+  geocoding_provider: string
+  geocoding_countrycodes: Array<string>,
+  tilelayer_provider: string
+  tilelayer_provider_attribution: string,
+  enable_federation: boolean,
+  federated_events_in_home: boolean,
+  enable_resources: boolean,
+  hide_boosts: boolean,
+  'theme.is_dark': boolean,
+  dark_colors: object //{ primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00' },
+  light_colors: object // { primary: '#FF4500', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00' },
+  hide_thumbs: boolean,
+  hide_calendar: boolean,
+  footerLinks: Array<object> 
+  plugins: Array<object>,
+  admin_email: string
+  smtp: object,
+  collection_in_home?: number,
+  calendar_first_day_of_week?: number,
+  default_fedi_hashtags: Array<string>,
+  custom_js: string,
+  custom_css: string
+}
+
 export type KeyValueType =
-| { [key: string]: string | boolean | object | null }
-// import { SettingType } from './sequelize'
+| { [key: string]: string | boolean | object | null | number | undefined }
 
 export const settingSchema = z.object({
   key: z.string(),
@@ -13,7 +56,7 @@ export const settingSchema = z.object({
 const config = useRuntimeConfig()
 export type SettingType = z.infer<typeof settingSchema>
 
-export const publicSettings:KeyValueType = {
+export const publicSettings:Settings = {
   title: config.title || 'Gancio',
   description: config.description || 'A shared agenda for local communities',
   baseurl: config.baseurl || '',
@@ -53,33 +96,34 @@ export const publicSettings:KeyValueType = {
   plugins: [],
   admin_email: config.admin_email || '',
   smtp: config.smtp || {},
-  collection_in_home: null,
-  calendar_first_day_of_week: null,
   default_fedi_hashtags: [],
   custom_js: '',
   custom_css: ''
 }
 export const secretSettings:KeyValueType = {}
 
-export function getSetting (key: string) {
+export function getSetting (key: keyof Settings) {
     return publicSettings[key]
 }
-
 export async function getSettings () {
   return Setting.findAll({ raw: true })
 }
 
-export function setSetting (setting: SettingType) {
-  if (setting.is_secret) {
-      secretSettings[setting.key] = setting.value
+export function setSetting<K extends keyof Settings>(
+  key: K,
+  value: Settings[K],
+  is_secret: boolean
+): Promise<[entity: Setting, created: boolean | null]> {
+  if (is_secret) {
+      secretSettings[key] = value
   } else {
-      publicSettings[setting.key] = setting.value
+      publicSettings[key] = value
   }
-  return Setting.upsert(setting)
+  return Setting.upsert({ key, value, is_secret })
 }
 
 export async function loadSettings () {
-  const settings = await Setting.findAll({ raw: true })
+  const settings = await Setting.findAll()
   for (const setting of settings) {
     if (setting.is_secret) {
       secretSettings[setting.key] = setting.value

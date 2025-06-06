@@ -1,7 +1,7 @@
 <script setup>
 
 const params = useState('params')
-const selectedDate = useState<Date>('selectedDate', () => null)
+const selectedDate = useState<Date>('selectedDate', () => {})
 const attributes = useState('attributes')
 const theme = useTheme()
 

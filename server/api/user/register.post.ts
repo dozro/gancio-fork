@@ -5,8 +5,7 @@
 export default defineEventHandler(async event => {
   const log = useLogger('register')
   const user = await readBody(event)
-  log.info(user)
-  // if (!publicSettings.allow_registration) { throw createError({ status: 404, message: 'Not found' }) }
+  if (!publicSettings.allow_registration) { throw createError({ status: 404, message: 'Not found' }) }
   
   const n_users = await User.count()
   try {
@@ -30,8 +29,10 @@ export default defineEventHandler(async event => {
     log.info('Register user ', user.email)
     const userInstance = await User.create(user)
     log.info(`Sending registration email to ${user.email} and registration confirmation to admins`)
-    // mail.send(user.email, 'register', { user, config }, res.locals.locale)
-    // notifier.notifyAdmins('admin_register', { user, config })
+    const config = useRuntimeConfig()
+    enqueueMail(user.email, 'register', { user, config } ) //, TODO publicSettings.locals.locale)
+    
+    notifyAdmins('admin_register', { user, config })
     return userInstance
     
   } catch (e) {

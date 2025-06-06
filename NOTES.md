@@ -6,11 +6,12 @@
 - authentication
 
 ## TODO
-- [ ] check role on server (create a composable?)
-- [ ] queue manager (use taskmanager with retries, save on db, cron etc.)
+- [ ] global css ? (vcard surface ?!?!)
+- [ ] check role on server (create a composable?) - ok but editor is missing
+- [ ] i18n vuetify
+- [ ] queue manager (use taskmanager with retries, save on db, cron etc.) - handleError is missing, test with prosmises and directly
 - [ ] client settings management (global public, etc..)
 - [ ] fetch events and calendars (useEvents)
-- [ ] i18n vuetify
 - [ ] header
 - [ ] images
 - [ ] single events
@@ -40,8 +41,7 @@
 ## API / Backend > (/server)
 
 ### Getting random values
-crypto.randomUUID()
-
+`crypto.randomUUID()`
 
 ### Settings
 You can use the `publicSettings` or `secretSettings` server utilities
@@ -60,8 +60,17 @@ raw: `event.context.params?.place`
 `return sendStream(event, fs.createReadStream(filePath))`
 check `server/routes/fallbackimage.png.ts`
 
-### Authentication
+### Require an admin user
+`await requireAdminSession(event)`
 
+### Get current logged user
+`const { user } = await getUserSession(event)`
+
+### Require a logged user
+`const { user } = await requireUserSession(event)`
+
+
+### Check 
 
 
 ### CORS

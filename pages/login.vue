@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Statuses } from '~/types/settings'
 
-const { loggedIn, user, fetch: refreshSession } = useUserSession()
+const { fetch: refreshSession } = useUserSession()
 const settings = useState('settings')
 const { $notify } = useNuxtApp()
 
@@ -49,13 +49,15 @@ async function forgot () {
         <v-form ref='form' v-model='valid' validate-on='lazy' @submit.prevent='login'>
           <v-card>
             <v-card-title>{{$t('common.login')}}</v-card-title>
-            <v-card-subtitle v-text="$t('login.description')" />
+            <v-card-subtitle v-html="$t('login.description')" />
             <v-card-text>
-              <v-text-field v-model='credentials.email' validate-on-blur 
+              <v-text-field
+                v-model='credentials.email' validate-on-blur 
                 :rules='$valid.email'
                 autofocus :label='$t("common.email")' />
                 
-              <v-text-field v-model='credentials.password' 
+              <v-text-field
+                v-model='credentials.password' 
                 :rules='[$valid.password]'
                 type='password' :label='$t("common.password")' />
             </v-card-text>
@@ -66,9 +68,8 @@ async function forgot () {
             
             <v-card-actions>
               <v-spacer/>
-              <div>{{valid}}</div>
               <v-btn v-if='settings?.allow_registration' to='/register' text color='orange'>{{$t('login.not_registered')}}</v-btn>
-              <v-btn color='success' type='submit' outlined :disabled='!valid || loading' :loading='loading'>{{$t('common.login')}}</v-btn>
+              <v-btn color='success' type='submit' variant='outlined' :disabled='!valid || loading' :loading='loading'>{{$t('common.login')}}</v-btn>
             </v-card-actions>
           </v-card>
           
@@ -77,13 +78,3 @@ async function forgot () {
     </v-row>
   </v-container>
 </template>
-
-<!-- <script setup lang="ts">
-const valid = ref(false)
-const email = ref('')
-const password = ref('')
-
-function submit () {
-console.error('submit')
-}
-</script> -->

@@ -16,25 +16,24 @@ yarg.version(pkg.version)
 
 // process.chdir(path.resolve(__dirname, '..'))
 
-// async function start () {
-//   require('@nuxt/cli-edge').run(['start', '--modern'])
-//     .catch((error) => {
-//       console.error(error)
-//       process.exit(2)
-//     })
-// }
+async function start () {
+  
+  return import('./server/index').catch(e => {
+    console.error(e)
+    process.exit(2)
+  })
+}
 
-// async function migrate () {
-//   const config = require('./config')
-//   if (config.status  === 'SETUP') {
-//     console.error('> Cannot run database migration before setup')
-//     return
-//   }
-//   const db = require('./api/models/index')
-//   db.connect()
-//   await db.sequelize.authenticate()
-//   await db.runMigrations()
-// }
+async function migrate () {
+  const sequelize = await import("./utils/sequelize.ts")
+  const config = require('./config')
+  if (config.status  === 'SETUP') {
+    console.error('> Cannot run database migration before setup')
+    return
+  }
+  await sequelize.connect()
+  await sequelize.runMigrations()
+}
 
 console.info(`📅 ${pkg.name} - v${pkg.version} - ${pkg.description} (nodejs: ${process.version})`)
 
@@ -49,8 +48,8 @@ yarg
       process.env.config_path = absolute_config_path
       return absolute_config_path
     }})
-  // .command(['migrate'], 'Run database migration', migrate)
-  // .command(['start', 'run', '$0'], 'Start gancio', {}, start)
+  .command(['migrate'], 'Run database migration', migrate)
+  .command(['start', 'run', '$0'], 'Start gancio', {}, start)
   .command(['users'], 'Manage users', usersCLI)
   // .command(['settings'], 'Manage settings', settingsCLI)
   .help('h')

@@ -1,5 +1,7 @@
 <script setup lang='ts'>
-const { Settings } = useSettings()
+// const { Settings } = useSettings()
+
+const settings = useState('settings')
 interface Place {
   name: string,
   address: string
@@ -9,7 +11,7 @@ const whereInputAdvancedDialog = ref(false)
 const search = ref('')
 const place = defineModel<Place>({ default: { name: '', address: '' }})
 
-const isOnLine = computed(() => Settings.allow_online_event && place.value.name === 'online')
+const isOnLine = computed(() => settings.allow_online_event && place.value.name === 'online')
 //       return this.settings.allow_online_event && this.place.name === 'online'
 
 const { data: places = [] } = await useFetch<Place[]>('/api/places', { params: { query: search }})

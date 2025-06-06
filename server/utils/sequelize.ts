@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+  import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import { Umzug, SequelizeStorage } from 'umzug'
 import { useLogger } from './useLogger'
@@ -18,6 +18,7 @@ import {
     HasMany,
     NotNull,
     Table,
+    Scopes,
     CreatedAt,
     UpdatedAt,
     PrimaryKey,
@@ -34,6 +35,7 @@ import {
 } from "@sequelize/core/decorators-legacy"
 
 import { SqliteDialect } from "@sequelize/sqlite3"
+import { Settings } from './settings'
 
 const log = useLogger('sequelize')
 //   import bcrypt from "bcrypt";
@@ -62,7 +64,10 @@ export async function connect() {
   await sequelize.authenticate()
   await runMigrations(sequelize).catch(e => { console.error(e)})
   sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Resource, Page])
-  log.warn('add models ok!')
+
+  User.addScope('defaultScope', { attributes: { exclude: ['password', 'recover_code'] } })
+  User.addScope('withPassword', { })
+
   return sequelize
 }
 
@@ -237,6 +242,10 @@ InferCreationAttributes<User>
     @Attribute(DataTypes.BOOLEAN)
     declare is_active: boolean
     
+    @Attribute(DataTypes.BOOLEAN)
+    @Default(true)
+    declare to_notify: boolean
+    
     @Attribute(DataTypes.STRING)
     declare description: string
     
@@ -251,82 +260,26 @@ InferCreationAttributes<User>
     declare readonly updatedAt: CreationOptional<Date>;
     
     async generateRecoverCode() {
-        this.recover_code = crypto.randomBytes(16).toString('hex')
-        await this.save()
+      this.recover_code = crypto.randomUUID()
+      await this.save()
     }
     
     async comparePassword(pwd: string) {
-        if (!this.password) { return false }
-        return bcrypt.compare(pwd, this.password)
+      if (!this.password) { return false }
+      return bcrypt.compare(pwd, this.password)
     }
-    // @HasMany(() => Post, {
-    //   foreignKey: "userId",
-    //   inverse: {
-    //     as: "author",
-    //   },
-    // })
-    // declare posts?: NonAttribute<Post[]>;
-    
-    // declare createPost: HasManyCreateAssociationMixin<Post, "userId">;
     
     @BeforeSave
     static async hashPassword(instance: User) {
-        if (instance.changed('password')) {
-            const password = instance.getDataValue('password')
-            if (password) {
-                const hashedPassword = bcrypt.hashSync(password, 10)
-                instance.setDataValue("password", hashedPassword)
-            }
+      if (instance.changed('password')) {
+        const password = instance.getDataValue('password')
+        if (password) {
+          const hashedPassword = bcrypt.hashSync(password, 10)
+          instance.setDataValue("password", hashedPassword)
         }
+      }
     }
-    // @BeforeCreate
-    // static async hashPassword(instance: User) {
-    //   const password = instance.getDataValue("password");
-    //   if (password) {
-    //     const hashedPassword = bcrypt.hashSync(password, 10);
-    //     instance.setDataValue("password", hashedPassword);
-    //   }
-    // }
 }
-
-//   @Table({
-//     tableName: "Posts",
-//   })
-//   export class Post extends Model<
-//     InferAttributes<Post>,
-//     InferCreationAttributes<Post>
-//   > {
-//     @Attribute(DataTypes.INTEGER.UNSIGNED)
-//     @PrimaryKey
-//     @AutoIncrement
-//     declare readonly id: CreationOptional<number>;
-
-//     @Attribute(DataTypes.STRING)
-//     @NotNull
-//     declare title: string;
-
-//     @Attribute(DataTypes.STRING)
-//     @NotNull
-//     declare content: string;
-
-//     @Attribute({
-//       type: DataTypes.INTEGER.UNSIGNED,
-//       references: { table: "Users", key: "id" },
-//       onUpdate: "CASCADE",
-//       onDelete: "CASCADE",
-//     })
-//     declare userId: number;
-
-//     @CreatedAt
-//     declare readonly createdAt: CreationOptional<Date>;
-
-//     @UpdatedAt
-//     declare readonly updatedAt: CreationOptional<Date>;
-
-//     /** Declared by {@link User#posts} */
-//     declare author?: NonAttribute<User>;
-//   }
-
 
 @Table({
     tableName: 'instances'
@@ -405,10 +358,10 @@ InferCreationAttributes<Setting>
 > {
     @Attribute(DataTypes.STRING)
     @PrimaryKey
-    declare key: string
+    declare key: keyof Settings
     
     @Attribute(DataTypes.JSON)
-    declare value: string | boolean
+    declare value: string | number | boolean | object | null
     
     @Attribute(DataTypes.BOOLEAN)
     @Default(false)
