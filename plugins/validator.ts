@@ -3,20 +3,19 @@ export default defineNuxtPlugin((nuxtApp) => {
   const t = nuxtApp.vueApp.$nuxt.$i18n.t
 
   const validators = {
-          required: (value) => !!value || 'This field is required',
-          checked: value => !!value || 'This is mandatory',
+    required: (fieldName: string) => value => !!value || t('validators.required', { fieldName }),
 
-          password: (value) => {
-              if (value.length < 8) return 'The password must have at least 8 characters'
-              return true
-          },
+    password: (value) => {
+        if (value.length < 8) return 'The password must have at least 8 characters'
+        return true
+    },
 
-          confirm: (password) => value => password === value || `Password does not match`,
+    confirm: (password) => value => password === value || `Password does not match`,
 
-          email: [
-              (v: string) => !!v || t('validators.required', { fieldName: t('common.email') }),
-              (v: string) => (v && (v === 'admin' || !!linkify.test(v, 'email')) || t('validators.email'))
-            ]
+    email: [
+        (v: string) => !!v || t('validators.required', { fieldName: t('common.email') }),
+        (v: string) => (v && (v === 'admin' || !!linkify.test(v, 'email')) || t('validators.email'))
+      ]
   }
 
   nuxtApp.provide("valid", validators)
