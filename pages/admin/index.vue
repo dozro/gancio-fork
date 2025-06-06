@@ -2,7 +2,8 @@
 definePageMeta({ middleware: ['authenticated'] })
 // const { loadSettings } = useSettings()
 // loadSettings()
-const selectedTab = ref('')
+
+const selectedTab = ref('') // route.params.hash !??!
 
 // const { data: users } = await useFetch('/api/users')
 const { data: events } = await useFetch('/event/unconfirmed')
