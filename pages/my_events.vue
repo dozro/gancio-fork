@@ -1,12 +1,49 @@
+<script setup>
+
+const { t } = useI18n()
+// middleware: ['auth'],
+const { data: events, refresh } = await useFetch('/api/events/mine')
+const { $confirm, $notify } = useNuxtApp()
+
+const search = ref('')
+
+const headers = [
+  { value: 'title', text: t('common.title') },
+  { value: 'place.name', text: t('common.place') },
+  { value: 'start_datetime', text: t('common.when') },
+  { value: 'actions', text: t('common.actions'), align: 'right', sortable: false }
+]
+
+async function toggle (event) {
+  const id = event.id
+  const is_visible = event.is_visible
+  const method = is_visible ? 'unconfirm' : 'confirm'
+  try {
+    await $fetch(`/event/${method}/${id}`, { method: 'POST'})
+    event.is_visible = !is_visible
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+async function remove (event, parent) {
+  const ret = await $confirm(`event.remove_${parent ? 'recurrent_' : ''}confirmation`)
+  if (!ret) { return }
+  await $fetch(`/event/${event.id}`, { method: 'DELETE' })
+  refresh()
+  $notify('admin.event_remove_ok')
+}
+</script>
+
 <template>
 <v-container class="pa-0">
   <v-card>
     <v-card-title>{{$t('common.my_events')}}</v-card-title>
     <v-card-text class="pa-1 pa-md-3">
       <v-text-field v-model="search" :label="$t('common.search')"/>
-      <v-data-table :items="events"  :hide-default-footer='events.length<10' dense :search="search"
-        :header-props='{ sortIcon: mdiChevronDown }'
-        :footer-props='{ prevIcon: mdiChevronLeft, nextIcon: mdiChevronRight }'
+      <v-data-table
+        v-if='events'
+        :items="events" :hide-default-footer='events?.length<10' dense :search="search"
         :headers='headers'>
         <template v-slot:item.data-table-select="{ isSelected, select }">
           <v-simple-checkbox size='small' small dense :on-icon="mdiCheckboxOutline" :off-icon="mdiCheckboxBlankOutline" :value="isSelected" @input="select($event)" />
@@ -34,59 +71,3 @@
   </v-card>
 </v-container>
 </template>
-<!-- <script>
-
-import { mdiChevronLeft, mdiChevronRight, mdiChevronDown, mdiCheckboxOutline, mdiCheckboxBlankOutline,
-  mdiPencil, mdiDelete, mdiArrowRight, mdiEye, mdiEyeOff, mdiRepeat, mdiPause, mdiPlay, mdiDebugStepOver, mdiDeleteForever } from '@mdi/js'
-import { mapState } from 'vuex'
-import TBtn from '../components/TBtn.vue'
-
-export default {
-  name: 'Settings',
-  middleware: ['auth'],
-  components: { TBtn },
-  data () {
-    return {
-      mdiChevronLeft, mdiChevronRight, mdiChevronDown, mdiCheckboxOutline, mdiCheckboxBlankOutline,
-      mdiPencil, mdiDelete, mdiArrowRight, mdiEye, mdiEyeOff, mdiRepeat, mdiPause, mdiPlay, mdiDebugStepOver, mdiDeleteForever,
-      events: [],
-      search: '',
-      headers: [
-        { value: 'title', text: this.$t('common.title') },
-        { value: 'place.name', text: this.$t('common.place') },
-        { value: 'start_datetime', text: this.$t('common.when') },
-        { value: 'actions', text: this.$t('common.actions'), align: 'right', sortable: false }
-      ]      
-    }
-  },
-  computed: mapState(['settings']),
-  async fetch () {
-    this.events = await this.$axios.$get('/events/mine')
-  },
-  methods: {
-    async toggle (event) {
-      const id = event.id
-      const is_visible = event.is_visible
-      const method = is_visible ? 'unconfirm' : 'confirm'
-      try {
-        await this.$axios.$put(`/event/${method}/${id}`)
-        event.is_visible = !is_visible
-      } catch (e) {
-        console.error(e)
-      }
-    },
-    async remove (event, parent) {
-      const ret = await this.$root.$confirm(`event.remove_${parent ? 'recurrent_' : ''}confirmation`)
-      if (!ret) { return }
-      await this.$axios.delete(`/event/${event.id}`)
-      this.$fetch()
-      this.$root.$message('admin.event_remove_ok')
-    }    
-  },
-  head () {
-    return {
-      title: `${this.settings.title} - ${this.$t('common.my_events')}`
-    }
-  }
-}
-</script> -->
