@@ -39,14 +39,55 @@ const unconfirmedOldEvents = events?.oldEvents
                   <v-tabs-window-item value="settings">
                       <AdminSettings />
                   </v-tabs-window-item>
+                  
                   <v-tabs-window-item value="users">
                     <AdminUsers />
                   </v-tabs-window-item>
+                                    
                   <v-tabs-window-item value="events">
                     <AdminEvents :unconfirmedEvents='unconfirmedEvents' :unconfirmedOldEvents='unconfirmedOldEvents'
                       @confirmed='id => { unconfirmedEvents = unconfirmedEvents.filter(e => e.id !== id); unconfirmedOldEvents = unconfirmedOldEvents.filter(e => e.id !== id)}'
                       @removed='id => { unconfirmedEvents = unconfirmedEvents.filter(e => e.id !== id); unconfirmedOldEvents = unconfirmedOldEvents.filter(e => e.id !== id)}' />
+                  </v-tabs-window-item>
+                  
+                  <v-tabs-window-item value='collections'>
+                    <AdminCollection />
+                  </v-tabs-window-item>
+                  
+                  <v-tabs-window-item value='federation'>
+                    <AdminFederation />
+                  </v-tabs-window-item>
+                  
+                  <v-tabs-window-item value='moderation'>
+                    <AdminModeration />
+                  </v-tabs-window-item>
 
+                  <v-tabs-window-item value='places'>
+                    <AdminPlaces />
+                  </v-tabs-window-item>
+                  
+                  <v-tabs-window-item value='tags'>
+                    <AdminTags />
+                  </v-tabs-window-item>
+                  
+                  <v-tabs-window-item value='theme'>
+                    <AdminTheme />
+                  </v-tabs-window-item>
+
+                  <v-tabs-window-item value='geolocation'>
+                    <AdminGeolocation />
+                  </v-tabs-window-item>
+
+                  <v-tabs-window-item value='announcements'>
+                    <AdminAnnouncements />
+                  </v-tabs-window-item>
+                  
+                  <v-tabs-window-item value='pages'>
+                    <AdminPages />
+                  </v-tabs-window-item>
+
+                  <v-tabs-window-item value='plugins'>
+                    <AdminPlugin />
                   </v-tabs-window-item>
                 </v-tabs-window>
             </v-card-text>
