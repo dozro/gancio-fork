@@ -22,6 +22,8 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 
   // Hook to load messages when switching locales
   nuxtApp.hook('i18n:beforeLocaleSwitch', async ({ _oldLocale, newLocale }) => {
+    console.error('before locale switch?!?!', _oldLocale, newLocale)
     await loadMessages(newLocale)
+    return newLocale
   })
 })
