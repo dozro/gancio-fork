@@ -4,7 +4,7 @@ const loading = ref(false)
 const dialog = ref(false)
 const valid = ref(false)
 const selectedPlugin = ref({})
-const { data: plugins } = useFetch('/api/plugins')
+const { data: plugins } = await useFetch('/api/plugins')
 
 async function saveSettings (close=true) {
   loading.value = true
