@@ -11,24 +11,6 @@
 //   return db.initialize()
 // }
 
-// async function resetPassword (args) {
-//   await _initializeDB()
-//   const helpers = require('../helpers')
-//   const { User } = require('../api/models/models')
-//   const user = await User.findOne({ where: { email: args.email } })
-//   console.log()
-//   if (!user) {
-//     console.error(`User ${args.email} not found`)
-//     return
-//   }
-
-//   const password = helpers.randomString()
-//   user.password = password
-//   await user.save()
-//   console.log(`New password for user ${user.email} is '${password}'`)
-//   await db.close()
-// }
-
 // async function create (args) {
 //   await _initializeDB()
 //   const { User } = require('../api/models/models')
@@ -81,13 +63,28 @@
 import * as sequelize from "../utils/sequelize.ts"
 async function list () {
   await sequelize.connect()
-  // await _initializeDB()
-  // const { User } = require('../api/models/models')
-  const users = await User.findAll()
-  console.log('dentro list')
+  const users = await sequelize.User.findAll()
   users.forEach(u => console.log(`${u.id}\trole: ${u.role}\tenabled: ${u.is_active}\temail: ${u.email}`))
-  // console.log()
-  // await db.close()
+  await sequelize.sequelize.close()
+}
+
+
+async function resetPassword (args) {
+  await sequelize.connect()
+  // const helpers = require('../helpers')
+  // const { User } = require('../api/models/models')
+  const user = await sequelize.User.findOne({ where: { email: args.email } })
+  console.log()
+  if (!user) {
+    console.error(`User ${args.email} not found`)
+    return
+  }
+
+  // const password = helpers.randomString()
+  user.password = args.password
+  await user.save()
+  console.log(`New password for user ${user.email} is '${args.password}'`)
+  await sequelize.sequelize.close()
 }
 
 // async function enable (args, enable) {
@@ -114,6 +111,8 @@ async function list () {
 
 const usersCLI = yarg => yarg
   .command('list', 'List all users', list)
+  .command('reset-password <email> <password>', 'Resets the password of the given user', {
+  }, resetPassword)
   .argv
 
   export default usersCLI
@@ -121,8 +120,6 @@ const usersCLI = yarg => yarg
 // const usersCLI = yargs => yargs
 //   .command('enable <email>', 'Enable an user', {}, args => enable(args, true))
 //   .command('disable <email>', 'Enable an user', {}, args => enable(args, false))
-//   .command('reset-password <email>', 'Resets the password of the given user', {
-//   }, resetPassword)
 //   .command('set_role <email> <role>', 'Set specified role privileges to the given user',
 //     { role: { describe: 'Define this user role', choices: ['user', 'admin', 'editor' ] } }, setRole)
 //   .command('create <email> [password] [role]', 'Create an user (role could be `user`, `admin` or `editor`)',
