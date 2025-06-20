@@ -110,8 +110,9 @@ return {
       VDataTableItem: {
         density: 'compact'
       },
-      VCard: {
-        variant: 'tonal'
+      VCard: {  
+        color: 'surface',
+        variant: 'flat'
       },
       VFooter: {
         VBtn: {
