@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-const { Settings } = useSettings()
+const settings = useState('settings')
 
 const route = useRoute()
 const { data: page } = await useFetch<Page>(`/api/pages/${route.params.slug}`)
@@ -10,7 +10,7 @@ if (!page.value) {
 }
 
 useHead( () => {
-  const title = `${Settings.value.title} - ${page.value?.title}`
+  const title = `${settings.value.title} - ${page.value?.title}`
   return {
     title,
   }

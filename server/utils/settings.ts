@@ -112,7 +112,7 @@ export async function getSettings () {
 export function setSetting<K extends keyof Settings>(
   key: K,
   value: Settings[K],
-  is_secret: boolean
+  is_secret: boolean = false
 ): Promise<[entity: Setting, created: boolean | null]> {
   if (is_secret) {
       secretSettings[key] = value

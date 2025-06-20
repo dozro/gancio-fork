@@ -1,39 +1,56 @@
+import type { Event } from '#build/types/nitro-imports'
 import { DateTime } from 'luxon'
-// import type { Event } from '#build/types/nitro-imports'
 
-export function useTime() {
-
-  function currentMonth () {
-    // return DateTime.local({ zone }).month
-    return DateTime.local().month
-  }
-
-  function currentYear () {
-    return DateTime.local().year
-  }
-
-  function startMonth (year? :number, month?: number) {
-    if (year && month) {
-      return DateTime.local(year, month).startOf('month').toSeconds()
-    } else {
-      return DateTime.local().startOf('month').toSeconds()
-    }
-  }
-  
-  function nowUnix () {
-    return DateTime.local().toUnixInteger()
-  }
-  
-  function timeToISO (time: number) {
-    return DateTime.local(time).toISO()
-  }
-  
-  function time (datetime: number) {
-    return DateTime.local(datetime).toString()
-  }
-  
-  return { currentMonth, currentYear, startMonth, nowUnix, time, timeToISO }
+function currentMonth () {
+  // return DateTime.local({ zone }).month
+  return DateTime.local().month
 }
+
+function currentYear () {
+  return DateTime.local().year
+}
+
+function startMonth (year? :number, month?: number) {
+  if (year && month) {
+    return DateTime.local(year, month).startOf('month').toSeconds()
+  } else {
+    return DateTime.local().startOf('month').toSeconds()
+  }
+}
+
+function nowUnix () {
+  return DateTime.local().toUnixInteger()
+}
+
+function timeToISO (time: number) {
+  return DateTime.local(time).toISO()
+}
+
+function time (datetime: number) {
+  return DateTime.local(datetime).toString()
+}
+  
+function when (event: Event) {
+  const cy = currentYear()
+  const addTimezone = event.ap_id || event.place?.name === 'online'
+
+  const opt = {
+    // zone: settings.instance_timezone,
+    // locale: app.i18n.locale || settings.instance_locale
+  }
+
+  const start = DateTime.fromSeconds(event.start_datetime, opt)
+  let time = start.toLocaleString({ weekday: 'long', ...(cy !== start.year && { year: 'numeric'}), month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', ...( addTimezone && { timeZoneName: 'short' }) })
+  const end = event.end_datetime && DateTime.fromSeconds(event.end_datetime, opt)
+  if (end) {
+    time += event.multidate ? ` → ${end.toLocaleString({ weekday: 'long', ...(cy !== end.year && { year: 'numeric'}), month: 'short', day: '2-digit'})}` : `-${end.toLocaleString({hour: '2-digit', minute: '2-digit'})}`
+  }
+
+  return time
+} 
+  
+
+export default { when, currentYear, currentMonth, startMonth, nowUnix, time, timeToISO }
     
     // timeFormat () {
     //   const time = DateTime.fromObject({ hour: 14 }, {

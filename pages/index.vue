@@ -14,8 +14,8 @@ import type { Announcement, Event } from '#build/types/nitro-imports'
 //   }
 // })
 
-const { nowUnix } = useTime()
-const now = nowUnix()
+import time from '~/utils/time'
+const now = time.nowUnix()
 
 const params = useState('params')
 const selectedDate = useState<Date|null>('selectedDate', () => null)

@@ -32,12 +32,16 @@ const hasMedia = computed(() => event?.media?.length )
 
 <script setup lang="ts">
 // import { DateTime } from 'luxon'
-import type { Event } from '#build/types/nitro-imports';
+import type { Event } from '#build/types/nitro-imports'
+import time from '~/utils/time'
+
 
 const settings = useState('settings')
+const { $notify, $prompt } = useNuxtApp()
+const { t } = useI18n()
+const { user } = useUserSession()
 const route = useRoute()
 const { data: event } = useFetch<Event>(`/api/events/${route.params.slug}`)
-console.error('sono qui e ', route.params.slug)
 if (!event) {
     throw createError({ status: 404, statusMessage: 'Event not found'})
 }
@@ -57,6 +61,10 @@ const showEmbed = ref(false)
 const mapModal = ref(false)
 const openModeration = ref(route.query?.moderation ? true : false)
 const openAssignAuthor = ref(false)
+const showModeration = computed(() => settings.enable_moderation && event.isMine || user?.role === 'admin' || user?.role === 'editor')
+
+const canEdit = computed(() => event?.isMine || user?.role === 'admin' || user?.role === 'editor')
+
       // mapModal: false,
       // openModeration: $route?.query?.moderation ? true : false,
       // openAssignAuthor: false,
@@ -176,19 +184,20 @@ const openAssignAuthor = ref(false)
   // },
   // methods: {
   // 
-function report () {
-      // this.reporting = true
-      // const message = await this.$root.$prompt(this.$t('event.report_message_confirmation'), { title: this.$t('common.report') })
-      // if (!message) {
-      //   return
-      // }
-      // this.reporting = false
-      // try {
-      //   await this.$axios.$post(`/event/messages/${this.event.id}`, { message })
-      //   this.$root.$message('common.sent', { color: 'success' })
-      // } catch (e) {
-      //   this.$root.$message(e, { color: 'warning' })
-      // }
+  // 
+async function report () {
+  // this.reporting = true
+  const message = await $prompt(t('event.report_message_confirmation'), { title: t('common.report') })
+  if (!message) {
+    return
+  }
+  // this.reporting = false
+  try {
+    await $fetch(`/api/event/messages/${event.id}`, { method: 'POST', body: { message }})
+    $notify('common.sent')
+  } catch (e) {
+    $notify(e)
+  }
 }
     
 // function keyDown (ev) {
@@ -223,9 +232,9 @@ function goNext () {
 
 </script>
 <template>
-<div
-  id="event"
-  class="h-event pa-2 pa-sm-2 pt-0 pt-sm-0 container"
+<v-container
+  class="h-event pa-2 pa-sm-2 pt-0 pt-sm-0 event"
+  max-width='1200 '
   v-touch="{ left: goNext, right: goPrev }"
   itemscope
   itemtype="https://schema.org/Event"
@@ -233,12 +242,13 @@ function goNext () {
   <!-- EVENT PAGE -->
   <!-- gancio supports microformats (http://microformats.org/wiki/h-event) -->
   <!-- and microdata https://schema.org/Event -->
-  <div class="title text-center text-md-h4 text-h5 pa-6">
+  <div class="text-center text-md-h4 text-h5 pa-6">
     <strong class="p-name text--primary" itemprop="name">{{event.title}}</strong>
   </div>
+  
   <v-row>
-    <v-col class="col-12 col-md-8 pr-sm-2 pr-md-0">
-      <MyPicture v-if="hasMedia" :event="event" />
+    <v-col cols='12' md='8' class="pr-sm-2 pr-md-0">
+      <!-- <MyPicture v-if="hasMedia" :event="event" /> -->
       <div
         class="p-description text-body-1 pa-3 rounded"
         v-if="event.description"
@@ -246,8 +256,9 @@ function goNext () {
         v-html="event.description"
       />
     </v-col>
-    <v-col class="col-12 col-md-4">
-      <v-card outlined>
+    
+    <v-col cols='12' md='4'>
+      <v-card variant='outlined'>
         <v-container class="eventDetails">
           <v-icon
             class="float-right"
@@ -261,8 +272,8 @@ function goNext () {
             class="dt-start"
             itemprop="startDate"
           >
-            <v-icon icon="mdi-calendar" small />
-            <!-- <span class="ml-2 text-uppercase">{{$time.when(event)}}</span> -->
+            <v-icon icon="mdi-calendar" />
+            <span class="ml-2 text-uppercase">{{time.when(event)}}</span>
             <div
               class="d-none dt-end"
               v-if="event.end_datetime"
@@ -334,7 +345,7 @@ function goNext () {
           
           <!-- copy link -->
           <v-list-item
-            @click="clipboard(`${settings.baseurl}/event/${event.slug || event.id}`)"
+            @click="$copyToClipboard(`${settings.baseurl}/event/${event.slug || event.id}`)"
             prepend-icon='mdi-content-copy'
             :title="$t('common.copy_link')"
           />
@@ -375,13 +386,13 @@ function goNext () {
           
         </v-list>
         <!-- admin actions -->
-        <template v-if="can_edit">
+        <template v-if="canEdit">
           <span>event admin</span>
-          <!-- <EventAdmin
+          <EventAdmin
             :event="event"
-            @openModeration="openModeration=true"
-            @openAssignAuthor="thor=true"
-          /> -->
+            @open-moderation="openModeration=true"
+            @open-assign-author="openAuthor=true"
+          />
         </template>
       </v-card>
     </v-col>
@@ -391,7 +402,7 @@ function goNext () {
   <!-- <EventResource id="resources" class="mt-3" :event="event" v-if="showResources" /> -->
   
   <!-- Next/prev arrow -->
-  <div class="text-center mt-5 mb-5">
+  <!-- <div class="text-center mt-5 mb-5">
     <v-btn
       class="mr-2"
       nuxt
@@ -402,10 +413,11 @@ function goNext () {
       :disabled="!event.prev"
     />
     <v-btn nuxt bottom right outlined color="primary" :to="`/event/${event.next}`" :disabled="!event.next" icon='mdi-arrow-right' />
-  </div>
+  </div> -->
   <v-dialog v-model="showEmbed" width="700px" :fullscreen="$vuetify.display?.mobile">
-    <EmbedEvent :event="event" @close="showEmbed=false" />
+    <EventEmbed :event="event" @close="showEmbed=false" />
   </v-dialog>
+  
   <v-dialog
     v-show="settings.allow_geolocation && event.place?.latitude && event.place?.longitude"
     v-model="mapModal"
@@ -414,8 +426,8 @@ function goNext () {
   >
     <EventMapDialog :place="event.place" @close="mapModal=false" />
   </v-dialog>
+    <!-- v-if="$auth?.user?.is_admin" -->
   <v-dialog
-    v-if="$auth?.user?.is_admin"
     v-model="openAssignAuthor"
     :fullscreen="$vuetify.display?.mobile"
     destroy-on-close
@@ -438,5 +450,12 @@ function goNext () {
       @close="openModeration=false"
     />
   </v-navigation-drawer>
-</div>
+</v-container>
 </template>
+
+<style>
+.event {
+  word-wrap: break-word;
+  max-width: 1000px;
+}
+</style>

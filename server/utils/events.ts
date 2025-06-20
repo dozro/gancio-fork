@@ -39,9 +39,9 @@ export async function getEvents(args: EventQueryType) {
 
     }
 
-    // if (args.user_id) {
-    //   condition.userId = args.user_id
-    // }
+    if (args.user_id) {
+      condition.userId = args.user_id
+    }
 
     // if (args.include_parent !== true) {
     //   // do not include _parent_ recurrent event

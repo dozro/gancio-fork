@@ -1,5 +1,6 @@
 <script setup>
 // import clipboard from '../assets/clipboard'
+// import { useClipboard } from '@vueuse/core
 
 const { data: events } = await useFetch('/api/events')
 const settings = useState('settings')
@@ -15,7 +16,7 @@ const list = reactive({
 const filters = reactive({ tags: [], places: [], collection: undefined, show_recurrent: settings.recurrent_event_visible })
 
 const code = computed(() => {
-  const params = [`baseurl="${settings.baseurl}"`]
+  const params = [`baseurl="${settings.value.baseurl}"`]
 
   if (list.title && list.sidebar === 'true') {
     params.push(`title="${list.title}"`)
@@ -44,16 +45,15 @@ const code = computed(() => {
   params.push('sidebar="' + list.sidebar + '"')
   params.push(`theme="${list.theme}"`)
 
-  return `<script src="${settings.baseurl}/gancio-events.es.js"><\/script>\n<gancio-events ${params.join(' ')}></gancio-events>\n\n`
+  return `<script src="${settings.value.baseurl}/gancio-events.es.js"><\/script>\n<gancio-events ${params.join(' ')}></gancio-events>\n\n`
 })
 
 const link = computed(() => {
-  const typeMap = ['rss', 'ics']
+  const typeMap = { feed: 'rss', ical: 'ics' }
   const params = []
 
-
   if (filters.collection) {
-    return `${settings.baseurl}/feed/${typeMap[type]}/collection/${encodeURIComponent(filters.collection)}`
+    return `${settings.value.baseurl}/feed/${typeMap[type.value]}/collection/${encodeURIComponent(filters.collection)}`
   } else {
     if (filters.tags.length) {
       params.push(`tags=${filters.tags.map(encodeURIComponent).join(',')}`)
@@ -68,7 +68,7 @@ const link = computed(() => {
     params.push('show_recurrent=true')
   }
 
-  return `${settings.baseurl}/feed/${typeMap[type]}${params.length ? '?' : ''}${params.join('&')}`
+  return `${settings.value.baseurl}/feed/${typeMap[type.value]}${params.length ? '?' : ''}${params.join('&')}`
 })
 
 </script>
@@ -115,7 +115,7 @@ const link = computed(() => {
               <section v-html='$t(`export.feed_description`)' />
               <v-text-field v-model="link" readonly>
                 <template #prepend>
-                  <v-btn text color="primary" @click="clipboard(link)" append-icon='mdi-content-copy'>
+                  <v-btn variant='text' color="primary" @click="$copyToClipboard(link)" append-icon='mdi-content-copy'>
                     {{$t("common.copy")}}
                   </v-btn>
                 </template>
@@ -131,7 +131,7 @@ const link = computed(() => {
               <section v-html='$t(`export.ical_description`)' />
               <v-text-field v-model="link">
                 <template #prepend>
-                  <v-btn text color="primary" @click="clipboard(link)" append-icon='mdi-content-copy'>
+                  <v-btn variant='text' color="primary" @click="$copyToClipboard(link)" append-icon='mdi-content-copy'>
                     {{$t("common.copy")}}
                   </v-btn>
                 </template>
@@ -168,7 +168,7 @@ const link = computed(() => {
               </v-row>
               <v-alert class="pa-5 my-4 blue-grey darken-4 text-body-1 lime--text text--lighten-3">
                 <pre>{{code}}</pre>
-                <v-btn class="float-end" variant='text' append-icon='mdi-content-copy' color="primary" @click="clipboard(code)">
+                <v-btn class="float-end" variant='text' append-icon='mdi-content-copy' color="primary" @click="$copyToClipboard(code)">
                   {{$t("common.copy")}}
                 </v-btn>
               </v-alert>

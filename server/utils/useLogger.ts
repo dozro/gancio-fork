@@ -1,6 +1,4 @@
-import { consola } from 'consola'
-// consola.withDefaults({ level: LogLevel. })
+import { consola, LogLevels } from 'consola'
 export function useLogger (tag: string) {
-  return consola.withDefaults({ level: 0 }).withTag(tag)
+  return consola.withDefaults({ level: LogLevels.debug }).withTag(tag)
 }
-// export const log/ger = consola.withTag('server') // optional: tag for consistent prefix
