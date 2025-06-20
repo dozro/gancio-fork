@@ -21,7 +21,7 @@ const { data: footerLinks } = await useFetch<FooterLink[]>('/api/settings/footer
 
 </script>
 <template>
-  <v-footer color='surface' border id='footer' aria-label='Footer' class="flex-grow-0 py-3" >
+  <v-footer color='surface' border id='footer' aria-label='Footer' class="flex-grow-0 py-3 flex-wrap" >
     
     <!-- follow me dialog -->
     <v-dialog v-model='showFollowMe' destroy-on-close max-width='700px' :fullscreen='$vuetify.display?.mobile'>
@@ -36,7 +36,7 @@ const { data: footerLinks } = await useFetch<FooterLink[]>('/api/settings/footer
     <!-- trusted sources -->
     <v-menu
       v-if="settings.enable_federation && trusted_sources?.length"
-      offset-y transition="slide-y-transition">
+      transition="slide-y-transition">
       <template #activator="{ props }">
         <v-btn class="ml-1" v-bind="props" color="primary">{{ settings.trusted_sources_label || $t('admin.trusted_sources_label_default') }}</v-btn>
       </template>
