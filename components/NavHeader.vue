@@ -19,7 +19,7 @@ function toggleDark () {
 </script>
 <template>
   <div class='d-flex pa-4'>
-    <v-btn icon nuxt to='/' variant="text">
+    <v-btn icon to='/' variant="text">
       <img src='/static/logo.png' height='40'>
     </v-btn>
     
@@ -27,58 +27,56 @@ function toggleDark () {
     
     <div class='d-flex'>
 
+      <v-switch true-icon='mdi-repeat-off' base-color='orange' color='red' false-icon='mdi-repeat' flat :title='$t("common.search")' variant='text' />
+      
+      <v-btn icon='mdi-magnify' to='/search' :title='$t("common.search")' variant='text' color='info' />
       <v-btn icon="mdi-information" href='/about' :title='$t("common.about")' :aria-label='$t("common.about")' variant="text" />
+      
       <v-btn variant="text" icon="mdi-contrast-circle" @click='toggleDark' />
 
       <!-- language selection menu -->
-      <v-menu offset-y transition="slide-y-transition">
+      <v-menu transition="slide-y-transition">
         <template #activator="{ props }">
-          <v-btn variant="text" icon large v-bind='props' aria-label='Language'>{{locale}}</v-btn>
+          <v-btn variant="text" icon v-bind='props' aria-label='Language'>{{locale}}</v-btn>
         </template>
-        <v-list dense max-height="300" width="200">
-          <v-list-item v-for='l in locales' :key='l.code' @click.prevent.stop="setLocale(l.code)">
-            <v-list-item-title>{{l.language}}</v-list-item-title>
-          </v-list-item>
-          <v-list-item nuxt target='_blank' href='https://hosted.weblate.org/engage/gancio/'>
+        <v-list density='compact' max-height="350" width="250">
+          <v-list-item v-for='l in locales' :key='l.code' @click.prevent.stop="setLocale(l.code)" :title='l.language' />
+          
+          <v-list-item target='_blank' href='https://hosted.weblate.org/engage/gancio/'>
             <v-list-item-subtitle v-text='$t("common.help_translate")' />
           </v-list-item>
         </v-list>
       </v-menu>
     
       <!-- auth menu -->
-      <client-only>
-        <v-menu v-if='loggedIn' offset-y transition="slide-y-transition">
-          <template v-slot:activator="{ props }">
-            <v-btn variant="text" class='mr-0' large icon="mdi-dots-vertical" v-bind='props' title='Menu' aria-label='Menu' />
-          </template>
-          <v-list>
-            <v-list-item nuxt to='/settings'>
-              <template v-slot:prepend><v-icon icon='mdi-cog'></v-icon></template>
-              <v-list-item-title v-text="$t('common.settings')"/>
-            </v-list-item>
-            
-            <v-list-item nuxt to='/my_events'>
-              <template v-slot:prepend><v-icon icon='mdi-calendar-account'></v-icon></template>
-              <v-list-item-title v-text="$t('common.my_events')"/>
-            </v-list-item>
-            <v-list-item v-if='user?.role === "admin" || user?.role === "editor"' nuxt to='/admin'>
-              <template v-slot:prepend><v-icon icon='mdi-account' /></template>
-              <v-list-item-title v-text="$t(`common.${user.role}`)" />
-            </v-list-item>
-            
-            <v-list-item @click='logout'>
-              <template v-slot:prepend><v-icon icon='mdi-logout' /></template>
-              <v-list-item-title v-text="$t('common.logout')" />
-            </v-list-item>
-          </v-list>
-        </v-menu>
-        <template #placeholder>
-          <v-btn variant="text" v-if='loggedIn' large icon="mdi-dots-vertical" aria-label='Menu' title='Menu' />
+      <v-menu v-if='loggedIn' transition="slide-y-transition">
+        <template v-slot:activator="{ props }">
+          <v-btn variant="text" class='mr-0' icon="mdi-dots-vertical" v-bind='props' title='Menu' aria-label='Menu' />
         </template>
-      </client-only>
+        <v-list>
+          <v-list-item to='/settings'>
+            <template v-slot:prepend><v-icon icon='mdi-cog' /></template>
+            <v-list-item-title v-text="$t('common.settings')"/>
+          </v-list-item>
+          
+          <v-list-item to='/my_events'>
+            <template v-slot:prepend><v-icon icon='mdi-calendar-account'/></template>
+            <v-list-item-title v-text="$t('common.my_events')"/>
+          </v-list-item>
+          <v-list-item v-if='user?.role === "admin" || user?.role === "editor"' to='/admin'>
+            <template v-slot:prepend><v-icon icon='mdi-account' /></template>
+            <v-list-item-title v-text="$t(`common.${user.role}`)" />
+          </v-list-item>
+          
+          <v-list-item @click='logout'>
+            <template v-slot:prepend><v-icon icon='mdi-logout' /></template>
+            <v-list-item-title v-text="$t('common.logout')" />
+          </v-list-item>
+        </v-list>
+      </v-menu>
       
       <!-- login button -->
-      <v-btn variant="text" class='mr-0' v-if='!loggedIn' icon="mdi-login" nuxt  to='/login' :title='$t("common.login")' :aria-label='$t("common.login")' />
+      <v-btn variant="text" class='mr-0' v-if='!loggedIn' icon="mdi-login"  to='/login' :title='$t("common.login")' :aria-label='$t("common.login")' />
     </div>
   </div>
 </template>
