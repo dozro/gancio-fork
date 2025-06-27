@@ -1,5 +1,5 @@
 <script setup>
-import cloneDeep from 'lodash/cloneDeep'
+// import cloneDeep from 'lodash/cloneDeep'
 const { t } = useI18n()
 
 const valid = ref(false)
@@ -11,7 +11,7 @@ const announcement = reactive({ title: '', announcement: '' })
 const headers = [
   { value: 'title', text: t('common.title') },
   { value: 'actions', text: t('common.actions'), align: 'right', sortable: false }
-],
+]
 
 const { data: announcements, refresh } = useFetch('/api/announcements')
     
@@ -35,10 +35,13 @@ async function toggle(announcement) {
     await $fetch(`/api/announcements/${announcement.id}`, { method: 'PUT', body: announcement })
     
     // TODO: refresh announcements
+    refresh()
     // announcements.value = this.announcements.map(a => a.id === announcement.id ? announcement : a)
     // TODO: update global announcement useState!
     // this.setAnnouncements(cloneDeep(this.announcements.filter(a => a.visible)))
-  } catch (e) { }
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 async function remove(announcement) {
@@ -52,29 +55,31 @@ async function remove(announcement) {
     })
 }
     
-    
-async function save() {
-  if (!this.$refs.announcement.validate()) { return }
-  loading.value = true
-  try {
-    let announcement = null
-    if (this.editing) {
-      announcement = await this.$axios.$put(`/announcements/${this.announcement.id}`, this.announcement)
-      this.announcements = this.announcements.map(a => a.id === announcement.id ? announcement : a)
-    } else {
-      announcement = await this.$axios.$post('/announcements', this.announcement)
-      this.announcements = this.announcements.concat(announcement)
-    }
-    this.setAnnouncements(cloneDeep(this.announcements))
-    this.announcement = { title: '', announcement: '' }
-    this.$refs.announcement.reset()
-    this.editing = false
-    this.dialog = false
-  } catch (e) {
-    console.error(e)
-  }
-  loading.value = false
-}
+
+// async function save() {
+//   // if (!this.$refs.announcement.validate()) { return }
+//   loading.value = true
+//   try {
+//     let announcement = null
+//     if (editing.value) {
+//       announcement = await $fetch(`/announcements/${announcement.id}`, { method: 'PUT', body: announcement })
+//       refresh()
+//       // announcements = this.announcements.map(a => a.id === announcement.id ? announcement : a)
+//     } else {
+//       announcement = await $fetch('/announcements', { method: 'POST', body: announcement })
+//       refresh()
+//       // this.announcements = this.announcements.concat(announcement)
+//     }
+//     // this.setAnnouncements(cloneDeep(this.announcements))
+//     announcement = { title: '', announcement: '' }
+//     this.$refs.announcement.reset()
+//     editing.value = false
+//     dialog.value = false
+//   } catch (e) {
+//     console.error(e)
+//   }
+//   loading.value = false
+// }
 </script>
 
 <template>
@@ -89,18 +94,18 @@ async function save() {
           <v-text-field class='col-12' v-model='announcement.title'
             :rules="[$validators.required('common.title')]"
             :label='$t("common.title")' />
-          <Editor class='col-12' v-model='announcement.announcement'
+          <CoreEditor class='col-12' v-model='announcement.announcement'
             border no-save max-height='400px' :placeholder="$t('common.description')" />
         </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn @click='dialog = false' color='error' outlined> {{ $t('common.cancel') }}</v-btn>
-        <v-btn @click='save' color='primary' :disabled='!valid || loading' :loading='loading' outlined> {{ $t(`common.${editing ? 'save' : 'send'}`) }}</v-btn>
+        <v-btn @click='dialog = false' color='error' variant='outlined'> {{ $t('common.cancel') }}</v-btn>
+        <v-btn @click='save' color='primary' :disabled='!valid || loading' :loading='loading' variant='outlined'> {{ $t(`common.${editing ? 'save' : 'send'}`) }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <v-btn @click='openDialog' text color='primary' prepend-icon='mdi-plus'> {{ $t('common.add') }}</v-btn>
+  <v-btn @click='openDialog' variant='text' color='primary' prepend-icon='mdi-plus'> {{ $t('common.add') }}</v-btn>
   <v-card-text>
     <v-data-table
       v-if='announcements.length'
