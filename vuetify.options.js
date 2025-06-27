@@ -11,8 +11,8 @@ export default () => {
 
 return {
     // lang: { locales: { ca, cs, de, en, es, eu, fr, gl, it, nb, nl, pl, pt, sk, sv, tr, ro, ru, zhHans } },
-    // lang: { locales: { ca, cs, de, en, es, fr, it, nl, pl, pt, sk, sv, tr, ro, ru, zhHans } },
-    // locales: { ca, cs, it, en },
+    lang: { locales: { ca, cs, de, en, es, fr, it, nl, pl, pt, sk, sv, tr, ro, ru, zhHans } },
+    locales: { ca, cs, it, en },
     locale: {
       fallback: 'en',
       messages: { en, it }
@@ -99,13 +99,16 @@ return {
       VSwitch: {
         density: 'compact',
         inset: true,
-        color: 'indigo'
+        color: 'primary',
       },
       VDataTableServer: {
         density: 'compact',
       },
       VDataTableRow: {
-        density: 'compact'
+        density: 'compact',
+        VBtn: {
+          variant: 'text'
+        }
       },
       VDataTableItem: {
         density: 'compact'
