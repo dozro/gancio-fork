@@ -1,101 +1,226 @@
-<template lang="pug">
-v-col(cols=12)
-  .text-center
-    v-btn-toggle.flex-wrap.flex-row(v-if="!event.parentId && !event.recurrent" v-model='type' color='primary' @change='type => change("type", type)')
-      v-btn(value='normal' label="normal") {{ $t('event.normal') }}
-      v-btn(v-if='settings.allow_multidate_event' value='multidate' label='multidate') {{ $t('event.multidate') }}
-      v-btn(v-if='settings.allow_recurrent_event' value='recurrent' label="recurrent") {{ $t('event.recurrent') }}
+<script setup>
+import { DateTime } from 'luxon'
 
-    p {{ $t(`event.${type}_description`) }}
+const settings = useState('settings')
+const { t } = useI18n()
+const event = defineModel('event', { type: Object } )
+const type = ref('normal')
+const frequencies = [
+  { value: '1w', text: t('event.each_week') },
+  { value: '2w', text: t('event.each_2w') },
+  { value: '1m', text: t('event.each_month') }
+]
 
-    v-btn-toggle.v-col-6.flex-column.flex-sm-row(v-if='type === "recurrent"' color='primary' :value='value.recurrent.frequency' @change='fq => change("frequency", fq)')
-      v-btn(v-for='f in frequencies' :key='f.value' :value='f.value') {{ f.text }}
-    client-only
-      .datePicker.mt-3
-        v-input(:value='fromDate' :rules="[$validators.required('common.when')]")
-          vc-date-picker(
-            :value='fromDate'
-            :is-range='type === "multidate"'
-            @input="date => change('date', date)"
-            :attributes='attributes'
-            :locale='$i18n.locale'
-            :is-dark="is_dark"
+// Helpers
+function formatDate(ts) {
+  return new Date(ts * 1000).toISOString().substring(0, 10)
+}
+
+function formatTime(ts) {
+  return new Date(ts * 1000).toTimeString().substring(0, 5)
+}
+
+function toUnix(dateStr, timeStr) {
+  return Math.floor(new Date(`${dateStr}T${timeStr}`).getTime() / 1000)
+}
+
+// Selected date
+const selectedDate = computed({
+  get() {
+    return event.value.start_datetime ? formatDate(event.value.start_datetime) : ''
+  },
+  set(val) {
+    const sTime = startTime.value || '00:00'
+    const eTime = endTime.value || '00:00'
+    event.value.start_datetime = DateTime.fromJSDate(val).toUnixInteger() 
+    event.value.end_datetime = toUnix(val, eTime)
+  },
+})
+
+// Start time
+const startTime = computed({
+  get() {
+    return event.value.start_datetime ? formatTime(event.value.start_datetime) : ''
+  },
+  set(val) {
+    const date = selectedDate.value || '1970-01-01'
+    console.error(date)
+    event.value.start_datetime = toUnix(date, val)
+  },
+})
+
+// End time
+const endTime = computed({
+  get() {
+    return event.value.end_datetime ? formatTime(event.value.end_datetime) : ''
+  },
+  set(val) {
+    const date = selectedDate.value || '1970-01-01'
+    event.value.end_datetime = toUnix(date, val)
+  },
+})
+
+
+</script>
+<template>
+<v-col cols="12">
+  <div class="text-center">
+    
+    <v-btn-toggle
+      class="flex-wrap flex-row"
+      v-if="!event.parentId && !event.recurrent"
+      v-model="type"
+      color="primary"
+    >
+      <v-btn value="normal" label="normal">{{ $t('event.normal') }}</v-btn>
+      <v-btn v-if="settings.allow_multidate_event" value="multidate" label="multidate">{{ $t('event.multidate') }}</v-btn>
+      <v-btn v-if="settings.allow_recurrent_event" value="recurrent" label="recurrent">{{ $t('event.recurrent') }}</v-btn>
+    </v-btn-toggle>
+
+    <p>{{ $t(`event.${type}_description`) }}</p>
+
+    <v-btn-toggle
+      class="v-col-6 flex-column flex-sm-row"
+      v-if="type === 'recurrent'"
+      color="primary"
+      :model-value="event.recurrent.frequency"
+    >
+      <!-- @change="fq => change('frequency', fq)" -->
+      <v-btn v-for="f in frequencies" :key="f.value" :value="f.value">{{ f.text }}</v-btn>
+    </v-btn-toggle>
+  
+    <div class="mx-auto d-block mt-3">
+      <v-input v-model="selectedDate">
+        <template #default>
+          <DatePicker
+            :rules="[$valid.required('common.when')]"
+            class='mx-auto'
+            v-model='selectedDate'
+            :is-range="type === 'multidate'"
+            :locale="$i18n.locale"
             is-inline
             is-expanded
-            :min-date='!$auth?.user?.is_admin && new Date()')
-      v-col.calh.mx-auto(slot='placeholder')
-        v-progress-circular(indeterminate color='primary')
+          />
+            <!-- :attributes="attributes" -->
+            <!-- :is-dark="is_dark" -->
+            <!-- :min-date="!$auth?.user?.is_admin && new Date()" -->
+        </template>
+      </v-input>
+    </div>
+    
+  </div>
 
-  div.text-center.mb-2(v-if='type === "recurrent"')
-    span(v-if='value.recurrent.frequency !== "1m" && value.recurrent.frequency !== "2m"') {{ whenPatterns }}
-    v-btn-toggle.mt-1.flex-column.flex-sm-row(v-else :value='value.recurrent.type' color='primary' @change='fq => change("recurrentType", fq)')
-      v-btn(v-for='whenPattern in whenPatterns' :value='whenPattern.key' :key='whenPatterns.key' small) {{ whenPattern.label }}
+  <div class="text-center mb-2" v-if="type === 'recurrent'">
+    <span v-if="event.recurrent.frequency !== '1m' && event.recurrent.frequency !== '2m'">{{ whenPatterns }}</span>
+    <v-btn-toggle
+      class="mt-1 flex-column flex-sm-row"
+      v-else
+      :model-value="event.recurrent.type"
+    >
+      <v-btn
+        v-for="whenPattern in whenPatterns"
+        :value="whenPattern.key"
+        :key="whenPattern.key"
+        size='small'
+      >{{ whenPattern.label }}</v-btn>
+    </v-btn-toggle>
+  </div>
 
-  v-row.mt-3.col-md-6.mx-auto
-    v-col.col-12.col-sm-6
-      v-menu(
+  <v-row class="mt-3 col-md-6 mx-auto datePicker">
+    
+    <v-col class="col-12 col-sm-6">
+      <v-text-field
+        :label="$t('event.from')"
+        :rules="[$valid.required('event.from')]"
+        prepend-icon='mdi-clock-time-four-outline' type='time' step='300' />
+    </v-col>
+    
+    <v-col class="col-12 col-sm-6">
+        <!-- :disabled="!value.fromHour" -->
+      <v-text-field
+        :rules="[settings.allow_event_without_end_time ? true : $valid.required('event.due')]"
+        :label="$t('event.due')"
+        prepend-icon='mdi-clock-time-eight-outline' type='time' />
+    </v-col>    
+    
+  </v-row>
+  <!--
+      <v-menu
         v-model="menuFromHour"
         :close-on-content-click="false"
         offset-y
-        :value="value.fromHour"
+        :value="event.fromHour"
         max-width="290px"
         min-width="290px"
-        transition="scale-transition")
-        template(v-slot:activator="{ on, attrs }")
-          v-text-field(
+        transition="scale-transition"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field
             clearable
-            :clear-icon='mdiClose'
-            @click:clear='() => change("fromHour")'
+            :clear-icon="mdiClose"
+            @click:clear="() => change('fromHour')"
             :label="$t('event.from')"
             :value="$time.formatHour(value.fromHour)"
-            :disabled='!value.from'
+            :disabled="!value.from"
             readonly
             :prepend-icon="mdiClockTimeFourOutline"
             :rules="[$validators.required('event.from')]"
             v-bind="attrs"
-            v-on="on")
-        v-time-picker(
+            v-on="on"
+          ></v-text-field>
+        </template>
+        <v-time-picker
           v-if="menuFromHour"
           :value="value.fromHour"
-          :allowedMinutes='allowedMinutes'
+          :allowedMinutes="allowedMinutes"
           full-width
-          :format='$time.timeFormat()'
-          @click:minute='menuFromHour = false'
-          @input='hr => change("fromHour", hr)')
+          :format="$time.timeFormat()"
+          @click:minute="menuFromHour = false"
+          @input="hr => change('fromHour', hr)"
+        ></v-time-picker>
+      </v-menu>
+    </v-col>
 
-
-    v-col.col-12.col-sm-6
-      v-menu(
+    <v-col class="col-12 col-sm-6">
+      <v-menu
         v-model="menuDueHour"
         :close-on-content-click="false"
         offset-y
         max-width="290px"
         min-width="290px"
         :value="value.dueHour"
-        transition="scale-transition")
-        template(v-slot:activator="{ on, attrs }")
-          v-text-field(
+        transition="scale-transition"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field
             clearable
-            :clear-icon='mdiClose'
-            @click:clear='() => change("dueHour")'
-            :label="$t('event.due')"
+            :clear-icon="mdiClose"
+            @click:clear="() => change('dueHour')"
             :value="$time.formatHour(value.dueHour)"
-            :disabled='!value.fromHour'
             readonly
+            :disabled="!value.fromHour"
+            :label="$t('event.due')"
             :prepend-icon="mdiClockTimeEightOutline"
             :rules="[settings.allow_event_without_end_time ? true : $validators.required('event.due')]"
             v-bind="attrs"
-            v-on="on")
-        v-time-picker(
+            v-on="on"
+          ></v-text-field>
+        </template>
+        <v-time-picker
           v-if="menuDueHour"
           :value="value.dueHour"
           full-width
-          :allowedMinutes='allowedMinutes'
-          :format='$time.timeFormat()'
-          @click:minute='menuDueHour = false'
-          @input='hr => change("dueHour", hr)')
+          :allowedMinutes="allowedMinutes"
+          :format="$time.timeFormat()"
+          @click:minute="menuDueHour = false"
+          @input="hr => change('dueHour', hr)"
+        ></v-time-picker>
+      </v-menu>
+    </v-col>
+  </v-row> -->
+</v-col>
 
-  List(v-if='type === "normal" && todayEvents.length' :events='todayEvents' :title='$t("event.same_day")')
+  <!-- //List(v-if='type === "normal" && todayEvents.length' :events='todayEvents' :title='$t("event.same_day")') -->
 
 </template>
 <script>
@@ -288,8 +413,14 @@ v-col(cols=12)
 </script>
 
 <style>
-/* .datePicker {
+.datePicker {
   max-width: 500px !important;
   margin: 0 auto;
-} */
+}
+
+/* in chrome the input type time adds an icon by default, remove it to make it the same for each browser */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
 </style>
