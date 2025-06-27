@@ -1,176 +1,167 @@
-<script>
+<script setup>
 // import debounce from 'lodash/debounce'
 // import isEqual from 'lodash/isEqual'
 // import sortBy from 'lodash/sortBy'
 
-export default {
-  data({ $store }) {
-    return {
-      loading: false,
-      dialog: false,
-      valid: false,
-      collection: { name: '', id: null },
-      filterTags: [],
-      filterPlaces: [],
-      filterActors: [],
-      negateFilter: false,
-      actors: [],
-      tags: [],
-      places: [],
-      collections: [],
-      filters: [],
-      tagName: '',
-      placeName: '',
-      editFilterId: false,
-      collectionHeaders: [
-        { value: 'name', text: this.$t('common.name') },
-        // { value: 'filters', text: this.$t('common.filter') },
-        { value: 'pin', text: this.$t('common.pin'), align: 'right', sortable: false },
-        { value: 'actions', text: this.$t('common.actions'), align: 'right', width: 150, sortable: false }
-      ],
-      filterHeaders: [
-        { value: 'negate', text: '', width: 20, sortable: false },
-        { value: 'actors', text: this.$t('common.actors') },
-        { value: 'tags', text: this.$t('common.tags') },
-        { value: 'places', text: this.$t('common.places') },
-        { value: 'actions', text: this.$t('common.actions'), align: 'right', sortable: false }
-      ],
-      in_home: $store.state.settings.collection_in_home !== null,
-    }
-  },
-  async fetch() {
-    this.collections = await this.$axios.$get('/collections?withFilters=true')
-    this.setCollections(this.collections)
-    this.actors = await this.$axios.$get('/ap_actors/trusted')
 
-    // add local instance
-    this.actors.unshift({ ap_id: null })
-  },
-  computed: {
-    ...mapState(['settings']),
-    collection_in_home: {
-      get () { return this.settings.collection_in_home },
-      set (value) { this.setSetting({ key: 'collection_in_home', value }) }
-    },
-  },
-  watch: {
-    in_home (val) {
-      this.collection_in_home = null
-    }
-  },
-  methods: {
-    ...mapActions(['setSetting', 'setCollections']),
-    searchTags: debounce(async function (ev) {
-      this.tags = await this.$axios.$get(`/tag?search=${encodeURIComponent(ev.target.value)}`)
-    }, 100),
-    searchPlaces: debounce(async function (ev) {
-      this.places = await this.$axios.$get(`/place?search=${ev.target.value}`)
-    }, 100),
+const loading = ref(false)
+const dialog = ref(false)
+const valid = ref(false)
+const collection = ref({ name: '', id: null })
+const filterTags = ref([])
+const filterPlaces = ref([])
+const filterActors = ref([])
+const negateFilter = ref(false)
+const tags = ref([])
+const places = ref([])
+const filters = ref([])
+const tagName = ref('')
+const placeName = ref('')
+const editFilterId = ref(false)
+const collectionHeaders = [
+  { value: 'name', text: this.$t('common.name') },
+  // { value: 'filters', text: this.$t('common.filter') },
+  { value: 'pin', text: this.$t('common.pin'), align: 'right', sortable: false },
+  { value: 'actions', text: this.$t('common.actions'), align: 'right', width: 150, sortable: false }
+]
 
-    async addFilter() {
-      this.loading = true
-      const tags = this.filterTags
-      const places = this.filterPlaces.map(p => ({ id: p.id, name: p.name }))
-      const actors = this.filterActors.map(a => ({ ap_id: a.ap_id, name: a.object?.preferredUsername ?? a.object?.username ?? a?.name, domain: a?.instanceDomain ?? a.domain  }))
-      const filter = { collectionId: this.collection.id, tags, places, actors, negate: this.negateFilter }
+const filterHeaders = [
+  { value: 'negate', text: '', width: 20, sortable: false },
+  { value: 'actors', text: this.$t('common.actors') },
+  { value: 'tags', text: this.$t('common.tags') },
+  { value: 'places', text: this.$t('common.places') },
+  { value: 'actions', text: this.$t('common.actions'), align: 'right', sortable: false }
+]
 
-      // tags and places are JSON field and there's no way to use them inside a unique constrain
-      const alreadyExists = this.filters.find(f =>
-        isEqual(sortBy(f.places, 'id'), sortBy(filter.places, 'id')) && 
-        isEqual(sortBy(f.tags), sortBy(filter.tags)) &&
-        isEqual(sortBy(f.actors), sortBy(filter.actors))
-      )
+// const in_home  $store.state.settings.collection_in_home !== null,
+const { data: collections } = useFetch('/api/collections?withFilters=true')
+const { data: actors } = useFetch('/api/ap_users/trusted', { transform: (ret) => ret.unshift({ ap_id: null })})
 
-      if (this.editFilterId !== false) {
-        await this.$axios.$put(`/filter/${this.editFilterId}`, filter)
-      } else {
-        if (alreadyExists) {
-          this.$root.$message('Already exists', { color: 'warning' })
-          this.loading = false
-          return
-        }
-        await this.$axios.$post('/filter', filter )
-      }
+const settings = useState('settings')
 
-      this.$fetch()
-      this.filters = await this.$axios.$get(`/filter/${this.collection.id}`)
+  //   collection_in_home: {
+  //     get () { return this.settings.collection_in_home },
+  //     set (value) { this.setSetting({ key: 'collection_in_home', value }) }
+  //   },
+  // },
+  // watch: {
+  //   in_home (val) {
+  //     this.collection_in_home = null
+  //   }
+  // },
+  // methods: {
+    // ...mapActions(['setSetting', 'setCollections']),
+    // searchTags: debounce(async function (ev) {
+    //   this.tags = await this.$axios.$get(`/tag?search=${encodeURIComponent(ev.target.value)}`)
+    // }, 100),
+    // searchPlaces: debounce(async function (ev) {
+    //   this.places = await this.$axios.$get(`/place?search=${ev.target.value}`)
+    // }, 100),
 
-      this.filterTags = []
-      this.filterPlaces = []
-      this.filterActors = []
-      this.negateFilter = false
-      this.editFilterId = false
-      this.loading = false
-    },
-    async editCollection(collection) {
-      this.collection = { ...collection }
-      this.filters = await this.$axios.$get(`/filter/${collection.id}`)
-      this.dialog = true
-    },
-    newCollection() {
-      this.collection = { name: '', id: null }
-      this.filters = []
-      this.dialog = true
-    },
-    async saveCollection() {
-      if (!this.$refs.form.validate()) return
-      this.loading = true
-      this.collection.name = this.collection.name.trim()
-      this.collection = await this.$axios.$post('/collections', this.collection)
-      this.$fetch()
-      this.loading = false
-    },
-    async moveUp (collection) {
-      try {
-        await this.$axios.$put(`/collection/moveup/${collection.sortIndex}`)
-        this.$fetch()
-      } catch (e) {
-        const err = get(e, 'response.data.errors[0].message', e)
-        this.$root.$message(this.$t(err), { color: 'error' })
-      }
-    },
-    async togglePinCollection (collection) {
-      try {
-        await this.$axios.$put(`/collection/toggle/${collection.id}`)
-        collection.isTop = !collection.isTop
-      } catch (e) {
-        const err = get(e, 'response.data.errors[0].message', e)
-        this.$root.$message(this.$t(err), { color: 'error' })
-      }
-    },
-    async editFilter(filter) {
-      this.filterActors = filter.actors
-      this.filterPlaces = filter.places
-      this.filterTags = filter.tags
-      this.negateFilter = filter.negate
-      this.editFilterId = filter.id
-    },
-    async removeFilter(filter) {
-      try {
-        await this.$axios.$delete(`/filter/${filter.id}`)
-        this.filters = this.filters.filter(f => f.id !== filter.id)
-        this.$fetch()
-      } catch (e) {
-        const err = get(e, 'response.data.errors[0].message', e)
-        this.$root.$message(this.$t(err), { color: 'error' })
-        this.loading = false
-      }
-    },
-    async removeCollection(collection) {
-      const ret = await this.$root.$confirm('admin.delete_collection_confirm', { collection: collection.name })
-      if (!ret) { return }
-      try {
-        await this.$axios.$delete(`/collection/${collection.id}`)
-        this.collections = this.collections.filter(c => c.id !== collection.id)
-        this.setCollections(this.collections)
-      } catch (e) {
-        const err = get(e, 'response.data.errors[0].message', e)
-        this.$root.$message(this.$t(err), { color: 'error' })
-        this.loading = false
-      }
-    }
-  }
-}
+// async function addFilter() {
+//       this.loading = true
+//       const tags = this.filterTags
+//       const places = this.filterPlaces.map(p => ({ id: p.id, name: p.name }))
+//       const actors = this.filterActors.map(a => ({ ap_id: a.ap_id, name: a.object?.preferredUsername ?? a.object?.username ?? a?.name, domain: a?.instanceDomain ?? a.domain  }))
+//       const filter = { collectionId: this.collection.id, tags, places, actors, negate: this.negateFilter }
+
+//       // tags and places are JSON field and there's no way to use them inside a unique constrain
+//       const alreadyExists = this.filters.find(f =>
+//         isEqual(sortBy(f.places, 'id'), sortBy(filter.places, 'id')) && 
+//         isEqual(sortBy(f.tags), sortBy(filter.tags)) &&
+//         isEqual(sortBy(f.actors), sortBy(filter.actors))
+//       )
+
+//       if (this.editFilterId !== false) {
+//         await this.$axios.$put(`/filter/${this.editFilterId}`, filter)
+//       } else {
+//         if (alreadyExists) {
+//           this.$root.$message('Already exists', { color: 'warning' })
+//           this.loading = false
+//           return
+//         }
+//         await this.$axios.$post('/filter', filter )
+//       }
+
+//       this.$fetch()
+//       this.filters = await this.$axios.$get(`/filter/${this.collection.id}`)
+
+//       this.filterTags = []
+//       this.filterPlaces = []
+//       this.filterActors = []
+//       this.negateFilter = false
+//       this.editFilterId = false
+//       this.loading = false
+//     },
+//     async editCollection(collection) {
+//       this.collection = { ...collection }
+//       this.filters = await this.$axios.$get(`/filter/${collection.id}`)
+//       this.dialog = true
+//     },
+//     newCollection() {
+//       this.collection = { name: '', id: null }
+//       this.filters = []
+//       this.dialog = true
+//     },
+//     async saveCollection() {
+//       if (!this.$refs.form.validate()) return
+//       this.loading = true
+//       this.collection.name = this.collection.name.trim()
+//       this.collection = await this.$axios.$post('/collections', this.collection)
+//       this.$fetch()
+//       this.loading = false
+//     },
+//     async moveUp (collection) {
+//       try {
+//         await this.$axios.$put(`/collection/moveup/${collection.sortIndex}`)
+//         this.$fetch()
+//       } catch (e) {
+//         const err = get(e, 'response.data.errors[0].message', e)
+//         this.$root.$message(this.$t(err), { color: 'error' })
+//       }
+//     },
+//     async togglePinCollection (collection) {
+//       try {
+//         await this.$axios.$put(`/collection/toggle/${collection.id}`)
+//         collection.isTop = !collection.isTop
+//       } catch (e) {
+//         const err = get(e, 'response.data.errors[0].message', e)
+//         this.$root.$message(this.$t(err), { color: 'error' })
+//       }
+//     },
+//     async editFilter(filter) {
+//       this.filterActors = filter.actors
+//       this.filterPlaces = filter.places
+//       this.filterTags = filter.tags
+//       this.negateFilter = filter.negate
+//       this.editFilterId = filter.id
+//     },
+//     async removeFilter(filter) {
+//       try {
+//         await this.$axios.$delete(`/filter/${filter.id}`)
+//         this.filters = this.filters.filter(f => f.id !== filter.id)
+//         this.$fetch()
+//       } catch (e) {
+//         const err = get(e, 'response.data.errors[0].message', e)
+//         this.$root.$message(this.$t(err), { color: 'error' })
+//         this.loading = false
+//       }
+//     },
+//     async removeCollection(collection) {
+//       const ret = await this.$root.$confirm('admin.delete_collection_confirm', { collection: collection.name })
+//       if (!ret) { return }
+//       try {
+//         await this.$axios.$delete(`/collection/${collection.id}`)
+//         this.collections = this.collections.filter(c => c.id !== collection.id)
+//         this.setCollections(this.collections)
+//       } catch (e) {
+//         const err = get(e, 'response.data.errors[0].message', e)
+//         this.$root.$message(this.$t(err), { color: 'error' })
+//         this.loading = false
+//       }
+//     }
+//   }
+// }
 </script>
 <template>
 <div>
@@ -196,7 +187,7 @@ export default {
             v-if="in_home"
             :disabled="!!filters.length"
             v-model="collection_in_home"
-            outlined
+            variant='outlined'
             :label="$t('common.collections')"
             hide-details
             color="primary"
@@ -206,13 +197,13 @@ export default {
             hide-no-data
             clearable
             :clear-icon="mdiCloseCircle"
-            item-text="name"
+            item-title="name"
           />
         </v-col>
       </v-row>
     </v-card-text>
 
-    <v-btn color="primary" text @click="newCollection">
+    <v-btn color="primary" variant='text' @click="newCollection">
       <v-icon v-text="mdiPlus" />
       {{ $t('admin.new_collection') }}
     </v-btn>
@@ -239,7 +230,7 @@ export default {
             >
               <template v-slot:append-outer v-if="!collection.id">
                 <v-btn
-                  text
+                  variant='text'
                   @click="saveCollection"
                   color="primary"
                   :loading="loading"
@@ -256,12 +247,10 @@ export default {
             <v-col cols="6">
               <v-autocomplete
                 v-model="filterActors"
-                cache-items
                 :prepend-inner-icon="mdiWeb"
                 chips
-                small-chips
                 multiple
-                deletable-chips
+                closable-chips
                 hide-no-data
                 hide-selected
                 persistent-hint
@@ -270,7 +259,7 @@ export default {
                 return-object
                 hide-details
                 item-value="ap_id"
-                item-text="ap_id"
+                item-title="ap_id"
                 :delimiters="[';', ',']"
                 :items="actors"
                 :label="$t('common.trusted_sources')"
@@ -288,15 +277,15 @@ export default {
                     </v-list-item-subtitle>
                   </v-list-item-content>
                 </template>
-                <template v-slot:selection="{ item, attrs, selected, parent }">
+                <template #chip="{ item, attrs, selected, parent }">
                   <v-chip
                     v-bind="attrs"
-                    close
+                    closable
                     :close-icon="mdiCloseCircle"
                     @click:close="parent.selectItem(item)"
-                    :input-value="selected"
+                    :model-value="selected"
                     label
-                    small
+                    size='small'
                   >
                     {{ $format.actor(item, 'label') }}
                   </v-chip>
@@ -307,12 +296,10 @@ export default {
             <v-col cols="6">
               <v-autocomplete
                 v-model="filterPlaces"
-                cache-items
                 :prepend-inner-icon="mdiMapMarker"
                 chips
-                small-chips
                 multiple
-                deletable-chips
+                closable-chips
                 hide-no-data
                 hide-selected
                 persistent-hint
@@ -320,23 +307,24 @@ export default {
                 clearable
                 return-object
                 hide-details
-                item-text="name"
+                item-title="name"
                 :disabled="!collection.id"
-                @input="searchPlaces"
+                @update:model-value="searchPlaces"
                 @focus="searchPlaces"
                 :delimiters="[';', ',']"
                 :items="places"
                 :label="$t('common.places')"
               >
-                <template v-slot:selection="{ item, attrs, selected, parent }">
+                <template
+                  #chip="{ item, attrs, selected, parent }">
                   <v-chip
                     v-bind="attrs"
-                    close
+                    closable
                     :close-icon="mdiCloseCircle"
                     @click:close="parent.selectItem(item)"
-                    :input-value="selected"
+                    :model-value="selected"
                     label
-                    small
+                    size='small'
                   >
                     {{ item.name }}
                   </v-chip>
@@ -347,19 +335,17 @@ export default {
             <v-col cols="6">
               <v-combobox
                 v-model="filterTags"
-                cache-items
                 :prepend-inner-icon="mdiTagMultiple"
                 chips
-                small-chips
                 multiple
-                deletable-chips
+                closable-chips
                 hide-no-data
                 hide-selected
                 persistent-hint
                 :disabled="!collection.id"
                 hide-details
                 placeholder="All"
-                @input="searchTags"
+                @update:model-value="searchTags"
                 @focus="searchTags"
                 :delimiters="[';', ',']"
                 :items="tags"
@@ -368,12 +354,12 @@ export default {
                 <template v-slot:selection="{ item, attrs, selected, parent }">
                   <v-chip
                     v-bind="attrs"
-                    close
+                    closable
                     :close-icon="mdiCloseCircle"
                     @click:close="parent.selectItem(item)"
-                    :input-value="selected"
+                    :model-value="selected"
                     label
-                    small
+                    size='small'
                   >
                     {{ item }}
                   </v-chip>
@@ -414,7 +400,7 @@ export default {
             <template v-slot:item.tags="{ item }">
               <v-chip
                 class="ma-1"
-                small
+                size='small'
                 label
                 v-for="tag in item.tags"
                 v-text="tag"
@@ -424,7 +410,7 @@ export default {
             <template v-slot:item.places="{ item }">
               <v-chip
                 class="ma-1"
-                small
+                size='small'
                 label
                 v-for="place in item.places"
                 v-text="place.name"
@@ -434,7 +420,7 @@ export default {
             <template v-slot:item.actors="{ item }">
               <v-chip
                 class="ma-1"
-                small
+                size='small'
                 label
                 v-for="actor in item.actors"
                 :key="actor.ap_id"
@@ -459,20 +445,21 @@ export default {
           >
             {{ $t('common.add') }}
           </v-btn>
+          
           <v-btn
             color="primary"
+            variant='outlined'
             v-else
-            outlined
             :loading="loading"
-            text
             @click="addFilter"
             :disabled="loading || filterActors.length<1 && filterPlaces.length<1 && filterTags.length<1"
           >
             {{ $t('common.save') }}
           </v-btn>
+          
           <v-btn
             @click="dialog = false"
-            outlined
+            variant='outlined'
             color="warning"
             :disabled="loading || filterActors.length>0 || filterPlaces.length>0 || filterTags.length>0"
           >
@@ -493,8 +480,8 @@ export default {
         <template v-slot:item.pin="{ item }">
           <v-switch
             class="float-right"
-            :input-value="item.isTop"
-            @change="togglePinCollection(item)"
+            :model-value="item.isTop"
+            @update="togglePinCollection(item)"
             inset
             hide-details
           />
