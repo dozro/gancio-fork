@@ -42,7 +42,12 @@ export default defineNuxtConfig({
     strategy: 'no_prefix',
     defaultLocale: 'en',
     vueI18n: 'i18n.config.js'
-  },  
+  },
+  vue: {
+    compilerOptions: {
+      isCustomElement: tag => ['gancio-events', 'gancio-event'].includes(tag)
+    }
+  },
   runtimeConfig: {
     baseurl: config?.baseurl ?? process.env.BASE_URL,
     db_dialect: config?.db?.dialect ?? process.env.DB_DIALECT,
