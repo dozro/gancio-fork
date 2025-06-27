@@ -1,4 +1,9 @@
-<template lang="pug">
+<script setup>
+</script>
+<template>
+</template>
+
+<!-- <template lang="pug">
 v-card
   v-card-title {{$t('admin.geolocation')}}
   v-card-text
@@ -155,4 +160,4 @@ export default {
   }
 }
 </script>
-
+ -->
