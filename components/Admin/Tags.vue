@@ -1,7 +1,7 @@
 <script setup>
 import get from 'lodash/get'
 const { t } = useI18n()
-const { $notify } = useNuxtApp()
+const { $notify, $confirm } = useNuxtApp()
 
 const loading = ref(false)
 const dialog = ref(false)
@@ -58,7 +58,7 @@ async function removeTag (tag) {
     <v-spacer />
     <v-text-field
       v-model='search'
-      :append-icon='mdiMagnify' outlined rounded
+      :append-icon='mdiMagnify' variant='outlined' rounded
       :label="$t('common.search')"
       single-line hide-details />
 
@@ -79,7 +79,7 @@ async function removeTag (tag) {
             :items="newTag ? tags.filter(t => t.tag.includes(newTag)) : tags"
             :return-object='false'
             item-value='tag'
-            item-text='tag'
+            item-title='tag'
             :label="$t('common.tag')"
             @keyup.enter='saveTag'>
               <template #item="{ item }">
@@ -90,8 +90,9 @@ async function removeTag (tag) {
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn @click='dialog = false' outlined color='warning'> {{ $t('common.cancel') }}</v-btn>
-        <v-btn @click='saveTag' color='primary' outlined :loading='loading'
+        <v-btn @click='dialog = false' variant='outlined' color='warning'> {{ $t('common.cancel') }}</v-btn>
+        <v-btn
+          @click='saveTag' color='primary' variant='outlined' :loading='loading'
           :disabled='!newTag || loading'> {{ $t('common.save') }}</v-btn>
       </v-card-actions>
     </v-card>

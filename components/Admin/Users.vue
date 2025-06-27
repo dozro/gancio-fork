@@ -34,7 +34,7 @@ async function toggle (user) {
     if (!ret) { return }
   }
   user.is_active = !user.is_active
-  $fetch('/api/user', { method: 'PUT', body: user })
+  fetch('/api/user', { method: 'PUT', body: user })
 }
 
 async function deleteUser (user) {
@@ -54,7 +54,7 @@ async function deleteUser (user) {
 
   async function toggle_to_notify (user) {
     user.to_notify = !user.to_notify
-    await $fetch('/api/user', { method: 'PUT', body: user })
+    await fetch('/api/user', { method: 'PUT', body: user })
   }
   
   async function changeRole (user, role) {
@@ -62,7 +62,7 @@ async function deleteUser (user) {
     const ret = await $confirm('admin.change_role_confirm', { user: user.email, from_role: user.role, to_role: role })
     if (!ret) { return }
     try {
-      await $fetch('/api/user', { method: 'PUT', body: ({ ...user, role })})
+      await fetch('/api/user', { method: 'PUT', body: ({ ...user, role })})
       user.role = role
     } catch (e) {
       console.error(e)
@@ -96,7 +96,7 @@ async function deleteUser (user) {
       <v-text-field
         v-model="search"
         append-icon="mdi-magnify"
-        outlined
+        variant='outlined'
         rounded
         :label="$t('common.search')"
         single-line
@@ -104,7 +104,7 @@ async function deleteUser (user) {
       />
     </v-card-title>
 
-    <v-btn color="primary" text @click="newUserDialog = true" append-icon='mdi-plus'>
+    <v-btn color="primary" variant='text' @click="newUserDialog = true" append-icon='mdi-plus'>
       {{$t('common.new_user')}}
     </v-btn> 
 
@@ -113,7 +113,7 @@ async function deleteUser (user) {
       <v-card>
         <v-card-title>{{$t('common.new_user')}}</v-card-title>
         <v-card-text>
-          <v-form v-model="valid" ref="userForm" lazy-validation @submit.prevent="createUser">
+          <v-form v-model="valid" ref="userForm" validate-on='lazy' @submit.prevent="createUser">
             <v-col>
               <v-text-field
                 v-model="newUser.email"
@@ -138,8 +138,8 @@ async function deleteUser (user) {
           <v-alert type="info" :closable="false" icon="mdi-information">{{$t('admin.user_add_help')}}</v-alert>
           <v-card-actions>
             <v-spacer/>
-            <v-btn @click="newUserDialog=false" color="error" outlined>{{$t('common.cancel')}}</v-btn>
-            <v-btn @click="createUser" :disabled="!valid" color="primary" outlined>{{$t('common.send')}}</v-btn>
+            <v-btn @click="newUserDialog=false" color="error" variant='outlined'>{{$t('common.cancel')}}</v-btn>
+            <v-btn @click="createUser" :disabled="!valid" color="primary" variant='outlined'>{{$t('common.send')}}</v-btn>
           </v-card-actions>
         </v-card-text>
       </v-card> 
@@ -148,6 +148,7 @@ async function deleteUser (user) {
     <v-card-text>
       <!-- USERS LIST -->
       <v-data-table
+        v-if='users'
         :headers="headers"
         :items="users"
         :search="search"
