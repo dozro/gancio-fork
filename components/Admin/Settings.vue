@@ -1,6 +1,8 @@
 <script setup lang="ts">
-// const { Settings, saveSetting } = useSettings()
-// const settings = useState('settings')
+const settings = useState('settings')
+
+const { locales } = useI18n()
+const filteredTimezones = []
 
 const instanceSettings = await $fetch('/api/settings')
 
@@ -10,78 +12,108 @@ async function setSetting(key: string, value: string) {
     // return saveSetting(key, value)
 }
 
+
+function manageSetting(key) {
+  return computed({
+    get: () =>  settings.value[key],
+    set: (value) => {
+      $fetch('/api/settings', { method: 'PUT', body: { key, value } })
+      settings.value[key] = value
+    }
+  })
+}
+
+const title = manageSetting('title')
+const description = manageSetting('description')
+const instance_timezone = manageSetting('instance_timezone')
+const instance_locale = manageSetting('instance_locale')
+const allow_registration = manageSetting('allow_registration')
+const allow_anon_event = manageSetting('allow_anon_event')
+const allow_multidate_event = manageSetting('allow_multidate_event')
+const allow_recurrent_event = manageSetting('allow_recurrent_event')
+const recurrent_event_visible = manageSetting('recurrent_event_visible')
+const allow_event_without_end_time = manageSetting('allow_event_without_end_time')
+const allow_online_event = manageSetting('allow_online_event')
+const allow_geolocation = manageSetting('allow_geolocation')
+const show_download_media = manageSetting('show_download_media')
+const enable_moderation = manageSetting('enable_moderation')
+const enable_report = manageSetting('enable_report')
+
+
 </script>
 <template>
-    <v-container>
-        <v-card-title>{{ $t('common.settings') }}</v-card-title>
-        <v-card-text>
-            
-            <v-text-field :modelValue="instanceSettings.title"
-                :label="$t('common.title')"
-                @update:model-value="(v: string) => setSetting('title', v)"
-                :hint="$t('admin.title_description')" persistent-hint />
-            
-            <v-text-field class='mt-5' :modelValue="instanceSettings.description" @update:model-value="(v:string) => setSetting('description', v)"
-                :label="$t('common.description')"
-                :hint="$t('admin.description_description')" persistent-hint />
+<v-container>
+    <v-card-title>{{ $t('common.settings') }}</v-card-title>
+    <v-card-text>
+        
+        <v-text-field v-model="title"
+          :label="$t('common.title')"
+          :hint="$t('admin.title_description')" persistent-hint />
+        
+        <v-text-field class='mt-5' v-model="description" 
+          :label="$t('common.description')"
+          :hint="$t('admin.description_description')" persistent-hint />
 
-            <v-autocomplete class="mt-5" 
-                :modelValue="instanceSettings.instance_timezone" @update:model-value="(v:string) => setSetting('instance_timezone', v)"
-                :label="$t('admin.select_instance_timezone')" :hint="$t('admin.instance_timezone_description')"
-                :items="filteredTimezones" persistent-hint placeholder="Timezone, type to search" />
+        <v-autocomplete class="mt-5" 
+            v-model="instance_timezone" 
+            :label="$t('admin.select_instance_timezone')" :hint="$t('admin.instance_timezone_description')"
+            :items="filteredTimezones" persistent-hint placeholder="Timezone, type to search" />
 
-            <v-select class="mt-5" 
-                :modelValue="instanceSettings.instance_locale" @update:model-value="(v:string) => setSetting('instance_locale', v)"
-                :label="$t('admin.instance_locale')" :hint="$t('admin.instance_locale_description')" persistent-hint :items="locales" />
+        <v-select class="mt-5" 
+            v-model="instance_locale" 
+            :label="$t('admin.instance_locale')" :hint="$t('admin.instance_locale_description')" persistent-hint :items="locales" />
 
-            <v-switch class="mt-4"
-                :modelValue="instanceSettings.allow_registration" @update:model-value="(v:boolean) => setSetting('allow_registration', v)"
-                :label="$t('admin.allow_registration_description')" />
+        <v-switch class="mt-4"
+            v-model="allow_registration" 
+            :label="$t('admin.allow_registration_description')" />
 
-            <v-switch class="mt-1"
-                :modelValue="instanceSettings.allow_anon_event" @update:model-value="(v:boolean) => setSetting('allow_anon_event', v)"
-                :label="$t('admin.allow_anon_event')" />
+        <v-switch class="mt-1"
+            v-model="allow_anon_event" 
+            :label="$t('admin.allow_anon_event')" />
 
-            <v-switch class="mt-1" 
-                :modelValue="instanceSettings.allow_multidate_event" @update:model-value="(v:boolean) => setSetting('allow_multidate_event', v)"
-                :label="$t('admin.allow_multidate_event')" />
+        <v-switch class="mt-1" 
+            v-model="allow_multidate_event" 
+            :label="$t('admin.allow_multidate_event')" />
 
-            <v-switch class="mt-1" 
-                :modelValue="instanceSettings.allow_recurrent_event" @update:model-value="(v:boolean) => setSetting('allow_recurrent_event', v)"
-                :label="$t('admin.allow_recurrent_event')" />
+        <v-switch class="mt-1" 
+            v-model="allow_recurrent_event" 
+            :label="$t('admin.allow_recurrent_event')" />
 
-            <v-switch class="mt-1" v-if="instanceSettings.allow_recurrent_event"
-                :modelValue="instanceSettings.recurrent_event_visible" @update:model-value="(v:boolean) => setSetting('recurrent_event_visible', v)"
-                :label="$t('admin.recurrent_event_visible')" />
+        <v-switch class="mt-1" v-if="instanceSettings.allow_recurrent_event"
+            v-model="recurrent_event_visible" 
+            :label="$t('admin.recurrent_event_visible')" />
 
-            <v-switch class="mt-1" 
-                :modelValue="instanceSettings.allow_event_without_end_time" @update:model-value="(v:boolean) => setSetting('allow_event_without_end_time', v)"
-                :label="$t('admin.allow_event_without_end_time')" />
+        <v-switch class="mt-1" 
+            v-model="allow_event_without_end_time" 
+            :label="$t('admin.allow_event_without_end_time')" />
 
-            <v-switch class="mt-1" 
-                :modelValue="instanceSettings.allow_online_event" @update:model-value="(v:boolean) => setSetting('allow_online_event', v)"
-                :label="$t('admin.allow_online_event')" />
+        <v-switch class="mt-1" 
+            v-model="allow_online_event" 
+            :label="$t('admin.allow_online_event')" />
 
-            <v-switch class="mt-4" 
-                :modelValue="instanceSettings.allow_geolocation" @update:model-value="(v:boolean) => setSetting('allow_geolocation', v)"
-                persistent-hint :hint="$t('admin.allow_geolocation_hint')" 
-                :label="$t('admin.allow_geolocation')" />
+        <v-switch class="mt-4" 
+            v-model="allow_geolocation" 
+            persistent-hint :hint="$t('admin.allow_geolocation_hint')" 
+            :label="$t('admin.allow_geolocation')" />
 
-            <v-switch class="mt-4" 
-                :modelValue="instanceSettings.show_download_media" @update:model-value="(v:boolean) => setSetting('show_download_media', v)"
-                persistent-hint :hint="$t('admin.show_download_media_hint')" 
-                :label="$t('admin.show_download_media')" />
+        <v-switch class="mt-4" 
+            v-model="show_download_media" 
+            persistent-hint :hint="$t('admin.show_download_media_hint')" 
+            :label="$t('admin.show_download_media')" />
 
-            <v-switch class="mt-4" 
-                :modelValue="instanceSettings.enable_moderation" @update:model-value="(v:boolean) => setSetting('enable_moderation', v)"
-                persistent-hint :hint="$t('admin.enable_moderation_hint')" 
-                :label="$t('admin.enable_moderation')" />
+        <v-switch class="mt-4" 
+            v-model="enable_moderation" 
+            density='compact'
+            persistent-hint :hint="$t('admin.enable_moderation_hint')" 
+            :label="$t('admin.enable_moderation')" />
 
-            <v-switch class="mt-4" v-if="instanceSettings.enable_moderation" persistent-hint :hint="$t('admin.enable_report_hint')"
-                :modelValue="instanceSettings.enable_report" @update:model-value="(v:boolean) => setSetting('enable_report', v)"
-                :label="$t('admin.enable_report')" />
+        <v-switch class="mt-4" v-if="instanceSettings.enable_moderation"
+          persistent-hint
+          :hint="$t('admin.enable_report_hint')"
+          v-model='enable_report'
+          :label="$t('admin.enable_report')" />
 
 
-        </v-card-text>
-    </v-container>
+    </v-card-text>
+</v-container>
 </template>
