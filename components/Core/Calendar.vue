@@ -1,14 +1,15 @@
 <script setup>
 
+import time from '~/utils/time'
 const params = useState('params')
-const selectedDate = useState<Date>('selectedDate', () => {})
+const selectedDate = useState<Date>('selectedDate')
 const attributes = useState('attributes')
 const theme = useTheme()
 
-const { startMonth } = useTime()
+// const { startMonth } = useTime()
 function updatePages (pages) {
   const start = pages?.[0] ?? pages
-  const tmpStart = startMonth(start.year, start.month)
+  const tmpStart = time.startMonth(start.year, start.month)
   if (tmpStart != params.value.start) {
     params.value.start = tmpStart
   }
