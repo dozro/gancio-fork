@@ -1,22 +1,25 @@
 <script setup>
+import { Statuses } from '~/types/settings'
+
 const props = defineProps({ event: { type: Object, default: () => ({}) } })
 const settings = useState('settings')
-const { $confirm, $message } = useNuxtApp()
+const { isAdmin } = useAuth()
+const { $confirm, $notify } = useNuxtApp()
 
 async function disableAuthor () {
   const ret = await $confirm('event.disable_author_confirm')
   if (!ret) { return }
   try {
     await $fetch(`/api/event/disable_author/${props.event.id}`, { method: 'PUT' })
-    $message('Author disabled!')
+    $notify('Author disabled!', Statuses.SUCCESS)
     props.event.isAnon = true
   } catch (e) {
-    $message(e, { color: 'warning' })
+    $notify(e, Statuses.WARNING)
   }
 }
 
 async function remove (parent = false) {
-  const ret = await $confirm(`event.remove_${parent ? 'recurrent_' : ''}confirmation`)
+  const ret = await $confirm(`event.remove_${parent ? 'recurrent_' : ''}confirmation`, { event: props.event?.title })
   if (!ret) { return }
   const id = parent ? props.event.parentId : props.event.id
   await $fetch(`/event/${id}`, { method: 'DELETE' })
@@ -38,20 +41,21 @@ async function toggle (parent = false) {
     console.error(e)
   }
 }
+
+const opened = ref(['Admin'])
 </script>
 
 <template>
-<span>
-  <v-list density='compact'  nav color="transparent">
-    <v-list-group append-icon="mdi-chevron-up" :value="true">
-      <template v-slot:activator>
-        <v-list-item class="text-overline">{{$t('common.admin_actions')}}</v-list-item>
+  <v-list density='compact' v-model:opened="opened" >
+    <v-list-group value='Admin'>
+      <template v-slot:activator="{ props }" >
+        <v-list-item class="text-overline" v-bind='props'>{{$t('common.admin_actions')}}</v-list-item>
       </template>
 
       <!-- Hide / confirm event -->
       <v-list-item
         @click="toggle(false)"
-        :icon="event.is_visible ? 'mdi-eye-off' : 'mdi-eye' "
+        :icon="event?.is_visible ? 'mdi-eye-off' : 'mdi-eye' "
         :title="$t(`common.${event.is_visible?(event.parentId?'skip':'hide'):'confirm'}`)" />
 
       <!-- Edit event -->
@@ -81,13 +85,13 @@ async function toggle (parent = false) {
 
       <!-- Disable author -->
       <v-list-item
-        v-if="settings.enable_moderation && !event.isAnon && $auth.user.is_admin" @click="disableAuthor"
+        v-if="settings.enable_moderation && !event.isAnon && isAdmin" @click="disableAuthor"
         prepend-icon='mdi-account-off'
         :title="$t('event.disable_author')" />
 
       <!-- Assign to user -->
       <v-list-item
-        v-if="event.isAnon && $auth?.user?.is_admin" @click="$emit('openAssignAuthor')"
+        v-if="event.isAnon && isAdmin" @click="$emit('openAssignAuthor')"
         prepend-icon='mdi-clipboard-account'
         :title="$t('event.assign_to_user')" />
 
@@ -120,5 +124,4 @@ async function toggle (parent = false) {
       </template>
     </v-list-group>
   </v-list>
-</span>
 </template>

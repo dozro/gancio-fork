@@ -25,7 +25,7 @@ const { data: footerLinks } = await useFetch<FooterLink[]>('/api/settings/footer
     
     <!-- follow me dialog -->
     <v-dialog v-model='showFollowMe' destroy-on-close max-width='700px' :fullscreen='$vuetify.display?.mobile'>
-      <!-- <FollowMe @close='showFollowMe=false' is-dialog /> -->
+      <FollowMe @close='showFollowMe=false' is-dialog />
     </v-dialog>
     
     <!-- footer links -->
