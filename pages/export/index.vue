@@ -1,11 +1,14 @@
 <script setup>
 // import clipboard from '../assets/clipboard'
 // import { useClipboard } from '@vueuse/core
-
+// 
+// 
+const theme = useTheme()
+const route = useRoute()
 const { data: events } = await useFetch('/api/events')
 const settings = useState('settings')
 
-const type = ref('feed')
+const type = ref(route?.hash ?? 'feed')
 const list = reactive({
   title: settings.title,
   maxEvents: null,
@@ -79,11 +82,13 @@ const link = computed(() => {
     <v-card-title> {{$t('common.share')}}</v-card-title>
     <v-card-text>
       <p class='text-body-1'> {{$t('export.intro')}}</p>
-      <v-card variant='outlined' :dark='is_dark' :color="is_dark ? '#333' : '#ececec'">
+      <v-card variant='outlined' color='note'>
         <v-card-title> {{$t('export.filter_title')}}</v-card-title>
         <v-card-subtitle> {{$t('export.filter_description')}}</v-card-subtitle>
         <v-card-text>
           <!-- <Search v-model='filters' /> -->
+          <span>{{filters}}</span>
+          <CoreFilter v-model='filters' />
         </v-card-text>
       </v-card>
     </v-card-text>
@@ -109,7 +114,7 @@ const link = computed(() => {
       <v-card-text>
       <v-tabs-window v-model='type'>
 
-        <v-tabs-window-item value="feed">
+        <v-tabs-window-item value="feed" id='feed'>
           <v-card>
             <v-card-text>
               <section v-html='$t(`export.feed_description`)' />
@@ -125,7 +130,7 @@ const link = computed(() => {
         </v-tabs-window-item>
 
         
-        <v-tabs-window-item value='ical'>
+        <v-tabs-window-item value='ical' id='ical'>
           <v-card>
             <v-card-text>
               <section v-html='$t(`export.ical_description`)' />
@@ -141,7 +146,7 @@ const link = computed(() => {
         </v-tabs-window-item>
 
         <!-- <v-tab> {{$t('export.list_title')}}</v-tab> -->
-        <v-tabs-window-item value='list'>
+        <v-tabs-window-item value='list' id='list'>
           <v-card>
             <v-card-text>
               <p v-html='$t(`export.list_description`)' />
@@ -176,7 +181,7 @@ const link = computed(() => {
           </v-card>
         </v-tabs-window-item>
 
-        <v-tabs-window-item v-if='settings.enable_federation' value='federation'>
+        <v-tabs-window-item v-if='settings.enable_federation' value='federation' id='federation'>
           <FollowMe />
         </v-tabs-window-item>
           <!-- //- TOFIX

@@ -3,8 +3,8 @@ import { Statuses } from "~/types/settings"
 export default defineNuxtPlugin(() => {
   const { $once, $emit } = useNuxtApp() // nuxtApp
   
-  function confirm (msg: string) {
-    $emit('confirmDialog', { msg })
+  function confirm (msg: string, args?: Object) {
+    $emit('confirmDialog', { msg, args })
     return new Promise((resolve, _reject) => {
       $once('confirmDialog:result', resolve)
     })

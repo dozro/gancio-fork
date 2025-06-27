@@ -16,3 +16,8 @@
     <CoreFooter />
   </v-app>
 </template>
+<style>
+ul {
+  padding-left: 2rem;
+}
+</style>

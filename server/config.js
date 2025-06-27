@@ -15,6 +15,7 @@ const config = {
   db: {},
   user_locale: path.resolve(process.env.cwd || '', 'user_locale'),
   upload_path: path.resolve(process.env.cwd || '', 'uploads'),
+  plugins_path: path.resolve(process.env.cwd || '', 'plugins'),
   proxy: {
     protocol: process.env.GANCIO_PROXY_PROTOCOL || '',
     hostname: process.env.GANCIO_PROXY_HOSTNAME || '',

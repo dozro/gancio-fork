@@ -41,21 +41,12 @@ const { $notify, $prompt } = useNuxtApp()
 const { t } = useI18n()
 const { user } = useUserSession()
 const route = useRoute()
-const { data: event } = useFetch<Event>(`/api/events/${route.params.slug}`)
+const { data: event } = await useFetch<Event>(`/api/events/${route.params.slug}`)
 if (!event) {
     throw createError({ status: 404, statusMessage: 'Event not found'})
 }
 
 const hasMedia = computed(() => event?.media?.length )
-
-// import clipboard from '../../assets/clipboard'
-// import MyPicture from '~/components/MyPicture'
-// import EventAdmin from '@/components/EventAdmin'
-// import EventResource from '@/components/EventResource'
-// import EmbedEvent from '@/components/embedEvent'
-// import EventMapDialog from '@/components/EventMapDialog'
-// import EventModeration from '@/components/EventModeration'
-// EventAssignAuthor: () => import(/* webpackChunkName: "admin" */ '@/components/EventAssignAuthor'),
 
 const showEmbed = ref(false)
 const mapModal = ref(false)
@@ -63,7 +54,8 @@ const openModeration = ref(route.query?.moderation ? true : false)
 const openAssignAuthor = ref(false)
 const showModeration = computed(() => settings.enable_moderation && event.isMine || user?.role === 'admin' || user?.role === 'editor')
 
-const canEdit = computed(() => event?.isMine || user?.role === 'admin' || user?.role === 'editor')
+const canEdit = true // computed(() => event?.isMine || user?.role === 'admin' || user?.role === 'editor')
+const hasOnlineLocations = computed(() => event?.online_locations?.length )
 
       // mapModal: false,
       // openModeration: $route?.query?.moderation ? true : false,
@@ -233,6 +225,7 @@ function goNext () {
 </script>
 <template>
 <v-container
+  v-if='event'
   class="h-event pa-2 pa-sm-2 pt-0 pt-sm-0 event"
   max-width='1200 '
   v-touch="{ left: goNext, right: goPrev }"
@@ -243,7 +236,7 @@ function goNext () {
   <!-- gancio supports microformats (http://microformats.org/wiki/h-event) -->
   <!-- and microdata https://schema.org/Event -->
   <div class="text-center text-md-h4 text-h5 pa-6">
-    <strong class="p-name text--primary" itemprop="name">{{event.title}}</strong>
+    <strong class="p-name text--primary" itemprop="name">{{event?.title}}</strong>
   </div>
   
   <v-row>
@@ -251,18 +244,18 @@ function goNext () {
       <!-- <MyPicture v-if="hasMedia" :event="event" /> -->
       <div
         class="p-description text-body-1 pa-3 rounded"
-        v-if="event.description"
+        v-if="event?.description"
         itemprop="description"
-        v-html="event.description"
+        v-html="event?.description"
       />
     </v-col>
     
     <v-col cols='12' md='4'>
-      <v-card variant='outlined'>
+      <v-card>
         <v-container class="eventDetails">
           <v-icon
             class="float-right"
-            v-if="event.parentId"
+            v-if="event?.parentId"
             color="success"
             icon="mdi-repeat"
           />
@@ -276,7 +269,7 @@ function goNext () {
             <span class="ml-2 text-uppercase">{{time.when(event)}}</span>
             <div
               class="d-none dt-end"
-              v-if="event.end_datetime"
+              v-if="event?.end_datetime"
               itemprop="endDate"
             >
               <!-- :content="$time.unixFormat(event.end_datetime,'yyyy-MM-dd\'T\'HH:mm')" -->
@@ -345,14 +338,14 @@ function goNext () {
           
           <!-- copy link -->
           <v-list-item
-            @click="$copyToClipboard(`${settings.baseurl}/event/${event.slug || event.id}`)"
+            @click="$copyToClipboard(`${settings.baseurl}/event/${event?.slug || event.id}`)"
             prepend-icon='mdi-content-copy'
             :title="$t('common.copy_link')"
           />
 
           <!-- map -->
           <v-list-item
-            v-if="settings.allow_geolocation && event.place?.latitude && event.place?.longitude"
+            v-if="settings.allow_geolocation && event?.place?.latitude && event.place?.longitude"
             @click="mapModal = true"
             prepend-icon='mdi-map'
             :title="$t('common.show_map')"
@@ -360,7 +353,7 @@ function goNext () {
 
           <!-- calendar -->
           <v-list-item
-            :href="`/api/event/detail/${event.slug || event.id}.ics`"
+            :href="`/api/event/detail/${event?.slug || event.id}.ics`"
             prepend-icon='mdi-calendar-export'
             :title="$t('common.add_to_calendar')"
           />
@@ -386,14 +379,12 @@ function goNext () {
           
         </v-list>
         <!-- admin actions -->
-        <template v-if="canEdit">
-          <span>event admin</span>
-          <EventAdmin
-            :event="event"
-            @open-moderation="openModeration=true"
-            @open-assign-author="openAuthor=true"
-          />
-        </template>
+        <EventAdmin
+          v-if='canEdit'
+          :event="event"
+          @open-moderation="openModeration=true"
+          @open-assign-author="openAssignAuthor=true"
+        />
       </v-card>
     </v-col>
   </v-row>
@@ -419,12 +410,12 @@ function goNext () {
   </v-dialog>
   
   <v-dialog
-    v-show="settings.allow_geolocation && event.place?.latitude && event.place?.longitude"
+    v-show="settings.allow_geolocation && event?.place?.latitude && event.place?.longitude"
     v-model="mapModal"
     :fullscreen="$vuetify.display?.mobile"
     destroy-on-close
   >
-    <EventMapDialog :place="event.place" @close="mapModal=false" />
+    <EventMapDialog :place="event?.place" @close="mapModal=false" />
   </v-dialog>
     <!-- v-if="$auth?.user?.is_admin" -->
   <v-dialog

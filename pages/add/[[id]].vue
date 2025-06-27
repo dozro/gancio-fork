@@ -5,7 +5,7 @@
 
 const { loggedIn } = useUserSession()
 
-const event = ref({ title: '', tags: [], place: {} })
+const event = ref({ title: '', tags: [], place: {}, recurrent: {} })
 const date = ref()
 const valid = ref(false)
 const edit = ref(false)
@@ -14,7 +14,7 @@ const loading = ref(false)
 const openImportDialog = ref(false)
 const searchTag = ref('')
 
-const { data: tags, status: statusTags } = await useFetch<Tag[]>('/api/tags', { params: { query: searchTag } })
+const { data: tags, status: statusTags } = await useFetch('/api/tags', { params: { query: searchTag } })
 
 function done() {
   const formData = new FormData()
@@ -33,7 +33,8 @@ function done() {
         <!-- <ImportDialog(@close='openImportDialog = false' @imported='eventImported') -->
       </v-dialog>
       <v-card-text class='px-0 px-xs-2'>
-        <v-form v-model='valid' ref='form' lazy-validation>
+        <span>{{valid}}</span>
+        <v-form v-model='valid' ref='form'>
           <v-container>
             <v-row>
               <!-- Not logged event -->
@@ -54,18 +55,20 @@ function done() {
               <!-- Where -->
               <v-col cols=12>
                 <span>MODEL: {{event.place}} -</span>
-                <WhereInput ref='where' v-model='event.place' :event='event' />
+                <!-- <WhereInput ref='where' v-model='event.place' :event='event' /> -->
               </v-col>
 
               <!-- When -->
-              <!-- <DateInput ref="when" v-model="date" :event="event" /> -->
+              <span>MODEL: {{event.start_datetime}} -</span>
+              <DateInput ref="when" v-model:event="event" />
 
               <!-- TAGS -->
               <v-col cols=12 md=6>
                 <span>{{ tags }} - {{ searchTag }} - {{ statusTags }}</span>
-                <v-combobox v-model:search="searchTag" v-model="event.tags" prepend-icon="mdi-tag-multiple" chips
-                  small-chips multiple deletable-chips hide-no-data hide-selected persistent-hint cache-items
-                  :loading="statusTags === 'pending'" :delimiters="[',', ';']" :items="[]"
+                <v-combobox
+                  v-model:search="searchTag" v-model="event.tags" prepend-icon="mdi-tag-multiple" chips
+                  multiple closable-chips hide-no-data hide-selected persistent-hint
+                  :loading="statusTags === 'pending'" :delimiters="[',', ';']" :items="tags || []"
                   :menu-props="{ maxWidth: 400, eager: true }" :label="$t('common.tags')">
                   <!-- <template v-slot:selection="{ item, on, attrs, selected, parent }">
                     <v-chip v-bind="attrs" close :close-icon='mdiCloseCircle' @click:close='parent.selectItem(item)'
@@ -81,7 +84,7 @@ function done() {
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn :loading='loading' :disabled='!valid || loading' outlined color='primary' @click='done'>{{ edit ?
+        <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='done'>{{ edit ?
           $t('common.save') : $t('common.send') }}</v-btn>
       </v-card-actions>
     </v-card>

@@ -3,7 +3,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const t = nuxtApp.vueApp.$nuxt.$i18n.t
 
   const validators = {
-    required: (fieldName: string) => value => !!value || t('validators.required', { fieldName }),
+    required: (fieldName: string) => value => !!value || t('validators.required', { fieldName: t(fieldName) }),
 
     password: (value) => {
         if (value.length < 8) return 'The password must have at least 8 characters'
