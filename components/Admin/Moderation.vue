@@ -22,7 +22,7 @@ const resourcesHeader = [
 ]
  
 const { data: instances } = await useFetch('/api/instances')
-const { data: users } = await useFetch(`/api/instances/${instances[0].domain}`)
+const { data: users } = await useFetch(`/api/instances/${instances?.[0]?.domain}`)
 const { data: resources } = await useFetch('/api/resources')
 
 // function resourceStyle ({ row }) {
