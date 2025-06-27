@@ -32,25 +32,33 @@ function time (datetime: number) {
   
 function when (event: Event) {
   const cy = currentYear()
-  const addTimezone = event.ap_id || event.place?.name === 'online'
+  const addTimezone = event?.ap_id || event?.place?.name === 'online'
 
   const opt = {
     // zone: settings.instance_timezone,
     // locale: app.i18n.locale || settings.instance_locale
   }
 
-  const start = DateTime.fromSeconds(event.start_datetime, opt)
+  const start = DateTime.fromSeconds(event?.start_datetime ?? 0, opt)
   let time = start.toLocaleString({ weekday: 'long', ...(cy !== start.year && { year: 'numeric'}), month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', ...( addTimezone && { timeZoneName: 'short' }) })
-  const end = event.end_datetime && DateTime.fromSeconds(event.end_datetime, opt)
+  const end = event?.end_datetime && DateTime.fromSeconds(event?.end_datetime ?? 0, opt)
   if (end) {
-    time += event.multidate ? ` → ${end.toLocaleString({ weekday: 'long', ...(cy !== end.year && { year: 'numeric'}), month: 'short', day: '2-digit'})}` : `-${end.toLocaleString({hour: '2-digit', minute: '2-digit'})}`
+    time += event?.multidate ? ` → ${end.toLocaleString({ weekday: 'long', ...(cy !== end.year && { year: 'numeric'}), month: 'short', day: '2-digit'})}` : `-${end.toLocaleString({hour: '2-digit', minute: '2-digit'})}`
   }
 
   return time
 } 
   
+function unixFormat (timestamp, format='EEEE d MMMM HH:mm') {
+  // , {
+  //   zone: store.state.settings.instance_timezone,
+  //   locale: app.i18n.locale || store.state.settings.instance_locale
+  // }
+  return DateTime.fromSeconds(timestamp).toFormat(format)
+}
 
-export default { when, currentYear, currentMonth, startMonth, nowUnix, time, timeToISO }
+
+export default { when, currentYear, currentMonth, startMonth, nowUnix, time, timeToISO, unixFormat }
     
     // timeFormat () {
     //   const time = DateTime.fromObject({ hour: 14 }, {

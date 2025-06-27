@@ -20,7 +20,7 @@ export const eventQuerySchema = z.object({
   include_unconfirmed: z.boolean().default(false),
   include_parent: z.boolean().default(false),
   include_description: z.boolean().default(false),
-  inlude_ap_events: z.boolean().default(false)
+  inlude_ap_events: z.boolean().default(false),
 })
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>

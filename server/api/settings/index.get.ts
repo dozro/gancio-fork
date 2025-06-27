@@ -1,6 +1,8 @@
 // import type { KeyValueType } from "~/server/utils/settings"
 
-export default defineEventHandler( async event => {
+export default defineCachedEventHandler( async event => {
+  const log = useLogger('settings')
+  log.info('get settings')
   const { user } = await getUserSession(event)
   if (user?.role === 'admin') {
     return publicSettings
@@ -12,4 +14,4 @@ export default defineEventHandler( async event => {
     // })
     // return ret
     return publicSettings
-})
+}, { maxAge: 5 })

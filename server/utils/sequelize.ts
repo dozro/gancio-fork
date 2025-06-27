@@ -1,11 +1,13 @@
   import bcrypt from 'bcrypt'
 import crypto from 'crypto'
+import slugify from 'slugify'
 import { Umzug, SequelizeStorage } from 'umzug'
 import { useLogger } from './useLogger'
 
 import {
     Sequelize,
     DataTypes,
+    Op,
     Model,
     type InferAttributes,
     type InferCreationAttributes,
@@ -32,6 +34,8 @@ import {
     BelongsToMany,
     // BelongsTo,
     Default,
+    BeforeValidate,
+    BeforeCreate
 } from "@sequelize/core/decorators-legacy"
 
 import { SqliteDialect } from "@sequelize/sqlite3"
@@ -159,6 +163,28 @@ InferCreationAttributes<Event>
     @BelongsToMany(() => Tag, { through: 'event_tags', inverse: { as: 'events' } })
     declare tags?: NonAttribute<Tag[]>
     
+    @BeforeCreate
+    static async generateSlug(event: Event) {
+      if (event.title && !event.slug) {
+        let baseSlug = slugify(event.title, { lower: true, strict: true })
+        let slug = baseSlug
+        let count = 1
+  
+        // Ensure slug is unique
+        while (
+          await Event.findOne({
+            where: {
+              slug,
+              id: { [Op.ne]: event.id }, // skip self in case of update
+            },
+          })
+        ) {
+          slug = `${baseSlug}-${count++}`
+        }
+  
+        event.slug = slug
+      }
+    }    
 }
 
 @Table({

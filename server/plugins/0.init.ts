@@ -15,9 +15,7 @@ export default defineNitroPlugin(async () => {
     
     log.info('Loading plugins')
     // usePluginController()._load()
-    pluginController._load()
-    
-    
+    // pluginController._load()
     
 
   } catch (e) {

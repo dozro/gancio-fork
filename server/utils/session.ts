@@ -1,6 +1,56 @@
 import type { UserSessionRequired } from '#auth-utils'
+import { verifyJwtToken } from './jwt'
 
 type UseSessionEvent = Parameters<typeof useSession>[0]
+
+export async function getUser(event: UseSessionEvent) {
+  
+  const session = await getUserSession(event)
+  if (session?.user) {
+    return session.user
+  }
+
+  const authHeader = getHeader(event, 'authorization')
+  const token = authHeader?.split(' ')[1]
+
+  if (token) {
+    try {
+      const payload = await verifyJwtToken(token)
+
+      // Attach decoded user info to context
+      return {
+        id: payload.userId,
+        email: payload.email,
+        role: payload.role
+      }
+
+      return
+    } catch (err) {
+      console.warn('Invalid JWT:', err)
+    }
+  }
+  
+  return null
+}
+
+export async function requireUser(event: UseSessionEvent) {
+  const user = await getUser(event)
+  if (!user) {
+    throw createError({ status: 401, message: 'Unauthorized' })
+  }
+  
+  return user as UserSessionRequired
+}
+
+export async function requireRole(event: UseSessionEvent, role: string) {
+  const user = await requireUser(event)
+  
+  if (user?.role !== role) {
+    throw createError({ status: 401, message: 'Unauthorized' })
+  }
+  
+  return user as UserSessionRequired
+}
 
 /**
  * Require a user session, throw a 401 error if the user is not logged in
