@@ -116,7 +116,7 @@
         "remove_recurrent_confirmation": "Er du sikker på at du ønsker å fjerne denne gjentagende hendelsen?\nHendelser i fortiden vil forbli, men ingen videre hendelser vil bli opprettet.",
         "interact_with_me_at": "Snakk til meg i fediverset på",
         "image_too_big": "Bildet kan ikke være større enn 4 MB",
-        "recurrent_2m_ordinal": "no|Den {n} {days} i måneden annenhver|Den {n} {days} i måneden annenhver",
+        "recurrent_2m_ordinal": "|Den {n} {days} i måneden annenhver|Den {n} {days} i måneden annenhver",
         "recurrent_1m_ordinal": "På {n} {days} i hver måned",
         "recurrent_2m_days": "På {days} i hver måned annenhver",
         "recurrent_1m_days": "På {days} i hver måned",

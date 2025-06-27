@@ -146,7 +146,7 @@
         "only_future": "仅限即将到来的事件",
         "normal": "普通",
         "recurrent_1w_days": "每 {days} 天",
-        "recurrent_1m_days": "sdf|每月的第 {days} 天|每月的第 {days} 天",
+        "recurrent_1m_days": "|每月的第 {days} 天|每月的第 {days} 天",
         "recurrent_1m_ordinal": "每月的第 {n} 个 {days}",
         "each_month": "每月",
         "follow_me_description": "一种对这里发布的 {title} 事件保持关注的方法，\n是在 Fediverse 网络，比如 Mastodon，上关注 <u>{account}</u>，亦有可能通过此方式给此事件添加资源。<br/><br/>\n如果你没听说过 Mastodon 和 Fediverse，我们建议你阅读 <a href='https://www.savjee.be/videos/simply-explained/mastodon-and-fediverse-explained/'>这篇文章</a>。<br/><br/>在下方输入你的实例名称（例如：mastodon.social）",

@@ -4,6 +4,7 @@ export default defineI18nConfig(() => {
     legacy: false,
     availableLocales: ['en', 'it'],
     fallbackLocale: 'en',
-    fallbackWarn: false
+    fallbackWarn: false,
+    warnHtmlMessage: false
   }
 })

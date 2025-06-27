@@ -28,20 +28,20 @@ function isPast() {
           <CoreImg v-if='!hideThumbs' :event='event' thumb :lazy='lazy' />
           <v-icon class='float-right mr-1' v-if='event.parentId' color='success' icon='mdi-repeat' />
           <v-icon class='float-right mr-1' v-if='isPast()' color='warning' icon='mdi-timer-sand' />
-          <h3 class='text-h6 p-name' itemprop="name">{{ event.title }}</h3>
+          <h3 class='text-primary text-h6 p-name mx-3 text-decoration-none' itemprop="name">{{ event.title }}</h3>
       </nuxt-link>
       
       <v-img v-if='event?.ap_user?.image' cover :src='event?.ap_user?.image' max-height=30  max-width=30 style="position: absolute; top: 5px; right: 5px;" />
       
-      <v-card-text class='body pt-0 pb-0'>
-          <span>{{event.start_datetime}} - {{time.when(event)}}</span>
+      <v-card-text class='pt-0 pb-0 m-0'>
+          <!-- <span>{{event.start_datetime}} - {{time.when(event)}}</span> -->
           
-          <time class="dt-start text-subtitle-1" :datetime="time.time(event.start_datetime)" itemprop="startDate" :content="time.timeToISO(event.start_datetime)">{{time.time(event.start_datetime)}}</time>
-          <!-- <time class='dt-start subtitle-1' :datetime='$time.unixFormat(event.start_datetime, "yyyy-MM-dd HH:mm")'
-              itemprop="startDate" :content="$time.unixFormat(event.start_datetime, 'yyyy-MM-dd\'T\'HH:mm')"> <v-icon v-text='mdiCalendar' /> {{ $time.when(event) }}
+          <!-- <time class="dt-start text-subtitle-1" :datetime="time.time(event.start_datetime)" itemprop="startDate" :content="time.timeToISO(event.start_datetime)">{{time.time(event.start_datetime)}}</time> -->
+          <time class='dt-start subtitle-1' :datetime='time.unixFormat(event.start_datetime, "yyyy-MM-dd HH:mm")'
+              itemprop="startDate" :content="time.unixFormat(event.start_datetime, 'yyyy-MM-dd\'T\'HH:mm')"> <v-icon icon='mdi-calendar' /> {{ time.when(event) }}
           </time>
           <time class='d-none dt-end' v-if='event.end_datetime' itemprop="endDate"
-              :content="$time.unixFormat(event.end_datetime,'yyyy-MM-dd\'T\'HH:mm')"> {{ $time.unixFormat(event.end_datetime)}}</time> -->
+              :content="time.unixFormat(event.end_datetime,'yyyy-MM-dd\'T\'HH:mm')"> {{ time.unixFormat(event.end_datetime)}}</time>
       
           <nuxt-link
             class='place d-block p-location pl-0' text
@@ -62,3 +62,13 @@ function isPast() {
 
   </article>
 </template>
+
+<style scoped>
+.h-event a {
+  text-decoration: none;
+}
+
+.h-event a:hover {
+  text-decoration: underline;
+}
+</style>
