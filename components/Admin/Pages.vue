@@ -1,86 +1,99 @@
 <script setup>
 import cloneDeep from 'lodash/cloneDeep'
+const { t } = useI18n()
+const { $notify, $confirm } = useNuxtApp()
+
+const form = ref()
 const valid = ref(false)
 const dialog = ref(false)
 const editing = ref(false)
 const loading = ref(false)
 const headers = [
-  { value: 'title', text: this.$t('common.title') },
-  { value: 'actions', text: this.$t('common.actions'), align: 'right', sortable: false }
+  { value: 'title', title: t('common.title') },
+  { value: 'actions', title: t('common.actions'), align: 'end', sortable: false }
 ]
 
 const page = reactive({ title: '', content: '' })
-const { data: pages } = useFetch('/api/pages')
-  // methods: {
-  //   edit(page) {
-  //     this.page.title = page.title
-  //     this.page.content = page.content
-  //     this.page.id = page.id
-  //     this.editing = true
-  //     this.dialog = true
-  //   },
-  //   openDialog() {
-  //     this.page = { title: '', content: '' }
-  //     this.dialog = true
-  //     this.$nextTick(() => this.$refs.page.reset())
-  //   },
-  //   async toggle(page) {
-  //     try {
-  //       page.visible = !page.visible
-  //       await this.$axios.$put(`/pages/${page.id}`, page)
-  //       this.pages = this.pages.map(a => a.id === page.id ? page : a)
-  //       this.setPages(cloneDeep(this.pages.filter(a => a.visible)))
-  //     } catch (e) { }
-  //   },
-  //   async remove(page) {
-  //     const ret = await this.$root.$confirm('admin.delete_page_confirm', { title: page.title })
-  //     if (!ret) { return }
-  //     this.$axios.delete(`/pages/${page.id}`)
-  //       .then(() => {
-  //         this.$root.$message('admin.page_remove_ok')
-  //         this.pages = this.pages.filter(a => a.id !== page.id)
-  //       })
-  //   },
-  //   async save() {
-  //     if (!this.$refs.page.validate()) { return }
-  //     this.loading = true
-  //     try {
-  //       let page = null
-  //       if (this.editing) {
-  //         page = await this.$axios.$put(`/pages/${this.page.id}`, this.page)
-  //         this.pages = this.pages.map(a => a.id === page.id ? page : a)
-  //       } else {
-  //         page = await this.$axios.$post('/pages', this.page)
-  //         this.pages = this.pages.concat(page)
-  //       }
-  //       this.page = { title: '', content: '' }
-  //       this.$refs.page.reset()
-  //       this.editing = false
-  //       this.dialog = false
-  //     } catch (e) {
-  //       console.error(e)
-  //     }
-  //     this.loading = false
-  //   }
-  // }
-// }
+const { data: pages, refresh } = await useFetch('/api/pages')
+
+function openDialog () {
+  page.title = ''
+  page.content = ''
+  dialog.value = true
+}
+
+function edit(p) {
+  page.title = p.title
+  page.content = p.content
+  page.id = p.id
+  editing.value = true
+  dialog.value = true
+}
+
+async function save() {
+  if (!form.value.validate()) { return }
+  loading.value = true
+  
+  try {
+    if (editing.value) {
+      page = await $fetch(`/pages/${page.id}`, {
+        method: 'PUT',
+        body: page
+      })
+    } else {
+      page = await $fetch('/pages', {
+        method: 'POST',
+        body: page
+      })
+    }
+    refresh()
+    page.title = ''
+    page.content = ''
+    form.value.reset()
+    editing.value = false
+    dialog.value = false
+  } catch (e) {
+    console.error(e)
+  }
+  loading.value = false
+}
+
+async function remove(page) {
+  const ret = $confirm('admin.delete_page_confirm', { title: page.title })
+  if (!ret) { return }
+  await $fetch(`/pages/${page.id}`, { method: 'DELETE' })
+  $notify('admin.page_remove_ok')
+  refresh()
+}
+
+async function toggle(page) {
+  try {
+    page.visible = !page.visible
+    await $fetch(`/pages/${page.id}`, {
+      method: 'PUT',
+      body: page
+    })
+    refresh()
+  } catch (e) { }
+}
+
 </script>
 <template>
 <v-container>
   <v-card-title>{{ $t('common.pages') }}</v-card-title>
   <v-card-subtitle v-html="$t('admin.page_description')" />
-  <v-dialog v-model="dialog" width="800px" :fullscreen="$vuetify.breakpoint.xsOnly">
+  <v-dialog v-model="dialog" width="800px" :fullscreen="$vuetify.display?.mobile">
     <v-card>
       <v-card-title>{{ $t('admin.new_page') }}</v-card-title>
       <v-card-text class="px-0">
-        <v-form v-model="valid" ref="page" @submit.prevent="save" validate-on='lazu'>
+        <v-form v-model="valid" ref="form" @submit.prevent="save" validate-on='lazy'>
           <v-text-field
             class="col-12"
             v-model="page.title"
             :rules="[$valid.required('common.title')]"
             :label="$t('common.title')"
           />
-          <Editor
+          <CoreEditor
             class="col-12"
             v-model="page.content"
             label="Content"
@@ -112,28 +125,19 @@ const { data: pages } = useFetch('/api/pages')
     <v-data-table
       v-if="pages.length"
       :hide-default-footer="pages.length<10"
-      :footer-props="{ prevIcon: mdiChevronLeft, nextIcon: mdiChevronRight }"
-      :header-props="{ sortIcon: mdiChevronDown }"
       :headers="headers"
       :items="pages"
     >
       <template v-slot:item.actions="{ item }">
-        <t-btn :to="`/p/${item.slug || item.id}`" :tooltip="$t('common.preview')">
-          <v-icon v-text="mdiArrowRight" />
-        </t-btn>
+        <t-btn size='small' :small='true' :to="`/p/${item.slug || item.id}`" :tooltip="$t('common.preview')" icon='mdi-arrow-right' />
         <t-btn
           @click="toggle(item)"
           :color="item.visible ? 'warning' : 'success'"
           :tooltip="item.visible ? $t('common.disable') : $t('common.enable')"
-        >
-          <v-icon v-text="item.visible ? mdiEyeOff : mdiEye" />
-        </t-btn>
-        <t-btn @click="edit(item)" color="info" :tooltip="$t('common.edit')">
-          <v-icon v-text="mdiPencil" />
-        </t-btn>
-        <t-btn @click="remove(item)" color="error" :tooltip="$t('common.delete')">
-          <v-icon v-text="mdiDeleteForever" />
-        </t-btn>
+          :icon="item.visible ? 'mdi-eye-off' : 'mdi-eye'"
+        />
+        <t-btn @click="edit(item)" color="info" :tooltip="$t('common.edit')" icon='mdi-pencil' />
+        <t-btn @click="remove(item)" color="error" :tooltip="$t('common.delete')" icon='mdi-delete-forever' />
       </template>
     </v-data-table>
   </v-card-text>
