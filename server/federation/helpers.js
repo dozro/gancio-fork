@@ -79,6 +79,14 @@ import { getImageFromURL } from '../helpers'
   }
 
   export async function signAndSend (message, inbox, method='post') {
+    useTaskManager().add({
+      name: 'SIGN_AND_SEND',
+      method: _signAndSend,
+      args: [message, inbox, method]
+    })
+  }
+
+  async function _signAndSend (message, inbox, method='post') {
     log.debug('[FEDI] Sign and %s %s %s', method, message, inbox)
     const inboxUrl = new URL(inbox)
     const privkey = secretSettings.privateKey
@@ -119,17 +127,22 @@ import { getImageFromURL } from '../helpers'
         ...( method === 'post' && ({ data: message}))
       })
       
-      console.error(ret)
-
       const contentType = ret.headers.get('content-type')
       // check if content-type is json
       if (!contentType.includes('json')) {
         log.error(`[FEDI] Error in sign and send, wrong content-type returned: ${contentType} - status: ${ret.status}`)
         return
       }
-
-      log.debug(`[FEDI] signed ${ret.status} ${ret.statusMessage} => ${contentType}`)
-      return ret.json()
+      
+      if (ret.ok) {
+        log.debug(`[FEDI] Signed and verified! ${ret.status} ${ret.statusMessage} => ${contentType}`)
+        return ret.json()
+      } else {
+        const body = await ret.json()
+        log.error("[FEDI] Error in sign and send [%s]: %s", inbox, body)
+        throw body
+      }
+      
     } catch (e) {
       log.error("[FEDI] Error in sign and send [%s]: %s", inbox, e?.response?.data?.error ?? e?.response?.statusMessage ?? '' + ' ' + String(e))
       throw e
