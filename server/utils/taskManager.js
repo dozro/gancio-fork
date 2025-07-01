@@ -5,16 +5,13 @@
 
 import { Duration } from 'luxon'
 import { useLogger } from './useLogger'
+import { cleanOrphanPlaces } from '../lib/places'
+import { cleanOrphanTags } from '../lib/tags'
+import { cleanPastEvents, cleanUnusedAPActor } from '../lib/ap'
 const log = useLogger('queue')
 
-// const placeHelpers = require('./helpers/place')
-// const tagHelpers = require('./helpers/tag')
-// const apHelpers = require('./helpers/ap.js')
-// const notifier = require('./notifier')
-
-
 const loopInterval = 1 // process.env.NODE_ENV === 'production' ? 1 : 1
-const minute = 6 * loopInterval
+const minute = 60 * loopInterval
 const hour = minute * 60
 const day = hour * 24
 
@@ -36,7 +33,7 @@ export class Task {
     
   this.repeat = repeat
     this.repeatDelay = repeatDelay
-    this.processInNTick = callAtStart ? 0 : repeatDelay
+    this.processInNTick = callAtStart ? 1 : repeatDelay
     // retries on non-repeatable task only
     this.retries = !repeat && retries
   }
@@ -44,9 +41,9 @@ export class Task {
   handleError (e) {
     log.error(`TASK ERROR [${this?.name}]: ${e} ${e.stack}`)
     if (!this.repeat) {
-      this.processInNTick = this.retries?.shift()
+      this.processInNTick = this.retries?.shift() ?? false
       if (this.processInNTick) {
-        log.info('Retring in', this.processInNTick)
+        log.info(`Error in ${this.name}: retring in `, Duration.fromMillis(this.processInNTick * 1000).rescale().toHuman({ listStyle: "long" }))
       } else {
         log.info('This was the last try processing this task')
       }
@@ -55,7 +52,6 @@ export class Task {
   
   process () {
     this.processInNTick--
-    log.info(`process ${this.name} in ${this.processInNTick} `)
     if (this.processInNTick > 0) {
       return
     }
@@ -69,7 +65,7 @@ export class Task {
       }
       return ret
     } catch (e) {
-      console.error(e)
+      log.error(e)
       this.handleError(e)
     }
   }
@@ -94,8 +90,8 @@ export class TaskManager {
   }
 
   start (interval = loopInterval) {
-    // const eventController = require('./api/controller/event')
     log.info('Inside start')
+  
     // test task
     // this.add(new Task({
     //   name: 'test',
@@ -106,45 +102,45 @@ export class TaskManager {
     // }))
 
     // create and clean recurrent events
-    // this.add(new Task({
+    // this.add({
     //   name: 'CREATE_RECURRENT_EVENT',
     //   method: eventController._createRecurrent,
     //   repeatDelay: hour / 2, // check each half an hour
     //   repeat: true
-    // }))
+    // })
     
     // remove unrelated places
-    // this.add(new Task({
-    //   name: 'CLEAN_UNUSED_PLACES',
-    //   method: placeHelpers._cleanUnused,
-    //   repeatDelay: day,
-    //   repeat: true,
-    //   callAtStart: true
-    // }))
+    this.add({
+      name: 'CLEAN_UNUSED_PLACES',
+      method: cleanOrphanPlaces,
+      repeatDelay: day,
+      repeat: true,
+      callAtStart: true
+    })
     
-    // this.add(new Task({
-    //   name: 'CLEAN_UNUSED_TAGS',
-    //   method: tagHelpers._cleanUnused,
-    //   repeatDelay: day+minute,
-    //   repeat: true,
-    //   callAtStart: true
-    // }))
+    this.add({
+      name: 'CLEAN_UNUSED_TAGS',
+      method: cleanOrphanTags,
+      repeatDelay: day+minute,
+      repeat: true,
+      callAtStart: true
+    })
 
-    // this.add(new Task({
-    //   name: 'CLEAN_FEDIVERSE_PAST_EVENT',
-    //   method: apHelpers._cleanPastEvents,
-    //   repeatDelay: 6*hour+5*minute,
-    //   repeat: true,
-    //   callAtStart: true
-    // }))
+    this.add({
+      name: 'CLEAN_FEDIVERSE_PAST_EVENT',
+      method: cleanPastEvents,
+      repeatDelay: 12*hour+5*minute,
+      repeat: true,
+      callAtStart: true,
+    })
 
-    // this.add(new Task({
-    //   name: 'CLEAN_FEDIVERSE_AP_USERS',
-    //   method: apHelpers._cleanUnusedAPUser,
-    //   repeatDelay: day+10*minute,
-    //   repeat: true,
-    //   callAtStart: true
-    // }))
+    this.add({
+      name: 'CLEAN_FEDIVERSE_AP_USERS',
+      method: cleanUnusedAPActor,
+      repeatDelay: day+10*minute,
+      repeat: true,
+      callAtStart: true
+    })
 
     log.info(`START TASK MANAGER WITH LOOP INTERVAL OF ${interval} seconds`)
     this.interval = interval
@@ -158,9 +154,13 @@ export class TaskManager {
       this.timeout = false
     }
   }
-
+  
   add ({ name, repeat = false, repeatDelay = 1, callAtStart = false, retries = [2, 5], method, args = [] }) {
-    log.info(`[TASK] Add ${name} (${Duration.fromMillis(repeatDelay * this.interval * 1000).rescale().toHuman({ listStyle: "long" })})`)
+    if (repeat) {
+      log.info(`[TASK] Add ${name} (each ${Duration.fromMillis(repeatDelay * this.interval * 1000).rescale().toHuman({ listStyle: "long" })})`)
+    } else {
+      log.info(`[TASK] Add ${name}`)
+    }
     const task = new Task({ name, repeat, repeatDelay, callAtStart, retries, method, args })
     this.tasks.push(task)
   }
@@ -185,7 +185,6 @@ export class TaskManager {
     this.timeout = setTimeout(this.tick.bind(this), this.interval * 1000)
   }
 }
-
 
 // daily morning notification
 // TS.add(new Task({
