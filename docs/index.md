@@ -19,7 +19,7 @@ Alpha release  **[2.0.0-alpha - 1 Jul 2025](/changelog)**
 
 > warning "Note"
 > This is an alpha release of Gancio v2 and it is **NOT production ready**!
-> The codebase is completely different, it is a port from nuxt2 to nuxt3, from vuetify2 to vuetify3, the backend no longer uses Express, but has moved to Nitro and h3. We're also gradually migrating to TypeScript, taking this opportunity to write and improve code documentation in the meanwhile.
+> The codebase is completely different, it is a port from nuxt2 to nuxt3, from vuetify2 to vuetify3, the backend no longer uses Express, but has moved to Nitro and h3. We're also gradually migrating to TypeScript, taking this opportunity to write and improve code and documentation.
 
 Our effort in this project is not to build an alternative that mimics mainstream solutions, we respond to different needs.
 The assumption here is that technology is neither good nor bad, nor is it neutral. It does not depend (only) on how it is used.
