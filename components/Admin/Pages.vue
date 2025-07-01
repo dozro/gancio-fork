@@ -36,12 +36,12 @@ async function save() {
   
   try {
     if (editing.value) {
-      page = await $fetch(`/pages/${page.id}`, {
+      page = await $fetch(`/api/pages/${page.id}`, {
         method: 'PUT',
         body: page
       })
     } else {
-      page = await $fetch('/pages', {
+      page = await $fetch('/api/pages', {
         method: 'POST',
         body: page
       })
@@ -61,7 +61,7 @@ async function save() {
 async function remove(page) {
   const ret = $confirm('admin.delete_page_confirm', { title: page.title })
   if (!ret) { return }
-  await $fetch(`/pages/${page.id}`, { method: 'DELETE' })
+  await $fetch(`/api/pages/${page.id}`, { method: 'DELETE' })
   $notify('admin.page_remove_ok')
   refresh()
 }
@@ -69,7 +69,7 @@ async function remove(page) {
 async function toggle(page) {
   try {
     page.visible = !page.visible
-    await $fetch(`/pages/${page.id}`, {
+    await $fetch(`/api/pages/${page.id}`, {
       method: 'PUT',
       body: page
     })
@@ -88,13 +88,13 @@ async function toggle(page) {
       <v-card-text class="px-0">
         <v-form v-model="valid" ref="form" @submit.prevent="save" validate-on='lazy'>
           <v-text-field
-            class="col-12"
+            class="v-col-12"
             v-model="page.title"
             :rules="[$valid.required('common.title')]"
             :label="$t('common.title')"
           />
           <CoreEditor
-            class="col-12"
+            class="v-col-12"
             v-model="page.content"
             label="Content"
             height="250px"
