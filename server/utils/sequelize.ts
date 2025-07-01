@@ -35,7 +35,8 @@ import {
     // BelongsTo,
     Default,
     BeforeValidate,
-    BeforeCreate
+    BeforeCreate,
+    BelongsTo
 } from "@sequelize/core/decorators-legacy"
 
 import { SqliteDialect } from "@sequelize/sqlite3"
@@ -56,7 +57,7 @@ if (typeof useRuntimeConfig === 'function') {
   config = await import('../config.js')
 }
 
-export let sequelize
+export let sequelize: Sequelize | undefined
 export async function connect() {
   log.info('connect')
   if (sequelize) { return sequelize }
@@ -67,7 +68,7 @@ export async function connect() {
   })
   await sequelize.authenticate()
   await runMigrations(sequelize).catch(e => { console.error(e)})
-  sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Resource, Page])
+  sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Resource, Page, Notification])
 
   User.addScope('defaultScope', { attributes: { exclude: ['password', 'recover_code'] } })
   User.addScope('withPassword', { })
@@ -160,8 +161,22 @@ InferCreationAttributes<Event>
     })
     declare placeId: number;
     
+    @BelongsTo(() => Place, { foreignKey: 'placeId' })
+    declare place?: NonAttribute<Place>
+    
     @BelongsToMany(() => Tag, { through: 'event_tags', inverse: { as: 'events' } })
     declare tags?: NonAttribute<Tag[]>
+
+    @Attribute({
+        type: DataTypes.STRING,
+        references: { table: "ap_users", key: "ap_id" },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+    })
+    declare apUserApId: string;
+
+    @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
+    declare apUser?: NonAttribute<APUser>
     
     @BeforeCreate
     static async generateSlug(event: Event) {
@@ -256,7 +271,10 @@ InferCreationAttributes<User>
     @Attribute(DataTypes.STRING)
     @NotNull
     @Index
-    @Unique
+    @Unique({
+      name: 'unique_mail',
+      msg: 'error.email_taken'
+    })
     declare email: string;
     
     @Attribute(DataTypes.STRING)
@@ -328,7 +346,10 @@ InferCreationAttributes<Instance>
     declare data: string;
     
     @Attribute(DataTypes.STRING)
-    declare applicationActor: string;
+    declare applicationActor?: string
+    
+    @HasMany(() => APUser, { foreignKey: 'instanceDomain', sourceKey: 'domain' })
+    declare apUsers?: NonAttribute<APUser[]>
     
     // @HasMany(() => Event, /* foreign key */ 'placeId')
     // declare events?: NonAttribute<Event[]>;
@@ -370,8 +391,22 @@ InferCreationAttributes<APUser>
     @Attribute(DataTypes.JSON)
     declare object: APUserObject;
     
-    // @HasMany(() => Event, /* foreign key */ 'placeId')
-    // declare events?: NonAttribute<Event[]>;
+    @Attribute({
+        type: DataTypes.STRING,
+        references: { table: "instances", key: "domain" },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+    })
+    declare instanceDomain: string
+
+    @BelongsTo(() => Instance, { foreignKey: 'instanceDomain', targetKey: 'domain' })
+    declare instance?: NonAttribute<Instance>
+    
+    @HasMany(() => Event, { foreignKey: 'apUserApId', sourceKey: 'ap_id' })
+    declare events?: NonAttribute<Event[]>
+    
+    @HasMany(() => Resource, { foreignKey: 'activitypub_id', sourceKey: 'ap_id' })
+    declare resources?: NonAttribute<Resource[]>
     
 }
 
@@ -440,6 +475,17 @@ InferCreationAttributes<Resource>
     
     @Attribute(DataTypes.JSON)
     declare data: any // @todo
+    
+    @Attribute({
+        type: DataTypes.STRING,
+        references: { table: "ap_users", key: "ap_id" },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+    })
+    declare apUserApId: string
+
+    @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
+    declare apUser?: NonAttribute<APUser>
 }
 
 @Table({
@@ -469,4 +515,40 @@ InferCreationAttributes<Page>
     @Index
     @Unique
     declare slug: string
+}
+
+export const NotificationActionEnum = ['Create', 'Update', 'Delete'] as const
+export type NotificationAction = typeof NotificationActionEnum[number]
+
+export const NotificationTypeEnum = ['mail', 'admin_email', 'ap'] as const
+export type NotificationType = typeof NotificationTypeEnum[number]
+
+@Table({
+  tableName: 'notifications',
+  timestamps: false,
+  indexes: [
+    {
+      unique: true,
+      fields: ['action', 'type']
+    }
+  ]
+})
+export class Notification extends Model<
+    InferAttributes<Notification>,
+    InferCreationAttributes<Notification>
+> {
+    @Attribute(DataTypes.JSON)
+    declare filters: any
+
+    @Attribute(DataTypes.STRING)
+    declare email: string
+
+    @Attribute(DataTypes.STRING)
+    declare remove_code: string
+
+    @Attribute(DataTypes.ENUM(...NotificationActionEnum))
+    declare action: NotificationAction
+
+    @Attribute(DataTypes.ENUM(...NotificationTypeEnum))
+    declare type: NotificationType
 }
