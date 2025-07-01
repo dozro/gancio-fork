@@ -1,59 +1,9 @@
-// const escape = require('lodash/escape')
-// const axios = require('axios')
-// const crypto = require('crypto')
 import crypto from 'crypto'
 import httpSignature from '@peertube/http-signature'
 import { DateTime } from 'luxon'
 
 import { parseAPLocation } from './places'
 import { getImageFromURL } from '../helpers'
-
-// const config = require('../config')
-// const httpSignature = require('@peertube/http-signature')
-// const dayjs = require('dayjs')
-// const url = require('url')
-// const settingsController = require('../api/controller/settings')
-// const log = require('../log')
-// const Ego = require('./ego')
-// const Place = require('./places')
-
-// const { APUser, Instance, Event } = require('../api/models/models')
-// const { Task, TaskManager } = require('../taskManager')
-// const { getImageFromURL, sanitizeHTML, NotFoundError, BadRequestError, UnauthorizedError } = require('../helpers')
-
-// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
-
-  // const '@context' = [
-  //   'https://www.w3.org/ns/activitystreams',
-  //   'https://w3id.org/security/v1',
-  //   {
-  //     toot: 'http://joinmastodon.org/ns#',
-
-  //     // A property-value pair, e.g. representing a feature of a product or place.
-  //     // https://docs.joinmastodon.org/spec/activitypub/#PropertyValue
-  //     schema: 'http://schema.org#',
-  //     ProperyValue: 'schema:PropertyValue',
-  //     value: 'schema:value',
-
-  //     // https://docs.joinmastodon.org/spec/activitypub/#discoverable
-  //     // This flag may be used as an indicator of the user’s preferences toward being included
-  //     // in external discovery services, such as search engines or other indexing tools
-  //     // in gancio is always true
-  //     "discoverable": "toot:discoverable",
-
-  //     // https://docs.joinmastodon.org/spec/activitypub/#Hashtag
-  //     "Hashtag": "https://www.w3.org/ns/activitystreams#Hashtag",
-
-  //     // supported but always false
-  //     manuallyApprovesFollowers: 'as:manuallyApprovesFollowers',
-
-  //     // focal point - https://docs.joinmastodon.org/spec/activitypub/#focalPoint
-  //     "focalPoint": {
-  //       "@container": "@list",
-  //       "@id": "toot:focalPoint"
-  //     }
-  //   }
-  // ],
 
   const log = useLogger('federation')
   
@@ -202,12 +152,7 @@ import { getImageFromURL } from '../helpers'
           }
         }]
 
-      const task = new Task({
-        name: 'AP',
-        method: signAndSend,
-        args: [JSON.stringify(body), sharedInbox]
-      })
-      TaskManager.add(task)
+        signAndSend(JSON.stringify(body), sharedInbox)
     }
   }
 

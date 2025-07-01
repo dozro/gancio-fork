@@ -6,7 +6,7 @@ nav_order: 5
 has_children: true
 ---
 
-### Development Stack
+## Development Stack
 
 **Gancio** is built with following technologies:
 
@@ -116,7 +116,7 @@ There are two main ways to create backend logic:
   For more advanced routing, place files in `/server/routes/`. The filename and folder structure map directly to the route path. You can use any HTTP method and have full control over the request/response.
 
 
-**Common things you want to do:**
+### **Common things to do:**
 
 ### Access query parameters
 You can use `event.context.params?.query` or `getQuery(event)`
@@ -177,7 +177,8 @@ There are some utilities so manage authentication via cookies and via JWT token.
 `const { user } = await requireUserSession(event)`
 
 
-#### Task Manager / Queue scheduling
+
+## Task Manager / Queue scheduling
 
 The **[Task Manager]({{site.gh_edit_repository}}/-/blob/main/server/utils/taskManager.js)** is an utility for scheduling and running background tasks. It is used to automate recurring maintenance and notification jobs without blocking the main application flow.  
 We initially evaluated several existing solutions, including Redis-based queue managers like [Bull](https://github.com/OptimalBits/bull) and job schedulers like [Croner](https://github.com/hexagon/croner), however, Redis’s licensing model at the time was incompatible and we want to avoid adding another dependency.
@@ -189,7 +190,7 @@ We also reviewed [nightcoral](https://code.lag.net/robey/nightcoral), a lightwei
 - Cleaning up unused / orphan resources (tags, places, AP actors - running once a day) 
 - Creating new instances of recurring events (running each half an hour)
 - Removing past federated events and related resources (twice a day)
-- Sending ActivityPub notifications
+- [Sending ActivityPub notifications]({{site.gh_edit_repository}}/-/tree/main/server/federation/helpers.js#L81)
 - Sending e-mails
 
 **What we will use it for:**
@@ -203,7 +204,8 @@ We also reviewed [nightcoral](https://code.lag.net/robey/nightcoral), a lightwei
 - Tasks can be set to repeat, run once, retry on failure.
 
 **Example: Adding a new task**
-First of all you'll need the utils `useTaskManager`: this will expose you the singleton instance of the TaskManager
+
+First of all you'll need the utils `useTaskManager`: this will expose you the singleton instance of the TaskManager.  
 To add a new task, you can use the `add` method of the `TaskManager`. For example, [the code]({{site.gh_edit_repository}}/-/blob/main/server/utils/sendMail.ts) that enqueue an email is:
 
 ```js
@@ -213,6 +215,7 @@ To add a new task, you can use the `add` method of the `TaskManager`. For exampl
     args: [addresses, template, locals, locale, bcc],
   })
 ```
+
 
 **Task options:**
 - `name`: String, name of the task (used in logs)
@@ -225,7 +228,7 @@ To add a new task, you can use the `add` method of the `TaskManager`. For exampl
 
 
 
-#### Sending E-mail
+### Sending E-mail
 
 To send emails in the background, use the `enqueueMail` utility. This schedules the email to be sent as a task, ensuring that email delivery does not block the main application flow and retrying in case of failure. For example:
 
