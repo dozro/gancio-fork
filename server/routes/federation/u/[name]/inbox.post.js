@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { APUser } from "~/server/utils/sequelize"
-import { verifySignature } from '~/server/federation/helpers'
+import { parseAPMessage, verifySignature } from '~/server/federation/helpers'
 import { follow, unfollow } from "~/server/federation/follows"
 
 export default defineEventHandler(async event => {
@@ -29,41 +29,41 @@ export default defineEventHandler(async event => {
       if (message.object?.type === 'Follow') {
         unfollow(event, message)
       } else if (message.object?.type === 'Like') {
-        Ego.unbookmark(req, res)
+        // Ego.unbookmark(req, res)
       } else if (message.object?.type === 'Announce') {
-        Ego.unboost(req, res)
+        // Ego.unboost(req, res)
       } else {
         log.warn('[FEDI] Undo Activity for unsupported Object: %s', JSON.stringify(message.object))
-        return res.status(400).send('Undo Activity for unsupported Object')
+        // return res.status(400).send('Undo Activity for unsupported Object')
       }
       break
     case 'Announce':
-      log.debug(`[FEDI] Announce incoming from ${res.locals.fedi_user.ap_id}`)
-      await parseAPMessage(message, res.locals.fedi_user)
-      return res.status(201).send()
+      log.debug(`[FEDI] Announce incoming from ${event.context.fedi_user.ap_id}`)
+      await parseAPMessage(message, event.context.fedi_user)
+      // return res.status(201).send()
     case 'Note':
       log.debug('[FEDI] Direct Note Activity is not supported: %s', JSON.stringify(message.object))
       break
     case 'Like':
-      Ego.bookmark(req, res)
+      // Ego.bookmark(req, res)
       break
     case 'Delete':
       if (message.object?.type === 'Tombstone') {
         message.object.type = message.object?.formerType ?? 'Tombstone'
       }
       if (message.object?.type === 'Note') {
-        await Resources.remove(req, res)
+        // await Resources.remove(req, res)
       } else if (message.object?.type === 'Event') {
-        await Events.remove(req, res)
+        // await Events.remove(req, res)
       } else {
-        const ap_id = get(req.body, 'object.id', req.body.object)
+        const ap_id = message.object?.id ?? message.object
         const ap_actor = await APUser.findOne({ where: { ap_id } })
         if (ap_actor) {
-          await Users.remove(req, res)
+          // await Users.remove(req, res)
         } else {
           const resource = await Resource.findOne({ where: { activitypub_id: ap_id } })
           if (resource) {
-            await Resources.remove(req, res)
+            // await Resources.remove(req, res)
           }
         }
       }
@@ -71,10 +71,10 @@ export default defineEventHandler(async event => {
     case 'Update':
       if (message.object?.type === 'Event') {
         log.debug(`[FEDI] Event update is coming from ${res.locals.fedi_user.ap_id}`)
-        await Events.update(req, res)
+        // await Events.update(req, res)
       } else if (message.object?.type === 'Note') {
         log.debug('[FEDI] Note update is coming from %s', res.locals.fedi_user.ap_id)
-        await Resources.update(req, res)
+        // await Resources.update(req, res)
       } else {
         log.debug('[FEDI] Update unsupported Object: %s', JSON.stringify(message?.object))
       }
@@ -82,22 +82,23 @@ export default defineEventHandler(async event => {
     case 'Create':
       // this is a reply
       if (message.object?.type === 'Note') {
-        await Resources.create(req, res)
+        // await Resources.create(req, res)
       } else if (message.object?.type === 'Event') {
         log.debug(`[FEDI] Create Activity with Event type incoming from ${res.locals.fedi_user.ap_id}`)
         if (!res.locals.fedi_user.following || !res.locals.fedi_user.trusted) {
           log.warn(`[FEDI] APUser not followed or not trusted`)
-          return res.sendStatus(404)
+          return
+          // return res.sendStatus(404)
         }
         await parseAPMessage(message, res.locals.fedi_user)
-        return res.status(201).send()
+        // return res.status(201).send()
       } else {
         log.warn('[FEDI] Create unsupported Object => %s', JSON.stringify(message?.object))
-        return res.sendStatus(404)
+        // return res.sendStatus(404)
       }
       break
     default:
       log.error('[FEDI] Unknown message type: %s', message?.type)
-      res.sendStatus(404)
+      // res.sendStatus(404)
   }
 })

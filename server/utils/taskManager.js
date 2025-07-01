@@ -26,7 +26,7 @@ export function useTaskManager() {
 }
 
 export class Task {
-  constructor ({ name, repeat = false, repeatDelay = 1, callAtStart = false, retries = [2, 5], method, args = [] }) {
+  constructor ({ name, repeat = false, repeatDelay = 0, callAtStart = false, retries = [10, 50], method, args = [] }) {
     this.name = name
     this.method = method
     this.args = args
@@ -51,11 +51,12 @@ export class Task {
   }
   
   process () {
+    console.log(`Processing ${this.name} in ${this.processInNTick}`)
     this.processInNTick--
     if (this.processInNTick > 0) {
       return
     }
-    log.info(`[TASK] Process ${this.name}`)
+    log.info(`[TASK] Process ${this.name} - ${this.processInNTick}`)
     this.processInNTick = this.repeatDelay
     try {
       const ret = this.method.apply(this, this.args)
@@ -72,7 +73,7 @@ export class Task {
 }
 
 /**
- * Manage tasks:
+ * Managed tasks:
  * - Send emails
  * - Send AP notifications
  * - Create recurrent events
@@ -92,15 +93,6 @@ export class TaskManager {
   start (interval = loopInterval) {
     log.info('Inside start')
   
-    // test task
-    // this.add(new Task({
-    //   name: 'test',
-    //   method: () => {
-    //     console.error('dentro task')
-    //     throw new Error('error inside task')
-    //   }
-    // }))
-
     // create and clean recurrent events
     // this.add({
     //   name: 'CREATE_RECURRENT_EVENT',
@@ -109,7 +101,6 @@ export class TaskManager {
     //   repeat: true
     // })
     
-    // remove unrelated places
     this.add({
       name: 'CLEAN_UNUSED_PLACES',
       method: cleanOrphanPlaces,
@@ -121,7 +112,7 @@ export class TaskManager {
     this.add({
       name: 'CLEAN_UNUSED_TAGS',
       method: cleanOrphanTags,
-      repeatDelay: day+minute,
+      repeatDelay: day+10*minute,
       repeat: true,
       callAtStart: true
     })
@@ -155,7 +146,7 @@ export class TaskManager {
     }
   }
   
-  add ({ name, repeat = false, repeatDelay = 1, callAtStart = false, retries = [2, 5], method, args = [] }) {
+  add ({ name, repeat = false, repeatDelay = 0, callAtStart = false, retries = [20, 50], method, args = [] }) {
     if (repeat) {
       log.info(`[TASK] Add ${name} (each ${Duration.fromMillis(repeatDelay * this.interval * 1000).rescale().toHuman({ listStyle: "long" })})`)
     } else {
