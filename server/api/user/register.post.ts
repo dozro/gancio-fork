@@ -36,7 +36,6 @@ export default defineEventHandler(async event => {
     return userInstance
     
   } catch (e) {
-    log.error('Registration error:', e)
-    throw createError({ status: 400, statusText: String(e) })
+    throw createError({ status: 400, statusMessage: String(e) })
   }
 })
