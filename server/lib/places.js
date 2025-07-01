@@ -1,5 +1,7 @@
 import { Op, col, where, fn } from '@sequelize/core'
-  
+import { useLogger } from '../utils/useLogger'
+const log = useLogger('place')
+
 export async function findOrCreatePlace (body) {
   
   if (body?.place_id) {
@@ -36,4 +38,19 @@ export async function findOrCreatePlace (body) {
     })
   }
   return place
+}
+
+export async function cleanOrphanPlaces () {
+  const places = await Place.findAll({
+    include: [{ model: Event, as: 'events', required: false, attributes: [] }],
+    group: ['place.id'],
+    having: where(fn('COUNT', col('events.id')), Op.eq, 0)
+  })
+  if (!places.length) { return }
+  log.debug(`Remove ${places.length} unrelated places: %s`, places.map(p => p.name).join(', '))
+
+  const ids = places.map(p => p.id)
+  return Place.destroy({
+    where: { id: { [Op.in]: ids } }
+  })
 }

@@ -9,7 +9,7 @@
             <v-card-subtitle>{{user.email}}</v-card-subtitle>
             <v-card-text>
               <v-text-field type='password'
-                :rules="$validators.password"
+                :rules="$valid.password"
                 autofocus :placeholder='$t("common.new_password")'
                 v-model='new_password' />
             </v-card-text>
