@@ -35,7 +35,7 @@ const filterHeaders = [
 
 // const in_home  $store.state.settings.collection_in_home !== null,
 const { data: collections } = useFetch('/api/collections?withFilters=true')
-const { data: actors } = useFetch('/api/ap_users/trusted', { transform: (ret) => ret.unshift({ ap_id: null })})
+const { data: actors } = useFetch('/api/ap_actors/trusted', { transform: (ret) => ret.unshift({ ap_id: null })})
 
 const settings = useState('settings')
 
@@ -223,7 +223,7 @@ const settings = useState('settings')
           <v-form v-model="valid" ref="form" @submit.prevent="saveCollection">
             <v-text-field
               v-if="!collection.id"
-              :rules="[$validators.required('common.name')]"
+              :rules="[$valid.required('common.name')]"
               :label="$t('common.name')"
               v-model="collection.name"
               :placeholder="$t('common.name')"
@@ -380,8 +380,6 @@ const settings = useState('settings')
             :headers="filterHeaders"
             :items="filters"
             :hide-default-footer="filters.length < 5"
-            :header-props="{ sortIcon: mdiChevronDown }"
-            :footer-props="{ prevIcon: mdiChevronLeft, nextIcon: mdiChevronRight }"
           >
             <template v-slot:item.actions="{ item }">
               <v-btn @click="editFilter(item)" color="primary" icon>
@@ -474,8 +472,6 @@ const settings = useState('settings')
         :headers="collectionHeaders"
         :items="collections"
         :hide-default-footer="collections.length < 5"
-        :header-props="{ sortIcon: mdiChevronDown }"
-        :footer-props="{ prevIcon: mdiChevronLeft, nextIcon: mdiChevronRight }"
       >
         <template v-slot:item.pin="{ item }">
           <v-switch

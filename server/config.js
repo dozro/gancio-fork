@@ -4,7 +4,7 @@ import URL from 'url'
 
 const config = {
   status: 'SETUP',
-  baseurl: '',
+  baseurl: process.env.BASE_URL || '',
   hostname: '',
   server: {
     host: process.env.GANCIO_HOST || '0.0.0.0',
@@ -12,7 +12,10 @@ const config = {
   },
   log_level: 'debug',
   log_path: path.resolve(process.env.cwd || '', 'logs'),
-  db: {},
+  db: {
+    dialect: process.env.DB_DIALECT || 'sqlite',
+    storage: process.env.DB_STORAGE || 'gancio.sqlite'
+  },
   user_locale: path.resolve(process.env.cwd || '', 'user_locale'),
   upload_path: path.resolve(process.env.cwd || '', 'uploads'),
   plugins_path: path.resolve(process.env.cwd || '', 'plugins'),

@@ -18,7 +18,7 @@ import time from '~/utils/time'
 const now = time.nowUnix()
 
 const params = useState('params')
-const selectedDate = useState<Date|null>('selectedDate', () => null)
+const selectedDate = useState<Date|null|undefined>('selectedDate', () => undefined)
 // const attributes = useState('attributes')
 const isCurrentMonth = computed(() => {
   return false

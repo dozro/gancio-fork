@@ -4,15 +4,14 @@ defineProps ({
   color: { type: String, default: '' },
   to: { type: String, default: '' },
   icon: { type: String, default: '' },
-  large: { type: Boolean, default: false },
-  small: { type: Boolean, default: false }
+  size: { type: String, default: 'small' },
 })
 
 </script>
 <template>
   <v-tooltip top>
     <template #activator="{ props }">
-      <v-btn v-bind='props' :color='color' :icon='icon' variant='text' size='large'  @click='$emit("click")' />
+      <v-btn v-bind='props' :color='color' :icon='icon' variant='text' :size='size'  @click='$emit("click")' :to='to' />
     </template>
     <span>{{ $t(tooltip) }}</span>
   </v-tooltip>

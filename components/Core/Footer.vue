@@ -7,7 +7,7 @@ const config = useRuntimeConfig()
 const { t } = useI18n()
 const showFollowMe = ref<boolean>(false)
 
-const { data: trusted_sources } = await useFetch<APUser[]>('/api/ap_users/trusted', { lazy: true })
+const { data: trusted_sources } = await useFetch<APUser[]>('/api/ap_actors/trusted', { lazy: true })
 const { data: footerLinks } = await useFetch<FooterLink[]>('/api/settings/footerLinks', {
   transform(links) {
     return links.map(link => {

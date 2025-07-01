@@ -2,7 +2,7 @@
 
 import time from '~/utils/time'
 const params = useState('params')
-const selectedDate = useState<Date>('selectedDate')
+const selectedDate = useState<Date|null|undefined>('selectedDate', () => undefined)
 const attributes = useState('attributes')
 const theme = useTheme()
 
@@ -17,7 +17,7 @@ function updatePages (pages) {
 </script>
 <template>
   <DatePicker
-    v-model:model-value='selectedDate'
+    v-model='selectedDate'
     :locale='$i18n.locale'  
     title-position='left'
     transition='fade'

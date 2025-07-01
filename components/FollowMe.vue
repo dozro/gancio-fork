@@ -8,7 +8,7 @@ const proceed = ref(false)
 const instance = ref({})
 const loading = ref(false)
       
-const { data: stats } = useFetch('/api/ap_users/stats')
+const { data: stats } = useFetch('/api/ap_actors/stats')
 const settings = useState('settings')
 
 const link = computed(() => `https://${instance_hostname.value}/authorize_interaction?uri=${settings.instance_name}@${settings.hostname}`)

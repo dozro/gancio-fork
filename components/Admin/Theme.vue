@@ -323,10 +323,10 @@
       <v-card-text>
         <v-form v-model='valid' ref='linkModalForm'>
           <v-text-field v-model='link.label'
-            :rules="[$validators.required('common.label')]"
+            :rules="[$valid.required('common.label')]"
             label='Label' />
           <v-text-field v-model='link.href'
-            :rules="[$validators.required('common.url')]"
+            :rules="[$valid.required('common.url')]"
             :label="$t('common.url')" />
         </v-form>
       </v-card-text>

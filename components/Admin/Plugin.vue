@@ -48,7 +48,7 @@ function setOptions(plugin) {
               <v-text-field v-if='setting.type === "TEXT"' v-model='selectedPlugin.settingsValue[name]'
                 type='text' :label='setting.description'
                 persistent-hint
-                :rules="[setting.required ? $validators.required(setting.description) : false]" />
+                :rules="[setting.required ? $valid.required(setting.description) : false]" />
 
               <v-text-field v-if='setting.type === "NUMBER"' v-model='selectedPlugin.settingsValue[name]' type='number' :label='setting.description' />
               <v-switch v-if='setting.type === "CHECK"' v-model='selectedPlugin.settingsValue[name]' :label='setting.description' inset />

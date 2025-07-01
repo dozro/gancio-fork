@@ -30,12 +30,12 @@ v-card
         v-text-field(v-model="place.latitude"
           :prepend-icon='mdiLatitude'
           :label="$t('common.latitude')"
-          :rules="$validators.latitude")
+          :rules="$valid.latitude")
       v-col.py-0(cols=12 sm=6)
         v-text-field(v-model="place.longitude"
           :prepend-icon='mdiLongitude'
           :label="$t('common.longitude')"
-          :rules="$validators.longitude")
+          :rules="$valid.longitude")
     p.mt-4(v-if='place.isNew' v-html="$t('event.address_geocoded_disclaimer')")
 
     Map.mt-4(:place='place' draggable=true

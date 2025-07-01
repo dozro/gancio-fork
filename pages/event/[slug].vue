@@ -36,26 +36,26 @@ import type { Event } from '#build/types/nitro-imports'
 import time from '~/utils/time'
 
 
-const settings = useState('settings')
+const settings = useState<Settings>('settings')
 const { $notify, $prompt } = useNuxtApp()
 const { t } = useI18n()
 const { user } = useUserSession()
 const route = useRoute()
 const { data: event } = await useFetch<Event>(`/api/events/${route.params.slug}`)
-if (!event) {
+if (!event.value) {
     throw createError({ status: 404, statusMessage: 'Event not found'})
 }
 
-const hasMedia = computed(() => event?.media?.length )
+const hasMedia = computed(() => event?.value.media?.length )
 
 const showEmbed = ref(false)
 const mapModal = ref(false)
 const openModeration = ref(route.query?.moderation ? true : false)
 const openAssignAuthor = ref(false)
-const showModeration = computed(() => settings.enable_moderation && event.isMine || user?.role === 'admin' || user?.role === 'editor')
+const showModeration = computed(() => settings.value.enable_moderation && event.isMine || user?.role === 'admin' || user?.role === 'editor')
 
 const canEdit = true // computed(() => event?.isMine || user?.role === 'admin' || user?.role === 'editor')
-const hasOnlineLocations = computed(() => event?.online_locations?.length )
+const hasOnlineLocations = computed(() => event.value.online_locations?.length )
 
       // mapModal: false,
       // openModeration: $route?.query?.moderation ? true : false,
@@ -191,36 +191,6 @@ async function report () {
     $notify(e)
   }
 }
-    
-// function keyDown (ev) {
-      // if (this.openModeration || this.reporting) {
-      //   return
-      // }
-      // if (ev.altKey || ev.ctrlKey || ev.metaKey || ev.shiftKey) { return }
-      // if (ev.key === 'ArrowRight' && this.event.next) {
-      //   this.goNext()
-      // }
-      // if (ev.key === 'ArrowLeft' && this.event.prev) {
-      //   this.goPrev()
-      // }
-// }
-
-function goPrev () {
-  // if (this.event.prev) {
-  //   this.$router.replace(`/event/${this.event.prev}`)
-  // }
-}
-
-function goNext () {
-  //     if (this.event.next) {
-  //       this.$router.replace(`/event/${this.event.next}`)
-  //     }
-  //   },
-  //   copyLink () {
-  //     this.$root.$message('common.copied', { color: 'success' })
-  //   },
-  // }
-}
 
 </script>
 <template>
@@ -228,7 +198,6 @@ function goNext () {
   v-if='event'
   class="h-event pa-2 pa-sm-2 pt-0 pt-sm-0 event"
   max-width='1200 '
-  v-touch="{ left: goNext, right: goPrev }"
   itemscope
   itemtype="https://schema.org/Event"
 >
@@ -392,40 +361,29 @@ function goNext () {
   <!-- resources from fediverse -->
   <!-- <EventResource id="resources" class="mt-3" :event="event" v-if="showResources" /> -->
   
-  <!-- Next/prev arrow -->
-  <!-- <div class="text-center mt-5 mb-5">
-    <v-btn
-      class="mr-2"
-      nuxt
-      icon='mdi-arrow-left'
-      outlined
-      color="primary"
-      :to="`/event/${event.prev}`"
-      :disabled="!event.prev"
-    />
-    <v-btn nuxt bottom right outlined color="primary" :to="`/event/${event.next}`" :disabled="!event.next" icon='mdi-arrow-right' />
-  </div> -->
-  <v-dialog v-model="showEmbed" width="700px" :fullscreen="$vuetify.display?.mobile">
+  <!-- <v-dialog v-model="showEmbed" width="700px" :fullscreen="$vuetify.display?.mobile">
     <EventEmbed :event="event" @close="showEmbed=false" />
-  </v-dialog>
+  </v-dialog> -->
   
-  <v-dialog
+  <!-- <v-dialog
     v-show="settings.allow_geolocation && event?.place?.latitude && event.place?.longitude"
     v-model="mapModal"
     :fullscreen="$vuetify.display?.mobile"
     destroy-on-close
   >
     <EventMapDialog :place="event?.place" @close="mapModal=false" />
-  </v-dialog>
+  </v-dialog> -->
+  
     <!-- v-if="$auth?.user?.is_admin" -->
-  <v-dialog
+  <!-- <v-dialog
     v-model="openAssignAuthor"
     :fullscreen="$vuetify.display?.mobile"
     destroy-on-close
     width="400"
   >
     <EventAssignAuthor :event="event" @close="openAssignAuthor=false" />
-  </v-dialog>
+  </v-dialog> -->
+  
   <v-navigation-drawer
     v-model="openModeration"
     :fullscreen="$vuetify.display?.mobile"

@@ -70,14 +70,14 @@ async function savePlace() {
       <v-card-text class="mb-4">
         <v-form v-model="valid" ref="form" lazy-validation>
           <v-text-field
-            :rules="[$validators.required('common.name')]"
+            :rules="[$valid.required('common.name')]"
             :label="$t('common.name')"
             v-model="place.name"
             :placeholder="$t('common.name')"
           />
           <v-text-field
             ref="address"
-            :rules="[ v => $validators.required('common.address')(v)]"
+            :rules="[ v => $valid.required('common.address')(v)]"
             :label="$t('common.address')"
             v-model="place.address"
             persistent-hint

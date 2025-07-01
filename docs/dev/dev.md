@@ -10,21 +10,33 @@ has_children: true
 
 **Gancio** is built with following technologies:
 
-- [Nuxt.js](https://nuxt.org/)
+- [Nuxt.js](https://nuxt.com/)
 - [Vue.js](https://vuejs.org/)
+- [Bun.sh](https://bun.sh/)
 - [Sequelize](https://sequelize.org/)
 - [Vuetify](https://vuetifyjs.com/)
 
 ### Testing on your own machine
 
-2. Download source
+1. Download source
 ```bash
 git clone https://framagit.org/les/gancio
+git checkout main
 ```
 
-3. Install dependencies
+2. Install bun
 ```bash
-yarn
+curl -fsSL https://bun.sh/install | bash
+```
+
+2. Install dependencies
+```bash
+bun install
+```
+
+3. Use a default sqlite configuration
+```bash
+cp config.example.json config.json
 ```
 
 4. Run db migrations
@@ -32,21 +44,44 @@ yarn
 ./node_modules/.bin/sequelize db:migrate
 ```
 
-5. Hacking
+5. Create a first admin user  
 ```bash
-yarn dev
+./server/cli.js users create admin secretpassword admin
 ```
 
-> warning "Warning"
-> You need to register a first user, this will be an active administrator!
+6. Hacking
+```bash
+bun dev
+```
 
+> info "Info"
+> You can skip step n.5 and register the user from the UI, the first registered user will be an active administrator.
+
+#### Using Docker
+
+1. Build the container
+```bash
+docker build -f Dockerfile.dev -t gancio .
+```
+
+2. Install dependencies
+```bash
+docker run -v $PWD:/home/node -it gancio bun install
+```
+
+3. Hacking
+```bash
+docker run -v $PWD:/home/node -it gancio
+```
+
+
+### Notes about hacking
+This section is to support people who want to contribute to the source code.
 Please use the [issues](https://framagit.org/les/gancio/-/issues) to discuss any modification.
 
 
-### NOTES
-
-
 #### Nuxt3 / Gancio lifecycle:
+
 - nuxt.config.ts:
   load the `runtimeConfig` from environment: `base_url`, db parameters and gancio `version` from package.json)
   - fallback from legacy config.json?
@@ -57,7 +92,6 @@ Please use the [issues](https://framagit.org/les/gancio/-/issues) to discuss any
 
 - nuxt server plugins in server (middleware, api, routes)
 
-
 - runtime plugins in plugins (.client.ts / .server.ts)
 
 - composable for reusable vue logic (auth)
@@ -65,16 +99,55 @@ Please use the [issues](https://framagit.org/les/gancio/-/issues) to discuss any
 - utilities helper function without state
 
 
-## API / Backend > (/server)
 
-### Getting random values
-`crypto.randomUUID()`
+## API / Backend > (/server)
+In Nuxt3, API endpoints and server routes are defined inside the `/server` directory. There are two main ways to create backend logic:
+
+- **API Routes:**  
+  Place files inside `/server/api/`. Each file (e.g., `/server/api/hello.get.ts`) automatically becomes an endpoint (e.g., `/api/hello`). The filename and extension determine the HTTP method (`.get.ts`, `.post.ts`, etc.). You can export a default function that receives the `event` object, which contains request and context information.
+
+  Example:
+  ```js
+  // /server/api/hello.get.ts
+  export default defineEventHandler((event) => {
+    return { message: 'Hello from API!' }
+  })
+  ```
+
+- **Custom Server Routes:**  
+  For more advanced routing, place files in `/server/routes/`. The filename and folder structure map directly to the route path. You can use any HTTP method and have full control over the request/response.
+
+  Example:
+  ```js
+  // /server/routes/custom.ts
+  export default eventHandler((event) => {
+    return 'Custom route response'
+  })
+  ```
+
+**How it works:**
+- Nuxt3 uses [Nitro](https://nitro.unjs.io/) as the server engine, which automatically scans the `/server` directory for API and route files.
+- You can access query parameters, request body, and headers using utilities like `getQuery(event)`, `readBody(event)`, and `getHeaders(event)`.
+- Middleware and plugins can be added in `/server/middleware/` and `/server/plugins/` for logic like authentication, logging, or database connections.
+
+**Summary:**
+- Use `/server/api/` for RESTful endpoints with automatic routing.
+- Use `/server/routes/` for custom or advanced server logic.
+- All routes are available under the `/api/` prefix (for `/server/api/`) or at the root (for `/server/routes/`).
+- Server code runs only on the backend and can securely access environment variables, the database, and other server-side resources.
+
+
+
+
 
 ### Settings
 You can use the `publicSettings` or `secretSettings` server utilities
 
 ### return errors
 `throw createError({ status: 404, message: 'Not found' })`
+
+### Getting random values
+`crypto.randomUUID()`
 
 ### logs
 `const log = useLogger('context')`
@@ -150,11 +223,11 @@ To send emails in the background, use the `enqueueMail` utility. This schedules 
 
 ```js
 enqueueMail(
-  'user@example.com',      // recipient address (string or array)
-  'register',              // template name
+  'user@example.com',      // recipient addresses (string or array)
+  'register',              // template name (template files are in `/server/emails`)
   { username: 'Alice' },   // template variables (optional)
   'en',                    // locale (optional)
-  false                    // send as BCC (optional)
+  false                    // use BCC for recipient (optional)
 )
 ```
 

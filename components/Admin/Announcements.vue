@@ -92,7 +92,7 @@ async function remove(announcement) {
       <v-card-text class='px-0'>
         <v-form v-model='valid' ref='announcement' @submit.prevent='save' lazy-validation>
           <v-text-field class='col-12' v-model='announcement.title'
-            :rules="[$validators.required('common.title')]"
+            :rules="[$valid.required('common.title')]"
             :label='$t("common.title")' />
           <CoreEditor class='col-12' v-model='announcement.announcement'
             border no-save max-height='400px' :placeholder="$t('common.description')" />
@@ -110,8 +110,6 @@ async function remove(announcement) {
     <v-data-table
       v-if='announcements.length'
       :hide-default-footer='announcements.length<10'
-      :footer-props='{ prevIcon: mdiChevronLeft, nextIcon: mdiChevronRight }'
-      :header-props='{ sortIcon: mdiChevronDown }'
       :headers='headers'
       :items='announcements'>
       <template v-slot:item.actions='{ item }'>

@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import type { Collection } from '#build/types/nitro-imports'
 import time from '~/utils/time'
-const settings = useState('settings')
+const settings = useState<Settings>('settings')
 
 // const { currentMonth, currentYear, startMonth } = useTime()
 const params = useState('params', () => ({ query: '', show_recurrent: false, start: time.startMonth(time.currentYear(),  time.currentMonth()) }))
 
 const route = useRoute()
 
-const show_calendar = computed(() => !settings.value.show_calendar && ['index'].includes(route.name))
-const show_search_bar = computed(() => ['index'].includes(route.name))
+const in_home = computed(() => route.name === 'index')
+const show_calendar = computed(() => !settings.value.hide_calendar && in_home.value)
+const show_search_bar = computed(() => in_home.value)
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections/home')
 

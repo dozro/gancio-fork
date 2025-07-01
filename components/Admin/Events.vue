@@ -53,8 +53,6 @@ async function remove (event) {
   <v-data-table
     v-if='unconfirmedEvents.length'
     :hide-default-footer='unconfirmedEvents.length<10'
-    :header-props='{ sortIcon: mdiChevronDown }'
-    :footer-props='{ prevIcon: mdiChevronLeft, nextIcon: mdiChevronRight }'
     :items='unconfirmedEvents'
     :headers='headers'>
       <template v-slot:item.start_datetime='{ item }'>{{$time.when(item)}}</template>
@@ -83,8 +81,6 @@ async function remove (event) {
   v-data-table(
     v-if='unconfirmedOldEvents.length'
     :hide-default-footer='unconfirmedOldEvents.length<10'
-    :header-props='{ sortIcon: mdiChevronDown }'
-    :footer-props='{ prevIcon: mdiChevronLeft, nextIcon: mdiChevronRight }'
     :items='unconfirmedOldEvents'
     :headers='headers')
     template(v-slot:item.start_datetime='{ item }') {{$time.when(item)}}

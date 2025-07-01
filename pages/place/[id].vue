@@ -1,16 +1,16 @@
 s<script setup lang="ts">
-import type { Place } from '#build/types/nitro-imports';
+import type { Place } from '#build/types/nitro-imports'
 
-const { Settings } = useSettings()
+const settings = useState<Settings>('settings')
 
 const route = useRoute()
 const { data: place } = await useFetch<Place>(`/api/events/place/${route.params.id}`)
-  if (!place) {
-    throw createError({ status: 404, statusMessage: 'Place not found'})
+if (!place) {
+  throw createError({ status: 404, statusMessage: 'Place not found'})
 }
 
 useHead( () => {
-      const title = `${Settings.title} - ${place?.name}`
+      const title = `${settings.value.title} - ${place?.value.name}`
       return {
         title,
         link: [
@@ -24,17 +24,17 @@ useHead( () => {
 <template>
     <v-container id='home' class='px-2 px-sm-6 pt-0'>
       <h1 class='d-block text-h4 font-weight-black text-center text-uppercase mt-10 mx-auto w-100 text-underline'>
-        <u>{{ place?.name }}</u>
+        <u>{{ place?.valuename }}</u>
       </h1>
       <span v-if='place?.name!=="online"' class="d-block text-subtitle text-center w-100">{{ place?.address }}</span>
   
       <!-- Map -->
-      <div v-if='Settings?.allow_geolocation && place?.latitude && place?.longitude' >
+      <div v-if='settings?.allow_geolocation && place?.latitude && place?.longitude' >
         <div class="mt-4 mx-auto px-4" >
           <!-- <Map :place='place' :height='mapHeight' /> -->
         </div>
         <div class="mt-4">
-          <HowToArriveNav :place='place' class="justify-center" />
+          <!-- <HowToArriveNav :place='place' class="justify-center" /> -->
         </div>
       </div>
   

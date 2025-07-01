@@ -1,39 +1,47 @@
-<script setup>
+<script setup lang='ts'>
 import { DateTime } from 'luxon'
-
-const settings = useState('settings')
+const settings = useState<Settings>('settings')
 const { t } = useI18n()
-const event = defineModel('event', { type: Object } )
+const event = defineModel<Event>('event', { type: Object } )
+
 const type = ref('normal')
 const frequencies = [
   { value: '1w', text: t('event.each_week') },
   { value: '2w', text: t('event.each_2w') },
-  { value: '1m', text: t('event.each_month') }
+  { value: '1m', text: t('event.each_month') },
+  { value: '1y', text: t('event.each_year') }
 ]
 
-// Helpers
-function formatDate(ts) {
-  return new Date(ts * 1000).toISOString().substring(0, 10)
+function fromDateAndTimeToDateTime(dateObj: Date | string, timeStr: string): DateTime {
+  const [hours, minutes] = timeStr.split(':').map(Number)
+  const dt = DateTime.fromJSDate(typeof dateObj === 'string' ? new Date(dateObj) : dateObj)
+    .set({ hour: hours, minute: minutes, second: 0, millisecond: 0 })
+  return dt
 }
 
-function formatTime(ts) {
-  return new Date(ts * 1000).toTimeString().substring(0, 5)
+function formatTime(date: Date | number): string {
+  let dt: DateTime
+  if (typeof date === 'number') {
+    // If it's a unix timestamp in seconds
+    dt = DateTime.fromSeconds(date)
+  } else {
+    dt = DateTime.fromJSDate(date)
+  }
+  return dt.toFormat('HH:mm')
 }
 
-function toUnix(dateStr, timeStr) {
-  return Math.floor(new Date(`${dateStr}T${timeStr}`).getTime() / 1000)
-}
 
 // Selected date
 const selectedDate = computed({
   get() {
-    return event.value.start_datetime ? formatDate(event.value.start_datetime) : ''
+    return event.value.start_datetime ?? ''
   },
   set(val) {
     const sTime = startTime.value || '00:00'
     const eTime = endTime.value || '00:00'
-    event.value.start_datetime = DateTime.fromJSDate(val).toUnixInteger() 
-    event.value.end_datetime = toUnix(val, eTime)
+    event.value.start_datetime = fromDateAndTimeToDateTime(val, sTime) //DateTime.fromJSDate(val).toUnixInteger() 
+    event.value.end_datetime = fromDateAndTimeToDateTime(val, eTime) //DateTime.fromJSDate(val).toUnixInteger() 
+    // event.value.end_datetime = toUnix(val, eTime)
   },
 })
 
@@ -43,11 +51,12 @@ const startTime = computed({
     return event.value.start_datetime ? formatTime(event.value.start_datetime) : ''
   },
   set(val) {
-    const date = selectedDate.value || '1970-01-01'
-    console.error(date)
-    event.value.start_datetime = toUnix(date, val)
+    const date = selectedDate.value
+    event.value.start_datetime = fromDateAndTimeToDateTime(selectedDate.value, val) //DateTime.fromJSDate(val).toUnixInteger() 
   },
 })
+
+
 
 // End time
 const endTime = computed({
@@ -55,8 +64,8 @@ const endTime = computed({
     return event.value.end_datetime ? formatTime(event.value.end_datetime) : ''
   },
   set(val) {
-    const date = selectedDate.value || '1970-01-01'
-    event.value.end_datetime = toUnix(date, val)
+    const date = selectedDate.value
+    event.value.end_datetime = fromDateAndTimeToDateTime(selectedDate.value, val)
   },
 })
 
@@ -130,14 +139,18 @@ const endTime = computed({
     
     <v-col class="col-12 col-sm-6">
       <v-text-field
+        v-model='startTime'
         :label="$t('event.from')"
         :rules="[$valid.required('event.from')]"
-        prepend-icon='mdi-clock-time-four-outline' type='time' step='300' />
+        prepend-icon='mdi-clock-time-four-outline'
+        type='time'
+        step='300' />
     </v-col>
     
     <v-col class="col-12 col-sm-6">
         <!-- :disabled="!value.fromHour" -->
       <v-text-field
+        v-model='endTime'
         :rules="[settings.allow_event_without_end_time ? true : $valid.required('event.due')]"
         :label="$t('event.due')"
         prepend-icon='mdi-clock-time-eight-outline' type='time' />
@@ -164,7 +177,7 @@ const endTime = computed({
             :disabled="!value.from"
             readonly
             :prepend-icon="mdiClockTimeFourOutline"
-            :rules="[$validators.required('event.from')]"
+            :rules="[$valid.required('event.from')]"
             v-bind="attrs"
             v-on="on"
           ></v-text-field>
@@ -201,7 +214,7 @@ const endTime = computed({
             :disabled="!value.fromHour"
             :label="$t('event.due')"
             :prepend-icon="mdiClockTimeEightOutline"
-            :rules="[settings.allow_event_without_end_time ? true : $validators.required('event.due')]"
+            :rules="[settings.allow_event_without_end_time ? true : $valid.required('event.due')]"
             v-bind="attrs"
             v-on="on"
           ></v-text-field>
@@ -223,7 +236,8 @@ const endTime = computed({
   <!-- //List(v-if='type === "normal" && todayEvents.length' :events='todayEvents' :title='$t("event.same_day")') -->
 
 </template>
-<script>
+
+// <!-- <script> -->
 // import { DateTime } from 'luxon'
 // import { mapState, mapActions, mapGetters } from 'vuex'
 // import List from '@/components/List'
@@ -410,7 +424,7 @@ const endTime = computed({
 //     },
 //   }
 // }
-</script>
+// <!-- </script> -->
 
 <style>
 .datePicker {

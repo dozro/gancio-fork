@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const settings = useState('settings')
+const settings = useState<Settings>('settings')
 
 </script>
 <template>
-  <nav>
+  <nav id='AppBar'>
     <NavHeader />
 
     <!-- title -->
@@ -20,13 +20,13 @@ const settings = useState('settings')
   </nav>
 </template>
 <style>
-  nav {
+  nav.AppBar {
     background-image: linear-gradient(rgba(0,0,0,.8),hsla(0,0%,8%,.7)),url(/headerimage.png);
     background-position: center center;
     background-size: cover;
   }
 
-  .v-theme--light nav {
+  .v-theme--light nav.AppBar {
     background-image: linear-gradient(
         to bottom,
         rgba(230, 230, 230, 0.95),

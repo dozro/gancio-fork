@@ -1,51 +1,100 @@
-<script setup lang='ts'>
-// const { Settings } = useSettings()
+<!-- Choose event location
 
-const settings = useState('settings')
+-->
+<script setup lang='ts'>
+import { debounce } from 'vuetify/lib/util/helpers.mjs'
+
+const settings = useState<Settings>('settings')
+
 interface Place {
-  name: string,
-  address: string
+  name?: string,
+  address?: string,
+  online?: boolean,
+  create?: boolean
 }
 
-const whereInputAdvancedDialog = ref(false)
-const search = ref('')
 const modelValue = defineModel('modelValue', { type: Object, default: () => ({ name: '', address: '' }) })
+
+const whereInputAdvancedDialog = ref(false)
+// const search = ref('')
 const onlineLocations = ref([])
 const disableAddress = ref(false)
 
-const isOnLine = computed(() => settings?.allow_online_event && modelValue.value.name === 'online')
-//       return this.settings.allow_online_event && this.place.name === 'online'
+const isOnLine = computed(() => settings.value.allow_online_event && modelValue.value.name === 'online')
 
-const { data: places = [], status } = await useFetch<Place[]>('/api/places', { params: { query: search }})
+const showAdvancedDialogButton = computed(() => {
+  if (!modelValue.value.name) return false
+  // do not show advanced dialog button in case geolocation is not allowed
+  if (!(settings.value.allow_geolocation)) {
+    return false
+  }
+  // known places already have coords
+  if (!modelValue.value.isNew) return false
+  return true
+})
+
+const places = ref<Place[]>([])
+
+const search = debounce(async function(ev) {
+  const query: string = ev ? ev.target.value.trim().toLowerCase() : ''
+  places.value = await $fetch('/api/places', { query: { query } }).catch() as Place[]
+
+  // Filter out the place with name 'online' if not allowed
+  if (places.value.length) {
+    places.value = places.value.filter(p => p.name?.toLocaleLowerCase() !== 'online')
+  }
+  if (settings.value.allow_online_event) {
+    places.value.push({ online: true, name: 'online' })
+  }
+
+  if (!search && places.value.length) { 
+    return places
+  }
+  const matches = places.value.find(p => query === p.name?.toLocaleLowerCase())
+  if (!matches && query) {
+    places.value.unshift({ create: true, name: ev.target.value.trim() })
+  }
+}, 200)
+search()
+
+// const { data: places = [], status } = await useFetch<Place[]>('/api/places', { params: { query: search },
+//     transform: places => {
+//       if (places) {
+//         places.push()
+//       }
+//     })
+
 </script>
 <template>
 <v-row class="mb-4">
   <v-col cols="12" md="4">
+      <!-- v-model:search.trim.toLowerCase="search" -->
     <v-combobox
       ref="place"
       :rules="[$valid.required('common.where')]"
       :label="$t('common.where')"
-      v-model='modelValue.name'
-      v-model:search.trim.toLowerCase="search"
+      v-model='modelValue'
       prepend-icon="mdi-map-marker"
       hide-no-data
+      @input='search'
       :hint="$t('event.where_description')"
       persistent-hint
-      :loading='status==="pending"'
       :items="places || []"
-      item-title="name"
+      item-title='name'
       item-value="id">
-      <!-- <template #item="{ item, props }"> -->
-        <!-- <v-list-item v-bind="props" lines="two" :title='item.title' :subtitle='item?.address' /> -->
-          <!-- <v-list-item-title v-if="item?.create">
-            <v-icon color='primary' icon='mdi-plus' :aria-label='$t("common.add")' /> {{$t('common.add')}} <strong>{{item?.name}}</strong>
-          </v-list-item-title>
-          <v-list-item-title v-else-if="item?.online">
-            <v-icon color='primary' icon='mdi-laptop-account' :aria-label='$t("common.online")' /> {{$t('common.online')}}
-          </v-list-item-title>
+        
+      <template #item="{ item, props }">
+        <v-list-item v-bind='props'>
+          <template #title v-if='item.raw.create'><v-list-item-title icon='mdi-plus'>{{ $t('common.add')}} {{ item.raw.name }}</v-list-item-title></template>
+          <template #title v-else-if='item.raw.online'>online</template>
+          <template #title v-else>{{ item.raw.name }}</template>
+          <template #subtitle v-if='item.raw.address'>{{ item.raw.address }}</template>
+          <!-- <v-list-item-title v-if="item?.create" prepend-icon='mdi-plus' color='primary':aria-label='$t("common.add")'> {{$t('common.add')}} <strong>{{item?.name}}</strong></v-list-item-title>
+          <v-list-item-title v-else-if="item?.online" prepend-icon='mdi-laptop-account'
+            color='primary' :aria-label='$t("common.online")'> {{$t('common.online')}}</v-list-item-title>
           <v-list-item-title v-else :title='item?.name' :subtitle='item?.address' /> -->
-        <!-- </v-list-item> -->
-      <!-- </template> -->
+        </v-list-item>
+      </template>
     </v-combobox>
   </v-col>
   
@@ -62,22 +111,23 @@ const { data: places = [], status } = await useFetch<Place[]>('/api/places', { p
   </v-col>
   
   <v-col cols="12" :md="isOnLine?8:3" v-if="settings.allow_online_event">
+    <span>{{ onlineLocations }}</span>
     <v-combobox
       class="mr-4" v-model="onlineLocations"
       prepend-icon="mdi-link" :hint="$t('event.online_locations_help')"
       :label="$t('event.online_locations')"
-      :rules="isOnLine ? [$validators.required('event.online_locations')] : []"
+      :rules="isOnLine ? [$valid.required('event.online_locations')] : []"
       clearable chips
       multiple
       closable-chips
       hide-no-data
       hide-selected
       persistent-hint
-      :delimiters="[',', ';', '; ']" :items="onlineLocations" @change="selectLocations">
-      <template v-slot:chip="{ item, index, on, attrs, selected, parent }">
-        <v-chip v-bind="attrs" :outlined="index !== 0" closable close-icon="mdi-close-circle" @click:close="parent.selectItem(item)" :model-value="selected" label="label" small="small">{{ item }}</v-chip>
-      </template>
-    </v-combobox>
+      :delimiters="[',', ';', '; ']" :items="onlineLocations" />
+      <!-- <template #chip="{ item, index, props }">
+        <v-chip v-bind="props" :outlined="index !== 0" closable close-icon="mdi-close-circle" @click:close="label="label" small="small">{{ item }}</v-chip>
+      </template> -->
+    <!-- </v-combobox> -->
   </v-col>
   <!-- <v-dialog v-model="whereInputAdvancedDialog" destroy-on-close="destroy-on-close" max-width="700px" :fullscreen="$vuetify.display.mobile" dense="dense">
     <WhereInputAdvanced ref="whereAdvanced" :place.sync="value" :event="event" @close="whereInputAdvancedDialog = false && this.$refs.address.blur()" :onlineLocations.sync="onlineLocations" @update:onlineLocations="selectLocations"></WhereInputAdvanced>
@@ -115,18 +165,13 @@ const { data: places = [], status } = await useFetch<Place[]>('/api/places', { p
 //       return this.settings.allow_online_event && this.place.name === 'online'
 //     },
 //     showAdvancedDialogButton () {
-
-
 //       if (!this.place.name) return false
-    
 //       // do not show advanced dialog button in case geolocation is not allowed
 //       if (!(this.settings.allow_geolocation)) {
 //         return false
 //       }
-
 //       // known places already have coords
 //       if (!this.place.isNew) return false
-
 //       return true
 //     }
 //   },

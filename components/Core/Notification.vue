@@ -10,9 +10,8 @@ onMounted( () => {
 const notifications = ref([])
 
 function showNotification(ev) {
-  console.error(ev)
   const msg = t(ev.msg, ev?.args)
-  notifications.value.unshift(msg)
+  notifications.value.unshift({ msg, status: ev.status })
   setTimeout(() => notifications.value.pop(), 5000)
 }
 

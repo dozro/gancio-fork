@@ -103,8 +103,6 @@ async function removeTag (tag) {
       :headers='headers'
       :items='tags'
       :hide-default-footer='tags.length < 5'
-      :header-props='{ sortIcon: mdiChevronDown }'
-      :footer-props='{ prevIcon: mdiChevronLeft, nextIcon: mdiChevronRight }'
       :search='search'>
       <template v-slot:item.actions='{ item }'>
         <t-btn @click='editTag(item)' color='primary' :tooltip="$t('common.edit')" icon='mdi-pencil' />
