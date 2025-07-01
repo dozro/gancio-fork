@@ -66,7 +66,7 @@ return {
       },
       VTextarea: {
         autocomplete: 'off',
-        clearable: true,
+        clearable: false,
         variant: 'underlined'        
       },
       VTextField: {

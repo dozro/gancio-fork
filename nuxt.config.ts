@@ -1,6 +1,7 @@
 import { version } from './package.json'
-import config from './config.json'
+import config from './server/config.js'
 import locales from './i18n/locales/index'
+import vuetify from 'vite-plugin-vuetify'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -9,18 +10,20 @@ export default defineNuxtConfig({
     port: 13120
   },
   compatibilityDate: '2024-04-03',
+  
   devtools: {
-    enabled: true,
-
+    enabled: false,
     timeline: {
       enabled: true,
     },
   },
+  
+  css: ['~/assets/css/main.css'],
   modules: [
     '@nuxtjs/i18n',
     "vuetify-nuxt-module",
     'nuxt-auth-utils',
-    '@nuxt/eslint',
+    '@nuxt/eslint'
   ],
   vuetify: {
     vuetifyOptions: './vuetify.options.js'
@@ -49,10 +52,10 @@ export default defineNuxtConfig({
     }
   },
   runtimeConfig: {
-    baseurl: config?.baseurl ?? process.env.BASE_URL,
-    db_dialect: config?.db?.dialect ?? process.env.DB_DIALECT,
-    db_storage: config?.db?.storage ?? process.env.DB_STORAGE,
-    user_locale_path: config?.user_locale ?? process.env.USER_LOCALE_PATH,
+    baseurl: config?.baseurl,
+    db_dialect: config?.db?.dialect,
+    db_storage: config?.db?.storage,
+    user_locale_path: config?.user_locale,
     // TODO
     public: {
       version
