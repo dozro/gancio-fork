@@ -1,4 +1,4 @@
-import withNuxt from './.nuxt/eslint.config.mjs'
+import withNuxt from '.nuxt/eslint.config.mjs'
 import vue from 'eslint-plugin-vue'
 import vuetify from 'eslint-plugin-vuetify'
 

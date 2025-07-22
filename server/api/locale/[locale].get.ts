@@ -1,4 +1,4 @@
-import locales from '~/i18n/locales/index'
+import locales from '~~/i18n/locales/index'
 import fs from 'fs'
 import path from 'path'
 import config from '../../config'

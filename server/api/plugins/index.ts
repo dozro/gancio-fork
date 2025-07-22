@@ -1,4 +1,4 @@
-import pluginController from "~/server/utils/plugins"
+import pluginController from "~~/server/utils/plugins"
 
 export default defineEventHandler(async event => {
     // return plugins and inner settings

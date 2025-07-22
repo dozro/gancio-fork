@@ -1,6 +1,8 @@
 import { z } from "zod"
-import { APUser } from "~/server/utils/sequelize"
-import { unfollowActor } from "~/server/federation/helpers"
+// import { APUser } from "#imports"
+// import { APUser } from "~/server/utils/sequelize"
+// import { unfollowActor } from "~/server/federation/helpers"
+import { unfollowActor } from "~~/server/federation/helpers"
 
 const schema = z.object({
   ap_id: z.string()

@@ -1,5 +1,5 @@
 import { Event } from "#imports"
-import { parseMultipartFormData } from "~/server/utils/parseMultipartForm"
+import { parseMultipartFormData } from "~~/server/utils/parseMultipartForm"
 
 
 /**

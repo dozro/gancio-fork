@@ -1,8 +1,11 @@
 import { z } from 'zod'
+import { updateActor } from '../federation/helpers'
 
 export type Settings = {
   title: string,
   description: string,
+  /** The path to the logo image for the instance */
+  logo?: string,
   baseurl: string,
   hostname: string,
   instance_timezone: string,
@@ -44,8 +47,12 @@ export type Settings = {
   custom_css: string
 }
 
-export type KeyValueType =
-| { [key: string]: string | boolean | object | null | number | undefined }
+export type SecretSettings = {
+  privateKey?: string,
+}
+
+// export type KeyValueType =
+// | { [key: string]: string | boolean | object | null | number | undefined }
 
 export const settingSchema = z.object({
   key: z.string(),
@@ -98,9 +105,12 @@ export const publicSettings:Settings = {
   smtp: config.smtp || {},
   default_fedi_hashtags: [],
   custom_js: '',
-  custom_css: ''
+  custom_css: '',
 }
-export const secretSettings:KeyValueType = {}
+
+export const secretSettings:Record<keyof SecretSettings, any> = {
+  privateKey: null
+}
 
 export function getSetting (key: keyof Settings) {
     return publicSettings[key]
@@ -114,16 +124,21 @@ export function setSetting<K extends keyof Settings>(
   value: Settings[K],
   is_secret: boolean = false
 ): Promise<[entity: Setting, created: boolean | null]> {
+  const log = useLogger('settings')
+  log.info(`SET '${key}' -> '${value}'`)
   if (is_secret) {
-      secretSettings[key] = value
+    secretSettings[key] = value
   } else {
-      publicSettings[key] = value
+    if (key === 'description') {
+      updateActor()
+    }
+    publicSettings[key] = value
   }
   return Setting.upsert({ key, value, is_secret })
 }
 
 export async function loadSettings () {
-  const settings = await Setting.findAll()
+  const settings = await Setting.findAll({ raw: true })
   for (const setting of settings) {
     if (setting.is_secret) {
       secretSettings[setting.key] = setting.value

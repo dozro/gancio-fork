@@ -1,7 +1,7 @@
 import { z } from "zod"
-import { APUser } from "~/server/utils/sequelize"
-import { parseAPMessage, verifySignature } from '~/server/federation/helpers'
-import { follow, unfollow } from "~/server/federation/follows"
+// import { APUser } from "~/server/utils/sequelize"
+import { parseAPMessage, verifySignature } from '~~/server/federation/helpers'
+import { follow, unfollow } from "~~/server/federation/follows"
 
 export default defineEventHandler(async event => {
   const log = useLogger('AP inbox')

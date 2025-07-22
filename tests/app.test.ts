@@ -1,4 +1,3 @@
-import type { Event } from "#build/types/nitro-imports"
 import { describe, expect, it } from "vitest"
 import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
 

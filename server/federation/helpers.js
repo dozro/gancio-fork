@@ -8,7 +8,7 @@ import { getImageFromURL } from '../helpers'
   const log = useLogger('federation')
   
   // ignore unimplemented ping url from fediverse
-  function spamFilter (req, res, next) {
+  export function spamFilter (req, res, next) {
     const urlToIgnore = [
       '/api/v1/instance',
       '/api/meta',
@@ -36,6 +36,93 @@ import { getImageFromURL } from '../helpers'
     })
   }
 
+  function _getUser () {
+    const settings = publicSettings
+    const name = publicSettings?.instance_name ?? publicSettings.title
+    const baseurl = publicSettings.baseurl
+    return {
+      '@context': [
+        'https://www.w3.org/ns/activitystreams',
+        'https://w3id.org/security/v1',
+        {
+          toot: 'http://joinmastodon.org/ns#',
+
+          // A property-value pair, e.g. representing a feature of a product or place. We use this to publish this very same instance
+          // https://docs.joinmastodon.org/spec/activitypub/#PropertyValue
+          schema: 'http://schema.org#',
+          ProperyValue: 'schema:PropertyValue',
+          value: 'schema:value',
+
+          // https://docs.joinmastodon.org/spec/activitypub/#discoverable
+          discoverable: 'toot:discoverable',
+
+          indexable: 'toot:indexable'
+        }
+      ],
+      id: `${baseurl}/federation/u/${name}`,
+      type: 'Application',
+      name: publicSettings.title,
+      preferredUsername: name,
+      inbox: `${baseurl}/federation/u/${name}/inbox`,
+      outbox: `${baseurl}/federation/u/${name}/outbox`,
+      manuallyApprovesFollowers: false,
+      endpoints: { sharedInbox: `${baseurl}/federation/u/${name}/inbox` },
+      discoverable: true,
+      indexable: true,
+      attachment: [
+        {
+          type: 'PropertyValue',
+          name: 'Website',
+          value: `<a href='${baseurl}'>${baseurl}</a>`
+        }
+      ],
+      icon: {
+        type: 'Image',
+        mediaType: 'image/png',
+        url: baseurl + '/logo.png'
+      },
+      summary: publicSettings.description,
+      publicKey: {
+        id: `${baseurl}/federation/u/${name}#main-key`,
+        owner: `${baseurl}/federation/u/${name}`,
+        publicKeyPem: publicSettings.publicKey
+      },
+      url: `${baseurl}/federation/u/${name}`
+    }    
+  }
+  
+export async function updateActor() {
+  if (!publicSettings.enable_federation) {
+    log.info('[FEDI] Federation is disabled')
+    return
+  }
+
+  const followers = await APUser.findAll({ where: { follower: true } })
+  log.debug("[FEDI] Sending to %d followers: [%s]", followers.length, followers.map(f => f.ap_id).join(', '))
+  const recipients = {}
+  followers.forEach(follower => {
+    const sharedInbox = follower?.object?.endpoints?.sharedInbox ?? follower?.object?.inbox
+    if (!recipients[sharedInbox]) { recipients[sharedInbox] = [] }
+    recipients[sharedInbox].push(follower.ap_id)
+  })
+
+  for (const sharedInbox in recipients) {
+    log.debug(`Notify ${sharedInbox} with actor update cc => ${recipients[sharedInbox].length}`)
+    const body = {
+      id: `${publicSettings.baseurl}/federation/m/actor#update-${DateTime.local().toMillis()}`,
+      type: 'Update',
+      to: ['https://www.w3.org/ns/activitystreams#Public'],
+      cc: [...recipients[sharedInbox], `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}/followers`],
+      actor: `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
+      object: _getUser()
+    }
+
+    body['@context'] = body['object']['@context']
+
+    signAndSend(JSON.stringify(body), sharedInbox)
+  }
+}
+  
   async function _signAndSend (message, inbox, method='post') {
     log.debug('[FEDI] Sign and %s %s %s', method, message, inbox)
     const inboxUrl = new URL(inbox)
@@ -527,16 +614,16 @@ import { getImageFromURL } from '../helpers'
     }
 
     event.context.fedi_user = ap_actor
-    
-    // res.locals.fedi_user = ap_actor
 
-    // TODO: check Digest // cannot do this with json bodyparser
+    // TODO: check Digest // cannot do this with json bodyparser (4.a: Enhance HTTP Signature verification for generic AP messages)
     // const digest = crypto.createHash('sha256')
-    //   .update(req.body)
+    //   .update(body)
     //   .digest('base64')
-    // if (`SHA-256=${digest}` !== req.headers.signature) {
-    //   log.warn(`Signature mismatch ${req.headers.signature} - ${digest}`)
-    //   return res.status(401).send('Signature mismatch')
+
+    // const signature = getHeader(event, 'Signature')
+    // if (`SHA-256=${digest}` !== signature) {
+    //   log.warn(`Signature mismatch ${signature} - ${digest}`)
+    //   throw createError({ status: 401, message: 'Signature mismatch' })
     // }
 
     const parsed = httpSignature.parseRequest(event.req)

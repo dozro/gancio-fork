@@ -1,9 +1,12 @@
+import { Op } from '@sequelize/core'
 import { Place, Event } from './sequelize'
 
-export async function getPlaceEvents (id: number) {
-  const place = await Place.findByPk(id)
+export async function getPlaceEvents (nameOrId: number | string) {
+  const place = typeof nameOrId === 'number'
+    ? await Place.findByPk(nameOrId)
+    : await Place.findOne({ where: { name: nameOrId } })
   if (!place) {
-      throw new Error(`Place ${id} not found`)
+      throw new Error(`Place ${nameOrId} not found`)
   }
   
   // const format = req.params.format || 'json'
@@ -20,5 +23,6 @@ export async function getPlaceEvents (id: number) {
   //     const pastEvents = await eventController._select({ places: String(place.id), show_recurrent: true, show_multidate: true, older: true, reverse: true, show_federated: true }) 
   //     return res.json({ events, pastEvents, place })
   // }
-  return Event.findAll({ where: { placeId: place.id }})
+  const events = await Event.findAll({ where: { placeId: place.id }, include: [Place, Tag] })
+  return { place, events } as { place: Place, events: Event[] }
 }

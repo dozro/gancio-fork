@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   log.info(`Login ${email}`)
   
   // search for the username
-  const user = await User.findOne({ where: { email, is_active: true } })
+  const user = await User.withScope('withPassword').findOne({ where: { email, is_active: true } })
   if (!user || !password) {
     log.warn('E-mail not found or not active', email)
     throw createError({ status: 401, message: 'Bad credentials' })

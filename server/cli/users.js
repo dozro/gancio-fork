@@ -60,7 +60,7 @@
 //   await db.close()
 // }
 
-import * as sequelize from "../utils/sequelize.ts"
+import * as sequelize from "../utils/sequelize.js"
 async function list () {
   await sequelize.connect()
   const users = await sequelize.User.findAll()

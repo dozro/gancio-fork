@@ -1,4 +1,4 @@
-import { APUser } from "~/server/utils/sequelize"
+// import { APUser } from "~/server/utils/sequelize"
 
 export default defineEventHandler(async event => {
   const log = useLogger('federation actor')

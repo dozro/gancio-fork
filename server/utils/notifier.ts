@@ -1,6 +1,6 @@
 import { sendEvent } from "../federation/helpers"
 import { Event, Notification, NotificationAction } from "./sequelize"
-import intersection from "lodash/intersection"
+import intersection from "lodash.intersection"
 
 const log = useLogger('notifier')
 

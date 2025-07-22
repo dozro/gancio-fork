@@ -1,0 +1,29 @@
+- [ ] DateInput component
+- [ ] l'add!
+- [ ] l'edit!
+- [ ] documentazione
+  - [ ] installation
+  - [ ] configuration
+  - [ ] add events
+  - [ ] recurring event
+  - [ ] rss feed
+  - [ ] ics feed
+  - [ ] web component
+  - [ ] wp gancio
+  - [ ] ap interaction
+  - [ ] trusted nodes
+  - [ ] Administration
+  - [ ] plugins
+  - [ ] moderation
+  - [ ] API
+- [ ] FAQ
+- [ ] l'autenticazione si disconnette spesso
+- [ ] sistemare l'editor
+- [ ] useState dei settings e' deep reactive? (ad esempio quando cambio le opzioni)
+- [ ] i18n e' un bordello (sto provando -edge)!
+- [ ] nei settings c'e' da riguardare tutto
+- [ ] il setup!
+- [ ] federazione!
+- [ ] build, docker, distribution!
+- [ ] /headerimage.png did not resolve at build time (just a warning? same with /logo.png, how can I have a default asset but customizable?)
+- [ ] custom 404 page!! (https://test.cisti.org/p/non_esiste)

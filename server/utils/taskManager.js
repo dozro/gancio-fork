@@ -51,7 +51,6 @@ export class Task {
   }
   
   process () {
-    console.log(`Processing ${this.name} in ${this.processInNTick}`)
     this.processInNTick--
     if (this.processInNTick > 0) {
       return

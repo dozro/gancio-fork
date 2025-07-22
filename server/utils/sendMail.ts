@@ -19,6 +19,7 @@ export function enqueueMail(addresses: string | string[], template: string, loca
     log.error(`Cannot send any email: SMTP Email configuration not completed!`)
     return
   }
+  
   log.debug(`Enqueue new email ${template} ${locale}`)
   useTaskManager().add({
     name: 'MAIL',
@@ -39,6 +40,7 @@ async function sendMail(addresses: string | string[], template: emailTemplates, 
   locale = locale || settings!.instance_locale
   locale = localeMapOverride?.[locale] ?? locale
   log.info(`Send ${template} email to ${addresses} with locale ${locale}`)
+  log.debug(settings?.smtp)
   const email = new Email({
     views: { root: path.join(process.cwd(), 'server/emails') },
     preview: true,
@@ -64,6 +66,7 @@ async function sendMail(addresses: string | string[], template: emailTemplates, 
       locale,
       // locales: Object.keys(locales).map(l => localeMapOverride?.[l] ?? l)
     },
+
     transport: settings.smtp // || {}
   })
 
@@ -85,6 +88,10 @@ async function sendMail(addresses: string | string[], template: emailTemplates, 
     }
   }
   return email.send(msg)
+    .then(e => {
+      console.error('finito mail SENT success!!!')
+      console.error(e)
+    })
     .catch(e => {
       log.error('[MAIL]', e)
       throw e

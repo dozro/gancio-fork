@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { APUser } from "~/server/utils/sequelize"
-import { followActor, unfollowActor, getInstance, getActor } from '~/server/federation/helpers'
+// import { APUser } from "~/server/utils/sequelize"
+import { followActor, unfollowActor, getInstance, getActor } from  '~~/server/federation/helpers.js'
 const schema = z.object({
   url: z.string()
 })

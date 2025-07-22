@@ -24,9 +24,9 @@ import { Event, Place, Tag } from "~/server/utils/sequelize"
 // include_description=false,
 // include_ap_events=false,
 
-import { eventQuerySchema } from "~/server/utils/events"
+import { eventQuerySchema } from "~~/server/utils/events"
 
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
     const opt = await getValidatedQuery(event, eventQuerySchema.parse)
     return getEvents(opt)
     // return Event.findAll({ include: [Place, { model: Tag, attributes: ['tag'], through: { attributes: [] } }] })

@@ -4,7 +4,7 @@ import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
 const base_url = 'http://localhost:13120'
 
 import path from 'path'
-import { parseIcsData } from  "../server/utils/icsparser.ts"
+import { parseIcsData } from  "../server/utils/icsparser.js"
 
 // const { parseIcsData } = require('../server/helpers/icsparser.js')
 // const icsController = require('../server/api/controller/ics.js')

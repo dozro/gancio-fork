@@ -6,6 +6,7 @@
 *.dump
 *.sqlite
 _*.js
+.output
 config*.json
 tests/seeds/testdb.sqlite
 gancio.sqlite

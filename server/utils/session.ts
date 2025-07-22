@@ -61,7 +61,9 @@ export async function requireRole(event: UseSessionEvent, role: string) {
  * @see https://github.com/atinux/nuxt-auth-utils
  */
 export async function requireAdminSession(event: UseSessionEvent, opts: { statusCode?: number, message?: string } = {}): Promise<UserSessionRequired> {
+  const log = useLogger('session')
   const userSession = await getUserSession(event)
+  log.info(userSession)
 
   if (!userSession.user) {
     if (isEvent(event)) {

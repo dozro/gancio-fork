@@ -2,11 +2,14 @@
 
 - [KISS]()
 
+## ?!?!
+resolution
+vue-router 4.4.0 ?
+
 ## BREAKING!
 - authentication
 
 ## TODO
-- [ ] global css ? (vcard surface ?!?!)
 - [ ] check role on server (create a composable?) - ok but editor is missing
 - [ ] i18n vuetify
 - [ ] queue manager (use taskmanager with retries, save on db, cron etc.) - handleError is missing, test with prosmises and directly
@@ -55,6 +58,11 @@ log.info / warning / error / debug
 
 ### GET params / query
 raw: `event.context.params?.place`
+
+or you can use
+getRouterParams
+or
+getValidatedRouterParams
 
 ### send raw file
 `return sendStream(event, fs.createReadStream(filePath))`

@@ -1,4 +1,4 @@
-import { Event } from "./sequelize"
+import { Event, Message } from "./sequelize"
 import { DateTime } from 'luxon'
 import { Op, literal, col, where, fn } from '@sequelize/core'
 
@@ -143,4 +143,12 @@ export async function getEvents(args: EventQueryType) {
     //   }
     //   return e
     // })
+}
+
+export async function getMessages(eventId: Number) {
+  const event = await Event.findByPk(eventId, { include: [{ model: Message, as: 'messages' } ] })
+  if (!event) {
+    throw createError({ status: 400 })
+  }
+  return event
 }

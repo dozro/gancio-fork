@@ -7,9 +7,6 @@
   //   "dist"
   // ],
   "compilerOptions": {
-    "types": [
-      "@nuxtjs/i18n"
-    ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
   //   "resolveJsonModule": true,

@@ -1,7 +1,7 @@
 import { version } from './package.json'
 import config from './server/config.js'
-import locales from './i18n/locales/index'
-import vuetify from 'vite-plugin-vuetify'
+// import locales from './i18n/locales/index'
+// import vuetify from 'vite-plugin-vuetify'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -9,7 +9,8 @@ export default defineNuxtConfig({
     host: '0.0.0.0',
     port: 13120
   },
-  compatibilityDate: '2024-04-03',
+  compatibilityDate: '2025-07-20',
+  // 2025-07-20
   
   devtools: {
     enabled: false,
@@ -20,27 +21,35 @@ export default defineNuxtConfig({
   
   css: ['~/assets/css/main.css'],
   modules: [
-    '@nuxtjs/i18n',
     "vuetify-nuxt-module",
     'nuxt-auth-utils',
-    '@nuxt/eslint'
+    '@nuxt/eslint',
+    '@nuxtjs/i18n-edge'
   ],
   vuetify: {
     vuetifyOptions: './vuetify.options.js'
   },
   i18n: {
-    lazy: true,            // enable lazy loading
+    locales: [
+          { code: 'en', name: 'English', file: 'en.json' },
+          { code: 'it', name: 'Italian', file: 'it.json' }
+    ],
+
+    // lazy: true,            // enable lazy loading
     // langDir: 'locales/',   // must be set, but won’t be used for actual loading
     // types: 'composition',
     // pages: undefined,
-    locales: Object.keys(locales).map(key => ({
-      code: key,
-      name: locales[key],
-      language: locales[key]
-    })),
+    // locales: Object.keys(locales).map(key => ({
+    //   code: key,
+    //   name: locales[key],
+    //   language: locales[key]
+    // })),
     skipSettingLocaleOnNavigate: true,// 
-    bundle: {
-      optimizeTranslationDirective: false
+    // bundle: {
+    //   optimizeTranslationDirective: false
+    // },
+    compilation: {
+      strictMessage: false
     },
     strategy: 'no_prefix',
     defaultLocale: 'en',
@@ -71,6 +80,10 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
+    // preset: 'node-listener',
+    // externals: {
+      // inline: ['jose']
+    // },
     storage: {
       uploads: {
         driver: "fs",

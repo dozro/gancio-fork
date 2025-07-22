@@ -1,13 +1,12 @@
-import { Event } from "#imports"
-import { parseMultipartFormData } from "~/server/utils/parseMultipartForm"
+import { Message, Event } from "~~/server/utils/sequelize"
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(async evt => {
   const log = useLogger('event')
-  const form = await parseMultipartFormData(event) as Event
-  if (!form) return
-  log.info(form)
-  
-  const ev = await Event.create( { title: form?.title } )
-  console.error(ev)
-  return
+  const eventId = evt.context.params?.event_id
+  const event = await Event.findByPk(eventId)
+  if (!event) {
+    throw createError({ status: 400 })
+  }
+  const body = await readBody(evt)
+  return Message.create({ ...body, eventId: event.id })
 })

@@ -40,7 +40,7 @@ import {
 } from "@sequelize/core/decorators-legacy"
 
 import { SqliteDialect } from "@sequelize/sqlite3"
-import { Settings } from './settings'
+import { SecretSettings, Settings } from './settings'
 
 const log = useLogger('sequelize')
 //   import bcrypt from "bcrypt";
@@ -68,7 +68,7 @@ export async function connect() {
   })
   await sequelize.authenticate()
   await runMigrations(sequelize).catch(e => { console.error(e)})
-  sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Resource, Page, Notification])
+  sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message])
 
   User.addScope('defaultScope', { attributes: { exclude: ['password', 'recover_code'] } })
   User.addScope('withPassword', { })
@@ -110,6 +110,41 @@ InferCreationAttributes<Announcement>
     declare visible: string;
     
 }
+
+@Table({
+    tableName: 'messages'
+})
+export class Message extends Model<
+  InferAttributes<Message>,
+  InferCreationAttributes<Message>
+> {
+    @Attribute(DataTypes.INTEGER)
+    @PrimaryKey
+    @AutoIncrement
+    declare id: CreationOptional<number>
+
+    @Attribute(DataTypes.TEXT)
+    @NotNull
+    declare message: string
+
+    @Attribute(DataTypes.ENUM(['AUTHOR', 'ADMIN', 'ANON', 'REGISTERED']))
+    declare author: 'AUTHOR' | 'ADMIN' | 'ANON' | 'REGISTERED'
+
+    @Attribute(DataTypes.BOOLEAN)
+    declare is_author_visible: boolean // is this message visible to the author?
+    
+    @Attribute({
+        type: DataTypes.INTEGER.UNSIGNED,
+        references: { table: "events", key: "id" },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+    })
+    declare eventId: number
+
+    @BelongsTo(() => Event, { foreignKey: 'eventId', targetKey: 'id' })
+    declare event: NonAttribute<Event>
+}
+
 
 @Table({
     tableName: 'events'
@@ -155,6 +190,18 @@ InferCreationAttributes<Event>
     
     @Attribute({
         type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
+        references: { table: "events", key: "id" },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+    })
+    declare parentId: number | null
+
+    @BelongsTo(() => Event, { foreignKey: 'parentId', targetKey: 'id' })
+    declare parent?: NonAttribute<Event>
+    
+    @Attribute({
+        type: DataTypes.INTEGER.UNSIGNED,
         references: { table: "places", key: "id" },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
@@ -177,6 +224,9 @@ InferCreationAttributes<Event>
 
     @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
     declare apUser?: NonAttribute<APUser>
+    
+    @HasMany(() => Message, { foreignKey: 'eventId', sourceKey: 'id' })
+    declare messages?: NonAttribute<Message[]>
     
     @BeforeCreate
     static async generateSlug(event: Event) {
@@ -298,10 +348,10 @@ InferCreationAttributes<User>
     
     
     @CreatedAt
-    declare readonly createdAt: CreationOptional<Date>;
+    declare readonly createdAt: CreationOptional<Date>
     
     @UpdatedAt
-    declare readonly updatedAt: CreationOptional<Date>;
+    declare readonly updatedAt: CreationOptional<Date>
     
     async generateRecoverCode() {
       this.recover_code = crypto.randomUUID()
@@ -419,7 +469,7 @@ InferCreationAttributes<Setting>
 > {
     @Attribute(DataTypes.STRING)
     @PrimaryKey
-    declare key: keyof Settings
+    declare key: keyof Settings | keyof SecretSettings
     
     @Attribute(DataTypes.JSON)
     declare value: string | number | boolean | object | null
@@ -427,6 +477,12 @@ InferCreationAttributes<Setting>
     @Attribute(DataTypes.BOOLEAN)
     @Default(false)
     declare is_secret: boolean
+    
+    @CreatedAt
+    declare readonly createdAt: CreationOptional<Date>
+    
+    @UpdatedAt
+    declare readonly updatedAt: CreationOptional<Date>
 }
 
 @Table({
@@ -452,8 +508,43 @@ InferCreationAttributes<Collection>
     @Attribute(DataTypes.BOOLEAN) // not used yet
     declare isActor: boolean
     
-    @Attribute(DataTypes.BOOLEAN) // is this collection shown in top navbar in home page?
+    @Attribute(DataTypes.BOOLEAN) // is this collection shown in the home page navbar? //TODO: rename in showInNavBar or showInHome?
     declare isTop: boolean
+    
+}
+
+@Table({
+  tableName: 'filters',
+  timestamps: false,
+  indexes: [
+    { fields: ['collectionId', 'tags', 'places', 'actors'], unique: true }
+  ]
+})
+export class Filter extends Model<
+  InferAttributes<Filter>,
+  InferCreationAttributes<Filter>
+> {
+  @Attribute(DataTypes.INTEGER)
+  @PrimaryKey
+  @AutoIncrement
+  declare id: CreationOptional<number>
+
+  @Attribute(DataTypes.BOOLEAN)
+  declare negate: boolean;
+
+  @Attribute(DataTypes.JSON)
+  declare tags: any
+
+  @Attribute(DataTypes.JSON)
+  declare places: any
+
+  @Attribute(DataTypes.JSON)
+  declare actors: any
+
+  // If collectionId is a foreign key, you may want to add:
+  @Attribute(DataTypes.INTEGER)
+  declare collectionId: number
+  
 }
 
 

@@ -1,6 +1,6 @@
 // import { connect } from '~/server/utils/sequelize'
 
-import pluginController from "../utils/plugins"
+// import pluginController from "../utils/plugins"
 
 export default defineNitroPlugin(async () => {
   const log = useLogger('init')
@@ -17,7 +17,7 @@ export default defineNitroPlugin(async () => {
     // usePluginController()._load()
     // pluginController._load()
     
-
+    return true
   } catch (e) {
     log.error(`Error connecting to database`)
     log.error(e)

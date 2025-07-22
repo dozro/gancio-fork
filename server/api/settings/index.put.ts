@@ -1,6 +1,5 @@
-
 export default defineEventHandler(async event => {
-    const setting = await readValidatedBody(event, body => settingSchema.parse(body))
-    setSetting(setting)
-    // return Setting.upsert(data)
+  // await requireAdminSession(event)
+  const setting = await readBody(event) //, body => settingSchema.parse(body))
+  return setSetting(setting.key, setting.value)
 })

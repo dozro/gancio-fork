@@ -1,4 +1,4 @@
-import { Event, Place, Tag } from "~/server/utils/sequelize"
+import { Event, Place, Tag } from "~~/server/utils/sequelize"
 import { Op } from '@sequelize/core'
 
 export default defineEventHandler(async event => {
