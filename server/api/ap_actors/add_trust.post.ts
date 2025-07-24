@@ -1,6 +1,9 @@
 import { z } from "zod"
 // import { APUser } from "~/server/utils/sequelize"
 import { followActor, unfollowActor, getInstance, getActor } from  '~~/server/federation/helpers.js'
+import config from '../../config'
+import { isHiddenService } from '../../helpers'
+
 const schema = z.object({
   url: z.string()
 })
@@ -28,12 +31,23 @@ export default defineEventHandler(async event => {
     const [ user, instance_url ] = url.replace(/^@/,'').split('@')
     log.debug('[FEDI] Adds user: %s and instance: %s because url was: %s', user, instance_url, url)
     try {
-      instance = await getInstance('https://' + instance_url, true)
+      var protocol = "https://"
+      if (config.hidden_service === "true" && isHiddenService(url)) {
+        protocol = "http://"
+      }
+
+      if (config.hidden_service !== "true" && isHiddenService(url)) {
+        log.warn(`[FEDI] Trying to trust instance {instance_url} but hidden services are not enabled`)
+        throw createError({ status: 403, message: 'Hidden service not allowed' })
+      }
+
+      instance = await getInstance(protocol + instance_url, true)
+
       if (!instance) { 
         throw createError({ status: 404, message: 'This ap instance does not exists' })
       }
       
-      const webfinger = await $fetch(`https://${instance_url}/.well-known/webfinger?resource=acct:${user}@${instance_url}`)
+      const webfinger = await $fetch(`${protocol}${instance_url}/.well-known/webfinger?resource=acct:${user}@${instance_url}`)
       if (webfinger?.links) {
         const actor_url = webfinger.links.find(l => l.rel === 'self')
         if (!actor_url) {

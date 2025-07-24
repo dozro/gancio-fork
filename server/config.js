@@ -19,6 +19,7 @@ const config = {
   user_locale: path.resolve(process.env.cwd || '', 'user_locale'),
   upload_path: path.resolve(process.env.cwd || '', 'uploads'),
   plugins_path: path.resolve(process.env.cwd || '', 'plugins'),
+  hidden_service: process.env.ALLOW_ACCESS_TO_HIDDEN_SERVICE || '',
   proxy: {
     protocol: process.env.GANCIO_PROXY_PROTOCOL || '',
     hostname: process.env.GANCIO_PROXY_HOSTNAME || '',
