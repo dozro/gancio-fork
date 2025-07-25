@@ -60,8 +60,9 @@
 //   await db.close()
 // }
 
-import * as sequelize from "../utils/sequelize.js"
+// import * as sequelize from "../utils/sequelize.ts"
 async function list () {
+  const sequelize = await import("../utils/sequelize.ts")
   await sequelize.connect()
   const users = await sequelize.User.findAll()
   users.forEach(u => console.log(`${u.id}\trole: ${u.role}\tenabled: ${u.is_active}\temail: ${u.email}`))
@@ -70,6 +71,7 @@ async function list () {
 
 
 async function resetPassword (args) {
+  const sequelize = await import("../utils/sequelize.ts")
   await sequelize.connect()
   // const helpers = require('../helpers')
   // const { User } = require('../api/models/models')

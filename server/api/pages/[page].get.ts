@@ -1,7 +1,8 @@
 export default defineEventHandler(async event => {
-  const slug = event.context.params?.page
+  const page = getRouterParam(event, 'page')
+  console.error(page)
   return Page.findOne({
-    where: { slug, visible: true },
+    where: { slug: page, visible: true },
     raw: true
   })
 })
