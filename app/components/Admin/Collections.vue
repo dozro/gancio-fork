@@ -18,6 +18,8 @@ const filters = ref([])
 const tagName = ref('')
 const placeName = ref('')
 const editFilterId = ref(false)
+const form = ref()
+
 const collectionHeaders = [
   { value: 'name', title: t('common.name') },
   // { value: 'filters', title: t('common.filter') },
@@ -34,9 +36,12 @@ const filterHeaders = [
 ]
 const settings = useState('settings')
 
-const in_home = !isNan(settings.value?.collection_in_home)
-const { data: collections } = useFetch('/api/collections?withFilters=true')
-const { data: actors } = useFetch('/api/ap_actors/trusted', { transform: (ret) => ret.unshift({ ap_id: null })})
+const in_home = !isNaN(settings.value?.collection_in_home)
+
+const { data: collections, refresh } = await useFetch('/api/collections?withFilters=true')
+
+// get trusted AP actors adding myself
+const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: (ret) => ret.unshift({ ap_id: null })})
 
 const collection_in_home = ref(null)
 
@@ -44,6 +49,15 @@ function newCollection() {
   collection.value = { name: '', id: null }
   filters.value = []
   dialog.value = true
+}
+
+async function saveCollection() {
+  if (!form.value.validate()) return
+  loading.value = true
+  collection.name = collection.name.trim()
+  await $fetch('/collections', { method: 'POST', body: collection.value })
+  refresh()
+  loading.value = false
 }
 
   //   collection_in_home: {

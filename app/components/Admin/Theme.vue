@@ -1,4 +1,5 @@
-<script setup>
+<script setup lang="ts">
+const settings = useState<Settings>('settings')
 // <!-- 
 // export default {
 //   name: 'Theme',
@@ -46,119 +47,113 @@
 //   methods: {
 //     ...mapActions(['setSetting', 'setLocalSetting']),
 //     reset () {
-//       this.setSetting({
-//         key: 'footerLinks',
-//         value: [
-//           { href: '/', label: 'common.home' },
-//           { href: '/about', label: 'common.about' }
-//         ]
-//       })
 //     },
-//     forceLogoReload () {
-//       this.logoKey++
-//     },
-//     forceFallbackImageReload () {
-//       this.fallbackImageKey++
-//     },
-//     forceHeaderImageReload () {
-//       this.headerImageKey++
-//     },    
-//     resetLogo (e) {
-//       this.setSetting({ key: 'logo', value: null })
-//         .then(this.forceLogoReload)
-//       e.stopPropagation()
-//     },
-//     resetFallbackImage (e) {
-//       this.setSetting({ key: 'fallback_image', value: null })
-//         .then(this.forceFallbackImageReload)
-//       e.stopPropagation()
-//     },
-//     resetHeaderImage (e) {
-//       this.setSetting({ key: 'header_image', value: null })
-//         .then(this.forceHeaderImageReload)
-//       e.stopPropagation()
-//     },
+
 //     updateSettingColor: debounce( async function (theme, color, value) {
 //       const key = `${theme}_colors`
 //       this.setSetting({ key, value: { ...this.settings[key], [color]: value.hex } })
 //     }, 200),
-//     updateColor (theme, color, value) {
-//       this.$vuetify.theme.themes[theme][color] = value.hex
-//       this.updateSettingColor(theme, color, value)
-//     },
-//     openLinkModal () {
-//       this.linkModal = true
-//       this.$nextTick(() => this.$refs.linkModalForm.reset())
-//     },
-//     addFooterLink () {
-//       const link = Object.assign({}, this.link)
-//       this.setSetting({ key: 'footerLinks', value: this.settings.footerLinks.concat(link) })
-//       // this.link = { href: '', label: '' }
-//       this.$refs.linkModalForm.reset()
-//       this.linkModal = false
-//     },
-//     async removeFooterLink (item) {
-//       const ret = await this.$root.$confirm('admin.delete_footer_link_confirm')
-//       if (!ret) { return }
-//       const footerLinks = this.settings.footerLinks.filter(l => l.label !== item.label)
-//       this.setSetting({ key: 'footerLinks', value: footerLinks })
-//     },
-//     async moveUpFooterLink (item, idx) {
-//       const footerLinks = [...this.settings.footerLinks]
-//       footerLinks[idx] = footerLinks[idx-1]
-//       footerLinks[idx-1] = this.settings.footerLinks[idx]
-//       this.setSetting({ key: 'footerLinks', value: footerLinks })
-//     },
-//     editFooterLink (item) {
-//       this.link = { href: item.href, label: item.label }
-//       this.linkModal = true
-//     },
-//     async uploadLogo (file) {
-//       const formData = new FormData()
-//       formData.append('logo', file)
-//       try {
-//         await this.$axios.$post('/settings/logo', formData)
-//         this.$root.$emit('message', {
-//           message: 'Logo updated'
-//         })
-//         this.forceLogoReload()
-//       } catch (e) {
 
-//       }
-//     },
-//     async uploadFallbackImage (file) {
-//       const formData = new FormData()
-//       formData.append('fallbackImage', file)
-//       try {
-//         await this.$axios.$post('/settings/fallbackImage', formData)
-//         this.$root.$emit('message', {
-//           message: 'Fallback image updated'
-//         })
-//         this.forceFallbackImageReload()
-//       } catch (e) {
-
-//       }
-//     },
-//     async uploadHeaderImage (file) {
-//       const formData = new FormData()
-//       formData.append('headerImage', file)
-//       try {
-//         await this.$axios.$post('/settings/headerImage', formData)
-//         this.$root.$emit('message', {
-//           message: 'Header image updated'
-//         })
-//         this.forceHeaderImageReload()
-//       } catch (e) {
-
-//       }
-//     },    
-//     save (key, value) {
-//       if (this.settings[key] !== value) {
-//         this.setSetting({ key, value })
-//       }
-//     }
 //   } -->
 // }
+
+const linkModal = ref(false)
+function resetFooterLinks () {
+  //       this.setSetting({
+  //         key: 'footerLinks',
+  //         value: [
+  //           { href: '/', label: 'common.home' },
+  //           { href: '/about', label: 'common.about' }
+  //         ]
+  //       })
+
+}
+
+function updateColor (theme, color, value) {
+  // this.$vuetify.theme.themes[theme][color] = value.hex
+  // this.updateSettingColor(theme, color, value)
+}
+
+function resetHeaderImage () {
+
+}
+function resetLogo () {
+  //       this.setSetting({ key: 'logo', value: null })
+//         .then(this.forceLogoReload)
+//       e.stopPropagation()
+}
+function resetFallbackImage () {
+
+}
+
+function openLinkModal () {
+  linkModal.value = true
+  // this.$nextTick(() => this.$refs.linkModalForm.reset())
+}
+
+function addFooterLink () {
+  // const link = Object.assign({}, this.link)
+  // this.setSetting({ key: 'footerLinks', value: this.settings.footerLinks.concat(link) })
+  // // this.link = { href: '', label: '' }
+  // this.$refs.linkModalForm.reset()
+  linkModal.value = false
+}
+
+async function removeFooterLink (item) {
+  // const ret = await this.$root.$confirm('admin.delete_footer_link_confirm')
+  // if (!ret) { return }
+  // const footerLinks = this.settings.footerLinks.filter(l => l.label !== item.label)
+  // this.setSetting({ key: 'footerLinks', value: footerLinks })
+}
+
+async function moveUpFooterLink (item, idx) {
+  // const footerLinks = [...this.settings.footerLinks]
+  // footerLinks[idx] = footerLinks[idx-1]
+  // footerLinks[idx-1] = this.settings.footerLinks[idx]
+  // this.setSetting({ key: 'footerLinks', value: footerLinks })
+}
+
+async function editFooterLink (item) {
+//       this.link = { href: item.href, label: item.label }
+//       this.linkModal = true
+}
+
+async function uploadLogo (file: File) {
+
+}
+
+async function uploadFallbackImage (file: File) {
+  console.error('upload fallback image')
+}
+
+async function uploadHeaderImage (file: File) {
+  const formData = new FormData()
+  formData.append('headerImage', file)
+  try {
+    await $fetch('/settings/headerImage', { method: 'POST', body: formData })
+  //   this.$root.$emit('message', {
+  //     message: 'Header image updated'
+  //   })
+  //   this.forceHeaderImageReload()
+  } catch (e) {}
+}
+
+function manageSetting(key: keyof Settings) {
+  return computed({
+    get: () =>  settings.value[key],
+    set: (value) => {
+      $fetch('/api/settings', { method: 'PUT', body: { key, value } })
+      settings.value[key] = value
+    }
+  })
+}
+
+const is_dark = manageSetting('theme.is_dark')
+const hide_thumbs = manageSetting('hide_thumbs')
+const hide_calendar = manageSetting('hide_calendar')
+const custom_css = manageSetting('custom_css')
+const custom_js = manageSetting('custom_js')
+
 </script>
 
 <template>
@@ -208,7 +203,7 @@
           </v-file-input>
           <v-img
             class="mt-2"
-            :src="`/logo.png?${logoKey}`"
+            :src="`/logo.png`"
             max-height="60px"
             contain
           />
@@ -232,7 +227,7 @@
           </v-file-input>
           <v-img
             class="mt-2"
-            :src="`/fallbackimage.png?${fallbackImageKey}`"
+            :src="`/fallbackimage.png`"
             max-height="150px"
             contain
           />
@@ -256,7 +251,7 @@
           </v-file-input>
           <v-img
             class="mt-2"
-            :src="`/headerimage.png?${headerImageKey}`"
+            :src="`/headerimage.png`"
             max-height="150px"
             contain
           />
@@ -267,7 +262,7 @@
     <v-card-title>{{ $t('admin.colors') }}</v-card-title>
     <!-- choose theme colors -->
     <v-card-text>
-      <v-theme-provider dark>
+      <!-- <v-theme-provider>
         <v-card max-width="465">
           <v-card-text>
             <span class="mr-2" v-for="(color, i) in settings.dark_colors" :key="i">
@@ -293,10 +288,10 @@
             </span>
           </v-card-text>
         </v-card>
-      </v-theme-provider>
+      </v-theme-provider> -->
     </v-card-text>
 
-    <v-theme-provider light>
+    <!-- <v-theme-provider light>
       <v-card class='mt-4' max-width='465'>
         <v-card-text>
           <span class='mr-2' v-for='(color, i) in settings.light_colors' :key='i'>
@@ -315,7 +310,7 @@
           </span>
         </v-card-text>
       </v-card>
-    </v-theme-provider>
+    </v-theme-provider> -->
         
   <v-dialog v-model='linkModal' width='500' :fullscreen='$vuetify.display?.mobile'>
     <v-card>
@@ -341,17 +336,15 @@
   <v-card-title> {{$t('admin.footer_links')}}</v-card-title>
   <v-card-text>
     <v-btn color='primary' text @click='openLinkModal' prepend-icon='mdi-plus'> {{$t('admin.add_link')}}</v-btn>
-    <v-btn color='warning' text @click='reset' icon='mdi-restore'>{{$t('common.reset')}}</v-btn>
+    <v-btn color='warning' text @click='resetFooterLinks' icon='mdi-restore'>{{$t('common.reset')}}</v-btn>
     <v-card>
       <v-list class='mt-1' two-line subheader>
         <v-list-item
           v-for='(link, idx) in settings.footerLinks'
           :key='`${link.label}`' @click='editFooterLink(link)'>
             
-          <v-list-item-content>
             <v-list-item-title>{{link.label}}</v-list-item-title>
             <v-list-item-subtitle>{{link.href}}</v-list-item-subtitle>
-          </v-list-item-content>
           <v-list-item-action>
             <v-btn class='left' v-if='idx !== 0' icon='mdi-chevron-up' color='warn' @click.stop='moveUpFooterLink(link, idx)' />
             <v-btn class='float-right' icon='mdi-delete-forever' color='error' @click.stop='removeFooterLink(link)' />
@@ -364,14 +357,14 @@
   <v-card-title>{{$t('admin.custom_js')}}</v-card-title>
   <v-card-subtitle v-html="$t('admin.custom_js_help')" />
   <v-card-text>
-    <v-textarea :value='custom_js' @change='v => custom_js = v' :label='$t("admin.custom_js")' outlined />
+    <v-textarea v-model='custom_js' :label='$t("admin.custom_js")' outlined />
   </v-card-text>
 
   <!-- custom css -->
   <v-card-title>{{$t('admin.custom_css')}}</v-card-title>
-  <v-card-subtitle(v-html="$t('admin.custom_css_help')" />
+  <v-card-subtitle v-html="$t('admin.custom_css_help')" />
   <v-card-text>
-    <v-textarea :value='custom_css' @change='v => custom_css = v' :label='$t("admin.custom_css")' outlined />``
+    <v-textarea v-model='custom_css' :label='$t("admin.custom_css")' outlined />
   </v-card-text>
   </v-card-text>
 </v-container>

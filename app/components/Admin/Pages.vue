@@ -18,6 +18,7 @@ const { data: pages, refresh } = await useFetch('/api/pages')
 function openDialog () {
   page.title = ''
   page.content = ''
+  editing.value = false
   dialog.value = true
 }
 
@@ -71,11 +72,11 @@ async function remove(page) {
 
 async function toggle(page) {
   try {
+    page.visible = !page.visible
     await $fetch(`/api/pages/${page.id}`, {
       method: 'PUT',
       body: page
     })
-    page.visible = !page.visible
     refresh()
   } catch (e) {
     $notify(String(e))
