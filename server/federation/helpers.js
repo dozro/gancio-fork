@@ -161,19 +161,20 @@ export async function updateActor() {
           Accept: 'application/activity+json'
         },
         method,
-        ...( method === 'post' && ({ data: message}))
+        ...( method === 'post' && ({ body: message }))
       })
       
       const contentType = ret.headers.get('content-type')
       // check if content-type is json
       if (!contentType.includes('json')) {
         log.error(`[FEDI] Error in sign and send, wrong content-type returned: ${contentType} - status: ${ret.status}`)
+        console.error(await ret.text())
         return
       }
       
       if (ret.ok) {
-        log.debug(`[FEDI] Signed and verified! ${ret.status} ${ret.statusMessage} => ${contentType}`)
-        return ret.json()
+        log.debug(`[FEDI] Signed and verified! ${ret.status} => ${contentType}`)
+        return ret.json().catch(e => '')
       } else {
         const body = await ret.json()
         log.error("[FEDI] Error in sign and send [%s]: %s", inbox, body)
