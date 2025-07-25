@@ -1,15 +1,17 @@
-<script setup>
+<script setup lang="ts">
 const { t } = useI18n()
+const { $notify, $confirm } = useNuxtApp()
 
 const valid = ref(false)
 const dialog = ref(false)
 const editing = ref(false)
+const form = ref()
 
 const loading = ref(false)
 const announcement = reactive({ title: '', announcement: '' })
 const headers = [
   { value: 'title', title: t('common.title') },
-  { value: 'actions', title: t('common.actions'), align: 'right', sortable: false }
+  { value: 'actions', title: t('common.actions'), align: 'end', sortable: false }
 ]
 
 const { data: announcements, refresh } = await useFetch('/api/announcements')
@@ -23,6 +25,8 @@ function edit(newAnnouncement) {
 }
 
 function openDialog() {
+  // form.value.reset()
+  editing.value = false
   announcement.title = ''
   announcement.announcement = ''
   dialog.value = true
@@ -45,50 +49,41 @@ async function toggle(announcement) {
 async function remove(announcement) {
   const ret = await $confirm('admin.delete_announcement_confirm')
   if (!ret) { return }
-  $fetch(`/api/announcements/${announcement.id}`, { method: 'DELETE' })
-    .then(() => {
-      $message('admin.announcement_remove_ok')
-      // TODO: refresh announcements
-      // this.announcements = this.announcements.filter(a => a.id !== announcement.id)
-    })
+  await $fetch(`/api/announcements/${announcement.id}`, { method: 'DELETE' })
+  $notify('admin.announcement_remove_ok')
 }
     
-
-// async function save() {
-//   // if (!this.$refs.announcement.validate()) { return }
-//   loading.value = true
-//   try {
-//     let announcement = null
-//     if (editing.value) {
-//       announcement = await $fetch(`/announcements/${announcement.id}`, { method: 'PUT', body: announcement })
-//       refresh()
-//       // announcements = this.announcements.map(a => a.id === announcement.id ? announcement : a)
-//     } else {
-//       announcement = await $fetch('/announcements', { method: 'POST', body: announcement })
-//       refresh()
-//       // this.announcements = this.announcements.concat(announcement)
-//     }
-//     // this.setAnnouncements(cloneDeep(this.announcements))
-//     announcement = { title: '', announcement: '' }
-//     this.$refs.announcement.reset()
-//     editing.value = false
-//     dialog.value = false
-//   } catch (e) {
-//     console.error(e)
-//   }
-//   loading.value = false
-// }
+async function save() {
+  if (!form.value.validate()) { return }
+  loading.value = true
+  try {
+    if (editing.value) {
+      await $fetch(`/api/announcements/${announcement.id}`, { method: 'PUT', body: announcement })
+    } else {
+      await $fetch('/api/announcements', { method: 'POST', body: announcement })
+    }
+    refresh()
+    // announcement = { title: '', announcement: '' }
+    form.value.reset()
+    editing.value = false
+    dialog.value = false
+  } catch (e) {
+    $notify(String(e), Statuses.ERROR)
+  }
+  loading.value = false
+}
 </script>
 
 <template>
 <v-container>
   <v-card-title> {{ $t('common.announcements') }}</v-card-title>
   <v-card-subtitle v-html="$t('admin.announcement_description')" />
+  
   <v-dialog v-model='dialog' width='800px' :fullscreen='$vuetify.display?.mobile'>
     <v-card>
       <v-card-title> {{ $t('admin.new_announcement') }}</v-card-title>
       <v-card-text class='px-0'>
-        <v-form v-model='valid' ref='announcement' @submit.prevent='save' lazy-validation>
+        <v-form v-model='valid' ref='form' @submit.prevent='save' lazy-validation>
           <v-text-field class='col-12' v-model='announcement.title'
             :rules="[$valid.required('common.title')]"
             :label='$t("common.title")' />
@@ -103,6 +98,7 @@ async function remove(announcement) {
       </v-card-actions>
     </v-card>
   </v-dialog>
+  
   <v-btn @click='openDialog' variant='text' color='primary' prepend-icon='mdi-plus'> {{ $t('common.add') }}</v-btn>
   <v-card-text>
     <v-data-table
