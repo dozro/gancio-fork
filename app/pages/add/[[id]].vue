@@ -5,7 +5,7 @@
 const { loggedIn } = useUserSession()
 const { $notify } = useNuxtApp()
 
-const event = ref({ title: '', tags: [], place: {}, recurrent: null })
+const event = ref({ title: '', tags: [], place: {}, recurrent: null, media: [] })
 const date = ref()
 const valid = ref(false)
 const edit = ref(false)
@@ -108,7 +108,7 @@ async function done() {
         <h4>{{ edit ? $t('common.edit_event') : $t('common.add_event') }}</h4>
       </v-card-title>
       <v-dialog v-model='openImportDialog' :fullscreen='$vuetify.display.mobile'>
-        <!-- <ImportDialog(@close='openImportDialog = false' @imported='eventImported') -->
+        <ImportDialog @close='openImportDialog = false' />
       </v-dialog>
       <v-card-text class='px-0 px-xs-2'>
         <v-form v-model='valid' ref='form'>
@@ -136,6 +136,22 @@ async function done() {
 
               <!-- When -->
               <DateInput ref="when" v-model:event="event" />
+
+            <!-- Description -->
+            <v-col class='px-0' cols='12'>
+              <CoreEditor class='px-3 ma-0'
+                :label="$t('event.description_description')"
+                v-model='event.description'
+                :placeholder="$t('event.description_description')"
+                max-height='400px' />
+            </v-col>
+
+            <!-- MEDIA / FLYER / POSTER -->
+            <v-col cols=12 md=6>
+              <MediaInput v-model='event.media[0]' :event='event' @remove='event.media = []' />
+            </v-col>
+
+
 
               <!-- TAGS -->
               <v-col cols=12 md=6>
