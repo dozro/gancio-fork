@@ -4,6 +4,7 @@ import path from 'path'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
+
 import usersCLI from './cli/users.js'
 
 const yarg = yargs(hideBin(process.argv))
@@ -14,10 +15,10 @@ yarg.version(pkg.version)
 
 // process.env.cwd = process.env.GANCIO_DATA || path.resolve('./')
 
-// process.chdir(path.resolve(__dirname, '..'))
+const __dirname = path.dirname(new URL(import.meta.url).pathname)
+process.chdir(path.resolve(__dirname, '..'))
 
 async function start () {
-  
   return import('./server/index').catch(e => {
     console.error(e)
     process.exit(2)
@@ -26,7 +27,7 @@ async function start () {
 
 async function migrate () {
   const sequelize = await import("./utils/sequelize.ts")
-  const config = require('./config')
+  const config = require('./server/config.js')
   if (config.status  === 'SETUP') {
     console.error('> Cannot run database migration before setup')
     return
