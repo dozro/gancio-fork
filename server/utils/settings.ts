@@ -138,7 +138,7 @@ export function setSetting<K extends keyof Settings>(
 }
 
 export async function loadSettings () {
-  const settings = await Setting.findAll({ raw: true })
+  const settings = await Setting.findAll()
   for (const setting of settings) {
     if (setting.is_secret) {
       secretSettings[setting.key] = setting.value

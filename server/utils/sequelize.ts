@@ -41,6 +41,7 @@ import {
 
 import { SqliteDialect } from "@sequelize/sqlite3"
 import { SecretSettings, Settings } from './settings'
+import { DateTime } from 'luxon'
 
 const log = useLogger('sequelize')
 //   import bcrypt from "bcrypt";
@@ -50,24 +51,18 @@ const log = useLogger('sequelize')
 //   export const sequelize = new Sequelize({
 //     ...options,
 //   } as Options<SqliteDialect>);
-let config
-if (typeof useRuntimeConfig === 'function') {
-  config = useRuntimeConfig()
-} else {
-  config = await import('../config.js')
-}
+import config from '../config.js'
 
 export let sequelize: Sequelize | undefined
 export async function connect() {
-  log.info('connect')
   if (sequelize) { return sequelize }
   log.info('connect')
   sequelize = new Sequelize({
       dialect: SqliteDialect || config?.db_dialect,
-      storage: config?.db_storage ?? './gancio.sqlite'
+      storage: config?.db.storage ?? './gancio.sqlite'
   })
   await sequelize.authenticate()
-  await runMigrations(sequelize).catch(e => { console.error(e)})
+  // await runMigrations(sequelize).catch(e => { console.error(e)})
   sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message])
 
   User.addScope('defaultScope', { attributes: { exclude: ['password', 'recover_code'] } })
@@ -157,6 +152,12 @@ InferCreationAttributes<Event>
     @PrimaryKey
     @AutoIncrement
     declare readonly id: CreationOptional<number>
+
+    @CreatedAt
+    declare readonly createdAt: CreationOptional<Date>
+
+    @UpdatedAt
+    declare readonly updatedAt: CreationOptional<Date>
     
     /**  title of the event */
     @Attribute(DataTypes.STRING)
@@ -227,7 +228,7 @@ InferCreationAttributes<Event>
     
     @HasMany(() => Message, { foreignKey: 'eventId', sourceKey: 'id' })
     declare messages?: NonAttribute<Message[]>
-    
+        
     @BeforeCreate
     static async generateSlug(event: Event) {
       if (event.title && !event.slug) {
@@ -238,18 +239,96 @@ InferCreationAttributes<Event>
         // Ensure slug is unique
         while (
           await Event.findOne({
-            where: {
-              slug,
-              id: { [Op.ne]: event.id }, // skip self in case of update
-            },
-          })
+            where: { slug, id: { [Op.ne]: event.id } } }) // skip self in case of update
         ) {
           slug = `${baseSlug}-${count++}`
         }
   
         event.slug = slug
       }
-    }    
+    }
+    
+    toAP (to = ['https://www.w3.org/ns/activitystreams#Public'], type = 'Create') {
+    
+        const username = publicSettings.instance_name
+        const opt = {
+          zone: publicSettings.instance_timezone,
+          locale: publicSettings.instance_locale
+        }
+    
+        const datetime = DateTime.fromSeconds(this.start_datetime, opt).toLocaleString({ weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
+        
+        // https://framagit.org/les/gancio/-/issues/304
+        // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-summary
+        const summary = `<p>${this.place && this.place.name}, ${datetime}</p>${this.description}`
+        
+        let attachment = []
+        let location = []
+    
+        if (this?.online_locations?.length) {
+          location = this.online_locations.map(url => ({
+            type: 'VirtualLocation',
+            url
+          }))
+          attachment = this.online_locations.map( href => ({
+            type: 'Link',
+            mediaType: 'text/html',
+            name: href,
+            href
+          }))
+        }
+    
+        if (this.place.name !== 'online') {
+          location.push(this.place.toAP())
+        }
+    
+        // in case we only have a single location (the common case) do not use an array to simplify federation parser
+        if (location.length === 1) {
+          location = location[0]
+        }
+            
+        if (this?.media?.length) {
+          attachment.push({
+            type: 'Document',
+            mediaType: 'image/jpeg',
+            url: `${config.baseurl}/media/${this.media[0].url}`,
+            name: this.media[0].name || this.title || '',
+            focalPoint: this.media[0].focalPoint || [0, 0]
+          })
+        }
+    
+        let tags = this.tags?.map(tag => tag.tag)
+        
+        // add default fedi hashtags if needed on local events only
+        if (!this.ap_id && publicSettings.default_fedi_hashtags.length) {
+          tags = union(tags, publicSettings.default_fedi_hashtags)
+        }
+    
+        tags = tags?.map(tag => ({
+          type: 'Hashtag',
+          name: '#' + tag,
+          href: `${publicSettings.baseurl}/tag/${encodeURIComponent(tag)}`
+        })) ?? []
+    
+        return {
+          id: this?.ap_id ?? `${publicSettings.baseurl}/federation/m/${this.id}`,
+          name: this.title,
+          url: `${publicSettings.baseurl}/event/${this.slug || this.id}`,
+          type: 'Event',
+          startTime: DateTime.fromSeconds(this.start_datetime, opt).toISO(),
+          ...( this.end_datetime ? { endTime: DateTime.fromSeconds(this.end_datetime, opt).toISO() } : {} ),
+          location,
+          attachment,
+          tag: tags,
+          published: this.updatedAt,
+          updated: this.updatedAt,
+          attributedTo: `${publicSettings.baseurl}/federation/u/${username}`,
+          to: ['https://www.w3.org/ns/activitystreams#Public'],
+          cc: [`${publicSettings.baseurl}/federation/u/${username}/followers`],
+          content: this.description || '',
+          summary
+        }
+      }    
 }
 
 @Table({
@@ -285,19 +364,41 @@ InferCreationAttributes<Place>
     @Index
     @Unique
     @NotNull
-    declare name: string;
+    declare name: string
     
     @Attribute(DataTypes.STRING)
-    declare address: string;
+    @Index
+    declare ap_id: string
+    
+    @Attribute(DataTypes.STRING)
+    declare address: string
     
     @Attribute(DataTypes.FLOAT)
-    declare latitude: number;
+    declare latitude: number
     
     @Attribute(DataTypes.FLOAT)
-    declare longitude: number;
+    declare longitude: number
     
     @HasMany(() => Event, /* foreign key */ 'placeId')
-    declare events?: NonAttribute<Event[]>;
+    declare events?: NonAttribute<Event[]>
+    
+    /**
+     * @returns ActivityStream location representation
+     * @link https://www.w3.org/TR/activitystreams-vocabulary/#places
+     * @todo support PostalAddress type
+     * @link WIP -> https://codeberg.org/fediverse/fep/src/commit/4a75a1bc50bc6d19fc1e6112f02c52621bc178fe/fep/8a8e/fep-8a8e.md#location
+     */
+    toAP () {
+      return {
+        id: this?.ap_id ?? `${config.baseurl}/federation/p/${this.id}`,
+        type: 'Place',
+        name: this.name,
+        address: this.address,
+        url: this?.ap_id ?? `${config.baseurl}/place/${this.id}/${encodeURIComponent(this.name)}`,
+        ...( this.latitude && this.longitude && ({ latitude: this.latitude, longitude: this.longitude}))
+      }
+    }
+
     
 }
 
@@ -346,7 +447,6 @@ InferCreationAttributes<User>
     @Attribute(DataTypes.ENUM(['admin', 'editor', 'user']))
     declare role: Role
     
-    
     @CreatedAt
     declare readonly createdAt: CreationOptional<Date>
     
@@ -368,6 +468,7 @@ InferCreationAttributes<User>
       if (instance.changed('password')) {
         const password = instance.getDataValue('password')
         if (password) {
+          log.info('inside hashPassword' , password)
           const hashedPassword = bcrypt.hashSync(password, 10)
           instance.setDataValue("password", hashedPassword)
         }
@@ -581,7 +682,7 @@ InferCreationAttributes<Resource>
 
 @Table({
     tableName: 'pages',
-    timestamps: false
+    timestamps: true
 })
 export class Page extends Model<
 InferAttributes<Page>,
@@ -598,7 +699,6 @@ InferCreationAttributes<Page>
     @Attribute(DataTypes.TEXT)
     declare content: string
 
-
     @Attribute(DataTypes.BOOLEAN)
     declare visible: boolean
     
@@ -606,6 +706,31 @@ InferCreationAttributes<Page>
     @Index
     @Unique
     declare slug: string
+
+    @BeforeCreate
+    static async generateSlug(page: Page) {
+      if (page.title && !page.slug) {
+        let baseSlug = slugify(page.title, { lower: true, strict: true })
+        let slug = baseSlug
+        let count = 1
+  
+        // Ensure slug is unique
+        while (
+          await Event.findOne({
+            where: { slug, id: { [Op.ne]: page.id } } }) // skip self in case of update
+        ) {
+          slug = `${baseSlug}-${count++}`
+        }
+  
+        page.slug = slug
+      }
+    }    
+    
+    @CreatedAt
+    declare readonly createdAt: CreationOptional<Date>
+
+    @UpdatedAt
+    declare readonly updatedAt: CreationOptional<Date>
 }
 
 export const NotificationActionEnum = ['Create', 'Update', 'Delete'] as const

@@ -22,7 +22,7 @@ export default defineEventHandler(async event => {
       })
     }
     
-    setResponseHeader(event, 'Content-Type', 'application/activity+json; charset=utf-8')
+    setHeader(event, 'Content-Type', 'application/activity+json; charset=utf-8')
     
     return {
       '@context': [
