@@ -1,8 +1,14 @@
-import { z } from "zod"
-// import { APUser } from "~/server/utils/sequelize"
 import { parseAPMessage, verifySignature } from '~~/server/federation/helpers'
 import { follow, unfollow } from "~~/server/federation/follows"
 
+/**
+ * Federation route handler for ActivityPub (AP) POST requests to /inbox.
+ *
+ * This route verifies the HTTP signature, parses the AP message,
+ * and dispatches handling logic based on the message type.
+ *
+ */
+ 
 export default defineEventHandler(async event => {
   const log = useLogger('AP inbox')
   const ret = await verifySignature(event)
@@ -14,8 +20,8 @@ export default defineEventHandler(async event => {
     log.warn('[FEDI] message without `object` or `type` property: %s', message)
     return res.status(404).send('Wrong AP message: no object or type property')
   }
-  
-  // res.set('Content-Type', 'application/activity+json')
+
+  setHeader(event, 'Content-Type', 'application/activity+json')  
   log.debug('[FEDI] Type %s', message.type)
   switch (message.type) {
     case 'Follow':

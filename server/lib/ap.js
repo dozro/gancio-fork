@@ -24,7 +24,8 @@ export async function cleanPastEvents () {
   await Resource.destroy({ where: { eventId: eventsId }})
 
   // ...and notiifcations
-  await EventNotification.destroy({ where: { eventId: eventsId }})
+  // TODO
+  // await EventNotification.destroy({ where: { eventId: eventsId }})
 
   await Event.destroy({ where: { id: eventsId } }).catch(e => {
     log.debug('[AP] Error while removing past federated events: %s', JSON.stringify(e))
