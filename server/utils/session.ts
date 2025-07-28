@@ -3,6 +3,9 @@ import { verifyJwtToken } from './jwt'
 
 type UseSessionEvent = Parameters<typeof useSession>[0]
 
+/**
+ * Get the user of the request based on `nuxt-session` cookie or JWT Bearer token
+ */
 export async function getUser(event: UseSessionEvent) {
   
   const session = await getUserSession(event)
@@ -33,6 +36,9 @@ export async function getUser(event: UseSessionEvent) {
   return null
 }
 
+/**
+ * Require an user to be authenticated (via cookie or JWT token)
+ */
 export async function requireUser(event: UseSessionEvent) {
   const user = await getUser(event)
   if (!user) {
@@ -42,6 +48,9 @@ export async function requireUser(event: UseSessionEvent) {
   return user as UserSessionRequired
 }
 
+/**
+ * Require an user via a specified role (admin|editor) to be authenticated (via cookie or JWT token)
+ */
 export async function requireRole(event: UseSessionEvent, role: string) {
   const user = await requireUser(event)
   
@@ -62,10 +71,10 @@ export async function requireRole(event: UseSessionEvent, role: string) {
  */
 export async function requireAdminSession(event: UseSessionEvent, opts: { statusCode?: number, message?: string } = {}): Promise<UserSessionRequired> {
   const log = useLogger('session')
-  const userSession = await getUserSession(event)
+  const userSession = await getUser(event)
   log.info(userSession)
 
-  if (!userSession.user) {
+  if (!userSession?.user) {
     if (isEvent(event)) {
       throw createError({
         statusCode: opts.statusCode || 401,
@@ -79,7 +88,7 @@ export async function requireAdminSession(event: UseSessionEvent, opts: { status
     }
   }
   
-  if (userSession.user.role !== 'admin') {
+  if (userSession.user?.role !== 'admin') {
     throw createError({
       statusCode: opts.statusCode || 401,
       message: opts.message || 'Unauthorized',
