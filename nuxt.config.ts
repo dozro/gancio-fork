@@ -61,11 +61,10 @@ export default defineNuxtConfig({
     }
   },
   runtimeConfig: {
-    baseurl: config?.baseurl,
-    db_dialect: config?.db?.dialect,
-    db_storage: config?.db?.storage,
-    user_locale_path: config?.user_locale,
-    // TODO
+    session: {
+      password: process.env?.NUXT_SESSION_PASSWORD ?? '',
+      maxAge: 60 * 60 * 24 * 365 // 1 week
+    },
     public: {
       version
     }

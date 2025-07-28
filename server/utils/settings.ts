@@ -60,12 +60,12 @@ export const settingSchema = z.object({
   value: z.union([z.string(), z.boolean()])
 })
 
-const config = useRuntimeConfig()
+const config = (await import('../config')).default // useRuntimeConfig()
 export type SettingType = z.infer<typeof settingSchema>
 
 export const publicSettings:Settings = {
-  title: config.title || 'Gancio',
-  description: config.description || 'A shared agenda for local communities',
+  title: config?.title || 'Gancio',
+  description: config?.description || 'A shared agenda for local communities',
   baseurl: config.baseurl || '',
   hostname: '', // new URL(config.baseurl).hostname,
   instance_timezone: 'Europe/Rome',
