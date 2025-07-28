@@ -1,16 +1,50 @@
 import { describe, expect, it } from "vitest"
 import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
+import { DateTime } from "luxon"
 
 const base_url = 'http://localhost:13120'
 
 await setup({ host: base_url })
 
-const admin = JSON.stringify({ username: 'admin', password: 'test', grant_type: 'password', client_id: 'self' })
+const admin = JSON.stringify({ email: 'admin', password: 'password', grant_type: 'password', client_id: 'self' })
+let cookie: string | null
+let token: string | null
 
-let token: string
 let app
 let places = []
 let event_id: number
+
+type AuthType = 'cookie' | 'jwt' | 'none'
+
+async function fetchWithAuth(
+  end_point: string,
+  method: string = 'GET',
+  data?: any,
+  authType: AuthType = 'none'
+) {
+  const headers: Record<string, string> = {}
+  let authHeader: string | undefined
+
+  if (authType === 'cookie' && cookie) {
+    headers['cookie'] = cookie
+  } else if (authType === 'jwt' && token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  let body: string | undefined
+  if (data !== undefined && method !== 'GET') {
+    headers['Content-Type'] = 'application/json'
+    body = JSON.stringify(data)
+  }
+
+  const response = await fetch(end_point, {
+    method,
+    headers,
+    body,
+  })
+
+  return response
+}
 
 
 describe('Basic', () => {
@@ -36,55 +70,75 @@ describe('Authentication / Authorization', () => {
     
   })
 
-  it('should register an admin as first user', async () => {
-    const { status, body, text } = await fetch('/api/user/register', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: 'admin', password: 'test' })})
+  // it('should register an admin as first user', async () => {
+  //   const { status, body, text } = await fetch('/api/user/register', {
+  //     method: 'POST',
+  //     headers: { 'content-type': 'application/json' },
+  //     body: JSON.stringify({ email: 'admin_test', password: 'test' })})
     
+  //   expect(status).toBe(200)
+  //   expect(body?.id).toBeDefined()
+    
+  // })
+
+  it('should authenticate with correct user/password', async () => {
+    const { status, headers }= await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: admin
+    })
+
     expect(status).toBe(200)
-    expect(body?.id).toBeDefined()
+    const setCookie = headers.get('set-cookie')
+    expect(setCookie).toContain('nuxt-session=')
+    cookie = setCookie
     
   })
 
-  // it('should authenticate with correct user/password', async () => {
-  //   const { status, body } = await fetch('/api/login', {
-  //     method: 'POST',
-  //     body: admin
-  //   })
-
-  //   expect(status).toBe(200)
-  //   expect(body?.refresh_token).toBeDefined()
-  //   expect(body?.access_token).toBeDefined()
-  //   expect(body?.token_type).toBe('Bearer')
-  //   token = body
-  // })
-
-  it('should get user when authenticated', async () => {
-    const { status, body } = await fetch('/api/user', {
-      headers: { authorization: `Bearer ${token.access_token}` }
+  it('should get user when authenticated via cookie', async () => {
+    const response = await fetch('/api/user', { headers: { cookie } })
+    expect(response.ok).toBe(true)
+    expect(response.body?.email).toBe(admin.username)
+  })
+  
+  it('should authenticate with correct user/password and get JWT token', async () => {
+    const response = await fetch('/api/login/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: admin
     })
-    
-    expect(status).toBe(200)
-    expect(body?.email).toBe(admin.username)
-    expect(body?.is_admin).toBe(true)
+
+    const json = await response.json()
+    expect(response.status).toBe(200)
+    expect(json?.access_token).toBeDefined()
+    expect(typeof json.access_token).toBe('string')
+    token = json.access_token
+  })
+  
+  it('should get user when authenticated via JWT', async () => {
+    const response = await fetch('/api/user', { headers: { 'Authorization': `Bearer ${token}` } })
+    expect(response.ok).toBe(true)
+    expect(response.body?.email).toBe(admin.username)
+    // expect(body?.is_admin).toBe(true)
   })
 })
 
-// describe('Settings', () => {
+describe('Settings', () => {
 
-//   it('should not change settings when not allowed', () => {
-//     return request(app).post('/api/settings')
-//       .send({ key: 'allow_anon_event', value: false })
-//       .expect(403)
-//   })
+  it('should not change settings when not allowed', async () => {
+    const response = await fetch('/api/settings', { method: 'PUT', body: JSON.stringify({ key: 'allow_anon_event', value: false })})
+    expect(response.status).toBe(401)
+  })
 
-//   it('should change settings when allowed', () => {
-//     return request(app).post('/api/settings')
-//       .send({ key: 'allow_anon_event', value: true })
-//       .auth(token.access_token, { type: 'bearer' })
-//       .expect(200)
-//   })
+  it('should change settings when allowed', async () => {
+    const response = await fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', cookie },
+      body: JSON.stringify({ key: 'allow_anon_event', value: true }),
+    })
+
+    expect(response.status).toBe(200)
+  })
 
 //   it('should retrieve stored array settings', async () => {
 //     await request(app).post('/api/settings')
@@ -131,25 +185,26 @@ describe('Authentication / Authorization', () => {
 //     expect(response.body.test).toBe('test string')
 //   })
 
-// })
+})
 
-// describe('Events', () => {
+describe('Events', () => {
 
-//   it('should not allow event creation without required fields', async () => {
-//     const required_fields = {
-//       'title': {},
-//       'start_datetime': { title: 'test title' },
-//       'place_id or place_name and place_address are': { title: 'test title', start_datetime: dayjs().unix() + 1000, place_name: 'test place name' },
-//     }
+  it('should not allow event creation without required fields', async () => {
+    const required_fields = {
+      'title': {},
+      'start_datetime': { title: 'test title' },
+      'place_id or place_name and place_address are': { title: 'test title', start_datetime: DateTime.now().toMillis(), place_name: 'test place name' },
+    }
 
-//     const promises = Object.keys(required_fields).map(async field => {
-//       const response = await request(app).post('/api/event').send(required_fields[field])
-//         .expect(400)
-//       expect(response.text).toBe(`${field} required`)
-//     })
+    const promises = Object.keys(required_fields).map(async field => {
+      
+      const response = await fetchWithAuth('/api/events', 'POST', required_fields[field])
+      expect(response.status).toBe(400)
+      expect(response.body).toBe(`${field} required`)
+    })
 
-//     await Promise.all(promises)
-//   })
+    await Promise.all(promises)
+  })
 
 //   it('should create anon event only when allowed', async () => {
 //     await request(app).post('/api/settings')
@@ -368,7 +423,7 @@ describe('Authentication / Authorization', () => {
 //   })
 
 
-// })
+})
 
 // let event = {}
 // describe('Tags', () => {

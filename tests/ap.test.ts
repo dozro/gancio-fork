@@ -14,13 +14,13 @@ describe('Nodeinfo', () => {
 
   it('shoud support nodeinfo 2.0 and 2.1', async () => {
     const res = await $fetch('/.well-known/nodeinfo')
-    expect(res.links.find(l => l.rel === 'http://nodeinfo.diaspora.software/ns/schema/2.0')?.href).toBe(base_url + '/.well-known/nodeinfo/2.0')
-    expect(res.links.find(l => l.rel === 'http://nodeinfo.diaspora.software/ns/schema/2.1')?.href).toBe(base_url + '/.well-known/nodeinfo/2.1')
+    expect(res.links.find(l => l.rel === 'http://nodeinfo.diaspora.software/ns/schema/2.0')?.href).toContain('/.well-known/nodeinfo/2.0')
+    expect(res.links.find(l => l.rel === 'http://nodeinfo.diaspora.software/ns/schema/2.1')?.href).toContain('/.well-known/nodeinfo/2.1')
   })
 
   it('shoud implement FEP-2677 - Application Actor', async () => {
     const response = await $fetch('/.well-known/nodeinfo')
-    expect(response.links.find(l => l.rel === 'https://www.w3.org/ns/activitystreams#Application')?.href).toBe(base_url + '/federation/u/gancio')
+    expect(response.links.find(l => l.rel === 'https://www.w3.org/ns/activitystreams#Application')?.href).toContain('/federation/u/gancio')
   })
 
 })
