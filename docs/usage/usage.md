@@ -8,6 +8,5 @@ has_children: true
 
 ## Usage
 
-ehmmm, help needed here :smile: feel free to send a PR => [here](https://framagit.org/les/gancio/tree/master/docs)
-
+In this section you can find some usage recommendations. Feel free to contribute your own tips or suggestions to help others!
 
