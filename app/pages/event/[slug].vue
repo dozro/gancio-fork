@@ -187,7 +187,7 @@ async function report () {
     await $fetch(`/api/events/messages/${event.value.id}`, { method: 'POST', body: { message }})
     $notify('common.sent')
   } catch (e) {
-    $notify(e)
+    $notify(String(e))
   }
 }
 
@@ -219,7 +219,7 @@ async function report () {
     </v-col>
     
     <v-col cols='12' md='4'>
-      <v-card>
+      <v-card class='border-2'>
         <v-container class="eventDetails">
           <v-icon
             class="float-right"
@@ -302,7 +302,7 @@ async function report () {
         
         <v-divider />
         <!-- info & actions -->
-        <v-list dense nav color="transparent">
+        <v-list base-color='primary'>
           
           <!-- copy link -->
           <v-list-item

@@ -1,7 +1,8 @@
 <!-- Add / Edit event
 
  -->
-<script setup>
+<script setup>import { DateTime } from 'luxon'
+
 const { loggedIn } = useUserSession()
 const { $notify } = useNuxtApp()
 
@@ -61,7 +62,7 @@ async function done() {
 
   // formData.append('description', this.event.description)
   // formData.append('multidate', !!this.date.multidate)
-  formData.append('start_datetime', event.value.start_datetime ? Math.floor(new Date(event.value.start_datetime).getTime() / 1000) : '') // this.$time.fromDateInput(this.date.from, this.date.fromHour))
+  formData.append('start_datetime', event.value.start_datetime)
   // if (!!this.date.multidate) {
   //   formData.append('end_datetime', this.$time.fromDateInput(this.date.due, this.date.dueHour || '23:59'))
   // } else if (this.date.dueHour && this.date.due) {
@@ -118,11 +119,10 @@ async function done() {
               <v-col v-if='!loggedIn' cols=12>
                 <p v-html="$t('event.anon_description')" />
               </v-col>
+              <span>{{event}}</span>
 
               <!-- Title -->
               <v-col cols=12>
-                <!-- @change='v => event?.title = v'
-                :value = 'event?.title' -->
                 <v-text-field v-model="event.title" prepend-icon='mdi-format-title' 
                   :label="$t('common.title')"
                   :rules="[$valid.required('common.title')]"
@@ -135,23 +135,22 @@ async function done() {
               </v-col>
 
               <!-- When -->
+               <span>{{event.start_datetime}}</span>
               <DateInput ref="when" v-model:event="event" />
-
-            <!-- Description -->
-            <v-col class='px-0' cols='12'>
-              <CoreEditor class='px-3 ma-0'
-                :label="$t('event.description_description')"
-                v-model='event.description'
-                :placeholder="$t('event.description_description')"
-                max-height='400px' />
-            </v-col>
-
-            <!-- MEDIA / FLYER / POSTER -->
-            <v-col cols=12 md=6>
-              <MediaInput v-model='event.media[0]' :event='event' @remove='event.media = []' />
-            </v-col>
-
-
+  
+              <!-- Description -->
+              <v-col class='px-0' cols='12'>
+                <CoreEditor class='px-3 ma-0'
+                  :label="$t('event.description_description')"
+                  v-model='event.description'
+                  :placeholder="$t('event.description_description')"
+                  max-height='400px' />
+              </v-col>
+  
+              <!-- MEDIA / FLYER / POSTER -->
+              <v-col cols=12 md=6>
+                <MediaInput v-model='event.media[0]' :event='event' @remove='event.media = []' />
+              </v-col>
 
               <!-- TAGS -->
               <v-col cols=12 md=6>

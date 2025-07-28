@@ -2,7 +2,7 @@
 // definePageMeta({ middleware: ['authenticated'] })
 // const { loadSettings } = useSettings()
 // loadSettings()
-
+const { isAdmin } = useAuth()
 const route = useRoute()
 console.error(route.params)
 const selectedTab = ref(route.params.hash) // route.params.hash !??!
@@ -15,10 +15,10 @@ const unconfirmedOldEvents = events?.oldEvents
 </script>
 <template>
   <v-card>
-      <div class="d-flex flex-row">
+      <div class="d-flex flex-column">
       <!-- admin alert -->
-      <!-- <AdminSetupAlert v-if="isAdmin" /> -->
-      <v-tabs direction='vertical' v-model="selectedTab" bg-color="note">
+      <AdminSetupAlert v-if="isAdmin || true" />
+      <v-tabs v-model="selectedTab" bg-color="note">
           <!-- <v-tab href="#settings" v-if="isAdmin" value="settings"> {{ $t('common.settings') }}</v-tab> -->
           <v-tab prepend-icon='mdi-cog' href="#settings" value="settings"> {{ $t('common.settings') }}</v-tab>
           <v-tab prepend-icon='mdi-calendar' href="#events" value="events"> {{ $t('common.events') }}</v-tab>

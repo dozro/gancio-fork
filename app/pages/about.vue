@@ -2,6 +2,7 @@
 
 const { $notify } = useNuxtApp()
 const { isAdmin } = useAuth()
+const { user, loggedIn, session } = useUserSession()
 const { t } = useI18n()
 const { data } = await useFetch<string>('/api/settings/about')
 const about = ref(data || t('about'))
