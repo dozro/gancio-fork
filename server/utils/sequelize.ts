@@ -278,8 +278,8 @@ InferCreationAttributes<Event>
           }))
         }
     
-        if (this.place.name !== 'online') {
-          location.push(this.place.toAP())
+        if (this.place?.name !== 'online') {
+          location.push(this.place?.toAP())
         }
     
         // in case we only have a single location (the common case) do not use an array to simplify federation parser
@@ -612,6 +612,9 @@ InferCreationAttributes<Collection>
     @Attribute(DataTypes.BOOLEAN) // is this collection shown in the home page navbar? //TODO: rename in showInNavBar or showInHome?
     declare isTop: boolean
     
+    @HasMany(() => Filter, { foreignKey: 'collectionId', sourceKey: 'id' })
+    declare filters?: NonAttribute<Filter[]>
+    
 }
 
 @Table({
@@ -645,6 +648,9 @@ export class Filter extends Model<
   // If collectionId is a foreign key, you may want to add:
   @Attribute(DataTypes.INTEGER)
   declare collectionId: number
+  
+  @BelongsTo(() => Collection, { foreignKey: 'collectionId', targetKey: 'id' })
+  declare collection?: NonAttribute<Collection>
   
 }
 
