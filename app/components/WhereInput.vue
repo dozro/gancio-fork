@@ -1,6 +1,4 @@
-<!-- Choose event location
-
--->
+<!-- Choose event location -->
 <script setup lang='ts'>
 const settings = useState<Settings>('settings')
 
@@ -11,22 +9,23 @@ interface Place {
   create?: boolean
 }
 
-const modelValue = defineModel('modelValue', { type: Object, default: () => ({ name: '', address: '' }) })
+const event = defineModel<Event>('event', { type: Object, required: true } )
+// const modelValue = defineModel('modelValue', { type: Object, default: () => ({ name: '', address: '' }) })
 
 const whereInputAdvancedDialog = ref(false)
 const onlineLocations = ref([])
 const disableAddress = ref(false)
 
-const isOnLine = computed(() => settings.value.allow_online_event && modelValue?.value?.name === 'online')
+const isOnLine = computed(() => settings.value.allow_online_event && event?.value?.place?.name === 'online')
 
 const showAdvancedDialogButton = computed(() => {
-  if (!modelValue?.value?.name) return false
+  if (!event?.value?.place?.name) return false
   // do not show advanced dialog button in case geolocation is not allowed
   if (!(settings.value.allow_geolocation)) {
     return false
   }
   // known places already have coords
-  if (!modelValue?.value?.isNew) return false
+  if (!event?.value?.place?.isNew) return false
   return true
 })
 
@@ -42,7 +41,7 @@ const { data: places } = await useFetch<Place[]>('/api/places', { params: { quer
       ref="place"
       :rules="[$valid.required('common.where')]"
       :label="$t('common.where')"
-      v-model='modelValue'
+      v-model='event.place'
       no-filter
       prepend-icon="mdi-map-marker"
       hide-no-data
@@ -72,7 +71,7 @@ const { data: places } = await useFetch<Place[]>('/api/places', { params: { quer
   <!-- address -->
   <v-col cols="12" :md="settings.allow_online_event?5:8" v-if="!isOnLine">
     <v-text-field
-      class="mr-4" ref="address" v-model="modelValue.address" prepend-icon="mdi-map" :disabled="disableAddress" 
+      class="mr-4" ref="address" v-model="event.place.address" prepend-icon="mdi-map" :disabled="disableAddress" 
       :rules="[ v => disableAddress ? true : $valid.required('common.address')(v)]" :label="$t('common.address')"
       :hint="$t('event.address_description')" persistent-hint>
       <template v-if="showAdvancedDialogButton" #append>
@@ -103,7 +102,6 @@ const { data: places } = await useFetch<Place[]>('/api/places', { params: { quer
   <!-- <v-dialog v-model="whereInputAdvancedDialog" destroy-on-close="destroy-on-close" max-width="700px" :fullscreen="$vuetify.display.mobile" dense="dense">
     <WhereInputAdvanced ref="whereAdvanced" :place.sync="value" :event="event" @close="whereInputAdvancedDialog = false && this.$refs.address.blur()" :onlineLocations.sync="onlineLocations" @update:onlineLocations="selectLocations"></WhereInputAdvanced>
   </v-dialog> -->
-  <span>{{ search }} - {{modelValue}}</span>
   
 </v-row>
     

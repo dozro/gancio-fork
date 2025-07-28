@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const settings = useState<Settings>('settings')
+const theme = useTheme()
 // <!-- 
 // export default {
 //   name: 'Theme',
@@ -138,17 +139,18 @@ async function uploadHeaderImage (file: File) {
   } catch (e) {}
 }
 
-function manageSetting(key: keyof Settings) {
+function manageSetting(key: keyof Settings, setCb = null) {
   return computed({
     get: () =>  settings.value[key],
     set: (value) => {
       $fetch('/api/settings', { method: 'PUT', body: { key, value } })
+      if (typeof setCb === 'function') { setCb(value) }
       settings.value[key] = value
     }
   })
 }
 
-const is_dark = manageSetting('theme.is_dark')
+const is_dark = manageSetting('theme.is_dark', () => { theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark' })
 const hide_thumbs = manageSetting('hide_thumbs')
 const hide_calendar = manageSetting('hide_calendar')
 const custom_css = manageSetting('custom_css')
@@ -335,20 +337,20 @@ const custom_js = manageSetting('custom_js')
   
   <v-card-title> {{$t('admin.footer_links')}}</v-card-title>
   <v-card-text>
-    <v-btn color='primary' text @click='openLinkModal' prepend-icon='mdi-plus'> {{$t('admin.add_link')}}</v-btn>
-    <v-btn color='warning' text @click='resetFooterLinks' icon='mdi-restore'>{{$t('common.reset')}}</v-btn>
+    <v-btn color='primary' variant='text' @click='openLinkModal' prepend-icon='mdi-plus'> {{$t('admin.add_link')}}</v-btn>
+    <v-btn color='warning' variant='text' @click='resetFooterLinks' prepend-icon='mdi-restore'>{{$t('common.reset')}}</v-btn>
     <v-card>
-      <v-list class='mt-1' two-line subheader>
+      <v-list class='mt-1'>
         <v-list-item
           v-for='(link, idx) in settings.footerLinks'
           :key='`${link.label}`' @click='editFooterLink(link)'>
             
             <v-list-item-title>{{link.label}}</v-list-item-title>
             <v-list-item-subtitle>{{link.href}}</v-list-item-subtitle>
-          <v-list-item-action>
-            <v-btn class='left' v-if='idx !== 0' icon='mdi-chevron-up' color='warn' @click.stop='moveUpFooterLink(link, idx)' />
-            <v-btn class='float-right' icon='mdi-delete-forever' color='error' @click.stop='removeFooterLink(link)' />
-          </v-list-item-action>
+          <template v-slot:append>
+            <v-btn size='small' class='left' v-if='idx !== 0' icon='mdi-chevron-up' color='warn' @click.stop='moveUpFooterLink(link, idx)' />
+            <v-btn size='small' class='float-right' icon='mdi-delete-forever' color='error' @click.stop='removeFooterLink(link)' />
+          </template>
         </v-list-item>
       </v-list>
     </v-card>

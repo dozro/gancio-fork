@@ -26,6 +26,7 @@ const headers = [
 ]
 
 async function toggle (user) {
+  console.error(user)
   // ask confirmation only to disable
   if (user.is_active) {
 
@@ -34,6 +35,7 @@ async function toggle (user) {
   }
   user.is_active = !user.is_active
   fetch('/api/user', { method: 'PUT', body: user })
+  refresh()
 }
 
 async function deleteUser (user) {
@@ -41,12 +43,13 @@ async function deleteUser (user) {
   if (!ret) { return }
   try {
     loading.value = true
-    await fetch(`/user/${user.id}`, { method: 'DELETE' })
+    await $fetch(`/api/user/${user.id}`, { method: 'DELETE' })
+    refresh()
     $notify('admin.user_remove_ok')
-    $emit('update')
+    // $emit('update')
   } catch (e) {
-    const err = response.data.errors?.[0]?.message ?? e
-    $notify(err, { color: 'error' })
+    // const err = response.data.errors?.[0]?.message ?? e
+    $notify(String(e), Statues.ERROR)
     loading.value = false
   }
 }
@@ -61,8 +64,9 @@ async function deleteUser (user) {
     const ret = await $confirm('admin.change_role_confirm', { user: user.email, from_role: user.role, to_role: role })
     if (!ret) { return }
     try {
-      await fetch('/api/user', { method: 'PUT', body: ({ ...user, role })})
-      user.role = role
+      await $fetch('/api/user', { method: 'PUT', body: ({ ...user, role })})
+      refresh()
+      // user.role = role
     } catch (e) {
       console.error(e)
     }
@@ -155,7 +159,7 @@ async function deleteUser (user) {
       >
         <template v-slot:item.is_active="{item}">
           <v-switch 
-            :input-value="item.is_active" 
+            :modelValue="item.is_active" 
             readonly 
             @click.prevent="toggle(item)" 
             inset 
@@ -165,7 +169,7 @@ async function deleteUser (user) {
         <template v-slot:item.to_notify="{item}">
           <v-switch 
             v-if="item.role!=='user'" 
-            :input-value="item.to_notify" 
+            :modelValue="item.to_notify" 
             readonly 
             @click.prevent="toggle_to_notify(item)" 
             inset

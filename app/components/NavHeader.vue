@@ -2,7 +2,7 @@
 import { useTheme } from 'vuetify'
 
 
-const { loggedIn, user, clear } = useUserSession()
+const { loggedIn, user, clear, session } = useUserSession()
 const { $notify } = useNuxtApp()
 const theme = useTheme()
 const route = useRoute()
@@ -42,15 +42,15 @@ const in_home = computed(() => route.name === 'index')
         v-model='params.show_recurrent'
       />
       
-      <v-btn icon='mdi-magnify' to='/search' :title='t("common.search")' variant='text' color='info' />
-      <v-btn icon="mdi-information" href='/about' :title='t("common.about")' :aria-label='t("common.about")' variant="text" />
+      <t-btn icon='mdi-magnify' to='/search' tooltip='common.search' color='info' />
+      <t-btn icon="mdi-information" href='/about' tooltip='common.about' :aria-label='t("common.about")'  />
       
-      <v-btn variant="text" icon="mdi-contrast-circle" @click='toggleDark' />
+      <t-btn icon="mdi-contrast-circle" tooltip='common.dark' @click='toggleDark' />
 
       <!-- language selection menu -->
       <v-menu transition="slide-y-transition">
         <template #activator="{ props }">
-          <v-btn variant="text" icon v-bind='props' aria-label='Language'>{{locale}}</v-btn>
+          <t-btn icon='mdi-translate' v-bind='props' aria-label='Language' tooltip='common.language'>{{locale}}</t-btn>
         </template>
         <v-list density='compact' max-height="350" width="250">
           <v-list-item v-for='l in locales' :key='l.code' @click.prevent.stop="setLocale(l.code)" :title='l.language' />

@@ -15,10 +15,10 @@ const frequencies = [
   { value: '1y', text: t('event.each_year') }
 ]
 
-function fromDateAndTimeToDateTime(dateObj: Date | string, timeStr: string): Date {
+function fromDateAndTimeToDateTime(dateObj: Date | string, timeStr: string): number {
   const [hours, minutes] = timeStr.split(':').map(Number)
   const dt = DateTime.fromJSDate(typeof dateObj === 'string' ? new Date(dateObj) : dateObj)
-    .set({ hour: hours, minute: minutes, second: 0, millisecond: 0 }).toJSDate()
+    .set({ hour: hours, minute: minutes, second: 0, millisecond: 0 }).toSeconds()
   return dt
 }
 
@@ -37,9 +37,11 @@ function formatTime(date: Date | number): string {
 const selectedDate = computed({
   get() {
     if (type.value === 'multidate') {
-      return { start: event.value.start_datetime, end: event.value.end_datetime }
+      return event.value.start_datetime ?
+      { start: DateTime.fromSeconds(event.value.start_datetime).toJSDate(),
+        end: DateTime.fromSeconds(event.value.end_datetime).toJSDate() } : null
     } else {
-      return event.value.start_datetime
+      return event.value.start_datetime ? DateTime.fromSeconds(event.value.start_datetime).toJSDate() : null
     }
   },
   set(val) {
@@ -50,8 +52,8 @@ const selectedDate = computed({
       event.value.start_datetime = fromDateAndTimeToDateTime(val.start, sTime) //DateTime.fromJSDate(val).toUnixInteger() 
       event.value.end_datetime = fromDateAndTimeToDateTime(val.end, eTime) //DateTime.fromJSDate(val).toUnixInteger()       
     } else {
-      event.value.start_datetime = fromDateAndTimeToDateTime(val, sTime) //DateTime.fromJSDate(val).toUnixInteger() 
-      event.value.end_datetime = fromDateAndTimeToDateTime(val, eTime) //DateTime.fromJSDate(val).toUnixInteger() 
+      event.value.start_datetime = fromDateAndTimeToDateTime(val as Date, sTime) //DateTime.fromJSDate(val).toUnixInteger() 
+      event.value.end_datetime = fromDateAndTimeToDateTime(val as Date, eTime) //DateTime.fromJSDate(val).toUnixInteger() 
     }
   },
 })
@@ -86,6 +88,7 @@ const endTime = computed({
     
     <v-btn-toggle
       class="flex-wrap flex-row"
+      variant='outlined'
       v-if="!event.parentId && !event.recurrent"
       v-model="type"
       color="primary"

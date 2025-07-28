@@ -50,16 +50,17 @@ const opened = ref(['Admin'])
 </script>
 
 <template>
-  <v-list density='compact' v-model:opened="opened" >
-    <v-list-group value='Admin'>
+  <v-list bg-color='error'>
+    <v-divider>{{$t('common.admin_actions')}}</v-divider>
+    <!-- <v-list-group value='Admin'>
       <template v-slot:activator="{ props }" >
         <v-list-item class="text-overline" v-bind='props'>{{$t('common.admin_actions')}}</v-list-item>
-      </template>
+      </template> -->
 
       <!-- Hide / confirm event -->
       <v-list-item
         @click="toggle(false)"
-        :icon="event?.is_visible ? 'mdi-eye-off' : 'mdi-eye' "
+        :prepend-icon="event?.is_visible ?? false ? 'mdi-eye-off' : 'mdi-eye' "
         :title="$t(`common.${event.is_visible?(event.parentId?'skip':'hide'):'confirm'}`)" />
 
       <!-- Edit event -->
@@ -126,6 +127,6 @@ const opened = ref(['Admin'])
           :title="$t('common.remove')" />
           
       </template>
-    </v-list-group>
+    <!-- </v-list-group> -->
   </v-list>
 </template>

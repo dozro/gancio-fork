@@ -4,7 +4,7 @@ defineProps ({
   color: { type: String, default: '' },
   to: { type: String, default: '' },
   icon: { type: String, default: '' },
-  size: { type: String, default: 'small' },
+  size: { type: String, default: 'default' },
 })
 
 </script>

@@ -8,7 +8,7 @@ defineProps({ event: { type: Object, default: () => ({})} })
         <v-container class="eventDetails">
             <!-- v-icon.float-right(v-if='event.parentId' color='success' v-text='mdiRepeat') -->
             <!-- <time datetime="" class="dt-start"></time> (:datetime='$time.unixFormat(event.start_datetime, "yyyy-MM-dd HH:mm")' itemprop="startDate" :content='$time.unixFormat(event.start_datetime, "yyyy-MM-dd\'T\'HH:mm")') -->
-            <span class="ml-2 text-uppercase">{{ time(event.start_datetime) }}</span>
+            <span class="ml-2 text-uppercase">{{ time.time(event.start_datetime) }}</span>
 
             <div class="p-location h-adr" itemprop="location" itemscope itemtype="https://schema.org/Place">
                 <v-icon icon="mdi-calendar"/>
@@ -34,11 +34,11 @@ defineProps({ event: { type: Object, default: () => ({})} })
                 </v-list-item>
             </v-list>
             <!-- v-list(nav dense v-if='hasOnlineLocations')
-v-list-item(v-for='(item, index) in event.online_locations' target='_blank' :href="`${item}`" :key="index")
-v-list-item-icon
-v-icon(v-text='mdiMonitorAccount')
-v-list-item-content.py-0
-v-list-item-title.text-caption(v-text='item') -->
+                v-list-item(v-for='(item, index) in event.online_locations' target='_blank' :href="`${item}`" :key="index")
+                v-list-item-icon
+                v-icon(v-text='mdiMonitorAccount')
+                v-list-item-content.py-0
+                v-list-item-title.text-caption(v-text='item') -->
 
         </v-container>
     </v-card>

@@ -3,6 +3,7 @@
 // import isEqual from 'lodash/isEqual'
 // import sortBy from 'lodash/sortBy'
 const { t } = useI18n()
+const { $confirm, $notify } = useNuxtApp()
 
 const loading = ref(false)
 const dialog = ref(false)
@@ -12,8 +13,6 @@ const filterTags = ref([])
 const filterPlaces = ref([])
 const filterActors = ref([])
 const negateFilter = ref(false)
-const tags = ref([])
-const places = ref([])
 const filters = ref([])
 const tagName = ref('')
 const placeName = ref('')
@@ -23,8 +22,8 @@ const form = ref()
 const collectionHeaders = [
   { value: 'name', title: t('common.name') },
   // { value: 'filters', title: t('common.filter') },
-  { value: 'pin', title: t('common.pin'), align: 'right', sortable: false },
-  { value: 'actions', title: t('common.actions'), align: 'right', width: 150, sortable: false }
+  { value: 'pin', title: t('common.pin'), align: 'end', sortable: false },
+  { value: 'actions', title: t('common.actions'), align: 'end', width: 150, sortable: false }
 ]
 
 const filterHeaders = [
@@ -32,7 +31,7 @@ const filterHeaders = [
   { value: 'actors', title: t('common.actors') },
   { value: 'tags', title: t('common.tags') },
   { value: 'places', title: t('common.places') },
-  { value: 'actions', title: t('common.actions'), align: 'right', sortable: false }
+  { value: 'actions', title: t('common.actions'), align: 'end', sortable: false }
 ]
 const settings = useState('settings')
 
@@ -43,7 +42,6 @@ const { data: collections, refresh } = await useFetch('/api/collections?withFilt
 // get trusted AP actors adding myself
 const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: (ret) => ret.unshift({ ap_id: null })})
 
-const collection_in_home = ref(null)
 
 function newCollection() {
   collection.value = { name: '', id: null }
@@ -54,24 +52,100 @@ function newCollection() {
 async function saveCollection() {
   if (!form.value.validate()) return
   loading.value = true
-  collection.name = collection.name.trim()
-  await $fetch('/collections', { method: 'POST', body: collection.value })
-  refresh()
+  collection.value.name = collection.value.name.trim()
+  try {
+    collection.value = await $fetch('/api/collections', { method: 'POST', body: collection.value })
+    refresh()
+  } catch (e) {
+    $notify(String(e), Statuses.ERROR)
+  }
   loading.value = false
 }
 
-  //   collection_in_home: {
-  //     get () { return this.settings.collection_in_home },
-  //     set (value) { this.setSetting({ key: 'collection_in_home', value }) }
-  //   },
-  // },
+async function removeCollection(collection) {
+  const ret = await $confirm('admin.delete_collection_confirm', { collection: collection.name })
+  if (!ret) { return }
+  try {
+    await $fetch(`/api/collections/${collection.id}`, { method: 'DELETE' })
+    // this.setCollections(this.collections)
+    refresh()
+  } catch (e) {
+    const err = get(e, 'response.data.errors[0].message', e)
+    $notify(t(err), Statuses.ERROR)
+    loading.value = false
+  }
+}
+
+async function editCollection(c) {
+  collection.value = { ...c }
+  filters.value = await $fetch(`/api/filter/${collection.value.id}`)
+  dialog.value = true
+}
+
+function manageSetting(key) {
+  return computed({
+    get: () =>  settings.value[key],
+    set: (value) => {
+      $fetch('/api/settings', { method: 'PUT', body: { key, value } })
+      settings.value[key] = value
+    }
+  })
+}
+
+const collection_in_home = manageSetting('collection_in_home')
+
+async function addFilter() {
+  loading.value = true
+  const tags = filterTags.value
+  const places = filterPlaces.value.map(p => ({ id: p.id, name: p.name }))
+  // const actors = this.filterActors.map(a => ({ ap_id: a.ap_id, name: a.object?.preferredUsername ?? a.object?.username ?? a?.name, domain: a?.instanceDomain ?? a.domain  }))
+  const actors = []
+  const filter = { collectionId: collection.value.id, tags, places, actors, negate: negateFilter.value }
+
+  // tags and places are JSON field and there's no way to use them inside a unique constrain
+  const alreadyExists = false 
+  // filters.value.find(f =>
+  //   isEqual(sortBy(f.places, 'id'), sortBy(filter.places, 'id')) && 
+  //   isEqual(sortBy(f.tags), sortBy(filter.tags)) &&
+  //   isEqual(sortBy(f.actors), sortBy(filter.actors))
+  // )
+  try {
+    if (editFilterId.value !== false) {
+      await $fetch(`/api/filter/${editFilterId.value}`, { body: filter, method: 'PUT' })
+    } else {
+      // if (alreadyExists) {
+      //     this.$root.$message('Already exists', { color: 'warning' })
+      //     loading.value = false
+      //     return
+      //   }
+      //   await this.$axios.$post('/filter', filter )
+      await $fetch('/api/filter', { body: filter, method: 'POST' })
+    }
+  } catch (e) {
+    loading.value = false
+    $notify(String(e), Statuses.ERROR)
+  } 
+  refresh()
+  // this.$fetch()
+  filters.value = await $fetch(`/api/filter/${collection.value.id}`)
+  filterTags.value = []
+  filterPlaces.value = []
+  filterActors.value = []
+  negateFilter.value = false
+  editFilterId.value = false
+  loading.value = false
+}
+
+
+
+
+
   // watch: {
   //   in_home (val) {
   //     this.collection_in_home = null
   //   }
   // },
   // methods: {
-    // ...mapActions(['setSetting', 'setCollections']),
     // searchTags: debounce(async function (ev) {
     //   this.tags = await this.$axios.$get(`/tag?search=${encodeURIComponent(ev.target.value)}`)
     // }, 100),
@@ -79,59 +153,13 @@ async function saveCollection() {
     //   this.places = await this.$axios.$get(`/place?search=${ev.target.value}`)
     // }, 100),
 
-// async function addFilter() {
-//       this.loading = true
-//       const tags = this.filterTags
-//       const places = this.filterPlaces.map(p => ({ id: p.id, name: p.name }))
-//       const actors = this.filterActors.map(a => ({ ap_id: a.ap_id, name: a.object?.preferredUsername ?? a.object?.username ?? a?.name, domain: a?.instanceDomain ?? a.domain  }))
-//       const filter = { collectionId: this.collection.id, tags, places, actors, negate: this.negateFilter }
 
-//       // tags and places are JSON field and there's no way to use them inside a unique constrain
-//       const alreadyExists = this.filters.find(f =>
-//         isEqual(sortBy(f.places, 'id'), sortBy(filter.places, 'id')) && 
-//         isEqual(sortBy(f.tags), sortBy(filter.tags)) &&
-//         isEqual(sortBy(f.actors), sortBy(filter.actors))
-//       )
-
-//       if (this.editFilterId !== false) {
-//         await this.$axios.$put(`/filter/${this.editFilterId}`, filter)
-//       } else {
-//         if (alreadyExists) {
-//           this.$root.$message('Already exists', { color: 'warning' })
-//           this.loading = false
-//           return
-//         }
-//         await this.$axios.$post('/filter', filter )
-//       }
-
-//       this.$fetch()
-//       this.filters = await this.$axios.$get(`/filter/${this.collection.id}`)
-
-//       this.filterTags = []
-//       this.filterPlaces = []
-//       this.filterActors = []
-//       this.negateFilter = false
-//       this.editFilterId = false
-//       this.loading = false
-//     },
-//     async editCollection(collection) {
-//       this.collection = { ...collection }
-//       this.filters = await this.$axios.$get(`/filter/${collection.id}`)
-//       this.dialog = true
-//     },
 //     newCollection() {
 //       this.collection = { name: '', id: null }
 //       this.filters = []
 //       this.dialog = true
 //     },
-//     async saveCollection() {
-//       if (!this.$refs.form.validate()) return
-//       this.loading = true
-//       this.collection.name = this.collection.name.trim()
-//       this.collection = await this.$axios.$post('/collections', this.collection)
-//       this.$fetch()
-//       this.loading = false
-//     },
+
 //     async moveUp (collection) {
 //       try {
 //         await this.$axios.$put(`/collection/moveup/${collection.sortIndex}`)
@@ -141,6 +169,7 @@ async function saveCollection() {
 //         this.$root.$message(this.$t(err), { color: 'error' })
 //       }
 //     },
+
 //     async togglePinCollection (collection) {
 //       try {
 //         await this.$axios.$put(`/collection/toggle/${collection.id}`)
@@ -150,39 +179,34 @@ async function saveCollection() {
 //         this.$root.$message(this.$t(err), { color: 'error' })
 //       }
 //     },
-//     async editFilter(filter) {
-//       this.filterActors = filter.actors
-//       this.filterPlaces = filter.places
-//       this.filterTags = filter.tags
-//       this.negateFilter = filter.negate
-//       this.editFilterId = filter.id
-//     },
-//     async removeFilter(filter) {
-//       try {
-//         await this.$axios.$delete(`/filter/${filter.id}`)
-//         this.filters = this.filters.filter(f => f.id !== filter.id)
-//         this.$fetch()
-//       } catch (e) {
-//         const err = get(e, 'response.data.errors[0].message', e)
-//         this.$root.$message(this.$t(err), { color: 'error' })
-//         this.loading = false
-//       }
-//     },
-//     async removeCollection(collection) {
-//       const ret = await this.$root.$confirm('admin.delete_collection_confirm', { collection: collection.name })
-//       if (!ret) { return }
-//       try {
-//         await this.$axios.$delete(`/collection/${collection.id}`)
-//         this.collections = this.collections.filter(c => c.id !== collection.id)
-//         this.setCollections(this.collections)
-//       } catch (e) {
-//         const err = get(e, 'response.data.errors[0].message', e)
-//         this.$root.$message(this.$t(err), { color: 'error' })
-//         this.loading = false
-//       }
-//     }
-//   }
-// }
+
+async function editFilter(filter) {
+  filterActors.value = filter.actors
+  filterPlaces.value = filter.places
+  filterTags.value = filter.tags
+  negateFilter.value = filter.negate
+  editFilterId.value = filter.id
+}
+
+async function removeFilter(filter) {
+  loading.value = true
+  try {
+    await $fetch(`/api/filter/${filter.id}`, { method: 'DELETE' })
+    filters.value = filters.value.filter(f => f.id !== filter.id)
+  } catch (e) {
+    const err = get(e, 'response.data.errors[0].message', e)
+    this.$root.$message(this.$t(err), { color: 'error' })
+    $notify(t(err?.response?.data?.errors?.[0]?.message), Status.ERROR)
+  }
+  loading.value = false
+}
+
+const searchTags = ref('')
+const { data: tags } = await useFetch('/api/tags', { query: { searchTags } })
+
+const searchPlaces = ref('')
+const { data: places } = await useFetch('/api/places', { query: { searchPlaces } })
+
 </script>
 <template>
 <div>
@@ -239,6 +263,7 @@ async function saveCollection() {
           {{ $t('admin.edit_collection') }}
         </v-card-title>
         <v-card-text>
+          <span>{{collection}}</span>
           <v-form v-model="valid" ref="form" @submit.prevent="saveCollection">
             <v-text-field
               v-if="!collection.id"
@@ -247,7 +272,7 @@ async function saveCollection() {
               v-model="collection.name"
               :placeholder="$t('common.name')"
             >
-              <template v-slot:append-outer v-if="!collection.id">
+              <template #append v-if="!collection.id">
                 <v-btn
                   variant='text'
                   @click="saveCollection"
@@ -264,7 +289,7 @@ async function saveCollection() {
 
           <v-row>
             <v-col cols="6">
-              <v-autocomplete
+              <!-- <v-autocomplete
                 v-model="filterActors"
                 prepend-inner-icon="mdi-web"
                 chips
@@ -282,7 +307,7 @@ async function saveCollection() {
                 :delimiters="[';', ',']"
                 :items="actors"
                 :label="$t('common.trusted_sources')"
-              >
+              > -->
                 <!-- <template v-slot:item="{ item }">
                   <v-list-item-avatar>
                     <v-img :src="$format.actor(item, 'icon')" />
@@ -296,7 +321,7 @@ async function saveCollection() {
                     </v-list-item-subtitle>
                   </v-list-item-content>
                 </template> -->
-                <template #chip="{ item, attrs, selected, parent }">
+                <!-- <template #chip="{ item, attrs, selected, parent }">
                   <v-chip
                     v-bind="attrs"
                     closable
@@ -308,7 +333,7 @@ async function saveCollection() {
                     {{ $format.actor(item, 'label') }}
                   </v-chip>
                 </template>
-              </v-autocomplete>
+              </v-autocomplete> -->
             </v-col>
 
             <v-col cols="6">
@@ -333,7 +358,7 @@ async function saveCollection() {
                 :items="places"
                 :label="$t('common.places')"
               >
-                <template
+                <!-- <template
                   #chip="{ item, attrs, selected, parent }">
                   <v-chip
                     v-bind="attrs"
@@ -345,7 +370,7 @@ async function saveCollection() {
                   >
                     {{ item.name }}
                   </v-chip>
-                </template>
+                </template> -->
               </v-autocomplete>
             </v-col>
 
@@ -362,8 +387,7 @@ async function saveCollection() {
                 :disabled="!collection.id"
                 hide-details
                 placeholder="All"
-                @update:model-value="searchTags"
-                @focus="searchTags"
+                v-model:search="searchTags"
                 :delimiters="[';', ',']"
                 :items="tags"
                 :label="$t('common.tags')"

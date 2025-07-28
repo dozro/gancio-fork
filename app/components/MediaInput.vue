@@ -184,7 +184,7 @@ const position = computed(() => {
       v-if="useUrl"
       :label="$t('common.url')"
       :hint="'https://example.com/image.jpg'"
-      :prepend-icon="mdiCamera"
+      prepend-icon="mdi-camera"
       persistent-hint
       type="url"
       v-model="imgUrlInput"
@@ -197,7 +197,7 @@ const position = computed(() => {
       v-else
       :label="$t('common.media')"
       :hint="$t('event.media_description')"
-      :prepend-icon="mdiCamera"
+      prepend-icon="mdi-camera"
       @change="selectMedia"
       persistent-hint
       accept="image/*"
