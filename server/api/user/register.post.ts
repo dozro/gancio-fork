@@ -26,7 +26,7 @@ export default defineEventHandler(async event => {
       // return res.status(404).json('Invalid email')
     // }
 
-    log.info('Register user ', user.email)
+    log.info('Register user', user.email)
     const userInstance = await User.create(user)
     log.info(`Sending registration email to ${user.email} and registration confirmation to admins`)
     const config = useRuntimeConfig()
@@ -36,6 +36,7 @@ export default defineEventHandler(async event => {
     return userInstance
     
   } catch (e) {
+    log.error(String(e))
     throw createError({ status: 400, statusMessage: String(e) })
   }
 })

@@ -1,0 +1,15 @@
+export default defineEventHandler(async event => {
+  await requireAdminSession(event)
+  const log = useLogger('Filter put')
+  const id = getRouterParam(event, 'id')
+  const body = await readBody(event)
+
+  const filter = await Filter.findByPk(id)
+  if (!filter) {
+    log.error('This filter does not exist: ', id)
+    throw createError({ status: 404, message: 'This filter does not exists' })
+  }
+
+  return filter.update(body)
+  
+})

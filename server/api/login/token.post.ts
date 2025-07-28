@@ -8,7 +8,7 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const log = useLogger('login')
+  const log = useLogger('login via API')
   // const body = await readBody(event)
   const { email, password } = await readValidatedBody(event, bodySchema.parse)
   log.info(`Login ${email}`)
@@ -24,14 +24,15 @@ export default defineEventHandler(async (event) => {
   if (await bcrypt.compare(password, user.password)) {
     // set the user session in the cookie
     // this server util is auto-imported by the auth-utils module
-    const token = await signJwt({
+    const access_token = await signJwt({
       user: {
         email: user.email,
         role: user.role,
       }
     })
-    return { token }
+    return { access_token }
   } else {
+    log.error('Bad credentials')
     throw createError({ statusCode: 401, message: 'Bad credentials' })
   }
 })

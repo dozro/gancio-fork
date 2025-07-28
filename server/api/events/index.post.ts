@@ -49,7 +49,7 @@ export default defineEventHandler(async event => {
   const eventDetails = {
     title: form?.title,
     start_datetime: form.start_datetime,
-    place_id: form.place_id,
+    placeId: form.place_id,
     is_visible: !!user
   }
   

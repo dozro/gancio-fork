@@ -29,8 +29,10 @@ export default defineEventHandler(async (event) => {
         role: user.role,
       }
     })
+    log.info('Logged in ', user.email)
     return { email: user.email, role: user.role }
   } else {
+    log.error('Bad credentials for ', user.email)
     throw createError({ statusCode: 401, message: 'Bad credentials' })
   }
 })
