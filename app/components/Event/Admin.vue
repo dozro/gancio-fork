@@ -1,6 +1,7 @@
 <script setup>
 
 const props = defineProps({ event: { type: Object, default: () => ({}) } })
+const emit = defineEmits(['update'])
 const settings = useState('settings')
 const { isAdmin } = useAuth()
 const { $confirm, $notify } = useNuxtApp()
@@ -24,7 +25,6 @@ async function remove (parent = false) {
   try {
     await $fetch(`/api/events/${id}`, { method: 'DELETE' })
   } catch (e) {
-    console.error(e)
     $notify(String(e), Statuses.ERROR)
   }
   navigateTo('/')
@@ -35,14 +35,10 @@ async function toggle (parent = false) {
   const is_visible = parent ? props.event.parent.is_visible : props.event.is_visible
   const method = is_visible ? 'unconfirm' : 'confirm'
   try {
-    await $fetch(`/api/events/${method}/${id}`, { method: 'PUT' })
-    if (parent) {
-      props.event.parent.is_visible = !is_visible
-    } else {
-      props.event.is_visible = !is_visible
-    }
+    await $fetch(`/api/events/${id}/${method}`, { method: 'PUT' })
+    emit('update')
   } catch (e) {
-    console.error(e)
+    $notify(e, Statuses.ERROR)
   }
 }
 
@@ -50,7 +46,7 @@ const opened = ref(['Admin'])
 </script>
 
 <template>
-  <v-list bg-color='error'>
+  <v-list>
     <v-divider>{{$t('common.admin_actions')}}</v-divider>
     <!-- <v-list-group value='Admin'>
       <template v-slot:activator="{ props }" >

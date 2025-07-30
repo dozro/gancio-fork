@@ -9,12 +9,6 @@ const settings = useState<Settings>('settings')
 useHead({
   title: computed(() => settings.value?.title)
 })
-// console.error(settings)
-// definePageMeta({
-//   head: {
-//     title: settings.value?.title
-//   }
-// })
 
 import time from '~/utils/time'
 const now = time.nowUnix()

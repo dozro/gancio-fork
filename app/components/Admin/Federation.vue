@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang='ts'>
 
 
 const settings = useState('settings')
@@ -52,7 +52,7 @@ async function toggleFollowing (trusted_source) {
     await $fetch('/api/ap_actors/follow', { method: 'PUT', body: { ap_id: trusted_source.ap_id } })
     $notify('common.ok', { color: 'success' })
   } catch (e) {
-    $notify(e, { color: 'error' })
+    $notify(e, Statuses.ERROR)
   }
   trusted_source.loading = false
   refresh()

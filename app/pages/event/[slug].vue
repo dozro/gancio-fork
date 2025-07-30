@@ -40,13 +40,16 @@ const { $notify, $prompt } = useNuxtApp()
 const { t } = useI18n()
 const { user } = useUserSession()
 const route = useRoute()
-const { data: event } = await useFetch<Event>(`/api/events/${route.params.slug}`)
+const { data: event, refresh } = await useFetch<Event>(`/api/events/${route.params.slug}`)
 if (!event.value) {
     throw createError({ status: 404, statusMessage: 'Event not found'})
 }
 
-const hasMedia = computed(() => event?.value.media?.length )
+useHead({
+  title: `${settings.value.title} - ${event.value.title}`,
+})
 
+const hasMedia = computed(() => event?.value.media?.length )
 const showEmbed = ref(false)
 const mapModal = ref(false)
 const openModeration = ref(route.query?.moderation ? true : false)
@@ -350,6 +353,7 @@ async function report () {
         <EventAdmin
           v-if='canEdit'
           :event="event"
+          @update='refresh'
           @open-moderation="openModeration=true"
           @open-assign-author="openAssignAuthor=true"
         />
