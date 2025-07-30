@@ -8,12 +8,13 @@ console.error(route.params)
 const selectedTab = ref(route.params.hash) // route.params.hash !??!
 
 // const { data: users } = await useFetch('/api/users')
-const { data: events } = await useFetch('/event/unconfirmed')
-const unconfirmedEvents = events?.events
-const unconfirmedOldEvents = events?.oldEvents
+const { data: unconfirmedEvents } = await useFetch('/api/events/unconfirmed')
+// const unconfirmedEvents = events?.value.events
+// const unconfirmedOldEvents = events?.value.oldEvents
 
 </script>
 <template>
+<v-container >
   <v-card>
       <div class="d-flex flex-column">
       <!-- admin alert -->
@@ -46,9 +47,9 @@ const unconfirmedOldEvents = events?.oldEvents
             </v-tabs-window-item>
                               
             <v-tabs-window-item value="events">
-              <AdminEvents :unconfirmedEvents='unconfirmedEvents' :unconfirmedOldEvents='unconfirmedOldEvents'
-                @confirmed='id => { unconfirmedEvents = unconfirmedEvents.filter(e => e.id !== id); unconfirmedOldEvents = unconfirmedOldEvents.filter(e => e.id !== id)}'
-                @removed='id => { unconfirmedEvents = unconfirmedEvents.filter(e => e.id !== id); unconfirmedOldEvents = unconfirmedOldEvents.filter(e => e.id !== id)}' />
+              <AdminEvents :unconfirmedEvents='unconfirmedEvents?.events' :unconfirmedOldEvents='unconfirmedEvents?.oldEvents' />
+                <!-- @confirmed='id => { unconfirmedEvents = unconfirmedEvents.filter(e => e.id !== id); unconfirmedOldEvents = unconfirmedOldEvents.filter(e => e.id !== id)}'
+                @removed='id => { unconfirmedEvents = unconfirmedEvents.filter(e => e.id !== id); unconfirmedOldEvents = unconfirmedOldEvents.filter(e => e.id !== id)}' /> -->
             </v-tabs-window-item>
             
             <v-tabs-window-item value='collections'>
@@ -93,4 +94,5 @@ const unconfirmedOldEvents = events?.oldEvents
           </v-tabs-window>
           </div>
   </v-card>
+</v-container>
 </template>
