@@ -191,6 +191,17 @@ InferCreationAttributes<Event>
     
     @Attribute({
         type: DataTypes.INTEGER.UNSIGNED,
+        references: { table: "users", key: "id" },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+    })
+    declare userId: number;
+
+    @BelongsTo(() => User, { foreignKey: 'userId', targetKey: 'id' })
+    declare user?: NonAttribute<User>
+    
+    @Attribute({
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: true,
         references: { table: "events", key: "id" },
         onUpdate: "CASCADE",
@@ -446,6 +457,9 @@ InferCreationAttributes<User>
     
     @Attribute(DataTypes.ENUM(['admin', 'editor', 'user']))
     declare role: Role
+    
+    @HasMany(() => Event, { foreignKey: 'userId', sourceKey: 'id' })
+    declare events?: NonAttribute<Event[]>
     
     @CreatedAt
     declare readonly createdAt: CreationOptional<Date>
