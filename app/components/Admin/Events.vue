@@ -8,19 +8,21 @@ const { $confirm } = useNuxtApp()
 const $route = useRoute()
 const { t } = useI18n()
 
+const openModeration = ref($route?.query?.moderation ? true : false)
+const selectedEvent = ref()
+
 const data = reactive({
-  openModeration: $route?.query?.moderation ? true : false,
   valid: false,
   dialog: false,
   editing: false,
-  selectedEvent: null,
-  headers: [
+})
+
+const headers = [
     { value: 'title', title: t('common.title') },
     { value: 'place.name', title: t('common.place'), width: 300 },
     { value: 'start_datetime', title: t('common.when'), width: 300 },
-    { value: 'actions', title: t('common.actions'), align: 'right', sortable: false, width: 220 }
+    { value: 'actions', title: t('common.actions'), align: 'end', sortable: false, width: 280 }
   ]
-})
   
 function edit (event) {
   navigateTo(`/add/${event.id}`)
@@ -28,7 +30,7 @@ function edit (event) {
 
 async function confirm (event) {
   try {
-    await $fetch(`/event/${event.id}/confirm`, { method: 'PUT' })
+    await $fetch(`/api/events/${event.id}/confirm`, { method: 'PUT' })
     $emit('confirmed', event.id)
     $notify('event.confirmed', { color: 'success' })
   } catch (e) {}
@@ -38,7 +40,7 @@ async function remove (event) {
   const ret = await $confirm('event.remove_confirmation', { event: event.title })
   if (!ret) { return }
   try {
-    await $fetch(`/event/${event.id}`, { method: 'DELETE'})
+    await $fetch(`/api/events/${event.id}`, { method: 'DELETE'})
     $notify('admin.event_remove_ok')
     $emit('removed', event.id)
   } catch (e) {}
@@ -49,47 +51,45 @@ async function remove (event) {
 <v-container>
   <v-card-title>{{$t('admin.unconfirmed_events')}}</v-card-title>
   <v-card-subtitle>{{$t('admin.event_confirm_description')}}</v-card-subtitle>
-  {{unconfirmedEvents}}
   <v-data-table
     v-if='unconfirmedEvents.length'
     :hide-default-footer='unconfirmedEvents.length<10'
     :items='unconfirmedEvents'
-    :headers='headers'>
-      <template v-slot:item.start_datetime='{ item }'>{{$time.when(item)}}</template>
-    </v-data-table>
-    <!-- template(v-slot:item.actions='{ item }')
-      t-btn(@click='confirm(item)' color='success' :tooltip="$t('common.confirm')")
-        v-icon(v-text='mdiCheckBold')
-      t-btn(@click='() => { selectedEvent = item; openModeration=true }' color='warning' :tooltip="$t('common.moderation')")
-        v-badge(v-if='item?.n_messages' :content="item?.n_messages" overlap bordered)
-          v-icon(v-text='mdiMessageText')
-        v-icon(v-else v-text='mdiMessageText')
-
-      t-btn(:to='`/event/${item.slug || item.id}`' color='info' :tooltip="$t('common.preview')")
-        v-icon(v-text='mdiEye')
-      t-btn(:to='`/add/${item.id}`' color='warning' :tooltip="$t('common.edit')")
-        v-icon(v-text='mdiPencil')
-      t-btn(@click='remove(item)' color='error' :tooltip="$t('common.delete')")
-        v-icon(v-text='mdiDeleteForever') --> 
+    :headers='headers'
+  >
+    <template v-slot:item.start_datetime='{ item }'>{{time.when(item)}}</template>
   
-</v-container>
-  <!-- //v-navigation-drawer(v-model='openModeration' :fullscreen='$vuetify.display?.mobile' fixed top right width=400 temporary)
-  //  EventModeration(:event='selectedEvent' v-if='openModeration' @close='openModeration=false')
+    <template v-slot:item.actions='{ item }'>
+      <t-btn @click='confirm(item)' color='success' :tooltip="$t('common.confirm')" icon='mdi-check-bold' />
 
+      <t-btn @click='() => { selectedEvent = item; openModeration=true }' color='warning' :tooltip="$t('common.moderation')" icon='mdi-message-text' />
+        <!-- v-badge(v-if='item?.n_messages' :content="item?.n_messages" overlap bordered)
+          v-icon(v-text='mdiMessageText')
+        v-icon(v-else v-text='mdiMessageText') -->
 
-  <!-- v-card-title {{$t('common.past_events')}}
-  v-data-table(
+      <t-btn :to='`/event/${item.slug || item.id}`' color='info' :tooltip="$t('common.preview')" icon='mdi-eye' />
+      
+      <t-btn :to='`/add/${item.id}`' color='warning' :tooltip="$t('common.edit')" icon='mdi-pencil' />
+        
+      <t-btn @click='remove(item)' color='error' :tooltip="$t('common.delete')" icon='mdi-delete-forever' />
+    </template>
+  </v-data-table>
+  
+  <v-card-title>{{$t('common.past_events')}}</v-card-title>
+  <v-data-table
     v-if='unconfirmedOldEvents.length'
     :hide-default-footer='unconfirmedOldEvents.length<10'
     :items='unconfirmedOldEvents'
-    :headers='headers')
-    template(v-slot:item.start_datetime='{ item }') {{$time.when(item)}}
-    template(v-slot:item.actions='{ item }')
-      template
-        t-btn(:to='`/event/${item.slug || item.id}`' color='info' :tooltip="$t('common.preview')")
-          v-icon(v-text='mdiArrowRight')
-        t-btn(:to='`/add/${item.id}`' color='warning' :tooltip="$t('common.edit')")
-          v-icon(v-text='mdiPencil')
-        t-btn(@click='remove(item)' color='error' :tooltip="$t('common.delete')")
-          v-icon(v-text='mdiDeleteForever') -->
+    :headers='headers'
+  >
+    <template v-slot:item.start_datetime='{ item }'> {{time.when(item)}} </template>
+    <template v-slot:item.actions='{ item }'>
+      <t-btn :to='`/event/${item.slug || item.id}`' color='info' :tooltip="$t('common.preview')" icon='mdi-arrow-right' />
+      <t-btn :to='`/add/${item.id}`' color='warning' :tooltip="$t('common.edit')" icon='mdi-pencil' />
+      <t-btn @click='remove(item)' color='error' :tooltip="$t('common.delete')" icon='mdi-delete-forever' />
+    </template>
+  </v-data-table>
+</v-container>
+
+
 </template>
