@@ -25,8 +25,11 @@ export default defineEventHandler(async (event) => {
     // this server util is auto-imported by the auth-utils module
     await setUserSession(event, {
       user: {
+        id: user.id,
         email: user.email,
         role: user.role,
+        is_admin: user.role === 'admin',
+        is_editor: user.role === 'editor'
       }
     })
     log.info('Logged in ', user.email)

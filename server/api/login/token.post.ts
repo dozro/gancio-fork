@@ -23,11 +23,13 @@ export default defineEventHandler(async (event) => {
   // check if password matches
   if (await bcrypt.compare(password, user.password)) {
     // set the user session in the cookie
-    // this server util is auto-imported by the auth-utils module
     const access_token = await signJwt({
       user: {
+        id: user.id,
         email: user.email,
         role: user.role,
+        is_admin: user.role === 'admin',
+        is_editor: user.role === 'editor'
       }
     })
     return { access_token }
