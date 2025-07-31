@@ -189,7 +189,15 @@ InferCreationAttributes<Event>
     declare is_visible: boolean
     
     @Attribute(DataTypes.JSON)
-    declare online_locations: string
+    declare online_locations: Array<string>
+
+    @Attribute(DataTypes.JSON)
+    declare ap_object?: Object
+
+    /** represent the AP URI */
+    @Attribute(DataTypes.STRING)
+    @Index
+    declare ap_id?: string
     
     @Attribute({
         type: DataTypes.INTEGER.UNSIGNED,
@@ -275,8 +283,8 @@ InferCreationAttributes<Event>
         // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-summary
         const summary = `<p>${this.place && this.place.name}, ${datetime}</p>${this.description}`
         
-        let attachment = []
-        let location = []
+        let attachment: Object[] = []
+        let location: Object[] = []
     
         if (this?.online_locations?.length) {
           location = this.online_locations.map(url => ({
@@ -310,14 +318,14 @@ InferCreationAttributes<Event>
           })
         }
     
-        let tags = this.tags?.map(tag => tag.tag)
+        let tags = this.tags?.map(tag => tag.tag) ?? []
         
         // add default fedi hashtags if needed on local events only
         if (!this.ap_id && publicSettings.default_fedi_hashtags.length) {
-          tags = union(tags, publicSettings.default_fedi_hashtags)
+          tags = [...new Set([...tags, ...publicSettings.default_fedi_hashtags])]
         }
     
-        tags = tags?.map(tag => ({
+        const tag = tags?.map(tag => ({
           type: 'Hashtag',
           name: '#' + tag,
           href: `${publicSettings.baseurl}/tag/${encodeURIComponent(tag)}`
@@ -332,7 +340,7 @@ InferCreationAttributes<Event>
           ...( this.end_datetime ? { endTime: DateTime.fromSeconds(this.end_datetime, opt).toISO() } : {} ),
           location,
           attachment,
-          tag: tags,
+          tag,
           published: this.updatedAt,
           updated: this.updatedAt,
           attributedTo: `${publicSettings.baseurl}/federation/u/${username}`,
