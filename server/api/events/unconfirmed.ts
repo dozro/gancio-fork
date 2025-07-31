@@ -5,7 +5,7 @@ import { DateTime } from "luxon"
 /** get all unconfirmed events
 */
 export default defineEventHandler(async event => {
-  requireUserSession(event)
+  await requireUserSession(event)
   const log = useLogger('event/unconfirmed')
   try {
     const events = await Event.findAll({
