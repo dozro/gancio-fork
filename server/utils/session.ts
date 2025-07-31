@@ -72,9 +72,8 @@ export async function requireRole(event: UseSessionEvent, role: string) {
 export async function requireAdminSession(event: UseSessionEvent, opts: { statusCode?: number, message?: string } = {}): Promise<UserSessionRequired> {
   const log = useLogger('session')
   const userSession = await getUser(event)
-  log.info(userSession)
 
-  if (!userSession?.user) {
+  if (!userSession) {
     if (isEvent(event)) {
       throw createError({
         statusCode: opts.statusCode || 401,
@@ -88,7 +87,7 @@ export async function requireAdminSession(event: UseSessionEvent, opts: { status
     }
   }
   
-  if (userSession.user?.role !== 'admin') {
+  if (userSession?.role !== 'admin') {
     throw createError({
       statusCode: opts.statusCode || 401,
       message: opts.message || 'Unauthorized',
