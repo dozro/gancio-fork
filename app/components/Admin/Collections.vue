@@ -23,7 +23,7 @@ const collectionHeaders = [
   { value: 'name', title: t('common.name') },
   // { value: 'filters', title: t('common.filter') },
   { value: 'pin', title: t('common.pin'), align: 'end', sortable: false },
-  { value: 'actions', title: t('common.actions'), align: 'end', width: 150, sortable: false }
+  { value: 'actions', title: t('common.actions'), align: 'end', width: 180, sortable: false }
 ]
 
 const filterHeaders = [
@@ -38,9 +38,6 @@ const settings = useState('settings')
 const in_home = !isNaN(settings.value?.collection_in_home)
 
 const { data: collections, refresh } = await useFetch('/api/collections?withFilters=true')
-
-// get trusted AP actors adding myself
-const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: (ret) => ret.unshift({ ap_id: null })})
 
 
 function newCollection() {
@@ -126,7 +123,6 @@ async function addFilter() {
     $notify(String(e), Statuses.ERROR)
   } 
   refresh()
-  // this.$fetch()
   filters.value = await $fetch(`/api/filter/${collection.value.id}`)
   filterTags.value = []
   filterPlaces.value = []
@@ -160,15 +156,7 @@ async function addFilter() {
 //       this.dialog = true
 //     },
 
-//     async moveUp (collection) {
-//       try {
-//         await this.$axios.$put(`/collection/moveup/${collection.sortIndex}`)
-//         this.$fetch()
-//       } catch (e) {
-//         const err = get(e, 'response.data.errors[0].message', e)
-//         this.$root.$message(this.$t(err), { color: 'error' })
-//       }
-//     },
+
 
 //     async togglePinCollection (collection) {
 //       try {
@@ -179,6 +167,17 @@ async function addFilter() {
 //         this.$root.$message(this.$t(err), { color: 'error' })
 //       }
 //     },
+
+async function moveUp (collection) {
+  try {
+    await $fetch(`/api/collections/moveup/${collection.sortIndex}`, { method: 'PUT' })
+    refresh()
+  } catch (e) {
+    // const err = get(e, 'response.data.errors[0].message', e)
+    // this.$root.$message(this.$t(err), { color: 'error' })
+    $notify(String(e), Statuses.ERROR)
+  }
+}
 
 async function editFilter(filter) {
   filterActors.value = filter.actors
@@ -206,6 +205,9 @@ const { data: tags } = await useFetch('/api/tags', { query: { searchTags } })
 
 const searchPlaces = ref('')
 const { data: places } = await useFetch('/api/places', { query: { searchPlaces } })
+
+// get trusted AP actors adding myself
+const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: ret => [{ ap_id: null }, ...ret] })
 
 </script>
 <template>
@@ -263,7 +265,6 @@ const { data: places } = await useFetch('/api/places', { query: { searchPlaces }
           {{ $t('admin.edit_collection') }}
         </v-card-title>
         <v-card-text>
-          <span>{{collection}}</span>
           <v-form v-model="valid" ref="form" @submit.prevent="saveCollection">
             <v-text-field
               v-if="!collection.id"
@@ -289,7 +290,7 @@ const { data: places } = await useFetch('/api/places', { query: { searchPlaces }
 
           <v-row>
             <v-col cols="6">
-              <!-- <v-autocomplete
+              <v-autocomplete
                 v-model="filterActors"
                 prepend-inner-icon="mdi-web"
                 chips
@@ -301,13 +302,13 @@ const { data: places } = await useFetch('/api/places', { query: { searchPlaces }
                 :disabled="!collection.id"
                 placeholder="Local"
                 return-object
+                item-id='ap_id'
+                item-title='ap_id'
                 hide-details
-                item-value="ap_id"
-                item-title="ap_id"
                 :delimiters="[';', ',']"
                 :items="actors"
                 :label="$t('common.trusted_sources')"
-              > -->
+              />
                 <!-- <template v-slot:item="{ item }">
                   <v-list-item-avatar>
                     <v-img :src="$format.actor(item, 'icon')" />
@@ -357,7 +358,7 @@ const { data: places } = await useFetch('/api/places', { query: { searchPlaces }
                 :delimiters="[';', ',']"
                 :items="places"
                 :label="$t('common.places')"
-              >
+              />
                 <!-- <template
                   #chip="{ item, attrs, selected, parent }">
                   <v-chip
@@ -371,7 +372,7 @@ const { data: places } = await useFetch('/api/places', { query: { searchPlaces }
                     {{ item.name }}
                   </v-chip>
                 </template> -->
-              </v-autocomplete>
+              <!-- </v-autocomplete> -->
             </v-col>
 
             <v-col cols="6">
@@ -409,6 +410,7 @@ const { data: places } = await useFetch('/api/places', { query: { searchPlaces }
 
             <v-col cols="3">
               <v-switch
+                :disabled="!collection.id"
                 inset
                 v-model="negateFilter"
                 label="Not"

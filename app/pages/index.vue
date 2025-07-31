@@ -51,7 +51,7 @@ const { data: announcements } = await useFetch<Announcement[]>('/api/announcemen
 </script>
 <template>
   <v-container id='home' class='px-2 px-sm-6 pt-0'>
-    <span>params: {{params}} - events: {{ events?.length }} - {{ status }}</span>
+
     <!-- Announcements -->
     <section v-if='announcements?.length' id='announcements' class='mt-2 mt-sm-4'>
       <Announcement v-for='announcement in announcements' :key='announcement.id' :announcement='announcement' />

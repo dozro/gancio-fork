@@ -107,7 +107,8 @@ return {
       VDataTableRow: {
         density: 'compact',
         VBtn: {
-          variant: 'text'
+          variant: 'text',
+          tile: true
         }
       },
       VDataTableItem: {

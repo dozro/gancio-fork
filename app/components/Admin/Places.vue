@@ -10,10 +10,10 @@ const search = ref('')
 const place = reactive({ name: '', address: '', latitude: null, longitude: null, id: null })
 
 const headers = [
-  { value: 'name', text: t('common.name') },
-  { value: 'address', text: t('common.address') },
-  { value: 'map', text: 'Map' },
-  { value: 'actions', text: t('common.actions'), align: 'right' }
+  { value: 'name', title: t('common.name') },
+  { value: 'address', title: t('common.address') },
+  { value: 'map', title: 'Map' },
+  { value: 'actions', title: t('common.actions'), align: 'end' }
 ]
 
 // @todo filter online place

@@ -3,6 +3,6 @@
 </script>
 <template>
   <nuxt-link class="text-decoration-none" :to='`/announcement/${announcement?.id}`'>
-    <v-alert type="info" :title='announcement.title' />
+    <v-alert class='mt-2 mt-sm-4' type="info" :title='announcement.title' />
   </nuxt-link>
 </template>
