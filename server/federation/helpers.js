@@ -37,7 +37,6 @@ import { getImageFromURL } from '../helpers'
   }
 
   function _getUser () {
-    const settings = publicSettings
     const name = publicSettings?.instance_name ?? publicSettings.title
     const baseurl = publicSettings.baseurl
     return {
@@ -124,7 +123,8 @@ export async function updateActor() {
 }
   
   async function _signAndSend (message, inbox, method='post') {
-    log.debug('[FEDI] Sign and %s %s %s', method, message, inbox)
+    // log.debug('[FEDI] Sign and %s %s %s', method, message, inbox)
+    log.debug('[FEDI] Sign and %s %s', method, inbox)
     const inboxUrl = new URL(inbox)
     const privkey = secretSettings.privateKey
     const signer = crypto.createSign('sha256')
@@ -205,11 +205,11 @@ export async function updateActor() {
     for (const sharedInbox in recipients) {
       log.debug(`Notify ${sharedInbox} with event ${event.title} cc => ${recipients[sharedInbox].length}`)
       const body = {
-        id: `${config.baseurl}/federation/m/${event.id}#${type}-${event.updatedAt.getTime()}`,
+        id: `${publicSettings.baseurl}/federation/m/${event.id}#${type}-${event.updatedAt.getTime()}`,
         type,
         to: ['https://www.w3.org/ns/activitystreams#Public'],
-        cc: [...recipients[sharedInbox], `${config.baseurl}/federation/u/${settingsController.settings.instance_name}/followers`],
-        actor: `${config.baseurl}/federation/u/${settingsController.settings.instance_name}`,
+        cc: [...recipients[sharedInbox], `${publicSettings.baseurl}/federation/u/${settingsController.settings.instance_name}/followers`],
+        actor: `${publicSettings.baseurl}/federation/u/${settingsController.settings.instance_name}`,
         object: event.toAP(settingsController.settings, recipients[sharedInbox], type)
       }
 
@@ -246,10 +246,11 @@ export async function updateActor() {
 
   export async function parseAPMessage (APMessage, actor) {
     
+    log.info('Parsing message from %s', actor?.ap_id ?? actor)
     if (APMessage.type === 'Announce' || APMessage.type === 'Create') {
       if (!APMessage?.object || !APMessage?.type) {
         log.warn('[FEDI] message without `object` or `type` property: %s', APMessage)
-        throw new BadRequestError('message without `object` or `type` property')
+        throw new Error('message without `object` or `type` property')
       }
       log.debug(`[FEDI] Parsing ${APMessage.type}`)
       return parseAPMessage(APMessage?.object, actor)
@@ -257,10 +258,10 @@ export async function updateActor() {
 
     let event
     if (typeof APMessage === 'string') {
-      const is_local = APMessage?.match(`${config.baseurl}/federation/m/(.*)`)
+      const is_local = APMessage?.match(`${publicSettings.baseurl}/federation/m/(.*)`)
       // Announce of local event
       if (is_local) {
-        return Ego.boost(APMessage, actor)
+        // return Ego.boost(APMessage, actor)
       }
     } else if (APMessage.type === 'Event') {
       event = APMessage
@@ -278,7 +279,7 @@ export async function updateActor() {
       let tmp_actor
       if (!event) {
         // this is an announce of a remote event, let's get the actor
-        event = await signAndSend('', APMessage, 'get')
+        event = await _signAndSend('', APMessage, 'get')
       }
       if (event?.type === 'Event') {
         if (event?.attributedTo !== actor?.ap_id) {
@@ -326,7 +327,7 @@ export async function updateActor() {
       const ap_id = APEvent.id
       const exists = await Event.findOne({ where: { ap_id }})
       if (exists) {
-        log.warn(`[FEDI] Avoid creating a duplicated event ${ap_id} - ${config.baseurl}/event/${exists.slug}`)
+        log.warn(`[FEDI] Avoid creating a duplicated event ${ap_id} - ${publicSettings.baseurl}/event/${exists.slug}`)
         return exists
       }
   
@@ -336,8 +337,8 @@ export async function updateActor() {
       const image_url = APEvent?.attachment?.find(a => a?.mediaType.includes('image') && a.url)?.url
       if (image_url) {
   
-        const file = await getImageFromURL(image_url)
         log.debug('[FEDI] Download attachment for event %s', image_url)
+        const file = await getImageFromURL(image_url)
   
         media = [{
           url: file.filename,
@@ -349,21 +350,6 @@ export async function updateActor() {
         }]
       }
   
-      // TODO: should skip past event?
-
-      console.error({
-        title: APEvent?.name?.trim() ?? '',
-        start_datetime: DateTime.fromISO(APEvent.startTime).toSeconds(),
-        end_datetime: APEvent?.endTime ? DateTime.fromISO(APEvent.endTime).toSeconds() : null,
-        // description: sanitizeHTML(APEvent?.content ?? APEvent?.summary ?? ''),
-        online_locations,
-        media,
-        is_visible: true,
-        ap_id,
-        ap_object: APEvent, 
-        apUserApId: actor?.ap_id ?? actor,
-      })
-      
       // create it
       const event = await Event.create({
         title: APEvent?.name?.trim() ?? '',
@@ -383,11 +369,10 @@ export async function updateActor() {
       }
   
       // create/assign tags
-      let tags = []
       if (APEvent.tag) {
         log.warn('TODO: APEvent with tags!')
-        // tags = await tagController._findOrCreate(APEvent.tag.map(t => t?.name?.substr(1)))
-        // await event.setTags(tags)
+        const tags = await findOrCreateTags(APEvent.tag.map(t => t?.name?.replace('#', '')))
+        await event.setTags(tags)
       }
       log.debug(`[FEDI] Event created: ${publicSettings.baseurl}/event/${event.slug}`)
       return event
@@ -406,13 +391,15 @@ export async function updateActor() {
     await signAndSend(JSON.stringify(body), actor.object.endpoints?.sharedInbox ?? actor.object.inbox)
     await actor.update({ following: true })
 
+    log.info('After actor update follogin, get the outbox')
     // let's try to get remote outbox
     const events = await getOutbox(actor, 10)
-    if (!events) {
+    if (!events?.length) {
       log.debug('[FEDI] No outbox events for %s', actor.ap_id)
       return
     }
     
+    log.info('Found some events in outbox', events.length)
     for(const event of events) {
       await parseAPMessage(event, actor).catch(e => log.warn(e))
     }
@@ -423,12 +410,12 @@ export async function updateActor() {
     
     if (!actor?.object?.outbox) return
     try {
-      let collection = await signAndSend('', actor?.object?.outbox, 'get')
+      let collection = await _signAndSend('', actor?.object?.outbox, 'get')
       // embedded collection
       if (typeof collection?.first !== 'string') {
         return collection?.first?.orderedItems ?? []
       } else if (/^https?:\/\//.test(collection?.first)) {
-        collection = await signAndSend('', collection.first, 'get')
+        collection = await _signAndSend('', collection.first, 'get')
         if (Array.isArray(collection?.orderedItems)) {
           return collection?.orderedItems ?? []
         }
@@ -550,10 +537,13 @@ export async function updateActor() {
    * https://www.w3.org/wiki/SocialCG/ActivityPub/Authentication_Authorization#Signing_requests_using_HTTP_Signatures
    * Each POST to /inbox coming from fediverse has to be verified.
    * Signature checking needs Actor's public key
+   * @return {Boolean} true in case of successfull validation
+   * @throws {H3Error} throw in case of validation failure
    */
   export async function verifySignature (event) {
 
     const name = event.context.params.name
+    const rawBody = await readRawBody(event)
     const body = await readBody(event)
     const actor_url = body?.actor
     const isDelete = body?.type === 'Delete'

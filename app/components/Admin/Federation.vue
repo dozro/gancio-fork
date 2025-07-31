@@ -17,7 +17,7 @@ const headers = [
 
 // const { data: stats } = useFetch('/api/ap_actors/stats')
 const stats = {}
-const { data: trusted_sources, refresh }  = useFetch('/api/ap_actors/trusted')
+const { data: trusted_sources, refresh } = await useFetch('/api/ap_actors/trusted', { deep: true })
 
 const source_url = ref('')
 const instance_name = ref(settings.value.instance_name)
@@ -50,9 +50,9 @@ async function toggleFollowing (trusted_source) {
   try {
     trusted_source.loading = true
     await $fetch('/api/ap_actors/follow', { method: 'PUT', body: { ap_id: trusted_source.ap_id } })
-    $notify('common.ok', { color: 'success' })
+    $notify('common.ok', Statuses.SUCCESS)
   } catch (e) {
-    $notify(e, Statuses.ERROR)
+    $notify(String(e), Statuses.ERROR)
   }
   trusted_source.loading = false
   refresh()
@@ -241,11 +241,11 @@ async function deleteTrustedSource (trusted_source) {
         <v-switch
           :input-value="item.following"
           :disabled="item.loading"
-          :loading="item.loading === true"
+          :loading="item.loading"
           @change="() => toggleFollowing(item)"
           inset
           hide-details
-        ></v-switch>
+        />
       </template>
       <template v-slot:item.follower="{ item }">
         <v-icon v-if="item.following" icon="mdi-download" />

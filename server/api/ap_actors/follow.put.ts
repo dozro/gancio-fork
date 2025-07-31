@@ -8,20 +8,20 @@ const schema = z.object({
 export default defineEventHandler(async event => {
   
   // authenticate
-  // await requireAdminSession(event)
+  await requireAdminSession(event)
 
   const log = useLogger('follow')
   const body = await readValidatedBody(event, schema.parse)
 
-  const ap_actor = await APUser.findByPk(body.ap_id) //, { include: Instance })
+  const ap_actor = await APUser.findByPk(body.ap_id, { include: Instance })
   if (!ap_actor) {
     throw createError({ status: 404, message: 'This ap user does not exists' })
   }
 
   if (ap_actor.following) {
-    await unfollowActor(ap_actor)
+    return unfollowActor(ap_actor)
   } else {
-    await followActor(ap_actor)
+    return followActor(ap_actor)
   }
   
 })

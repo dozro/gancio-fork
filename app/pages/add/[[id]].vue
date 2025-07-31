@@ -33,14 +33,14 @@ async function done() {
   const formData = new FormData()
   // formData.append('recurrent', JSON.stringify(this.date.recurrent))
 
-  // if (this.event.media.length) {
-  //   formData.append('image', this.event.media[0].image)
-  //   if (this.event.media[0].url) {
-  //     formData.append('image_url', this.event.media[0].url)
-  //   }
-  //   formData.append('image_name', this.event.media[0].name)
-  //   formData.append('image_focalpoint', this.event.media[0].focalpoint)
-  // }
+  if (event.value.media.length) {
+    formData.append('image', event.value.media[0].image)
+    if (event.value.media[0].url) {
+      formData.append('image_url', event.value.media[0].url)
+    }
+    formData.append('image_name', event.value.media[0].name)
+    formData.append('image_focalpoint', event.value.media[0].focalpoint)
+  }
 
   formData.append('title', event.value.title)
   if (event.value.place.id) {
@@ -149,7 +149,7 @@ async function done() {
   
               <!-- MEDIA / FLYER / POSTER -->
               <v-col cols=12 md=6>
-                <MediaInput v-model='event.media[0]' :event='event' @remove='event.media = []' />
+                <MediaInput v-model:event='event' />
               </v-col>
 
               <!-- TAGS -->

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang='ts'>
 import debounce from 'lodash/debounce'
 defineProps({ isDialog: { type: Boolean, default: false } })
 
@@ -8,10 +8,9 @@ const instance = ref({})
 const loading = ref(false)
       
 const { data: stats } = useFetch('/api/ap_actors/stats')
-const settings = useState('settings')
+const settings = useState<Settings>('settings')
 
-const link = computed(() => `https://${instance_hostname.value}/authorize_interaction?uri=${settings.instance_name}@${settings.hostname}`)
-
+const link = computed(() => `https://${instance_hostname.value}/authorize_interaction?uri=${settings.value.instance_name}@${settings.value.hostname}`)
 const getInstanceInfo = debounce(() => {
   console.error('dentro get instance info', instance_hostname.value)
   if (!instance_hostname.value) {
@@ -70,8 +69,8 @@ const getInstanceInfo = debounce(() => {
   </v-card-text>
 
   <v-card-actions v-if="isDialog">
-    <v-btn variant='outlined' color="info" @click='clipboard(`@${settings.instance_name}@${settings.hostname}`)'>
-      {{$t("common.copy")}}  @{{settings.instance_name}}@{{settings.hostname}}
+    <v-btn variant='outlined' color="info" @click='$copyToClipboard(`@${settings.instance_name}@${settings.hostname}`)'>
+      {{$t("common.copy")}}  @{{settings.instance_name}}@{{settings.hostname}}s
     </v-btn>
     <v-spacer/>
     <v-btn v-if="isDialog" variant='outlined' color="warning" @click="$emit('close')">

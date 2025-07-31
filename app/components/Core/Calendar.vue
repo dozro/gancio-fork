@@ -17,6 +17,7 @@ function updatePages (pages) {
 </script>
 <template>
   <DatePicker
+    class='mt-2'
     v-model='selectedDate'
     :locale='$i18n.locale'  
     title-position='left'

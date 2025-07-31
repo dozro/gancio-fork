@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import time from '~/utils/time'
 const settings = useState<Settings>('settings')
-const selectedDate = useState('selectedDate')
-
-const params = useState('params')
 
 const route = useRoute()
 

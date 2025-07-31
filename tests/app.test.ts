@@ -131,11 +131,7 @@ describe('Settings', () => {
   })
 
   it('should change settings when allowed', async () => {
-    const response = await fetch('/api/settings', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', cookie },
-      body: JSON.stringify({ key: 'allow_anon_event', value: true }),
-    })
+    const response = await fetchWithAuth('/api/settings', 'PUT', { key: 'allow_anon_event', value: true })
 
     expect(response.status).toBe(200)
   })
@@ -200,42 +196,37 @@ describe('Events', () => {
       
       const response = await fetchWithAuth('/api/events', 'POST', required_fields[field])
       expect(response.status).toBe(400)
-      expect(response.body).toBe(`${field} required`)
+      const data = await response.json()
+      
+      expect(data.statusMessage).toBe('Validation Error')
     })
 
     await Promise.all(promises)
   })
 
-//   it('should create anon event only when allowed', async () => {
-//     await request(app).post('/api/settings')
-//       .send({ key: 'allow_anon_event', value: false })
-//       .auth(token.access_token, { type: 'bearer' })
-//       .expect(200)
+  it('should create anon event only when allowed', async () => {
+    let response = await fetchWithAuth('/api/settings', 'PUT', { key: 'allow_anon_event', value: false })
+    expect(response.status).toBe(200)
 
-//     await request(app).post('/api/event')
-//       .expect(403)
+    response = await fetchWithAuth('/api/events', 'POST')
+    expect(response.status).toBe(403)
 
-//     let response = await request(app).post('/api/event')
-//       .send({ title: 'test title 2', place_name: 'place name', place_address: 'address', tags: ['test'], start_datetime: dayjs().unix() + 1000 })
-//       .auth(token.access_token, { type: 'bearer' })
-//       .expect(200)
+    response = await fetchWithAuth('/api/event', 'POST', { title: 'test title 2', place_name: 'place name', place_address: 'address', tags: ['test'], start_datetime: DateTime.now().toSeconds() + 1000 })
+    expect(response.status).toBe(200)
 
-//     expect(response.body.place.id).toBeDefined()
-//     places.push(response.body.place.id)
+    // expect(response.body.place.id).toBeDefined()
+    // places.push(response.body.place.id)
 
-//     await request(app).post('/api/settings')
-//       .send({ key: 'allow_anon_event', value: true })
-//       .auth(token.access_token, { type: 'bearer' })
-//       .expect(200)
+    response = await fetchWithAuth('/api/settings', 'PUT', { key: 'allow_anon_event', value: true})
+    expect(response.status).toBe(200)
 
-//     response = await request(app).post('/api/event')
-//       .send({ title: 'test title 3', place_name: 'place name 2', place_address: 'address 2', tags: ['test'], start_datetime: dayjs().unix() + 1000 })
-//       .expect(200)
+    response = await fetchWithAuth('/api/event', 'POST', { title: 'test title 3', place_name: 'place name 2', place_address: 'address 2', tags: ['test'], start_datetime: DateTime.now().toSeconds() + 1000 })
+    expect(response.status).toBe(200)
 
-//     expect(response.body.place.id).toBeDefined()
-//     places.push(response.body.place.id)
+    // expect(response.body.place.id).toBeDefined()
+    // places.push(response.body.place.id)
 
-//   })
+  })
 
 //   it('should not confirm anon events', async () => {
 //     const response = await request(app).post('/api/event')

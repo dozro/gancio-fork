@@ -80,14 +80,13 @@ export async function parseAPLocation(APEvent) {
     } else if (addr?.url) {
       place.place_name = 'online'
     } else {
-      console.warn(`[FEDI] Event "${APEvent?.name}" has bad address location: ${JSON.stringify(APPlace?.address)}`)
+      log.warn(`[FEDI] Event "${APEvent?.name}" has bad address location: ${JSON.stringify(APPlace?.address)}`)
     }
   } else {
     place.place_address = place.place_name
   }
 
   place = await findOrCreatePlace(place)
-  // place = await eventController._findOrCreatePlace(place)
 
   if (!place) {
     throw createError({ status: 400, message: 'Place not found nor created' })

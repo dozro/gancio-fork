@@ -11,17 +11,17 @@ import { follow, unfollow } from "~~/server/federation/follows"
  
 export default defineEventHandler(async event => {
   const log = useLogger('AP inbox')
-  const ret = await verifySignature(event)
+  await verifySignature(event)
   const message = await readBody(event)
   console.error('message:', message)
   
   // has to have an object and a type property..
   if (!message?.object || !message?.type) {
     log.warn('[FEDI] message without `object` or `type` property: %s', message)
-    return res.status(404).send('Wrong AP message: no object or type property')
+    throw createError({ status: 404, message: 'Wrong AP message: no object or type property' })
   }
 
-  setHeader(event, 'Content-Type', 'application/activity+json')  
+  setHeader(event, 'Content-Type', 'application/activity+json')
   log.debug('[FEDI] Type %s', message.type)
   switch (message.type) {
     case 'Follow':
@@ -40,12 +40,13 @@ export default defineEventHandler(async event => {
         // Ego.unboost(req, res)
       } else {
         log.warn('[FEDI] Undo Activity for unsupported Object: %s', JSON.stringify(message.object))
-        // return res.status(400).send('Undo Activity for unsupported Object')
+        throw createError({ status: 400, message: 'Undo Activity for unsupported Object'})
       }
       break
     case 'Announce':
       log.debug(`[FEDI] Announce incoming from ${event.context.fedi_user.ap_id}`)
       await parseAPMessage(message, event.context.fedi_user)
+      return setResponseStatus(event, 201)
       // return res.status(201).send()
     case 'Note':
       log.debug('[FEDI] Direct Note Activity is not supported: %s', JSON.stringify(message.object))
@@ -93,18 +94,20 @@ export default defineEventHandler(async event => {
         log.debug(`[FEDI] Create Activity with Event type incoming from ${res.locals.fedi_user.ap_id}`)
         if (!res.locals.fedi_user.following || !res.locals.fedi_user.trusted) {
           log.warn(`[FEDI] APUser not followed or not trusted`)
-          return
-          // return res.sendStatus(404)
+          throw createError({ status: 404, message: 'Not followed or not trusted' })
         }
-        await parseAPMessage(message, res.locals.fedi_user)
+        await parseAPMessage(message, event.context.fedi_user)
+        return setResponseStatus(event, 201)
         // return res.status(201).send()
       } else {
         log.warn('[FEDI] Create unsupported Object => %s', JSON.stringify(message?.object))
+        throw createError({ status: 404, message: 'Create unsupported Object' })
         // return res.sendStatus(404)
       }
       break
     default:
       log.error('[FEDI] Unknown message type: %s', message?.type)
+      throw createError({ status: 404, message: 'Unknown message type'})
       // res.sendStatus(404)
   }
 })
