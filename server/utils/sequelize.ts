@@ -13,6 +13,8 @@ import {
     type InferCreationAttributes,
     type CreationOptional,
     type NonAttribute,
+    AggregateOptions,
+    InferAttributesOptions,
 } from "@sequelize/core"
 
 import {
@@ -625,6 +627,18 @@ InferCreationAttributes<Collection>
     
     @Attribute(DataTypes.BOOLEAN) // is this collection shown in the home page navbar? //TODO: rename in showInNavBar or showInHome?
     declare isTop: boolean
+    
+    @Attribute(DataTypes.INTEGER.UNSIGNED)
+    @Index
+    declare sortIndex: CreationOptional<number>
+    
+    @BeforeCreate
+    static async autoincrementSortIndex (collection: Collection, options: AggregateOptions<InferAttributesOptions<Collection>>) {
+      const maxSort = await Collection.max('sortIndex', { transaction: options.transaction })
+      collection.sortIndex = (maxSort || 0) + 1
+      console.error(collection)
+    }
+    
     
     @HasMany(() => Filter, { foreignKey: 'collectionId', sourceKey: 'id' })
     declare filters?: NonAttribute<Filter[]>
