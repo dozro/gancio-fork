@@ -4,17 +4,16 @@ const settings = useState<Settings>('settings')
 const route = useRoute()
 const { data, error } = await useFetch(`/api/events/place/${route.params.id}`)
 if (!data.value) {
-  console.error(error)
   throw createError({ status: 404, statusMessage: `Place ${route.params?.id} not found` })
 }
 
 useHead( () => {
-      const title = `${settings.value.title} - ${data.value.place?.name}`
+      const title = `${settings.value.title} - ${data.value?.place?.name}`
       return {
         title,
         link: [
-          // { rel: 'alternate', type: 'application/rss+xml', title, href: this.settings.baseurl + `/feed/rss/place/${this.place.name}` },
-          // { rel: 'alternate', type: 'text/calendar', title, href: this.settings.baseurl + `/feed/ics/place/${this.place.name}` }
+          { rel: 'alternate', type: 'application/rss+xml', title, href: settings.value.baseurl + `/feed/rss/place/${data.value?.place.name}` },
+          { rel: 'alternate', type: 'text/calendar', title, href: settings.value.baseurl + `/feed/ics/place/${data.value?.place?.name}` }
         ],
       }
     })
@@ -46,45 +45,3 @@ useHead( () => {
       </section>
     </v-container>
   </template>
-  <!-- <script>
-  
-  import { mapState, mapGetters } from 'vuex'
-  import Event from '@/components/Event'
-  import HowToArriveNav from '@/components/HowToArriveNav.vue'
-  
-  export default {
-    name: 'Place',
-    components: { 
-      Event, 
-      HowToArriveNav,
-      [process.client && 'Map']: () => import('@/components/Map.vue')
-     },
-    data() {
-      return { mapHeight: "14rem" }
-    },
-    head() {
-      const title = `${this.settings.title} - ${this.place.name}`
-      return {
-        title,
-        link: [
-          { rel: 'alternate', type: 'application/rss+xml', title, href: this.settings.baseurl + `/feed/rss/place/${this.place.name}` },
-          { rel: 'alternate', type: 'text/calendar', title, href: this.settings.baseurl + `/feed/ics/place/${this.place.name}` }
-        ],
-      }
-    },
-    computed: {
-      ...mapState(['settings']),
-      ...mapGetters(['hide_thumbs', 'is_dark']),
-    },
-    async asyncData({ $axios, params, error }) {
-      try {
-        const events = await $axios.$get(`/place/${encodeURIComponent(params.place)}`)
-        return events
-      } catch (e) {
-        error({ statusCode: 404, message: 'Place not found!' })
-      }
-    }
-  
-  }
-  </script>
-   -->
