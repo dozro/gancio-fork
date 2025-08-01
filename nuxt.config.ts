@@ -21,15 +21,16 @@ export default defineNuxtConfig({
   
   css: ['~/assets/css/main.css'],
   modules: [
+    '@nuxt/eslint',
     "vuetify-nuxt-module",
     'nuxt-auth-utils',
-    '@nuxt/eslint',
     '@nuxtjs/i18n'
   ],
   vuetify: {
     vuetifyOptions: './vuetify.options.js'
   },
   i18n: {
+    defaultLocale: 'en',
     locales: [
           { code: 'en', name: 'English', file: 'en.json' },
           { code: 'it', name: 'Italian', file: 'it.json' }
@@ -44,16 +45,15 @@ export default defineNuxtConfig({
     //   name: locales[key],
     //   language: locales[key]
     // })),
-    skipSettingLocaleOnNavigate: true,// 
+    // skipSettingLocaleOnNavigate: true,// 
     // bundle: {
     //   optimizeTranslationDirective: false
     // },
     compilation: {
       strictMessage: false
     },
-    strategy: 'no_prefix',
-    defaultLocale: 'en',
-    vueI18n: 'i18n.config.js'
+    // strategy: 'no_prefix',
+    // vueI18n: 'i18n.config.js'
   },
   vue: {
     compilerOptions: {

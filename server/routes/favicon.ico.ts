@@ -3,7 +3,6 @@ import path from 'path'
 import mime from 'mime-types'
 
 export default defineEventHandler(async (event) => {
-  console.error('sono qui!')
   const filePath = path.resolve(publicSettings?.logo ?? 'public/logo.png')
 
   const mimeType = mime.lookup(filePath) || 'application/octet-stream'

@@ -7,7 +7,7 @@ const route = useRoute()
 const settings = useState<Settings>('settings')
 const params = useState('params', () => ({ show_recurrent: settings.value.recurrent_event_visible, start: time.startMonth(time.currentYear(),  time.currentMonth()) }))
 
-const { locale, setLocale, t, availableLocales, locales } = useI18n()
+const { locale, locales, setLocale, t } = useI18n()
 
 function logout () {
   clear()
@@ -26,7 +26,9 @@ const in_home = computed(() => route.name === 'index')
     <v-btn icon to='/' variant='text'>
       <img :src='`logo.png`' height='40'>
     </v-btn>
-    
+        <button v-for="locale in locales" :key='locale.code' @click="setLocale(locale.code)">
+      {{ locale.name }}
+    </button>
     <v-spacer/>
     
     <div class='d-flex'>
