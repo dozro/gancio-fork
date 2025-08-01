@@ -6,7 +6,8 @@ nav_order: 1
 parent: Usage
 has_toc: true
 ---
-## Pages <span class='label label-yellow'>since 1.24.0</span>
+
+# Pages <span class='label label-yellow'>since 1.24.0</span>
 
 Do you need a custom page where you can add content for your instance? A detailed policy page? A guide on how to post events?  
 In the **Admin > Pages**  section you can create as many as you like.
