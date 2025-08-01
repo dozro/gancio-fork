@@ -24,11 +24,8 @@ const in_home = computed(() => route.name === 'index')
 <template>
   <div class='d-flex pa-4'>
     <v-btn icon to='/' variant='text'>
-      <img :src='`logo.png`' height='40'>
+      <img :src='`/logo.png`' height='40'>
     </v-btn>
-        <button v-for="locale in locales" :key='locale.code' @click="setLocale(locale.code)">
-      {{ locale.name }}
-    </button>
     <v-spacer/>
     
     <div class='d-flex'>
@@ -53,7 +50,7 @@ const in_home = computed(() => route.name === 'index')
           <v-btn variant='plain' icon='mdi-translate' v-bind='props' aria-label='Language' tooltip='common.language'>{{locale}}</v-btn>
         </template>
         <v-list density='compact' max-height="350" width="250">
-          <v-list-item v-for='l in locales' :key='l.code' @click="sl(l.code)" :title='l.name' />
+          <v-list-item v-for='locale in locales' :key='locale.code' @click="setLocale(locale.code)" :title='locale.name' />
           
           <v-list-item target='_blank' href='https://hosted.weblate.org/engage/gancio/'>
             <v-list-item-subtitle v-text='t("common.help_translate")' />

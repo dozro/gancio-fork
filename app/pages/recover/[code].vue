@@ -1,14 +1,19 @@
 <script setup>
 
 const route = useRoute()
-const recoverCode = route.params.code
-const { data: user, error } = await $fetch('/api/user/check_recover_code', { method: 'POST', body: { recoverCode }})
+const settings = useState('settings')
+useHead({ title: `${settings.value.title} - Recover` })
 
+const recoverCode = route.params.code
 const newPassword = ref('')
 const valid = ref(false)
+
+const user = await $fetch('/api/user/check_recover_code', { method: 'POST', body: { recoverCode }}).catch(e => {})
+const { $notify } = useNuxtApp()
+
 async function changePassword () {
   try {
-    await $fetch('/api/user/recover', { method: 'POST', body: { recoverCode, password: newPassword.value } })
+    await $fetch('/api/user/recover_password', { method: 'POST', body: { recoverCode, password: newPassword.value } })
     $notify('common.password_updated')
     navigateTo('/login')
   } catch (e) {
@@ -27,20 +32,20 @@ async function changePassword () {
             <v-card-subtitle>{{user.email}}</v-card-subtitle>
             <v-card-text>
               <v-text-field type='password'
-                :rules="$valid.password"
+                :rules="[$valid.password]"
                 autofocus :placeholder='$t("common.new_password")'
                 v-model='newPassword' />
             </v-card-text>
           </template>
           <template v-else>
             <v-card-text>
-              <v-alert type='error' icon='mdi-alert'>{{$t('recover.not_valid_code')}} <br/> {{ error }}</v-alert>
+              <v-alert type='error' icon='mdi-alert'>{{$t('recover.not_valid_code')}}</v-alert>
             </v-card-text>
           </template>
 
           <v-card-actions>
             <v-spacer />
-            <v-btn v-if='user' outlined color='primary' type='submit' :disabled='!valid'>{{$t('common.send')}}</v-btn>
+            <v-btn v-if='user' variant='outlined' color='primary' type='submit' :disabled='!valid'>{{$t('common.send')}}</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>

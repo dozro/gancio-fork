@@ -9,7 +9,6 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     log.error('User not found')
     throw createError({ status: 400 })
-    return
   }
 
   return { email: user.email }

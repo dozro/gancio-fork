@@ -52,17 +52,17 @@ async function remove (event, parent) {
         <!-- </template> -->
         <template v-slot:item.actions='{ item }'>
           <template v-if="!item.recurrent">
-            <t-btn @click='toggle(item)' v-if='!item.is_visible' color='success' :tooltip="$t('common.confirm')" icon='mdi-eye' />
-            <t-btn @click='toggle(item)' v-else-if="!item.parentId" color='info' :tooltip="$t('common.hide')" icon='mdi-eye-off' />
-            <t-btn @click='toggle(item)' v-else color='info' :tooltip="$t('common.skip')" icon='mdi-debug-step-over' />
-            <t-btn :to='`/event/${item.slug || item.id}`' :tooltip="$t('common.preview')" icon='mdi-arrow-right' />
+            <t-btn @click='toggle(item)' v-if='!item.is_visible' color='success' tooltip="common.confirm" icon='mdi-eye' />
+            <t-btn @click='toggle(item)' v-else-if="!item.parentId" color='info' tooltip="common.hide" icon='mdi-eye-off' />
+            <t-btn @click='toggle(item)' v-else color='info' tooltip="common.skip" icon='mdi-debug-step-over' />
+            <t-btn :to='`/event/${item.slug || item.id}`' tooltip="common.preview" icon='mdi-arrow-right' />
           </template>
           <template v-else>
-            <t-btn @click='toggle(item)' v-if='!item.is_visible' color='success' :tooltip="$t('common.start')" icon='mdi-play' />
-            <t-btn @click='toggle(item)' v-else color='info' :tooltip="$t('common.pause')" icon='mdi-pause' />
+            <t-btn @click='toggle(item)' v-if='!item.is_visible' color='success' tooltip="common.start" icon='mdi-play' />
+            <t-btn @click='toggle(item)' v-else color='info' tooltip="common.pause" icon='mdi-pause' />
           </template>
-          <t-btn :to='`/add/${item.id}`' color='yellow' :tooltip="$t('common.edit')" icon='mdi-pencil' />
-          <t-btn @click='remove(item, item.recurrent)' color='error' :tooltip="$t('common.delete')" :icon="item.recurrent ? 'mdi-delete-forever' : 'mdi-delete'" />
+          <t-btn :to='`/add/${item.id}`' color='yellow' tooltip="common.edit" icon='mdi-pencil' />
+          <t-btn @click='remove(item, item.recurrent)' color='error' tooltip="common.delete" :icon="item.recurrent ? 'mdi-delete-forever' : 'mdi-delete'" />
         </template>
       </v-data-table>
     </v-card-text>
