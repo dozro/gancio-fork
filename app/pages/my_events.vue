@@ -1,17 +1,17 @@
 <script setup>
-
+definePageMeta({ middleware: ['authenticated']})
+import time from '~/utils/time'
 const { t } = useI18n()
-// middleware: ['auth'],
 const { data: events, refresh } = await useFetch('/api/events/mine')
 const { $confirm, $notify } = useNuxtApp()
 
 const search = ref('')
 
 const headers = [
-  { value: 'title', text: t('common.title') },
-  { value: 'place.name', text: t('common.place') },
-  { value: 'start_datetime', text: t('common.when') },
-  { value: 'actions', text: t('common.actions'), align: 'right', sortable: false }
+  { value: 'title', title: t('common.title') },
+  { value: 'place.name', title: t('common.place') },
+  { value: 'start_datetime', title: t('common.when') },
+  { value: 'actions', title: t('common.actions'), align: 'end', sortable: false, width: 250 }
 ]
 
 async function toggle (event) {
@@ -19,8 +19,8 @@ async function toggle (event) {
   const is_visible = event.is_visible
   const method = is_visible ? 'unconfirm' : 'confirm'
   try {
-    await $fetch(`/event/${method}/${id}`, { method: 'POST'})
-    event.is_visible = !is_visible
+    await $fetch(`/api/events/${id}/${method}`, { method: 'PUT' })
+    refresh()
   } catch (e) {
     console.error(e)
   }
@@ -45,26 +45,24 @@ async function remove (event, parent) {
         v-if='events'
         :items="events" :hide-default-footer='events?.length<10' dense :search="search"
         :headers='headers'>
-        <template v-slot:item.data-table-select="{ isSelected, select }">
-          <v-simple-checkbox size='small' small dense :on-icon="mdiCheckboxOutline" :off-icon="mdiCheckboxBlankOutline" :value="isSelected" @input="select($event)" />
-        </template>
-        <template v-slot:item.start_datetime='{ item }'>
-          <span v-if='!item.recurrent'>{{$time.when(item)}}</span>
-          <span v-else><v-icon color='success' v-text='mdiRepeat' /> {{$time.recurrentDetail({ parent: item }, 'EEEE, HH:mm')}}</span>
-        </template>
+        <!-- <template v-slot:item.start_datetime='{ item }'> -->
+          <!-- {{item?.start_datetime}} -->
+          <!-- <span v-if='!item.recurrent'>{{$time.when(item)}}</span> -->
+          <!-- <span v-else><v-icon color='success' v-text='mdiRepeat' /> {{$time.recurrentDetail({ parent: item }, 'EEEE, HH:mm')}}</span> -->
+        <!-- </template> -->
         <template v-slot:item.actions='{ item }'>
           <template v-if="!item.recurrent">
-            <t-btn @click='toggle(item)' v-if='!item.is_visible' color='success' :tooltip="$t('common.confirm')"><v-icon v-text='mdiEye' /></t-btn>
-            <t-btn @click='toggle(item)' v-else-if="!item.parentId" color='info' :tooltip="$t('common.hide')"><v-icon v-text='mdiEyeOff' /></t-btn>
-            <t-btn @click='toggle(item)' v-else color='info' :tooltip="$t('common.skip')"><v-icon v-text='mdiDebugStepOver' /></t-btn>
-            <t-btn :to='`/event/${item.slug || item.id}`' :tooltip="$t('common.preview')"><v-icon v-text='mdiArrowRight' /></t-btn>
+            <t-btn @click='toggle(item)' v-if='!item.is_visible' color='success' :tooltip="$t('common.confirm')" icon='mdi-eye' />
+            <t-btn @click='toggle(item)' v-else-if="!item.parentId" color='info' :tooltip="$t('common.hide')" icon='mdi-eye-off' />
+            <t-btn @click='toggle(item)' v-else color='info' :tooltip="$t('common.skip')" icon='mdi-debug-step-over' />
+            <t-btn :to='`/event/${item.slug || item.id}`' :tooltip="$t('common.preview')" icon='mdi-arrow-right' />
           </template>
           <template v-else>
-            <t-btn @click='toggle(item)' v-if='!item.is_visible' color='success' :tooltip="$t('common.start')"><v-icon v-text='mdiPlay' /></t-btn>
-            <t-btn @click='toggle(item)' v-else color='info' :tooltip="$t('common.pause')"><v-icon v-text='mdiPause' /></t-btn>
+            <t-btn @click='toggle(item)' v-if='!item.is_visible' color='success' :tooltip="$t('common.start')" icon='mdi-play' />
+            <t-btn @click='toggle(item)' v-else color='info' :tooltip="$t('common.pause')" icon='mdi-pause' />
           </template>
-          <t-btn :to='`/add/${item.id}`' color='yellow' :tooltip="$t('common.edit')"><v-icon v-text='mdiPencil' /></t-btn>
-          <t-btn @click='remove(item, item.recurrent)' color='error' :tooltip="$t('common.delete')"> <v-icon v-text='item.recurrent ? mdiDeleteForever : mdiDelete' /></t-btn>
+          <t-btn :to='`/add/${item.id}`' color='yellow' :tooltip="$t('common.edit')" icon='mdi-pencil' />
+          <t-btn @click='remove(item, item.recurrent)' color='error' :tooltip="$t('common.delete')" :icon="item.recurrent ? 'mdi-delete-forever' : 'mdi-delete'" />
         </template>
       </v-data-table>
     </v-card-text>

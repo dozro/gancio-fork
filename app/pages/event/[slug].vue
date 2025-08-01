@@ -49,14 +49,14 @@ useHead({
   title: `${settings.value.title} - ${event.value.title}`,
 })
 
-const hasMedia = computed(() => event?.value.media?.length )
+const hasMedia = computed(() => event?.value?.media?.length )
 const showEmbed = ref(false)
 const mapModal = ref(false)
 const openModeration = ref(route.query?.moderation ? true : false)
 const openAssignAuthor = ref(false)
-const showModeration = computed(() => settings.value.enable_moderation && event.isMine || user?.value.role === 'admin' || user?.value.role === 'editor')
+const showModeration = computed(() => settings.value.enable_moderation && event?.isMine || user?.value?.role === 'admin' || user?.value?.role === 'editor')
 
-const canEdit = computed(() => event?.value.isMine || user?.value.role === 'admin' || user?.value.role === 'editor')
+const canEdit = computed(() => event?.value?.isMine || user?.value?.role === 'admin' || user?.value?.role === 'editor')
 const hasOnlineLocations = computed(() => event.value.online_locations?.length )
 
       // mapModal: false,

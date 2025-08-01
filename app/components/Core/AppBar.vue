@@ -20,14 +20,14 @@ const settings = useState<Settings>('settings')
   </nav>
 </template>
 <style>
-  nav.AppBar {
+  nav#AppBar {
     background-image: linear-gradient(rgba(0,0,0,.8),hsla(0,0%,8%,.7)),url(/headerimage.png);
     background-position: center center;
     background-size: cover;
-    color: rgb(var(--v-theme-success));
+    /*color: rgb(var(--v-theme-success));*/
   }
 
-  .v-theme--light nav.AppBar {
+  .v-theme--light nav#AppBar {
     background-image: linear-gradient(
         to bottom,
         rgba(230, 230, 230, 0.95),

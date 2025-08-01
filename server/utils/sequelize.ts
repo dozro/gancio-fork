@@ -205,7 +205,7 @@ InferCreationAttributes<Event>
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
     })
-    declare userId: number;
+    declare userId?: number;
 
     @BelongsTo(() => User, { foreignKey: 'userId', targetKey: 'id' })
     declare user?: NonAttribute<User>

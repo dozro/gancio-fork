@@ -4,7 +4,7 @@ import { Op, literal, col, where, fn } from '@sequelize/core'
 
 import { z } from 'zod'
 export const eventQuerySchema = z.object({
-  start: z.coerce.number().default(DateTime.local().toUnixInteger()),
+  start: z.coerce.number().optional().default(DateTime.local().toUnixInteger()),
   end: z.coerce.number().optional(),
   query: z.string().optional(),
   tags: z.string().default('').optional().transform( t => t?.split(',').map(t => t.trim())),
@@ -24,7 +24,6 @@ export const eventQuerySchema = z.object({
 })
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-
 export async function getEvents(args: EventQueryType) {
 
 
@@ -32,10 +31,10 @@ export async function getEvents(args: EventQueryType) {
 
       apUserApId: null,
 
-      [Op.or]: {
-        start_datetime: { [args.older ? Op.lte : Op.gte]: args.start },
-        end_datetime: { [args.older ? Op.lte : Op.gte]: args.start }
-      },
+      // [Op.or]: {
+      //   start_datetime: { [args.older ? Op.lte : Op.gte]: args.start },
+      //   end_datetime: { [args.older ? Op.lte : Op.gte]: args.start }
+      // },
 
     }
 

@@ -463,7 +463,7 @@ export async function updateActor() {
       }
     }
 
-    fedi_user = await signAndSend('', URL, 'get')
+    fedi_user = await _signAndSend('', URL, 'get')
     if (!fedi_user?.id) {
       log.debug('[FEDI] getActor failed for %s', URL)
       return false
