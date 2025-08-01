@@ -9,6 +9,7 @@ export default defineNuxtPlugin(() => {
   }
   
   function notify (msg: string | object, status: Statuses = Statuses.SUCCESS) {
+    msg = String(msg)
     $emit('notify', { msg: String(msg), status })
   }
 

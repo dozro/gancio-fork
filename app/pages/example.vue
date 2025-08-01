@@ -1,6 +1,9 @@
 <script setup>
 import { DateTime } from 'luxon'
+// const { isAdmin } = useAuth()
 
+const { ready, loggedIn, user, session, fetch } = useUserSession()
+await fetch()
 
 // const search = ref('')
 // const place = ref('')
@@ -34,6 +37,12 @@ const event = ref({ title: '', tags: [], place: {}, recurrent: null })
 </script>
 <template>
 <v-container>
+  <span>
+    {{ready}} -
+    {{ loggedIn }} -
+    {{user}} /
+    {{ session }}
+  </span>
   <!-- <v-combobox
     v-model:search="searchTag" v-model="selectedTags" prepend-icon="mdi-tag-multiple" chips
     multiple closable-chips hide-no-data hide-selected persistent-hint
@@ -48,7 +57,8 @@ const event = ref({ title: '', tags: [], place: {}, recurrent: null })
       ref="when"
       v-model:event="event" /> -->
 
-    <WhereInput ref='where' v-model='event.place' :event='event' />
+    <span>MODEL: {{event.place }}</span>
+    <WhereInput ref='where' v-model:event='event' />
       
     <!-- <input type='checkbox' v-model='params.show_recurrent' /> -->
     

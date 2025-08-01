@@ -1,4 +1,3 @@
-
 export default defineEventHandler(async (event) => {
   const log = useLogger('user/recover')
   const { email } = await readBody(event)

@@ -2,9 +2,10 @@ import fs from 'fs'
 import path from 'path'
 import URL from 'url'
 
+
 const config = {
   status: 'SETUP',
-  baseurl: process.env.BASE_URL || '',
+  baseurl: 'https://test.cisti.org', // process.env.BASE_URL || '',
   hostname: '',
   server: {
     host: process.env.GANCIO_HOST || '0.0.0.0',

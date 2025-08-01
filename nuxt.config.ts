@@ -1,5 +1,5 @@
 import { version } from './package.json'
-import config from './server/config.js'
+// import config from './server/config.js'
 // import locales from './i18n/locales/index'
 // import vuetify from 'vite-plugin-vuetify'
 
@@ -24,7 +24,7 @@ export default defineNuxtConfig({
     "vuetify-nuxt-module",
     'nuxt-auth-utils',
     '@nuxt/eslint',
-    '@nuxtjs/i18n-edge'
+    '@nuxtjs/i18n'
   ],
   vuetify: {
     vuetifyOptions: './vuetify.options.js'

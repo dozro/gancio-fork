@@ -21,7 +21,7 @@ const show_collections_bar = computed(() => ['index', 'collection-name'].include
       </span>
         
       <!-- Calendar -->
-      <CoreCalendar v-if='show_calendar' class='mt-2' />
+      <CoreCalendar v-if='show_calendar' />
         
     </div>
   </div> 

@@ -8,7 +8,7 @@ const settings = useState<Settings>('settings')
 
     <!-- title -->
     <component :is='$route.name === "index" ? "h1" : "div"' class="text-center">
-      <nuxt-link id="title" v-text="settings?.title ?? 'Gancio'" to="/" />
+      <nuxt-link color='primary' id="title" v-text="settings?.title ?? 'Gancio'" to="/" />
       <div
         class="text-body-1 font-weight-light pb-3"
         v-html="settings?.description ?? 'a shared agenda for local communities'"
@@ -24,6 +24,7 @@ const settings = useState<Settings>('settings')
     background-image: linear-gradient(rgba(0,0,0,.8),hsla(0,0%,8%,.7)),url(/headerimage.png);
     background-position: center center;
     background-size: cover;
+    color: rgb(var(--v-theme-success));
   }
 
   .v-theme--light nav.AppBar {
@@ -40,6 +41,7 @@ const settings = useState<Settings>('settings')
     font-size: 2rem;
     font-weight: 600;
     text-decoration: none;
+    color: rgb(var(--v-theme-primary));
   }
 </style>
   

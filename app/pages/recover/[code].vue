@@ -1,6 +1,24 @@
+<script setup>
+
+const route = useRoute()
+const recoverCode = route.params.code
+const { data: user, error } = await $fetch('/api/user/check_recover_code', { method: 'POST', body: { recoverCode }})
+
+const newPassword = ref('')
+const valid = ref(false)
+async function changePassword () {
+  try {
+    await $fetch('/api/user/recover', { method: 'POST', body: { recoverCode, password: newPassword.value } })
+    $notify('common.password_updated')
+    navigateTo('/login')
+  } catch (e) {
+    $notify(e, Statuses.WARNING)
+  }
+}
+</script>
 <template>
 <v-container>
-  <v-form @submit.prevent="change_password" v-model='valid'>
+  <v-form @submit.prevent="changePassword" v-model='valid'>
     <v-row class='mt-5' align='center' justify='center'>
       <v-col cols='12' md="6" lg="5" xl="4">
         <v-card>
@@ -11,7 +29,7 @@
               <v-text-field type='password'
                 :rules="$valid.password"
                 autofocus :placeholder='$t("common.new_password")'
-                v-model='new_password' />
+                v-model='newPassword' />
             </v-card-text>
           </template>
           <template v-else>
@@ -30,41 +48,7 @@
   </v-form>
 </v-container>
 </template>
-<!-- <script>
-import { mapState } from 'vuex'
-import { mdiAlert } from '@mdi/js'
 
-export default {
-  name: 'Recover',
-  async asyncData ({ params, $axios }) {
-    const code = params.code
-    try {
-      const user = await $axios.$post('/user/check_recover_code', { recover_code: code })
-      return { user, code }
-    } catch (e) {
-      return { user: false, error: String(e) }
-    }
-  },
-  data () {
-    return { new_password: '', valid: false, mdiAlert }
-  },
-  computed: mapState(['settings']),
-  methods: {
-    async change_password () {
-      try {
-        await $fetch('/api/user/recover', { method: 'POST', body: { recover_code: this.code, password: this.new_password } })
-        $notify('common.password_updated')
-        navigateTo('/login')
-      } catch (e) {
-        this.$root.$message(e, { color: 'warning' })
-      }
-    }
-  },
-  head () {
-    return { title: `${this.settings.title} - Authorize` }
-  }
-}
-</script>
 <style>
   h4 img {
     max-height: 40px;
@@ -72,4 +56,4 @@ export default {
     background-color: #333;
     border: 1px solid #333;
   }
-</style> -->
+</style>

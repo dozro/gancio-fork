@@ -94,17 +94,17 @@ InferCreationAttributes<Announcement>
     @Attribute(DataTypes.INTEGER.UNSIGNED)
     @PrimaryKey
     @AutoIncrement
-    declare readonly id: CreationOptional<number>;
+    declare readonly id: CreationOptional<number>
     
     @Attribute(DataTypes.STRING)
     @NotNull
-    declare title: string;
+    declare title: string
     
     @Attribute(DataTypes.STRING)
-    declare announcement: string;
+    declare announcement: string
     
     @Attribute(DataTypes.BOOLEAN)
-    declare visible: string;
+    declare visible: string
     
 }
 

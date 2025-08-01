@@ -1,10 +1,9 @@
-import type { H3Event } from "h3"
-import { KeyValueType } from "./settings"
+import type { H3Event, MultiPartData } from "h3"
 
 export async function parseMultipartFormData(event: H3Event)  {
   const form = await readMultipartFormData(event)
   if (!form) return
-  const fields: KeyValueType = {}
+  const fields: Record<string, string | MultiPartData> = {}
   for (const item of form) {
     if (!item.name) continue
     if (!item.filename) {
