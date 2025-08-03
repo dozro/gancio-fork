@@ -40,6 +40,7 @@ const { $notify, $prompt } = useNuxtApp()
 const { t } = useI18n()
 const { user } = useUserSession()
 const route = useRoute()
+const { isAdmin } = useAuth()
 const { data: event, refresh } = await useFetch<Event>(`/api/events/${route.params.slug}`)
 if (!event.value) {
     throw createError({ status: 404, statusMessage: 'Event not found'})
@@ -213,6 +214,7 @@ async function report () {
   <v-row>
     <v-col cols='12' md='8' class="pr-sm-2 pr-md-0">
       <!-- <MyPicture v-if="hasMedia" :event="event" /> -->
+      <CoreImg v-if="hasMedia" :event="event" />
       <div
         class="p-description text-body-1 pa-3 rounded"
         v-if="event?.description"
@@ -248,7 +250,7 @@ async function report () {
             </div>
           </time>
           <div class="font-weight-light mb-3">
-            <!-- {{$time.from(event.start_datetime)}} -->
+            {{time.from(event.start_datetime)}}
             <!-- <small v-if="event.parentId">({{$time.recurrentDetail(event)}})</small> -->
           </div>
           <div
@@ -364,28 +366,28 @@ async function report () {
   <!-- resources from fediverse -->
   <!-- <EventResource id="resources" class="mt-3" :event="event" v-if="showResources" /> -->
   
-  <!-- <v-dialog v-model="showEmbed" width="700px" :fullscreen="$vuetify.display?.mobile">
+  <v-dialog v-model="showEmbed" width="700px" :fullscreen="$vuetify.display?.mobile">
     <EventEmbed :event="event" @close="showEmbed=false" />
-  </v-dialog> -->
+  </v-dialog>
   
-  <!-- <v-dialog
+  <v-dialog
     v-show="settings.allow_geolocation && event?.place?.latitude && event.place?.longitude"
     v-model="mapModal"
     :fullscreen="$vuetify.display?.mobile"
     destroy-on-close
   >
     <EventMapDialog :place="event?.place" @close="mapModal=false" />
-  </v-dialog> -->
+  </v-dialog>
   
-    <!-- v-if="$auth?.user?.is_admin" -->
-  <!-- <v-dialog
+  <v-dialog
+    v-if="isAdmin"
     v-model="openAssignAuthor"
     :fullscreen="$vuetify.display?.mobile"
     destroy-on-close
     width="400"
   >
     <EventAssignAuthor :event="event" @close="openAssignAuthor=false" />
-  </v-dialog> -->
+  </v-dialog>
   
   <v-navigation-drawer
     v-model="openModeration"

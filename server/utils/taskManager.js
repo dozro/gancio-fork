@@ -10,8 +10,8 @@ import { cleanOrphanTags } from '../lib/tags'
 import { cleanPastEvents, cleanUnusedAPActor } from '../lib/ap'
 const log = useLogger('queue')
 
-const loopInterval = 1 // process.env.NODE_ENV === 'production' ? 1 : 1
-const minute = 60 * loopInterval
+const loopInterval = 60 // process.env.NODE_ENV === 'production' ? 1 : 1
+const minute = 1 * loopInterval
 const hour = minute * 60
 const day = hour * 24
 

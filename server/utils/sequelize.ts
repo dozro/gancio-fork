@@ -192,12 +192,15 @@ InferCreationAttributes<Event>
     declare online_locations: Array<string>
 
     @Attribute(DataTypes.JSON)
+    declare recurrent?: Object | null
+
+    @Attribute(DataTypes.JSON)
     declare ap_object?: Object
 
     /** represent the AP URI */
     @Attribute(DataTypes.STRING)
     @Index
-    declare ap_id?: string
+    declare ap_id?: string | null
     
     @Attribute({
         type: DataTypes.INTEGER.UNSIGNED,

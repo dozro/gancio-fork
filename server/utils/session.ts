@@ -27,7 +27,6 @@ export async function getUser(event: UseSessionEvent) {
         role: payload.role
       }
 
-      return
     } catch (err) {
       console.warn('Invalid JWT:', err)
     }

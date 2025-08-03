@@ -1,3 +1,4 @@
+import type { Event } from '#build/types/nitro-imports'
 import { DateTime } from 'luxon'
 
 function currentMonth () {
@@ -30,12 +31,15 @@ function time (datetime: number) {
 }
   
 function when (event: Event) {
+  const settings = useState<Settings>('settings')
+const { locale } = useI18n()
+
   const cy = currentYear()
   const addTimezone = event?.ap_id || event?.place?.name === 'online'
 
   const opt = {
-    // zone: settings.instance_timezone,
-    // locale: app.i18n.locale || settings.instance_locale
+    zone: settings.value.instance_timezone,
+    locale: locale.value || settings.value.instance_locale
   }
 
   const start = DateTime.fromSeconds(event?.start_datetime ?? 0, opt)
@@ -65,8 +69,20 @@ function format (date, format='EEEE d MMMM HH:mm') {
   ).toFormat(format || '')
 }
 
+function from (timestamp) {
+  const settings = useState<Settings>('settings')
+const { locale } = useI18n()
 
-export default { when, currentYear, currentMonth, startMonth, nowUnix, time, timeToISO, unixFormat, format }
+  const opt = {
+    zone: settings.value.instance_timezone,
+    locale: locale.value || settings.value.instance_locale
+  }
+  return DateTime.fromSeconds(timestamp, opt).toRelative()
+}
+
+
+
+export default { when, currentYear, currentMonth, startMonth, nowUnix, time, timeToISO, unixFormat, format, from }
     
     // timeFormat () {
     //   const time = DateTime.fromObject({ hour: 14 }, {

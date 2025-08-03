@@ -1,6 +1,5 @@
 /**
   
-  @todo
 */
 export default defineEventHandler(async event => {
   const log = useLogger('register')

@@ -55,7 +55,8 @@ return {
       VFileInput: {
         prependIcon: '',
         prependInnerIcon: 'mdi-attachment',
-        density: 'compact'
+        density: 'compact',
+        variant: 'underlined'
       },
       VSelect: {
         density: 'compact'

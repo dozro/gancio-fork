@@ -1,8 +1,7 @@
+    
     /**
      * Get current authenticated user
-     * @category User
-     * @name /api/user
-     * @type GET
+     * @auth
      * @example **Response**
      * ```json
     {
@@ -18,7 +17,6 @@
     }
     ```
     */
-    
     export default defineEventHandler(async event => {
       const { user } = await requireUser(event)// await requireUserSession(event)
       return user

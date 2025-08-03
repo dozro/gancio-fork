@@ -19,6 +19,7 @@ const searchTag = ref('')
 const { data: tags, status: statusTags } = await useFetch('/api/tags', { params: { query: searchTag } })
 
 async function done() {
+  const evt = event.value
   if (loading.value) {
     return
   }
@@ -31,57 +32,60 @@ async function done() {
   loading.value = true
 
   const formData = new FormData()
-  // formData.append('recurrent', JSON.stringify(this.date.recurrent))
+  formData.append('recurrent', JSON.stringify(evt.date.recurrent))
 
-  if (event.value.media.length) {
-    formData.append('image', event.value.media[0].image)
-    if (event.value.media[0].url) {
-      formData.append('image_url', event.value.media[0].url)
+  if (evt.media.length) {
+    formData.append('image', evt.media[0].image)
+    if (evt.media[0].url) {
+      formData.append('image_url', evt.media[0].url)
     }
-    formData.append('image_name', event.value.media[0].name)
-    formData.append('image_focalpoint', event.value.media[0].focalpoint)
+    formData.append('image_name', evt.media[0].name)
+    formData.append('image_focalpoint', evt.media[0].focalpoint)
   }
 
-  formData.append('title', event.value.title)
-  if (event.value.place.id) {
-    formData.append('place_id', event.value.place.id)
+  formData.append('title', evt.title)
+  if (evt.place.id) {
+    formData.append('place_id', evt.place.id)
   }
-  // formData.append('place_name', this.event.place.name.trim())
-  // formData.append('place_address', this.event.place.address || null)
+  formData.append('place_name', this.event.place.name.trim())
+  formData.append('place_address', this.event.place.address || null)
 
-  // if (this.settings.allow_geolocation) {
-  //   formData.append('place_latitude', this.event.place.latitude || '')
-  //   formData.append('place_longitude', this.event.place.longitude || '')
-  // }
+  if (settings.value.allow_geolocation) {
+    formData.append('place_latitude', evt.place.latitude || '')
+    formData.append('place_longitude', evt.place.longitude || '')
+  }
 
-  // if (this.event.online_locations?.length) {
-  //   this.event.online_locations.forEach(l => formData.append('online_locations[]', l))
-  // } else {
-  //   formData.append('online_locations', [])
-  // }
+  if (evt.online_locations?.length) {
+    evt.online_locations.forEach(l => formData.append('online_locations[]', l))
+  }
 
-  // formData.append('description', this.event.description)
+  formData.append('description', evt.description)
   // formData.append('multidate', !!this.date.multidate)
-  formData.append('start_datetime', event.value.start_datetime)
+  formData.append('start_datetime', evt.start_datetime)
+
+  if (evt.end_datetime) {
+    formData.append('end_datetime', evt.end_datetime)
+  }
+
   // if (!!this.date.multidate) {
   //   formData.append('end_datetime', this.$time.fromDateInput(this.date.due, this.date.dueHour || '23:59'))
   // } else if (this.date.dueHour && this.date.due) {
-  //   formData.append('end_datetime', this.$time.fromDateInput(this.date.due, this.date.dueHour))
+    // formData.append('end_datetime', this.$time.fromDateInput(this.date.due, this.date.dueHour))
   // } else {
   //   formData.append('end_datetime', '')
   // }
 
-  // if (this.edit) {
-  //   formData.append('id', this.event.id)
-  // }
+  if (edit.value) {
+    formData.append('id', evt.id)
+  }
 
-  if (event.value.tags) { event.value.tags.forEach(tag => formData.append('tags[]', tag?.tag ?? tag)) }
+  if (evt.tags) { evt.tags.forEach(tag => formData.append('tags[]', tag?.tag ?? tag)) }
   
   // 
   try {
     const ret = await $fetch('/api/events', { method: edit.value ? 'PUT' : 'POST', body: formData })
     // navigate to created event in case its already visible and not a recurrent event!
-    if (!event.value?.recurrent && (ret.is_visible || loggedIn.value)) {
+    if (!evt?.recurrent && (ret.is_visible || loggedIn.value)) {
       navigateTo(`/event/${ret.slug}`)
     } else {
       navigateTo('/')
@@ -89,6 +93,7 @@ async function done() {
     
     $notify(loggedIn.value ? (edit.value ? 'event.saved' : 'event.added') : 'event.added_anon', Statuses.SUCCESS)
   } catch (e) {
+    console.error(e)
     switch (e?.request?.status) {
       case 413:
         $notify('event.image_too_big', Statuses.ERROR)
@@ -119,7 +124,6 @@ async function done() {
               <v-col v-if='!loggedIn' cols=12>
                 <p v-html="$t('event.anon_description')" />
               </v-col>
-              <span>{{event}}</span>
 
               <!-- Title -->
               <v-col cols=12>

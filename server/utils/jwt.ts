@@ -1,10 +1,10 @@
 // server/utils/jwt.ts
 
-import { jwtVerify, SignJWT } from 'jose'
+import { JWTPayload, jwtVerify, SignJWT } from 'jose'
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'your-dev-secret')
+const secret = new TextEncoder().encode(process.env.NUXT_SESSION_SECRET)
 
-export async function signJwt(payload: object, expiresIn = '1h') {
+export async function signJwt(payload: JWTPayload, expiresIn = '1m') {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime(expiresIn)

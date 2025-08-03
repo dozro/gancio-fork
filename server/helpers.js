@@ -26,6 +26,11 @@ import sharp from 'sharp'
 import path from 'path'
 import crypto from 'crypto'
 import { Readable } from 'node:stream'
+import { JSDOM } from 'jsdom'
+import DOMPurify from 'dompurify'
+
+const window = new JSDOM('').window
+const domPurify = DOMPurify(window)
 const log = useLogger('helper')
 
 
@@ -90,13 +95,13 @@ const log = useLogger('helper')
   //     .join('')
   // },
 
-  // sanitizeHTML(html) {
-  //   return domPurify.sanitize(html, {
-  //     ALLOWED_TAGS: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'br', 'i', 'span', 'em',
-  //       'h6', 'b', 'a', 'li', 'ul', 'ol', 'code', 'blockquote', 'u', 's', 'strong'],
-  //     ALLOWED_ATTR: ['href', 'target']
-  //   })
-  // },
+  export function sanitizeHTML(html) {
+    return domPurify.sanitize(html, {
+      ALLOWED_TAGS: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'br', 'i', 'span', 'em',
+        'h6', 'b', 'a', 'li', 'ul', 'ol', 'code', 'blockquote', 'u', 's', 'strong'],
+      ALLOWED_ATTR: ['href', 'target']
+    })
+  }
 
   // preferHTML (req) {
   //   return req.accepts('html', 'application/activity+json', 'application/ld+json') === 'html'

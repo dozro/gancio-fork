@@ -1,34 +1,26 @@
 import { Event } from "#imports"
-import { parseMultipartFormData } from "~~/server/utils/parseMultipartForm"
-import { z } from 'zod'
+import { mkdirp } from 'mkdirp'
+import config from '~~/server/config'
+import { parseMultipartFormData, saveUploadedFile } from "~~/server/utils/parseMultipartForm"
+import { MultiPartData } from "h3"
+import { DateTime } from "luxon"
+import { findOrCreatePlace } from "~~/server/lib/places"
+import { getImageFromURL, sanitizeHTML } from "~~/server/helpers"
+import linkifyHtml from "linkify-html"
+import { findOrCreateTags } from "~~/server/lib/tags"
 
-export const eventCreateSchema = z.object({
-  title: z.string(),
-  description: z.string().optional(),
-  start_datetime: z.coerce.bigint(),
-  end_datetime: z.coerce.bigint(),
-  place_id: z.string().optional(),
-  place_name: z.string().optional(),
-  place_address: z.string().optional(),
-}).superRefine((data, ctx) => {
-  const hasPlaceId = !!data.place_id;
-  const hasNameAndAddress = !!data.place_name && !!data.place_address;
 
-  if (!hasPlaceId && !hasNameAndAddress) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Either place_id or both place_name and place_address are required.",
-    });
-  }
-})
+
+try {
+  mkdirp.sync(config.upload_path + '/thumb')
+} catch (e) {}
+
+
 
 /**
  * Add a new event
- * Allow anyone to add an event (anon event has to be confirmed
+ * Allow anyone to add an event (anon event has to be confirmed)
  * @todo flood protection
- * @category Event
- * @name /api/events
- * @type POST
  * @info `Content-Type` has to be `multipart/form-data` to support image upload
  * @param {string} title - event's title
  * @param {string} description - event's description (html accepted and sanitized)
@@ -48,18 +40,99 @@ export const eventCreateSchema = z.object({
  * @todo Multiple images upload
  */
 export default defineEventHandler(async evt => {
-  const log = useLogger('event')
-
+  const log = useLogger('New event')
   const user = await getUser(evt)
 
-  log.info('Adding new event')
-  const form = await parseMultipartFormData(evt)
-  // const form = await readValidatedBody(evt, eventCreateSchema.parse)
-  console.error(form)
-  if (!form) return
+  const body = await parseMultipartFormData(evt)
+  if (!body) {
+    throw createError({ status: 400 })
+  }
+
   
-  log.info(form)
+  // check for required fields
+  const requiredFields = ['title', 'start_datetime']
+  let missingField = requiredFields.find(requiredField => !body[requiredField])
+  if (missingField) {
+    log.warn(`${missingField} required`)
+    throw createError({ status: 400, message: `${missingField} required`})
+  }
   
+  const isAnonymous = !user
+  const now = DateTime.local().toSeconds()
+  const start_datetime = Number(body.start_datetime)
+
+  // validate start_datetime and end_datetime
+  if (body.end_datetime) {
+    if (body.start_datetime > body.end_datetime) {
+      log.debug('start_datetime is greated than end_datetime')
+      throw createError({ status: 400, message: `start datetime is greater than end datetime`} )
+    }
+
+    if (Number(body.end_datetime) > 1000*24*60*60*365) {
+      log.debug('end_datetime is too much in the future')
+      throw createError({ status: 400, message: 'are you sure?'} )
+    }
+  }
+
+  if (!start_datetime) {
+    log.debug('start_datetime has to be a number')
+    throw createError({ status: 400, message: `Wrong format for start datetime`} )
+  }
+
+  if (body.end_datetime && !Number(body.end_datetime)) {
+    log.debug('start_datetime has to be a number')
+    throw createError({ status: 400, message: `Wrong format for end datetime`} )
+  }
+
+  if (start_datetime > 1000*24*60*60*365) {
+    log.debug('start_datetime is too much in the future')
+    throw createError({ status: 400, message: 'are you sure?'} )
+  }
+
+  if(isAnonymous && start_datetime < now) {
+    log.debug('Anonymous users cannot create past events')
+    throw createError({ status: 400, message: 'Anonymous user cannot create past events'} )
+  }
+
+  // find or create the place
+  let place = await findOrCreatePlace(body)
+  if (!place) {
+    throw createError({ status: 400, message: 'Place not found' })
+  }
+  
+  const recurrent = body.recurrent ? JSON.parse(body.recurrent as string) : null
+
+  const eventDetails = {
+    title: body.title?.trim(),
+    // sanitize and linkify html
+    description: sanitizeHTML(linkifyHtml(body.description as string || '', { target: '_blank', render: { email: ctx => ctx.content }})),
+    multidate: body.multidate,
+    start_datetime,
+    end_datetime: Number(body.end_datetime) || null,
+    online_locations: body.online_locations,
+    recurrent,
+    // publish this event only if authenticated
+    is_visible: !isAnonymous,
+    ...(user && { userId: user?.id })
+  }
+
+
+
+
+  // do we have an image?
+  if (body.image) {
+    eventDetails.media = [await saveUploadedFile(body.image as MultiPartData)]
+    // console.error('abbiamo un immagine', typeof form.image.data, form.image.data)
+    // const image_id = `img_${createHash('md5').update(`source_${id}_${new Date()}`).digest('hex')}`
+
+    // const ret = await sharp(form.image.data)
+    //   .resize(500, null, { withoutEnlargement: true } )
+    //   .webp()
+    //   .toFile(path.resolve(uploadPath, 'test' + '.webp'))
+  
+  }
+
+
   // validate
   // check required fields
   
@@ -68,19 +141,40 @@ export default defineEventHandler(async evt => {
   // find or create a place
   
   //
-  const eventDetails = {
-    title: form?.title,
-    start_datetime: form.start_datetime,
-    end_datetime: form.end_datetime,
-    placeId: form.place_id,
-    is_visible: !!user,
-    description: form.description,
-    
+  
+  const event = await Event.create(eventDetails, { raw: true })
+  await event.setPlace(place)
+  
+
+  // create/assign tags
+  let tags : Tag[] = []
+  if (body.tags) {
+    if (!Array.isArray(body.tags)) {
+      throw createError({ status: 400, message: 'tags field must be an array'})
+    }
+    tags = await findOrCreateTags(body.tags)
+    await event.setTags(tags)
+  }
+
+  // associate user to event and reverse
+  if (user) {
+    await event.setUser(user)
+  }
+
+  // event = event.get()
+  // event.tags = tags.map(t => t.tag)
+  // event.place = place
+  // return created event to the client
+  // res.json(event)
+
+  // create recurrent instances of event if needed
+  // without waiting for the task manager
+  if (event?.recurrent && event.is_visible) {
+    // eventController._createRecurrent()
+  } else {
+    // send notifications
+    // notifyEvent('Create', event.id)
   }
   
-  const ev = await Event.create(eventDetails, { raw: true })
-  
-  // notifyEvent('Create', ev.id)
-  
-  return ev
+  return event
 })

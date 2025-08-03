@@ -2,8 +2,6 @@ import { Event } from "#imports"
 import { Cast, fn, col, sql } from "@sequelize/core"
 import { DateTime } from "luxon"
 
-/** get all unconfirmed events
-*/
 export default defineEventHandler(async event => {
   await requireUserSession(event)
   const log = useLogger('event/unconfirmed')

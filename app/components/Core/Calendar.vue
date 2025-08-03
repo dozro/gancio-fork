@@ -16,6 +16,7 @@ function updatePages (pages) {
 }
 </script>
 <template>
+  <!-- :first-day-of-week='settings.calendar_first_day_of_week ?? undefined' -->
   <DatePicker
     class='mt-2'
     v-model='selectedDate'
@@ -29,8 +30,6 @@ function updatePages (pages) {
     :attributes='attributes'
     @update:pages="updatePages"
   />
-  <span>{{selectedDate}}</span>
-    <!-- :first-day-of-week='settings.calendar_first_day_of_week ?? undefined' -->
 </template>
 
 <style>
