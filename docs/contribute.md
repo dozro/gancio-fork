@@ -33,7 +33,7 @@ Please use the search function to make sure that you are not submitting duplicat
 
 ## Translations
 
-You can submit translations via [weblate.org](https://hosted.weblate.org/projects/gancio/). Note that if you want to change some label for your own instance [you can do it](https://gancio.org/install/config#user-locale).
+You can submit translations via [weblate.org](https://hosted.weblate.org/projects/gancio/). Note that if you want to change some label for your own instance only, [you can do it](https://gancio.org/install/config#user-locale).
 
 
 ## Code
@@ -44,7 +44,8 @@ To help with issues you can check for [Contibution welcome](https://framagit.org
 
 **Please use clean, concise titles for your pull requests.** Unless the pull request is about refactoring code or other internal tasks, assume that the person reading the pull request title is not a programmer but an user and **try to describe your change or fix from their perspective**. We use commit squashing, so the final commit in the main branch will carry the title of the pull request, and commits from the main branch are fed into the changelog. 
 Please use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) in your commit messages.  
-Please make forks you want to merge upstream public and possibly [allow commits](https://docs.gitlab.com/user/project/merge_requests/allow_collaboration/#allow-commits-from-upstream-members) from upstream members when requesting a merge request.
+Please make forks you want to merge upstream public and possibly [allow commits](https://docs.gitlab.com/user/project/merge_requests/allow_collaboration/#allow-commits-from-upstream-members) from upstream members when requesting a merge request.  
+Please check out the [Hacking]({% link dev.md %}) section and the [Code]({% link dev/code.md %}) section.
 
 
 
