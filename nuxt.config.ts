@@ -52,7 +52,7 @@ export default defineNuxtConfig({
     compilation: {
       strictMessage: false
     },
-    // strategy: 'no_prefix',
+    strategy: 'no_prefix',
     // vueI18n: 'i18n.config.js'
   },
   vue: {

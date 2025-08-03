@@ -167,7 +167,6 @@ const position = computed(() => {
   </v-dialog>
 
   <h3 class="mb-3 font-weight-regular" v-if="mediaPreview">{{ $t('common.media') }}</h3>
-  <span>{{mediaPreview}}  </span>
   <v-card-actions v-if="mediaPreview">
     <v-switch
       class="ml-3 mt-0 pt-0"
@@ -208,6 +207,7 @@ const position = computed(() => {
       prepend-icon="mdi-camera"
       @update:modelValue="selectMedia"
       persistent-hint
+      variant="underlined"
       accept="image/*"
     />
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-const settings = useState<Settings>('settings')
 
+const settings = useState<Settings>('settings')
 const route = useRoute()
 
 const in_home = computed(() => route.name === 'index')
@@ -8,7 +8,7 @@ const show_calendar = computed(() => !settings.value.hide_calendar && in_home.va
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections/home')
 
-const show_collections_bar = computed(() => ['index', 'collection-name'].includes(route.name))// true  // TODO
+const show_collections_bar = computed(() => ['index', 'collection-name'].includes(route.name as string))
 
 </script>
 
