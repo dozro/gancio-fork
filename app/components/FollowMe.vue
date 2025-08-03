@@ -12,7 +12,6 @@ const settings = useState<Settings>('settings')
 
 const link = computed(() => `https://${instance_hostname.value}/authorize_interaction?uri=${settings.value.instance_name}@${settings.value.hostname}`)
 const getInstanceInfo = debounce(() => {
-  console.error('dentro get instance info', instance_hostname.value)
   if (!instance_hostname.value) {
     return
   }
@@ -35,8 +34,8 @@ const getInstanceInfo = debounce(() => {
 <v-card>
   <v-card-title v-text="$t('common.follow_me_title')" />
   <v-card-text>
-    <v-alert type="warning" border="start" icon="mdi-information">
-      <!-- {{$t('admin.stats', stats)}} -->
+    <v-alert type="info" border="start" icon="mdi-information">
+      {{$t('admin.stats', stats)}}
     </v-alert>
 
     <p v-html="$t('event.follow_me_description', { title: settings.title, account: `@${settings.instance_name}@${settings.hostname}`})" />
