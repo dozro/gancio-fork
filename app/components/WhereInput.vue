@@ -1,5 +1,6 @@
 <!-- Choose event location -->
 <script setup lang='ts'>
+
 const settings = useState<Settings>('settings')
 
 interface Place {
@@ -14,11 +15,12 @@ const event = defineModel<Event>('event', { type: Object, required: true } )
 
 const whereInputAdvancedDialog = ref(false)
 const onlineLocations = ref([])
-const disableAddress = ref(false)
 
+const disableAddress = computed(() => event.value?.place?.id)
 const isOnLine = computed(() => settings.value.allow_online_event && event?.value?.place?.name === 'online')
 
 const showAdvancedDialogButton = computed(() => {
+  return true
   if (!event?.value?.place?.name) return false
   // do not show advanced dialog button in case geolocation is not allowed
   if (!(settings.value.allow_geolocation)) {
@@ -30,33 +32,51 @@ const showAdvancedDialogButton = computed(() => {
 })
 
 const search = ref('')
-const { data: places } = await useFetch<Place[]>('/api/places', { params: { query: search } })
+const { data: places } = await useFetch<Place[]>('/api/places', { params: { query: search },
+  dedupe: 'cancel',
+  transform: places => {
+    places.push({ online: true, name: 'online', props: { prependIcon: 'mdi-web', color: 'primary' } })
+    if (!search.value && places.length) { 
+      return places 
+    }
+    const matches = places.find(p => search.value === p.name?.toLocaleLowerCase())
+    if (!matches && search.value) {
+      places.unshift({ create: true, name: search.value.trim(), props: { prependIcon: 'mdi-plus', color: 'primary' } })
+    }
+    return places
+  }})
+
+function selectPlace (place) {
+  console.error('dentro select place')
+  console.error(place)
+  event.value.place = place ?? {}
+}
 
 </script>
 <template>
 <v-row class="mb-4">
   <v-col cols="12" md="4">
       <!-- v-model:search.trim.toLowerCase="search" -->
+       <span>{{ typeof event?.place }} - {{ typeof search }} - {{  event.place }}</span>
     <v-combobox
       ref="place"
       :rules="[$valid.required('common.where')]"
       :label="$t('common.where')"
-      v-model='event.place'
+      @update:modelValue="selectPlace"
       no-filter
       prepend-icon="mdi-map-marker"
       hide-no-data
-      v-model:search='search'
+      v-model:search.trim.toLowerCase='search'
       density='default'
       :hint="$t('event.where_description')"
       persistent-hint
-      :items="places ?? []"
+      :items="places"
       item-title='name'
-      item-value="id">
+    >
         
       <template #item="{ item, props }">
         <v-list-item v-bind='props'>
-          <template #title v-if='item.raw.create'><v-list-item-title icon='mdi-plus'>{{ $t('common.add')}} {{ item.raw.name }}</v-list-item-title></template>
-          <template #title v-else-if='item.raw.online'>online</template>
+          <template #title v-if='item.raw.create'>{{ $t('common.add')}} {{ item.raw.name }}</template>
           <template #title v-else>{{ item.raw.name }}</template>
           <template #subtitle v-if='item.raw.address'>{{ item.raw.address }}</template>
           <!-- <v-list-item-title v-if="item?.create" prepend-icon='mdi-plus' color='primary':aria-label='$t("common.add")'> {{$t('common.add')}} <strong>{{item?.name}}</strong></v-list-item-title>
@@ -99,9 +119,13 @@ const { data: places } = await useFetch<Place[]>('/api/places', { params: { quer
       </template> -->
     <!-- </v-combobox> -->
   </v-col>
-  <!-- <v-dialog v-model="whereInputAdvancedDialog" destroy-on-close="destroy-on-close" max-width="700px" :fullscreen="$vuetify.display.mobile" dense="dense">
-    <WhereInputAdvanced ref="whereAdvanced" :place.sync="value" :event="event" @close="whereInputAdvancedDialog = false && this.$refs.address.blur()" :onlineLocations.sync="onlineLocations" @update:onlineLocations="selectLocations"></WhereInputAdvanced>
-  </v-dialog> -->
+  <v-dialog
+    v-model="whereInputAdvancedDialog"
+    destroy-on-close="destroy-on-close"
+    max-width="700px" :fullscreen="$vuetify.display.mobile" density="dense">
+    <WhereInputAdvanced ref="whereAdvanced" 
+      v-model:event="event" @close="whereInputAdvancedDialog = false" />
+  </v-dialog>
   
 </v-row>
     

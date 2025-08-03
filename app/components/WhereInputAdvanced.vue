@@ -1,58 +1,12 @@
-<template lang="pug">
-v-card
-  v-card-title {{ $t('event.where_advanced_options') }}
-  v-card-subtitle {{ $t('event.where_advanced_options_description') }}
-
-  v-card-text(v-if='showGeocoded')
-    v-combobox(ref='geocodedAddress'
-      :prepend-icon='mdiMapSearch'
-      @input.native='searchAddress'
-      :label="$t('common.search_coordinates')"
-      :value='place.geocodedAddress'
-      item-text='address'
-      persistent-hint hide-no-data clearable no-filter
-      :loading='loading'
-      @change='selectAddress'
-      @focus='searchAddress'
-      :items="addressList"
-      :hint="$t('event.address_description_osm')")
-      template(v-slot:message="{message, key}")
-        span(v-html='message' :key="key")
-      template(v-slot:item="{ item, attrs, on  }")
-        v-list-item(v-bind='attrs' v-on='on')
-          v-icon.pr-4(v-text='loadCoordinatesResultIcon(item)')
-          v-list-item-content(two-line v-if='item')
-            v-list-item-title(v-text='item.name')
-            v-list-item-subtitle(v-text='`${item.address}`')
-
-    v-row.mt-4
-      v-col.py-0(cols=12 sm=6)
-        v-text-field(v-model="place.latitude"
-          :prepend-icon='mdiLatitude'
-          :label="$t('common.latitude')"
-          :rules="$valid.latitude")
-      v-col.py-0(cols=12 sm=6)
-        v-text-field(v-model="place.longitude"
-          :prepend-icon='mdiLongitude'
-          :label="$t('common.longitude')"
-          :rules="$valid.longitude")
-    p.mt-4(v-if='place.isNew' v-html="$t('event.address_geocoded_disclaimer')")
-
-    Map.mt-4(:place='place' draggable=true
-      v-if="(settings.allow_geolocation && place.latitude && place.longitude)"  )
-
-  v-card-actions
-    v-spacer
-    v-btn(@click='close' outlined) Close
-
-</template>
-<script>
-// import { mdiMap, mdiLatitude, mdiLongitude, mdiCog, mdiLink, mdiCloseCircle, mdiMapMarker, 
-//   mdiMapSearch, mdiRoadVariant, mdiHome, mdiCityVariant } from '@mdi/js'
-// import { mapState } from 'vuex'
+<script setup lang="ts">
 // import debounce from 'lodash/debounce'
 // import geolocation from '../server/helpers/geolocation/index'
 
+const event = defineModel<Event>('event', { type: Object, required: true } )
+const settings = ref({allow_geolocation: true }) // useState<Settings>('settings')
+const showGeocoded = computed(() => settings.value.allow_geolocation && event.value?.place.name !== 'online' && event.value?.place.isNew)
+const emit = defineEmits(['close', 'update:event'])
+//     },
 // export default {
 //   name: 'WhereInputAdvanced',
 //   props: {
@@ -78,16 +32,8 @@ v-card
 //       prevAddress: ''
 //     }
 //   },
-//   computed: {
-//     ...mapState(['settings']),
-//     showGeocoded () {
-//       return this.settings.allow_geolocation && this.place.name !== 'online' && this.place.isNew
-//     },
 //   },
 //   methods: {
-//     close() {
-//       this.$emit('close')
-//     },
 //     loadCoordinatesResultIcon(item) {
 //       let icon = this.currentGeocodingProvider.loadResultIcon(item)
 //       return this.iconsMapper[icon]
@@ -122,3 +68,57 @@ v-card
 //   }
 // }
 </script>
+<template>
+<v-card>
+  <v-card-title> {{ $t('event.where_advanced_options') }}</v-card-title>
+  <v-card-subtitle>{{ $t('event.where_advanced_options_description') }}</v-card-subtitle>
+
+  <v-card-text v-if='showGeocoded'>
+    <v-combobox ref='geocodedAddress'
+      :prepend-icon='mdiMapSearch'
+      @update:search='searchAddress'
+      :label="$t('common.search_coordinates')"
+      :value='place.geocodedAddress'
+      item-text='address'
+      persistent-hint hide-no-data clearable no-filter
+      :loading='loading'
+      @change='selectAddress'
+      @focus='searchAddress'
+      :items="addressList"
+      :hint="$t('event.address_description_osm')" />
+      //template(v-slot:message="{message, key}")
+      //  span(v-html='message' :key="key")
+      //template(v-slot:item="{ item, attrs, on  }")
+      //  v-list-item(v-bind='attrs' v-on='on')
+      //    v-icon.pr-4(v-text='loadCoordinatesResultIcon(item)')
+      //    v-list-item-content(two-line v-if='item')
+      //      v-list-item-title(v-text='item.name')
+      //      v-list-item-subtitle(v-text='`${item.address}`')
+    </v-card-text>
+
+    <v-row class='mt-4'>
+      <v-col class='py-0' cols=12 sm=6>
+        <v-text-field v-model="event.place.latitude"
+          prepend-icon='mdi-latitude'
+          :label="$t('common.latitude')"
+          :rules="$valid.latitude" />
+      </v-col>
+      
+      <v-col class='py-0' cols=12 sm=6>
+        <v-text-field v-model="event.place.longitude"
+          prepend-icon='mdi-longitude'
+          :label="$t('common.longitude')"
+          :rules="$valid.longitude" />
+      </v-col>
+    </v-row>
+    <p class='mt-4' v-if='event?.place?.isNew' v-html="$t('event.address_geocoded_disclaimer')" />
+
+    <!-- //:LMapStyles="{height: mapHeight}" /> -->
+    <Map class='mt-4' :place="event.place" draggable=true v-if="(settings.allow_geolocation && event.place.latitude && event.place.longitude)"  />
+
+  <v-card-actions>
+    <v-spacer />
+    <v-btn @click='emit("close")' variant='outlined' :text="$t('common.close')" />
+  </v-card-actions>
+</v-card>
+</template>
