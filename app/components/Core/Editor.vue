@@ -1,66 +1,77 @@
 <template>
-<div class='v-editor' :class='focused'>
+<div class='v-editor' :class='{focused}'>
   <label :class="{ float: isLabelFloating }">{{ label }}</label>
-  <div class='editor-menu-bar menubar' :class="{ isVisible: false }" >
+  <div class='editor-menu-bar menubar'>
     <v-btn-toggle density='compact'>
       
       <v-btn
+        tabindex='-1'
         icon='mdi-format-bold' variant='text'
         :active="editor?.isActive('bold')"
         @click="editor.chain().focus().toggleBold().run()" />
 
       <v-btn
+        tabindex='-1'
         icon='mdi-format-underline' variant='text'
         :active="editor?.isActive('underline')"
         @click="editor.chain().focus().toggleUnderline().run()" />
   
       <v-btn
+        tabindex='-1'
         icon='mdi-format-strikethrough' variant='text'
         :active="editor?.isActive('strike')"
         @click="editor.chain().focus().toggleStrike().run()" />
       
       <v-btn
+        tabindex='-1'
         icon='mdi-format-italic' variant='text'
         :active="editor?.isActive('italic')"
         @click="editor.chain().focus().toggleItalic().run()" />
       
       <v-btn
+        tabindex='-1'
         icon='mdi-format-header-1'
         :active="editor?.isActive('heading', { level: 1 })"
         @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
       />
 
       <v-btn
+        tabindex='-1'
         icon='mdi-format-header-2'
         :active="editor?.isActive('heading', { level: 2 })"
         @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
       />
 
       <v-btn
+        tabindex='-1'
         icon='mdi-format-header-3'
         :active="editor?.isActive('heading', { level: 3 })"
         @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
       />
       
       <v-btn
+        tabindex='-1'
         icon='mdi-code-tags'
         :active="editor?.isActive('code')"
         @click="editor.chain().focus().toggleCode().run()"
       />
 
       <v-btn
+        tabindex='-1'
         icon='mdi-format-quote-open'
         :active="editor?.isActive('blockquote')"
         @click="editor.chain().focus().toggleBlockquote().run()"
       />
 
       <v-btn
+        tabindex='-1'
         icon='mdi-format-list-bulleted'
         :active="editor?.isActive('bullet_list')"
         @click="editor.chain().focus().toggleBulletList().run()"
       />
       
       <v-btn
+        tabindex='-1'
         icon="mdi-link"
         :active="editor?.isActive('link')"
       />
@@ -82,7 +93,7 @@
           @keypress.enter='commands.link({ href: $event.target.value}); editor.focus()') -->
   </div>
   
-  <EditorContent :editor="editor" class="v-editor__content" :label='label' :aria-label='label'  />
+  <EditorContent :editor="editor" class="v-editor__content" :style="{ height }" :label='label' :aria-label='label'  />
   
 </div>
 </template>
@@ -95,8 +106,7 @@ const props = defineProps({
   modelValue: { type: String, default: '' },
   label: { type: String, default: '' },
   hint: { type: String, default: '' },
-  placeholder: { type: String, default: '' }
-  // height: String,
+  placeholder: { type: String, default: '' },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -128,11 +138,6 @@ const isLabelFloating = computed(() => {
 })
 
 
-function focusEditor() {
-  editor.value?.chain().focus().run()
-}
-
-
 onMounted(() => {
   editor.value?.on('focus', () => (focused.value = true))
   editor.value?.on('blur', () => (focused.value = false))
@@ -147,19 +152,18 @@ onBeforeUnmount(() => {
 <style lang='css'>
 .v-editor {
   position: relative;
-  border: 1px solid #ccc;
-  border-radius: 4px;
   padding: 20px 12px 8px;
   transition: border-color 0.2s;
   min-height: 100px;
 }
 
-.v-editor.focused {
-  border-color: #1976d2;
+
+.v-editor .tiptap {
+  background-color: #eee;
 }
 
-.v-editor.invalid {
-  border-color: red;
+.v-theme--dark .v-editor .tiptap {
+  background-color: #292929;
 }
 
 .v-editor label {
@@ -178,12 +182,35 @@ onBeforeUnmount(() => {
   color: #1976d2;
 }
 
-.v-editor__content {
+/* .v-editor__content {
   outline: none;
   min-height: 60px;
   font-size: 16px;
   line-height: 1.5;
+} */
+
+.focused .menubar {
+  visibility: visible !important;
+  opacity: 1 !important;
 }
+
+.menubar {
+  transition: opacity .5s;
+  opacity: 0;
+  visibility: hidden;
+  overflow: auto;
+}
+
+.tiptap {
+    padding: 5px 15px 0px 15px;
+    outline: 0;
+    min-height: 150px;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #FF4500 transparent;
+    overflow-y: auto;
+  }
 
 </style>
 
