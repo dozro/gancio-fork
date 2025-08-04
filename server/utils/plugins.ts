@@ -3,6 +3,7 @@ import fs from 'fs/promises'
 import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
 import config from '../config'
+import { sequelize } from './sequelize'
 
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
@@ -105,7 +106,7 @@ const pluginController = {
   async loadPlugin(name: string) {
     const plugin = pluginController.plugins.find(p => p.configuration.name === name)
     const settings = publicSettings[`plugin_${name}`]
-    if (!plugin) return
+    if (!plugin || !plugin.load) return
 
     log.info(`Loading plugin ${name}`)
 
@@ -113,11 +114,11 @@ const pluginController = {
     // notifier.emitter.on('Delete', plugin.onEventDelete)
     // notifier.emitter.on('Update', plugin.onEventUpdate)
 
-    plugin.load?.({
+    plugin.load({
       // helpers: await import('../helpers'),
-      logger: log,
+      log,
       settings: publicSettings,
-      // db: db.sequelize
+      db: sequelize
     }, settings)
   },
 
@@ -154,13 +155,14 @@ const pluginController = {
   },
 
   async _load() {
-    const defaultPath = path.resolve(__dirname, '../../../gancio_plugins')
+    const defaultPath = path.resolve(__dirname, '../../gancio_plugins')
     const customPath = path.resolve(config.plugins_path) || path.resolve(process.cwd(), 'plugins')
     const paths = customPath === defaultPath ? [customPath] : [customPath, defaultPath]
 
     log.info(`Loading plugins from: ${paths.join(', ')}`)
 
     for (const dir of paths) {
+      log.debug(dir)
       if (!existsSync(dir)) continue
       const dirs = await fs.readdir(dir)
 
