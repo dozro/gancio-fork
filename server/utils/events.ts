@@ -4,17 +4,23 @@ import { Op, literal, col, where, fn, Filterable, InferAttributes, WhereOptions 
 
 import { z } from 'zod'
 export const eventQuerySchema = z.object({
-  start: z.coerce.number().optional().default(DateTime.local().toUnixInteger()),
+  start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
   end: z.coerce.number().optional(),
   query: z.string().optional(),
   tags: z.preprocess((val) => {
-    if (Array.isArray(val)) return val;
-    if (typeof val === 'string') return val.split(',');
+    if (Array.isArray(val)) return val
+    if (typeof val === 'string') return val.split(',')
     return [];
-  }, z.array(z.string())),
-  places: z.string().optional(),
+  }, z.array(z.string())).optional(),
+  places: z.preprocess((val) => {
+    if (Array.isArray(val)) return val
+    if (typeof val === 'string') return val.split(',')
+    if (typeof val === 'number') return [val]
+    return []
+  }, z.array(z.number())).optional(),
   show_recurrent: z.coerce.boolean().default(publicSettings.recurrent_event_visible).optional(),
   show_multidate: z.coerce.boolean().default(true).optional(),
+  show_federated: z.coerce.boolean().default(false).optional(),
   limit: z.number().optional(),
   page: z.number().optional(),
   older: z.coerce.boolean().optional(),
@@ -28,7 +34,7 @@ export const eventQuerySchema = z.object({
 })
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-export async function getEvents(opts: EventQueryType) {
+export async function getEvents(opts?: EventQueryType | undefined) {
 
   const args  = eventQuerySchema.parse(opts)
   const condition = {//} // : WhereOptions<InferAttributes<Event, { omit: never; }>> = {
