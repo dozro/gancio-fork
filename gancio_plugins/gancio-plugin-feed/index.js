@@ -2,8 +2,8 @@
  * This is a beta ics feed importer
  */
 
-const get = require('lodash/get')
-const axios = require('axios')
+// const get = require('lodash/get')
+// const axios = require('axios')
 
 const plugin = {
   configuration: {
@@ -83,8 +83,9 @@ const plugin = {
       try {
         plugin.log.debug(`[FEED Plugin] Fetching ${plugin.settings?.feed_URL}`)
 
-        const response = await axios.post(`${plugin.apiBaseUrl}/ics-import/url`, {
-          url: plugin.settings.feed_URL
+        const response = await $fetch(`${plugin.apiBaseUrl}/ics-import/url`, {
+          method: 'POST',
+          body: { url: plugin.settings.feed_URL }
         })
 
         const events = response.data.events || []
