@@ -13,17 +13,20 @@ const msg = ref('')
 const visible = ref(false)
 const userInput = ref('')
 const name = ref('')
+const title = ref('')
 
 function confirmDialog (ev) {
   type.value = 'confirmDialog'
   msg.value = t(ev.msg, ev.args)
+  title.value = ''
   visible.value = true
 }
 
 function promptDialog (ev) {
   type.value = 'promptDialog'
   msg.value = t(ev.msg, ev.args)
-  name.value = ev.name
+  title.value = t(ev.title)
+  name.value = t(ev.label)
   visible.value = true
 }
 
@@ -40,10 +43,11 @@ function result (value) {
 </script>
 <template>
   <v-dialog v-model='visible'  width='400'>
-    <v-card :title="$t('common.confirm')">
+    <v-card>
+      <v-toolbar :title="title || $t('common.confirm')" />
       <v-card-text>
         <div v-html='msg' />
-        <v-text-field v-if='type === "promptDialog"' variant='outlined' :label='name' v-model='userInput' />
+        <v-textarea v-if='type === "promptDialog"' variant='underlined' :label='name' v-model='userInput' />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
