@@ -1,4 +1,4 @@
-<svelte:options tag="gancio-event" />
+<svelte:options customElement="gancio-event"/>
 
 <script>
   import { onMount } from 'svelte'
@@ -42,7 +42,7 @@
     class="card"
     target="_blank"
   >
-    {#if event.media.length}
+    {#if event.media?.length}
       <img
         src={thumbnail(event)}
         alt={event.media[0].name}
