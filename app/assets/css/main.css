@@ -1,6 +1,27 @@
 
+/* fix: reduce the space between icon and text and lower icon opacity, #360 */
+.v-application--is-ltr .v-list-item__action:first-child,
+.v-application--is-ltr .v-list-item__icon:first-child {
+  margin-right: 20px !important;
+}
+
+.v-card .v-icon {
+  opacity: 0.6 !important;
+}
 
 .v-card-subtitle {
   /* $card-subtitle-white-space */
   white-space: normal !important;
+}
+
+.v-theme--light .v-card,
+.v-theme--light .event-card {
+  background-color: #f8f8f8 !important;
+  border: thin solid rgba(0, 0, 0, 0.12);
+}
+
+
+pre {
+  white-space: break-spaces;
+  font-size: 13px;
 }
