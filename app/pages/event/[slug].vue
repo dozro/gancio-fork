@@ -41,7 +41,7 @@ const { t } = useI18n()
 const { user } = useUserSession()
 const route = useRoute()
 const { isAdmin } = useAuth()
-const { data: event, refresh } = await useFetch<Event>(`/api/events/${route.params.slug}`)
+const { data: event, refresh } = await useFetch<Event>(`/api/event/detail/${route.params.slug}`)
 if (!event.value) {
     throw createError({ status: 404, statusMessage: 'Event not found'})
 }
@@ -55,7 +55,7 @@ const showEmbed = ref(false)
 const mapModal = ref(false)
 const openModeration = ref(route.query?.moderation ? true : false)
 const openAssignAuthor = ref(false)
-const showModeration = computed(() => settings.value.enable_moderation && event?.isMine || user?.value?.role === 'admin' || user?.value?.role === 'editor')
+const showModeration = computed(() => settings.value.enable_moderation && (event?.isMine || user?.value?.role === 'admin' || user?.value?.role === 'editor'))
 
 const canEdit = computed(() => event?.value?.isMine || user?.value?.role === 'admin' || user?.value?.role === 'editor')
 const hasOnlineLocations = computed(() => event.value.online_locations?.length )
@@ -182,7 +182,7 @@ const hasOnlineLocations = computed(() => event.value.online_locations?.length )
   // 
 async function report () {
   // this.reporting = true
-  const message = await $prompt(t('event.report_message_confirmation'), { title: t('common.report') })
+  const message = await $prompt('event.report_message_confirmation', 'common.report')
   if (!message) {
     return
   }
@@ -207,9 +207,9 @@ async function report () {
   <!-- EVENT PAGE -->
   <!-- gancio supports microformats (http://microformats.org/wiki/h-event) -->
   <!-- and microdata https://schema.org/Event -->
-  <div class="text-center text-md-h4 text-h5 pa-6">
+  <h1 class="text-center text-md-h4 text-h5 pa-6">
     <strong class="p-name text--primary" itemprop="name">{{event?.title}}</strong>
-  </div>
+  </h1>
   
   <v-row>
     <v-col cols='12' md='8' class="pr-sm-2 pr-md-0">
@@ -262,7 +262,7 @@ async function report () {
             <v-icon icon="mdi-map-marker" small />
             <nuxt-link
               class="vcard ml-2 p-name text-decoration-none text-uppercase"
-              :to="`/place/${encodeURIComponent(event?.place?.name)}`"
+              :to="`/place/${event?.place?.id}/${encodeURIComponent(event?.place?.name)}`"
             >
               <span itemprop="name">{{event?.place?.name}}</span>
             </nuxt-link>
@@ -307,7 +307,7 @@ async function report () {
         
         <v-divider />
         <!-- info & actions -->
-        <v-list base-color='primary'>
+        <v-list>
           
           <!-- copy link -->
           <v-list-item

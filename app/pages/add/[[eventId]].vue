@@ -1,12 +1,21 @@
 <!-- Add / Edit event
 
  -->
-<script setup>import { DateTime } from 'luxon'
+<script setup>
+import { DateTime } from 'luxon'
 
 const { loggedIn } = useUserSession()
 const { $notify } = useNuxtApp()
 
-const event = ref({ title: '', tags: [], place: {}, recurrent: null, media: [] })
+const route = useRoute()
+
+const eventId = route.params.eventId
+let event
+if (route.params.eventId) {
+  ({ data: event } = await useFetch(() => `/api/event/detail/${route.params.eventId}`))
+} else {
+  event = ref({ title: '', tags: [], place: {}, recurrent: null, media: [] })
+}
 const date = ref()
 const valid = ref(false)
 const edit = ref(false)
