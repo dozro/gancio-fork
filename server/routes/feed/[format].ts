@@ -1,26 +1,33 @@
-// /** Export a feed
-// * @param format
-// */
-// export default defineEventHandler(async event => {
-//   // get format param
-//   // 
-// })
+import { DateTime } from "luxon"
+import { exportICS } from "~~/server/utils/ics"
+import { exportFeed } from "~~/server/utils/rss"
 
-// async export (req, res) {
-//     const settings = res.locals.settings
-//     const format = req.params.format || 'json'
-//     const tags = req.query.tags
-//     const places = req.query.places
-//     const collection = req.query?.collection ?? settings.collection_in_home
-//     const show_recurrent = settings.allow_recurrent_event && queryParamToBool(req.query?.show_recurrent, settings.recurrent_event_visible)
+export default defineCachedEventHandler(async evt => {
+  const format = getRouterParam(evt, 'format')
+  const {tags, places, collection, show_recurrent }= getQuery(evt)
+  const opt = {
+    zone: publicSettings.instance_timezone,
+    locale: publicSettings.instance_locale
+  }
+  
+  const where = {}
+  const yesterday = DateTime.local(opt).minus({day: 1}).toUnixInteger()
 
-//     const opt = {
-//       zone: settings.instance_timezone,
-//       locale: settings.instance_locale
-//     }
+  const events = await getEvents({})
 
-//     const where = {}
-//     const yesterday = DateTime.local(opt).minus({day: 1}).toUnixInteger()
+  switch (format) {
+    case 'rss':
+    case 'feed':
+      return exportFeed(evt, events.slice(0, 20))
+    case 'ics':
+      return exportICS(evt, events)
+    case 'json':
+      return events
+  }
+  throw createError({ status: 400, message: 'Please specify a valid format: rss, feed, ics or json' })
+})
+
+
 
 //     if (!collection) {
 

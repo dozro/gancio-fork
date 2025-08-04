@@ -1,5 +1,7 @@
 // import { connect } from '~/server/utils/sequelize'
 
+import pluginController from "../utils/plugins"
+
 // import pluginController from "../utils/plugins"
 
 export default defineNitroPlugin(async () => {
@@ -14,8 +16,7 @@ export default defineNitroPlugin(async () => {
     useTaskManager().start()
     
     log.info('Loading plugins')
-    // usePluginController()._load()
-    // pluginController._load()
+    pluginController._load()
     
     return true
   } catch (e) {
