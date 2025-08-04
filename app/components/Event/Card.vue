@@ -21,18 +21,18 @@ function isPast() {
 </script>
 
 <template>
-  <article class='h-event border b-1' itemscope itemtype="https://schema.org/Event">
+  <article class='h-event event-card' itemscope itemtype="https://schema.org/Event">
       <nuxt-link :to='`/event/${event.slug || event.id}`' itemprop="url">
           <!-- <nuxt-picture/> -->
           <CoreImg v-if='!hideThumbs' :event='event' thumb :lazy='lazy' />
           <v-icon class='float-right mr-1' v-if='event.parentId' color='success' icon='mdi-repeat' />
           <v-icon class='float-right mr-1' v-if='isPast()' color='warning' icon='mdi-timer-sand' />
-          <h3 class='text-primary text-h6 p-name mx-3 text-decoration-none' itemprop="name">{{ event.title }}</h3>
+          <h3 class='event-title' itemprop="name">{{ event.title }}</h3>
       </nuxt-link>
       
       <v-img v-if='event?.ap_user?.image' cover :src='event?.ap_user?.image' max-height=30  max-width=30 style="position: absolute; top: 5px; right: 5px;" />
       
-      <v-card-text class='pt-0 pb-0 m-0'>
+      <v-card-text class='pt-0 pb-0 m-0 mb-2'>
           <!-- <span>{{event.start_datetime}} - {{time.when(event)}}</span> -->
           
           <!-- <time class="dt-start text-subtitle-1" :datetime="time.time(event.start_datetime)" itemprop="startDate" :content="time.timeToISO(event.start_datetime)">{{time.time(event.start_datetime)}}</time> -->
@@ -43,9 +43,9 @@ function isPast() {
               :content="time.unixFormat(event.end_datetime,'yyyy-MM-dd\'T\'HH:mm')"> {{ time.unixFormat(event.end_datetime)}}</time>
       
           <nuxt-link
-            class='place d-block p-location pl-0' text
+            class='place d-block p-location pl-0' variant='text'
             :to='`/place/${encodeURIComponent(event.place.name)}`'
-            itemprop="location" itemscope itemtype="https://schema.org/Place">
+            itemprop="location" itemscope itemtype="https://schema.org/Place" icon='mdi-close'>
               <v-icon icon="mdi-map-marker"/>
               <span itemprop='name'>{{ event.place.name }}</span>
           </nuxt-link>
@@ -63,11 +63,39 @@ function isPast() {
 </template>
 
 <style scoped>
-.h-event a {
+.event-card {
+  border: 1px solid #e9e9e9;
+
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  /* width: 330px; */
+  /* max-width: 500px !important; */
+  flex-grow: 1;
+  /* margin-top: 16px;
+  margin-right: 16px; */
+  transition: all .5s;
+  min-height: 288px;
+  overflow: hidden;
+}
+
+.event-card a {
   text-decoration: none;
 }
 
-.h-event a:hover {
+.event-card a:hover {
   text-decoration: underline;
 }
+
+.event-card .event-title {
+  overflow: hidden;
+  margin: 0.5rem 1rem 0.5rem 1rem;
+  text-overflow: ellipsis;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  font-size: 1.1em !important;
+  line-height: 1.2em !important;
+}
+
 </style>
