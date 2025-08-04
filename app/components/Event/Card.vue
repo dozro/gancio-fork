@@ -44,7 +44,7 @@ function isPast() {
       
           <nuxt-link
             class='place d-block p-location pl-0' variant='text'
-            :to='`/place/${encodeURIComponent(event.place.name)}`'
+            :to='`/place/${event?.place?.id}/${encodeURIComponent(event.place.name)}`'
             itemprop="location" itemscope itemtype="https://schema.org/Place" icon='mdi-close'>
               <v-icon icon="mdi-map-marker"/>
               <span itemprop='name'>{{ event.place.name }}</span>

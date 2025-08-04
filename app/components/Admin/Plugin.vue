@@ -8,10 +8,10 @@ const { data: plugins } = await useFetch('/api/plugins')
 
 async function saveSettings (close=true) {
   loading.value = true
-  await setSetting({
+  await $fetch('/api/settings', { method: 'PUT', body: {
     key: 'plugin_' + selectedPlugin.value.name,
     value: selectedPlugin.value.settingsValue
-  })
+  } })
   loading.value = false
   if (close) {
     dialog.value = false
