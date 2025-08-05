@@ -19,11 +19,15 @@ export async function findOrCreateTags (tags) {
     existingTags.map(tag => [tag.tag.toLowerCase(), tag])
   )
 
-  const newTagsData = uniqBy(
-    trimmedTags.filter(t => !existingTagMap.has(t.toLowerCase())),
-    t => t.toLowerCase()
-  ).map(tag => ({ tag }))
-
+  const seen = new Set()
+  const newTagsData = trimmedTags.reduce((acc, t) => {
+    const lower = t.toLowerCase()
+    if (!existingTagMap.has(lower) && !seen.has(lower)) {
+      seen.add(lower)
+      acc.push({ tag: t })
+    }
+    return acc
+  }, [])
   const createdTags = await Tag.bulkCreate(newTagsData, { returning: true })
 
   return [

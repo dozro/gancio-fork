@@ -3,7 +3,7 @@ import { parseIcsData } from "./icsparser"
 import ics from 'ics'
 import { H3Event } from "h3"
 import { Event } from "./sequelize"
-
+import { htmlToText } from 'html-to-text'
 // const htmlToText = require('html-to-text')
 
 const log = useLogger('ics')
@@ -26,7 +26,7 @@ export function exportICS (evt: H3Event, events: Event[], alarms: any = []) {
       startInputType: 'utc',
       endInputType: 'utc',
       title: e.title,
-      description: e.description, //htmlToText(e.description),
+      description: htmlToText(e.description),
       htmlContent: e.description && e.description.replace(/\n/g,"<br>"),
       location,
       url: `${publicSettings.baseurl}/event/${e.slug || e.id}`,
