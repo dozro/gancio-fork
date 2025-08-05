@@ -1,7 +1,5 @@
 import { version } from './package.json'
-// import config from './server/config.js'
 // import locales from './i18n/locales/index'
-// import vuetify from 'vite-plugin-vuetify'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -19,7 +17,10 @@ export default defineNuxtConfig({
     },
   },
   
-  css: ['~/assets/css/main.css'],
+  css: [
+    '~/assets/css/main.css',
+    // '@mdi/font/css/materialdesignicons.css',
+  ],
   modules: [
     '@nuxt/eslint',
     "vuetify-nuxt-module",
@@ -32,39 +33,39 @@ export default defineNuxtConfig({
   i18n: {
     defaultLocale: 'en',
     locales: [
-          { code: 'en', name: 'English', file: 'en.json' },
+          { code: 'en', name: 'English', file: 'en.js' },
           { code: 'it', name: 'Italian', file: 'it.json' }
     ],
-
-    // lazy: true,            // enable lazy loading
-    // langDir: 'locales/',   // must be set, but won’t be used for actual loading
-    // types: 'composition',
+    lazy: true,            // enable lazy loading
+    langDir: 'locales/',   // must be set, but won’t be used for actual loading
+    types: 'composition',
     // pages: undefined,
     // locales: Object.keys(locales).map(key => ({
     //   code: key,
     //   name: locales[key],
     //   language: locales[key]
     // })),
-    // skipSettingLocaleOnNavigate: true,// 
-    // bundle: {
-    //   optimizeTranslationDirective: false
-    // },
+    skipSettingLocaleOnNavigate: true,// 
+    // dynamicRouteParams: false,
     compilation: {
       strictMessage: false
     },
     strategy: 'no_prefix',
-    // vueI18n: 'i18n.config.js'
+    vueI18n: 'i18n.config.js'
   },
   vue: {
     compilerOptions: {
-      isCustomElement: tag => ['gancio-events', 'gancio-event'].includes(tag)
+      isCustomElement: (tag: string) => ['gancio-events', 'gancio-event'].includes(tag)
     }
   },
+  features: {
+    inlineStyles: false
+  },
+  session: {
+    password: process.env?.NUXT_SESSION_PASSWORD ?? '',
+    maxAge: 60 * 60 * 24 * 365 // 1 year
+  },
   runtimeConfig: {
-    session: {
-      password: process.env?.NUXT_SESSION_PASSWORD ?? '',
-      maxAge: 60 * 60 * 24 * 365 // 1 week
-    },
     public: {
       version
     }
@@ -81,14 +82,9 @@ export default defineNuxtConfig({
   nitro: {
     // preset: 'node-listener',
     // externals: {
-      // inline: ['jose']
+    //   inline: ['jose', 'yargs'],
+    //   external: ['yargs', 'dotenv']
     // },
-    storage: {
-      uploads: {
-        driver: "fs",
-        base: "./uploads",
-      },
-    },
     esbuild: {
       options: {
         target: 'esnext',

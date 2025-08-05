@@ -55,11 +55,10 @@ return {
       VFileInput: {
         prependIcon: '',
         prependInnerIcon: 'mdi-attachment',
-        density: 'compact',
         variant: 'underlined'
       },
       VSelect: {
-        density: 'compact'
+        variant: 'underlined',
       },
       VBtn: {
         elevation: 0,
@@ -78,7 +77,6 @@ return {
       VCombobox: {
         variant: 'underlined',
         autocomplete: 'off',
-        density: 'compact',
         clearable: true
       },
       VAutocomplete :{
@@ -87,7 +85,6 @@ return {
           closeIcon: "mdi-close-circle",
         },
         autocomplete: 'off',
-        density: 'compact',
         clearable: true,
         variant: 'underlined'
       },
