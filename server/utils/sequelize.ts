@@ -63,7 +63,7 @@ export async function connect() {
       storage: config?.db.storage ?? './gancio.sqlite'
   })
   await sequelize.authenticate()
-  // await runMigrations(sequelize).catch(e => { console.error(e)})
+  await runMigrations(sequelize).catch(e => { console.error(e)})
   sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message])
 
   User.addScope('defaultScope', { attributes: { exclude: ['password', 'recover_code'] } })
@@ -141,6 +141,15 @@ export class Message extends Model<
     declare event: NonAttribute<Event>
 }
 
+export interface Media {
+  name: string, 
+  url: string,
+  height: number,
+  width: number,
+  size: number,
+  focalpoint: number[]
+}
+
 
 @Table({
     tableName: 'events'
@@ -176,10 +185,10 @@ InferCreationAttributes<Event>
     
     @Attribute(DataTypes.INTEGER.UNSIGNED)
     @Index
-    declare end_datetime: number
+    declare end_datetime?: number
     
     @Attribute(DataTypes.JSON)
-    declare media: string
+    declare media?: Media[]
     
     @Attribute(DataTypes.TEXT)
     declare description: string
@@ -244,14 +253,17 @@ InferCreationAttributes<Event>
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
     })
-    declare apUserApId: string;
+    declare apUserApId?: string
 
     @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
     declare apUser?: NonAttribute<APUser>
     
     @HasMany(() => Message, { foreignKey: 'eventId', sourceKey: 'id' })
     declare messages?: NonAttribute<Message[]>
-        
+
+    @HasMany(() => Resource, { foreignKey: 'eventId', sourceKey: 'id' })
+    declare resources?: NonAttribute<Resource[]>
+    
     @BeforeCreate
     static async generateSlug(event: Event) {
       if (event.title && !event.slug) {
@@ -712,16 +724,27 @@ InferCreationAttributes<Resource>
     @Attribute(DataTypes.JSON)
     declare data: any // @todo
     
-    @Attribute({
-        type: DataTypes.STRING,
-        references: { table: "ap_users", key: "ap_id" },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-    })
-    declare apUserApId: string
+    // @Attribute({
+    //     type: DataTypes.STRING,
+    //     references: { table: "ap_users", key: "ap_id" },
+    //     onUpdate: "CASCADE",
+    //     onDelete: "CASCADE",
+    // })
+    // declare apUserApId: string
 
-    @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
-    declare apUser?: NonAttribute<APUser>
+    // @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
+    // declare apUser?: NonAttribute<APUser>
+
+    @Attribute({
+      type: DataTypes.STRING,
+      references: { table: "events", key: "id" },
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
+    })
+    declare eventId: string
+
+    @BelongsTo(() => Event, { foreignKey: 'eventId', targetKey: 'id' })
+    declare event?: NonAttribute<Event>
 }
 
 @Table({

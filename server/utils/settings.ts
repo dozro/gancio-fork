@@ -129,7 +129,8 @@ export function setSetting<K extends keyof Settings>(
   if (is_secret) {
     secretSettings[key] = value
   } else {
-    if (key === 'description') {
+    // when changing this we have to update the actor
+    if (['description','logo'].includes(key)) {
       updateActor()
     }
     publicSettings[key] = value

@@ -162,7 +162,6 @@ const pluginController = {
     log.info(`Loading plugins from: ${paths.join(', ')}`)
 
     for (const dir of paths) {
-      log.debug(dir)
       if (!existsSync(dir)) continue
       const dirs = await fs.readdir(dir)
 
