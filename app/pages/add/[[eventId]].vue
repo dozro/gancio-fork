@@ -1,21 +1,30 @@
 <!-- Add / Edit event
 
  -->
-<script setup>
+<script setup lang="ts">
+import type { Event } from '#build/types/nitro-imports'
 import { DateTime } from 'luxon'
 
 const { loggedIn } = useUserSession()
 const { $notify } = useNuxtApp()
+const settings = useState<Settings>('settings')
+
+useHead({ title: `${settings.value.title} - Add Event`})
 
 const route = useRoute()
 
 const eventId = route.params.eventId
 let event
 if (route.params.eventId) {
-  ({ data: event } = await useFetch(() => `/api/event/detail/${route.params.eventId}`))
+  ({ data: event } = await useFetch<Event>(() => `/api/event/detail/${route.params.eventId}`))
 } else {
   event = ref({ title: '', tags: [], place: {}, recurrent: null, media: [] })
 }
+
+if (!event?.value) {
+  throw createError({ status: 404, message: 'Event not found' })
+}
+
 const date = ref()
 const valid = ref(false)
 const edit = ref(false)
@@ -41,7 +50,7 @@ async function done() {
   loading.value = true
 
   const formData = new FormData()
-  formData.append('recurrent', JSON.stringify(evt.date.recurrent))
+  // formData.append('recurrent', JSON.stringify(evt.date.recurrent))
 
   if (evt.media.length) {
     formData.append('image', evt.media[0].image)
@@ -56,8 +65,8 @@ async function done() {
   if (evt.place.id) {
     formData.append('place_id', evt.place.id)
   }
-  formData.append('place_name', this.event.place.name.trim())
-  formData.append('place_address', this.event.place.address || null)
+  formData.append('place_name', evt.place.name.trim())
+  formData.append('place_address', evt.place.address || null)
 
   if (settings.value.allow_geolocation) {
     formData.append('place_latitude', evt.place.latitude || '')
@@ -65,7 +74,7 @@ async function done() {
   }
 
   if (evt.online_locations?.length) {
-    evt.online_locations.forEach(l => formData.append('online_locations[]', l))
+    evt.online_locations.forEach((l: string) => formData.append('online_locations[]', l))
   }
 
   formData.append('description', evt.description)
@@ -119,12 +128,12 @@ async function done() {
   <v-container class="pa-0 pa-md-3">
     <v-card>
       <v-card-title>
-        <v-btn variant='outlined' class='float-right' color='primary' @click='openImportDialog = true' prepend-icon="mdi-file-import">{{$t('common.import') }}</v-btn>
+        <!-- <v-btn variant='outlined' class='float-right' color='primary' @click='openImportDialog = true' prepend-icon="mdi-file-import">{{$t('common.import') }}</v-btn> -->
         <h4>{{ edit ? $t('common.edit_event') : $t('common.add_event') }}</h4>
       </v-card-title>
-      <v-dialog v-model='openImportDialog' :fullscreen='$vuetify.display.mobile'>
+      <!-- <v-dialog v-model='openImportDialog' :fullscreen='$vuetify.display.mobile'>
         <ImportDialog @close='openImportDialog = false' />
-      </v-dialog>
+      </v-dialog> -->
       <v-card-text class='px-0 px-xs-2'>
         <v-form v-model='valid' ref='form'>
           <v-container>
