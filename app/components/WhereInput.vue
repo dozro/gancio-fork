@@ -1,5 +1,7 @@
 <!-- Choose event location -->
 <script setup lang='ts'>
+import type { Event } from '#build/types/nitro-imports'
+
 
 const settings = useState<Settings>('settings')
 
@@ -16,11 +18,10 @@ const event = defineModel<Event>('event', { type: Object, required: true } )
 const whereInputAdvancedDialog = ref(false)
 const onlineLocations = ref([])
 
-const disableAddress = computed(() => event.value?.place?.id)
+const disableAddress = computed(() => !!event.value?.place?.id)
 const isOnLine = computed(() => settings.value.allow_online_event && event?.value?.place?.name === 'online')
 
 const showAdvancedDialogButton = computed(() => {
-  return true
   if (!event?.value?.place?.name) return false
   // do not show advanced dialog button in case geolocation is not allowed
   if (!(settings.value.allow_geolocation)) {
@@ -102,7 +103,7 @@ function selectPlace (place) {
   
   <v-col cols="12" :md="isOnLine?8:3" v-if="settings.allow_online_event">
     <v-combobox
-      class="mr-4" v-model="onlineLocations"
+      class="mr-4" v-model="event.online_locations"
       prepend-icon="mdi-link" :hint="$t('event.online_locations_help')"
       :label="$t('event.online_locations')"
       :rules="isOnLine ? [$valid.required('event.online_locations')] : []"
@@ -113,7 +114,7 @@ function selectPlace (place) {
       hide-no-data
       hide-selected
       persistent-hint
-      :delimiters="[',', ';', '; ']" :items="onlineLocations" />
+      :delimiters="[',', ';', '; ']" />
       <!-- <template #chip="{ item, index, props }">
         <v-chip v-bind="props" :outlined="index !== 0" closable close-icon="mdi-close-circle" @click:close="label="label" small="small">{{ item }}</v-chip>
       </template> -->
