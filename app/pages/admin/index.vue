@@ -1,10 +1,9 @@
 <script setup lang="ts">
-definePageMeta({ middleware: ['authenticated'] })
+definePageMeta({ middleware: ['authenticated'], name: 'Admin' })
 // const { loadSettings } = useSettings()
 // loadSettings()
 const { isAdmin } = useAuth()
 const route = useRoute()
-console.error(route.params)
 const selectedTab = ref(route.params.hash) // route.params.hash !??!
 
 // const { data: users } = await useFetch('/api/users')

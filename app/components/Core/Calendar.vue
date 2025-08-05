@@ -17,13 +17,13 @@ function updatePages (pages) {
 </script>
 <template>
   <!-- :first-day-of-week='settings.calendar_first_day_of_week ?? undefined' -->
+  <!-- :columns="$vuetify.display?.smAndUp ? 2 : 1" -->
   <DatePicker
     class='mt-2'
     v-model='selectedDate'
     :locale='$i18n.locale'  
     title-position='left'
     transition='fade'
-    :columns="$vuetify.display?.smAndUp ? 2 : 1"
     :is-dark="theme.global.current.value.dark"
     aria-label='Calendar'
     expanded

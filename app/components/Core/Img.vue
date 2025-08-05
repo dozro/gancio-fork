@@ -21,7 +21,7 @@ const srcset = props.thumb ? '' : `/media/thumb/${media?.url} 500w, /media/${med
 const height = media?.height ?? 'auto'
 const width =  media?.width ?? 'auto'
 
-const src = media?.url ? '/media/thumb/' + media?.url : (props.thumb && '/noimg.svg')
+const src = media?.url ? '/media/thumb/' + media?.url : (props.thumb && '/fallbackimage.png')
 </script>
 <template>
     <div :class='{ img: true, thumb }'>

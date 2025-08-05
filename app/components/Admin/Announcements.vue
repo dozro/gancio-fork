@@ -83,11 +83,11 @@ async function save() {
     <v-card>
       <v-card-title> {{ $t('admin.new_announcement') }}</v-card-title>
       <v-card-text class='px-0'>
-        <v-form v-model='valid' ref='form' @submit.prevent='save' lazy-validation>
-          <v-text-field class='col-12' v-model='announcement.title'
+        <v-form v-model='valid' ref='form' @submit.prevent='save' validate-on="lazy">
+          <v-text-field class='v-col-12' v-model='announcement.title'
             :rules="[$valid.required('common.title')]"
             :label='$t("common.title")' />
-          <CoreEditor class='col-12' v-model='announcement.announcement'
+          <CoreEditor class='v-col-12' v-model='announcement.announcement' label="Content"
             border no-save max-height='400px' :placeholder="$t('common.description')" />
         </v-form>
       </v-card-text>
