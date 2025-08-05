@@ -1,14 +1,20 @@
 
 import fs from 'fs'
 import path from 'path'
+import config from '../config'
+import mime from 'mime-types'
+
 export default defineEventHandler(async (event) => {
-  // TODO: check if we do have custom fallback image
-  // TODO: send cache header?
-  let filePath = path.resolve('public/fallbackimage.svg')
-  if (publicSettings.fallbackimage) {
-    filePath = publicSettings.fallbackimage
-  } else {
-    setHeader(event, 'Content-Type', 'image/svg+xml')
-  }
-  return sendStream(event, fs.createReadStream(filePath))
+  
+  const logoPath = path.resolve(config.upload_path, 'fallbackimage.svg')
+  const mimeType = mime.lookup(logoPath) || 'application/octet-stream'
+  setHeader(event, 'Content-Type', mimeType)
+  
+  const stats = fs.statSync(logoPath)
+  const lastModified = stats.mtime.toUTCString()
+  const etag = `"${stats.size}-${Number(stats.mtimeMs).toString(16)}"`
+  setHeader(event, 'Last-Modified', lastModified)
+  setHeader(event, 'ETag', etag)
+  
+  return sendStream(event, fs.createReadStream(logoPath))
 })
