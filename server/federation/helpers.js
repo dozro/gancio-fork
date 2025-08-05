@@ -208,9 +208,9 @@ export async function updateActor() {
         id: `${publicSettings.baseurl}/federation/m/${event.id}#${type}-${event.updatedAt.getTime()}`,
         type,
         to: ['https://www.w3.org/ns/activitystreams#Public'],
-        cc: [...recipients[sharedInbox], `${publicSettings.baseurl}/federation/u/${settingsController.settings.instance_name}/followers`],
-        actor: `${publicSettings.baseurl}/federation/u/${settingsController.settings.instance_name}`,
-        object: event.toAP(settingsController.settings, recipients[sharedInbox], type)
+        cc: [...recipients[sharedInbox], `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}/followers`],
+        actor: `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
+        object: event.toAP(recipients[sharedInbox], type)
       }
 
       body['@context'] = [
@@ -355,7 +355,7 @@ export async function updateActor() {
         title: APEvent?.name?.trim() ?? '',
         start_datetime: DateTime.fromISO(APEvent.startTime).toSeconds(),
         end_datetime: APEvent?.endTime ? DateTime.fromISO(APEvent.endTime).toSeconds() : null,
-        // description: sanitizeHTML(APEvent?.content ?? APEvent?.summary ?? ''),
+        description: sanitizeHTML(APEvent?.content ?? APEvent?.summary ?? ''),
         online_locations,
         media,
         is_visible: true,
@@ -543,7 +543,6 @@ export async function updateActor() {
   export async function verifySignature (event) {
 
     const name = event.context.params.name
-    const rawBody = await readRawBody(event)
     const body = await readBody(event)
     const actor_url = body?.actor
     const isDelete = body?.type === 'Delete'
@@ -606,16 +605,17 @@ export async function updateActor() {
 
     event.context.fedi_user = ap_actor
 
-    // TODO: check Digest // cannot do this with json bodyparser (4.a: Enhance HTTP Signature verification for generic AP messages)
-    // const digest = crypto.createHash('sha256')
-    //   .update(body)
-    //   .digest('base64')
-
-    // const signature = getHeader(event, 'Signature')
-    // if (`SHA-256=${digest}` !== signature) {
-    //   log.warn(`Signature mismatch ${signature} - ${digest}`)
-    //   throw createError({ status: 401, message: 'Signature mismatch' })
-    // }
+    // check Digest
+    // cannot do this with json bodyparser (4.a: Enhance HTTP Signature verification for generic AP messages)
+    const rawBody = await readRawBody(event)
+    const digest = crypto.createHash('sha256')
+      .update(rawBody)
+      .digest('base64')
+    const signature = getHeader(event, 'Digest')
+    if (`SHA-256=${digest}` !== signature) {
+      log.warn(`Signature mismatch ${signature} - ${digest}`)
+      throw createError({ status: 401, message: 'Signature mismatch' })
+    }
 
     const parsed = httpSignature.parseRequest(event.req)
     if (httpSignature.verifySignature(parsed, ap_actor.object.publicKey.publicKeyPem)) {
