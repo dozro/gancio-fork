@@ -7,6 +7,94 @@ nav_order: 10
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-alpha.1]((https://framagit.org/les/gancio/compare/v1.27.0...v2.0.0-alpha.1)) (2025-08-5)
+Okay, here we are, after about 250 commits, 591 modified files, 33,566 lines added, 32,873 removed and a lot of sweat, it's time to release an alpha version of this 2.0.
+
+To be honest, there aren't any huge changes in terms of usage (well, there are a few), I tried to keep everything as backward-compatible as possible, so little has changed in terms of everyday use.
+So why all this work?
+
+Simple: Nuxt 2, the framework on which Gancio is based, has been [End-of-Life](https://nuxt.com/blog/nuxt2-eol) for over a year, and most of the stack had become obsolete. After all, Gancio is already 7 years old!
+
+The problem is that the natural evolution to Nuxt 3 was anything but simple — Nuxt has not been exactly “backward-compatible” (to put it mildly), and every part of the application had to be rewritten from scratch. It was a mountain to climb, but a necessary one if we want to take care of this project for the future.
+
+A huge thank you to [NLnet](https://nlnet.nl/) for supporting this work, without which this rewrite would not have been possible. 🙏
+
+
+### Some details
+The migration from Nuxt2 to Nuxt3 (technically Nuxt4) was not a simple upgrade, it required rewriting nearly every aspect of the application, from frontend to backend architecture and tooling.
+
+The Nuxt documentation has a very [substantial section on porting](https://nuxt.com/docs/4.x/migration/overview), but reading all the experiences of those who have already done similar work, everyone recommends [starting from scratch](https://debbie.codes/blog/migrating-nuxt2-nuxt3), which is exactly what I did first on a [temporary branch](https://framagit.org/les/gancio/-/merge_requests/53) and then took the opportunity to move the main branch from `master` to `main`. Note that `main` will be the main branch from now on for the `2.0` and I will maintain the `master` branch for the old `1.x` releases (do not expect many changes there).
+
+Furthermore, nuxt4 has already been released this year, and since the update was not as disruptive as from 2 to 3, I decided to port directly to 4.
+
+This work was part of a larger initiative to remove accumulated technical debt and establish a cleaner, more modern, and maintainable codebase across the full stack.
+
+The process included:
+  - Nuxt 2 ➜ Nuxt 4
+  - Vue 2 ➜ Vue 3 (Composition API)
+  - Express ➜ Nitro
+  - Sequelize 6 ➜ Sequelize 7
+  - Vuex ➜ Custom (useState)
+  - Vuetify 2 ➜ Vuetify 3
+
+
+## Key Changes
+
+### Frontend: Vue 3, Vuetify 3
+
+[Migrating from Vue 2 to Vue 3](https://v3-migration.vuejs.org/) involved adopting the Composition API and script setup, which required rewriting all components.
+
+The structure and reactivity system have changed significantly, and many older patterns (mixins, options API) were replaced or removed.
+
+As an example: the home/index page, which [previously](https://framagit.org/les/gancio/-/blob/master/pages/index.vue) used Pug templates and data provided via asyncData, was [completely rewritten](https://framagit.org/les/gancio/-/blob/main/app/pages/index.vue) using clean HTML and the Composition API.
+
+I dropped Pug entirely in favor of native HTML templates, resulting in a cleaner structure.
+
+This rewrite was also an opportunity to introduce TypeScript across the frontend and the backend.
+
+The migration to Vuetify 3 was smoother, thanks to relatively strong backward compatibility.
+Some component props and event names have changed, but the UI library maintained a familiar structure overall.
+
+
+### Backend: Express -> Nitro / Sequelize
+
+The migration from Express to Nitro (via h3) was the most disruptive backend change.
+
+Express gave us explicit, centralized routing via `.use()`, whereas Nitro uses a file-based routing system where the path and method are inferred from the filesystem (e.g., /server/api/foo.get.ts) and some route params could not be backward-compatible due too some restriction in how nitro handle this -> https://github.com/nitrojs/nitro/issues/3518
+
+This shift affected every aspect of backend development, including:
+
+- How we define and organize routes
+- How we access headers, query params, and authentication
+- How to upload files, send files, or set custom response headers
+- How we handle errors and exceptions
+
+This was a necessary but painful transition and as a result, [I start to write documentation](https://gancio.org/v2/dev/code) to support future development and onboarding. 
+
+The ORM was upgraded from Sequelize 6 ➜ Sequelize 7, which brought structural changes:
+
+- Models now use class-based syntax exclusively and decorators.
+- Migration tooling is no longer included, it must be handled manually.
+- Some bugs and edge cases still exist (issue https://github.com/sequelize/sequelize/issues/17818)
+
+## This is an alpha!
+This is an alpha release, there will still be many small bugs and there will probably be some changes to be made.
+Start experimenting, but don't use it in production yet. Some features are also missing:
+
+- Search functionality
+- Custom user localization
+
+## Breaking Changes
+And yes, there are also some breaking changes, which I haven't been able to get rid of yet, but we can look at them in the coming months:
+I switched to a new authentication system using `nuxt-auth-utils` and this introduces a breaking change in session handling:
+
+- users will be logged out during the upgrade and must log in again.
+- any scripts or tools that rely on the previous session API may break and require updates.
+
+OAuth support has been dropped for now to simplify the authentication flow.
+
+That's not all, stay tuned.
+
 ## [1.27.0](https://framagit.org/les/gancio/compare/v1.26.1...v1.27.0) (2025-06-21)
 
 
