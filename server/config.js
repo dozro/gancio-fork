@@ -5,7 +5,7 @@ import URL from 'url'
 
 const config = {
   status: 'SETUP',
-  baseurl: 'https://test.cisti.org', // process.env.BASE_URL || '',
+  baseurl: '', // process.env.BASE_URL || '',
   hostname: '',
   server: {
     host: process.env.GANCIO_HOST || '0.0.0.0',
@@ -45,9 +45,7 @@ const config = {
       const configContent = fs.readFileSync(config_path)
       Object.assign(config, JSON.parse(configContent))
       config.status = 'CONFIGURED'
-      if (!config.hostname && config.baseurl) {
-        config.hostname = new URL.URL(config.baseurl).hostname
-      }
+      config.hostname = new URL.URL(config.baseurl).host
     } else {
       config.status = 'SETUP'
       console.info('> Configuration file does not exists...')
@@ -55,6 +53,10 @@ const config = {
   }
 }
 
-config.load()
+try {
+  config.load()
+} catch (e) {
+  console.error(e)
+}
 export default config
 // module.exports = config

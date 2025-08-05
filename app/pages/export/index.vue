@@ -87,7 +87,7 @@ const link = computed(() => {
         <v-card-subtitle> {{$t('export.filter_description')}}</v-card-subtitle>
         <v-card-text>
           <!-- <Search v-model='filters' /> -->
-          <span>{{filters}}</span>
+          <!-- <span>{{filters}}</span> -->
           <CoreFilter v-model='filters' />
         </v-card-text>
       </v-card>

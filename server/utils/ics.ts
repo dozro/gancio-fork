@@ -1,19 +1,21 @@
 import { DateTime } from "luxon"
 import { parseIcsData } from "./icsparser"
 import ics from 'ics'
+import { H3Event } from "h3"
+import { Event } from "./sequelize"
 
 // const htmlToText = require('html-to-text')
 
 const log = useLogger('ics')
 
 
-  /**
-   * Send an ics of specified events (optionally with reminders)
-   * @param {*} events array of events from sequelize
-   * @param {*} alarms https://github.com/adamgibbons/ics#attributes (alarms)
-   */
-  export function exportICS (evt, events, alarms = []) {
-    const eventsMap = events.map(e => {
+/**
+ * Send an ics of specified events (optionally with reminders)
+ * @param {*} events array of events from sequelize
+ * @param {*} alarms https://github.com/adamgibbons/ics#attributes (alarms)
+ */
+export function exportICS (evt: H3Event, events: Event[], alarms: any = []) {
+  const eventsMap = events.map(e => {
     const tmpStart = DateTime.fromSeconds(e.start_datetime, { zone: 'UTC' })
     const start = [ tmpStart.year, tmpStart.month, tmpStart.day, tmpStart.hour, tmpStart.minute ]
 
@@ -29,7 +31,7 @@ const log = useLogger('ics')
       location,
       url: `${publicSettings.baseurl}/event/${e.slug || e.id}`,
       status: 'CONFIRMED',
-      categories: e.tags.map(t => t.tag || t),
+      categories: e?.tags?.map(t => t.tag || t),
       alarms
     }
 
@@ -45,7 +47,7 @@ const log = useLogger('ics')
 
     return ret
   })
-  
+
   setHeader(evt, 'Content-Type', 'text/calendar; charset=UTF-8')
   return ics.createEvents(eventsMap, (err, value) => {
     if (err) {

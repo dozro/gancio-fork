@@ -1,4 +1,4 @@
-  import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import slugify from 'slugify'
 import { Umzug, SequelizeStorage } from 'umzug'
@@ -13,7 +13,6 @@ import {
     type InferCreationAttributes,
     type CreationOptional,
     type NonAttribute,
-    AggregateOptions,
     InferAttributesOptions,
 } from "@sequelize/core"
 

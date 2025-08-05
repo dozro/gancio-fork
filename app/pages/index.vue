@@ -71,7 +71,7 @@ const { data: announcements } = await useFetch<Announcement[]>('/api/announcemen
     </section>
     
     <!-- Events -->
-    <section id='events' class='mt-sm-4 mt-2'>
+    <section class='events mt-sm-4 mt-2'>
       <v-lazy class='event' :modelValue='idx<9'
         v-for='(event, idx) in visibleEvents' :key='event.id'
         :min-height='settings.hide_thumbs ? 105 : undefined'
@@ -87,7 +87,7 @@ const { data: announcements } = await useFetch<Announcement[]>('/api/announcemen
   </v-container>
 </template>
 <style>
-#events {
+.events {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;

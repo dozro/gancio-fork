@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// definePageMeta({ middleware: ['authenticated'] })
+definePageMeta({ middleware: ['authenticated'] })
 // const { loadSettings } = useSettings()
 // loadSettings()
 const { isAdmin } = useAuth()
@@ -18,7 +18,7 @@ const { data: unconfirmedEvents } = await useFetch('/api/events/unconfirmed')
   <v-card>
       <div class="d-flex flex-column">
       <!-- admin alert -->
-      <AdminSetupAlert v-if="isAdmin || true" />
+      <AdminSetupAlert v-if="isAdmin" />
       <v-tabs v-model="selectedTab" bg-color="note">
           <!-- <v-tab href="#settings" v-if="isAdmin" value="settings"> {{ $t('common.settings') }}</v-tab> -->
           <v-tab prepend-icon='mdi-cog' href="#settings" value="settings"> {{ $t('common.settings') }}</v-tab>
@@ -26,7 +26,7 @@ const { data: unconfirmedEvents } = await useFetch('/api/events/unconfirmed')
           <v-tab prepend-icon='mdi-account-group' href="#users" value="users"> {{ $t('common.users') }}</v-tab>
           <v-tab prepend-icon='mdi-group' href="#collections" value="collections"> {{ $t('common.collections') }}</v-tab>
           <v-tab prepend-icon='mdi-web' href="#federation" value="federation"> {{ $t('common.federation') }}</v-tab>
-          <v-tab href="#moderation" value="moderation"> {{ $t('common.moderation') }}</v-tab>
+          <!-- <v-tab href="#moderation" value="moderation"> {{ $t('common.moderation') }}</v-tab> -->
           <v-tab prepend-icon='mdi-map-marker' href="#places" value="places"> {{ $t('common.places') }}</v-tab>
           <v-tab prepend-icon='mdi-tag-text' href="#tags" value="tags"> {{ $t('common.tags') }}</v-tab>
           <v-tab prepend-icon='mdi-shape' href="#theme" value="theme"> {{ $t('common.theme') }}</v-tab>
@@ -60,9 +60,9 @@ const { data: unconfirmedEvents } = await useFetch('/api/events/unconfirmed')
               <AdminFederation />
             </v-tabs-window-item>
             
-            <v-tabs-window-item value='moderation'>
+            <!-- <v-tabs-window-item value='moderation'>
               <AdminModeration />
-            </v-tabs-window-item>
+            </v-tabs-window-item> -->
 
             <v-tabs-window-item value='places'>
               <AdminPlaces />

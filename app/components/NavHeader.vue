@@ -40,7 +40,7 @@ const in_home = computed(() => route.name === 'index')
       />
       
       <!-- TODO <t-btn icon='mdi-magnify' to='/search' tooltip='common.search' /> -->
-      <t-btn icon="mdi-information" href='/about' tooltip='common.about' :aria-label='t("common.about")' />
+      <t-btn icon="mdi-information" to='/about' tooltip='common.about' :aria-label='t("common.about")' />
       
       <t-btn icon="mdi-contrast-circle" tooltip='common.dark' @click='toggleDark' />
 

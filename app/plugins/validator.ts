@@ -5,12 +5,12 @@ export default defineNuxtPlugin((nuxtApp) => {
   const validators = {
     required: (fieldName: string) => value => !!value || t('validators.required', { fieldName: t(fieldName) }),
 
-    password: (value) => {
+    password: (value: string) => {
         if (value.length < 8) return 'The password must have at least 8 characters'
         return true
     },
 
-    confirm: (password) => value => password === value || `Password does not match`,
+    confirm: (password: string) => (value: string) => password === value || `Password does not match`,
 
     email: [
         (v: string) => !!v || t('validators.required', { fieldName: t('common.email') }),

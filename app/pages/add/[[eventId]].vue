@@ -148,7 +148,6 @@ async function done() {
               </v-col>
 
               <!-- When -->
-               <span>{{event.start_datetime}}</span>
               <DateInput ref="when" v-model:event="event" />
   
               <!-- Description -->
@@ -167,7 +166,6 @@ async function done() {
 
               <!-- TAGS -->
               <v-col cols=12 md=6>
-                <span>{{ tags }} - {{ searchTag }} - {{ statusTags }}</span>
                 <v-combobox
                   v-model:search="searchTag" v-model="event.tags" prepend-icon="mdi-tag-multiple" chips
                   multiple closable-chips hide-no-data hide-selected persistent-hint

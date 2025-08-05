@@ -1,8 +1,12 @@
 <script setup>
-import get from 'lodash/get'
+
+useHead({
+  title: () => `${settings.value.title} - Register`
+})
+
+
 const form = ref()
 const email = ref()
-
 const loading = ref(false)
 const user = reactive({ email:'', password: '', description: '' })
 const valid = ref(false)
@@ -20,8 +24,7 @@ const register = async () => {
     $notify(isFirstUser ? "register.first_user" : "register.complete")
     navigateTo('/')
   } catch (e) {
-    const error = get(e, "response.data.errors[0].message", String(e))
-    $notify(error, 'error')
+    $notify(e, Statuses.ERROR)
   }
   loading.value = false
 }

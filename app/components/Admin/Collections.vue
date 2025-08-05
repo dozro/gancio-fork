@@ -35,7 +35,7 @@ const filterHeaders = [
 ]
 const settings = useState('settings')
 
-const in_home = !isNaN(settings.value?.collection_in_home)
+const in_home = ref(!isNaN(settings.value?.collection_in_home))
 
 const { data: collections, refresh } = await useFetch('/api/collections?withFilters=true')
 
@@ -64,12 +64,10 @@ async function removeCollection(collection) {
   if (!ret) { return }
   try {
     await $fetch(`/api/collections/${collection.id}`, { method: 'DELETE' })
-    // this.setCollections(this.collections)
+    $notify('common.ok')
     refresh()
   } catch (e) {
-    const err = get(e, 'response.data.errors[0].message', e)
-    $notify(t(err), Statuses.ERROR)
-    loading.value = false
+    $notify(e, Statuses.ERROR)
   }
 }
 
@@ -158,15 +156,14 @@ async function addFilter() {
 
 
 
-//     async togglePinCollection (collection) {
-//       try {
-//         await this.$axios.$put(`/collection/toggle/${collection.id}`)
-//         collection.isTop = !collection.isTop
-//       } catch (e) {
-//         const err = get(e, 'response.data.errors[0].message', e)
-//         this.$root.$message(this.$t(err), { color: 'error' })
-//       }
-//     },
+async function togglePinCollection (collection) {
+  try {
+    await $fetch(`/api/collections/toggle/${collection.id}`, { method: 'PUT' })
+    refresh()
+  } catch (e) {
+    $notify(e, Statuses.ERROR )
+  }
+}
 
 async function moveUp (collection) {
   try {
@@ -224,6 +221,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
       <v-row>
         <v-col>
           <v-switch
+            v-if="collections.length"
             :label="$t('common.collection_in_home')"
             inset
             v-model="in_home"
@@ -231,7 +229,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
         </v-col>
         <v-col>
           <v-autocomplete
-            v-if="in_home"
+            v-if="collections.length && in_home"
             :disabled="!!filters.length"
             v-model="collection_in_home"
             variant='outlined'
@@ -461,7 +459,8 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
                 v-for="actor in item.actors"
                 :key="actor.ap_id"
               >
-                {{ $format.actor(actor, 'filter') }}
+                {{ actor }}
+                <!-- {{ $format.actor(actor, 'filter') }} -->
               </v-chip>
             </template>
           </v-data-table>
@@ -513,8 +512,8 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
         <template v-slot:item.pin="{ item }">
           <v-switch
             class="float-right"
-            :model-value="item.isTop"
-            @update="togglePinCollection(item)"
+            :modelValue="item.isTop"
+            @update:modelValue="togglePinCollection(item)"
             inset
             hide-details
           />

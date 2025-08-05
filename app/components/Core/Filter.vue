@@ -6,7 +6,7 @@ const settings = useState('settings')
 
 const items = ref([])
 const filters = ref([])
-const collection = reactive({})
+const collection = reactive()
 
 const { data: collections } = await useFetch('/api/collections')
 
@@ -21,7 +21,7 @@ function change () {
       places: this.filters.filter(p => p.type === 'place').map(p => p.id),
       show_recurrent: this.show_recurrent
     }
-    this.$emit('input', filters)
+    emit('update:modelValue', filters)
   }
 }
 
@@ -112,7 +112,7 @@ function change () {
     <v-autocomplete
       v-if='collections'
       class="p-0"
-      v-model="collection"
+      v-model="value.collection"
       variant='outlined'
       :label="$t('common.collections')"
       hide-details

@@ -9,7 +9,7 @@ const about = ref(data || t('about'))
 
 function save() {
   $notify('common.ok', Statuses.SUCCESS )
-  // setSetting({ key: 'about', value: about })
+  $fetch('/api/settings', { method: 'PUT', body: { key: 'about', value: about.value } })
 }
 </script>
 <template>
@@ -17,7 +17,6 @@ function save() {
     <v-card-text v-if='isAdmin'>
       <CoreEditor class='px-3 ma-0' v-model='about' :label="t('common.about')" height='500px' />
     </v-card-text>
-    <v-card-text v-html="about" />
     <v-card-actions>
       <v-spacer />
       <v-btn color='primary' variant='outlined' @click='save'> {{t('common.save')}}</v-btn>

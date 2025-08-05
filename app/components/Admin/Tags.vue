@@ -1,5 +1,4 @@
 <script setup>
-import get from 'lodash/get'
 const { t } = useI18n()
 const { $notify, $confirm } = useNuxtApp()
 
@@ -10,13 +9,13 @@ const tag = ref({})
 const newTag = ref('')
 const search = ref('')
 const headers = [
-  { value: 'tag', text: t('common.tag') },
-  { value: 'count', text: 'N.' },
-  { value: 'actions', text: t('common.actions'), align: 'right' }
+  { value: 'tag', title: t('common.tag') },
+  { value: 'count', title: 'N.' },
+  { value: 'actions', title: t('common.actions'), align: 'end' }
 ]
 
 
-const { data: tags, refresh } = useFetch('/api/tags')
+const { data: tags, refresh } = await useFetch('/api/tags')
 
 function editTag(item) {
   tag.value.tag = item.tag
@@ -34,7 +33,7 @@ async function saveTag () {
   dialog.value = false
   refresh()
   loading.value = false
-  $notify('admin.tag_renamed', { oldTag: this.tag.tag, newTag: this.newTag }, { color: 'success' })
+  $notify('admin.tag_renamed', Statuses.SUCCESS, { oldTag: this.tag.tag, newTag: this.newTag })
   newTag.value = ''
 }
 
@@ -58,7 +57,7 @@ async function removeTag (tag) {
     <v-spacer />
     <v-text-field
       v-model='search'
-      :append-icon='mdiMagnify' variant='outlined' rounded
+      append-icon='mdi-magnify' variant='outlined' rounded
       :label="$t('common.search')"
       single-line hide-details />
 
@@ -67,13 +66,13 @@ async function removeTag (tag) {
       <v-card-title> {{$t('admin.edit_tag')}} -
         <strong class='ml-2'> {{tag.tag}}</strong>
       </v-card-title>
-      <v-card-subtitle> {{$tc('admin.edit_tag_help', tag.count)}}</v-card-subtitle>
+      <v-card-subtitle> {{$t('admin.edit_tag_help', tag.count)}}</v-card-subtitle>
       <v-card-text>
         <v-form v-model='valid' ref='form'>
           <v-combobox
             v-model='newTag'
             v-model:search="newTag"
-            :prepend-icon="mdiTag"
+            prepend-icon="mdi-tag"
             hide-no-data
             persistent-hint
             :items="newTag ? tags.filter(t => t.tag.includes(newTag)) : tags"

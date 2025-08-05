@@ -1,24 +1,24 @@
 s<script setup lang="ts">
 
-const { Settings } = useSettings()
+const settings = useState<Settings>('settings')
 
 
 const route = useRoute()
 const { data: tag } = await useFetch<Tag>(`/api/tag/${route.params.tag}`)
-  if (!tag) {
+  if (!tag.value) {
     throw createError({ status: 404, statusMessage: 'Tag not found'})
 }
 
 useHead( () => {
-      const title = `${Settings.value.title} - ${tag.value?.tag}`
-      return {
-        title,
-        link: [
-          // { rel: 'alternate', type: 'application/rss+xml', title, href: this.settings.baseurl + `/feed/rss/place/${this.place.name}` },
-          // { rel: 'alternate', type: 'text/calendar', title, href: this.settings.baseurl + `/feed/ics/place/${this.place.name}` }
-        ],
-      }
-    })
+  const title = `${settings.value.title} - ${tag.value?.tag}`
+  return {
+    title,
+    link: [
+      { rel: 'alternate', type: 'application/rss+xml', title, href: settings.value.baseurl + `/feed/rss/tag/${tag.value?.tag}` },
+      { rel: 'alternate', type: 'text/calendar', title, href: settings.value.baseurl + `/feed/ics/tag/${tag.value?.tag}` }
+    ],
+  }
+})
 
 </script>
 <template>

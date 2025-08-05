@@ -4,7 +4,7 @@ export default defineEventHandler (async evt => {
   const log = useLogger('Event confirm')
   const id = getRouterParam(evt, 'id')
   
-  const user = await getUser(evt)
+  const user = await requireUser(evt)
   const event = await Event.findByPk(id)
   
   if (!event) {

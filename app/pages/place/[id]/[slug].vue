@@ -38,11 +38,28 @@ useHead( () => {
   </div>
 
   <!-- Events -->
-  <section id='events' class='mt-sm-4 mt-2'>
-    <!-- <EventCard v-for='(event, idx) in data?.events' :key='event.id' :event='event' :lazy='idx>9' /> -->
-    <!-- <v-lazy class='event v-card' :value='idx<9' v-for='(event, idx) in data?.events' :key='event.id' :min-height='settings.hide_thumbs ? 105 : undefined' :options="{ threshold: .5, rootMargin: '500px' }" :class="{ 'theme--dark': is_dark }"> -->
-      <!-- <Event :event='event' :lazy='idx > 9' /> -->
-    <!-- </v-lazy> -->
+  <section class='events mt-sm-4 mt-2'>
+    <v-lazy class='event' :modelValue='idx<9'
+      v-for='(event, idx) in data.events' :key='event.id'
+      :min-height='settings.hide_thumbs ? 105 : undefined'
+      :options="{ threshold: .5, rootMargin: '500px' }"
+      >
+      <!-- :class="{ 'theme--dark': is_dark }"> -->
+        <EventCard :event='event' :lazy='idx>9' />    
+    </v-lazy>
   </section>
+
+  <!-- Past Events -->
+  <h2 class='mt-14 mb-3' v-if="data?.pastEvents.length">{{$t('common.past_events')}}</h2>
+  <section class="events" v-if="data?.pastEvents.length">
+    <v-lazy class='event' :modelValue='idx<9'
+      v-for='(event, idx) in data.pastEvents' :key='event.id'
+      :min-height='settings.hide_thumbs ? 105 : undefined'
+      :options="{ threshold: .5, rootMargin: '500px' }">
+        <!-- :class="{ 'theme--dark': is_dark }"> -->
+      <EventCard :event='event' :lazy='idx>9' />    
+    </v-lazy>
+  </section>
+
 </v-container>
 </template>

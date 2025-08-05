@@ -37,12 +37,6 @@ const event = ref({ title: '', tags: [], place: {}, recurrent: null })
 </script>
 <template>
 <v-container>
-  <span>
-    {{ready}} -
-    {{ loggedIn }} -
-    {{user}} /
-    {{ session }}
-  </span>
   <!-- <v-combobox
     v-model:search="searchTag" v-model="selectedTags" prepend-icon="mdi-tag-multiple" chips
     multiple closable-chips hide-no-data hide-selected persistent-hint

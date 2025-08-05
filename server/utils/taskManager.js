@@ -8,7 +8,7 @@ import { useLogger } from './useLogger'
 import { cleanOrphanPlaces } from '../lib/places'
 import { cleanOrphanTags } from '../lib/tags'
 import { cleanPastEvents, cleanUnusedAPActor } from '../lib/ap'
-const log = useLogger('queue')
+const log = useLogger('Task Manager')
 
 const loopInterval = 60 // process.env.NODE_ENV === 'production' ? 1 : 1
 const minute = 1 * loopInterval
@@ -55,7 +55,7 @@ export class Task {
     if (this.processInNTick > 0) {
       return
     }
-    log.info(`[TASK] Process ${this.name} - ${this.processInNTick}`)
+    log.info(`Process ${this.name}`)
     this.processInNTick = this.repeatDelay
     try {
       const ret = this.method.apply(this, this.args)
@@ -90,7 +90,6 @@ export class TaskManager {
   }
 
   start (interval = loopInterval) {
-    log.info('Inside start')
   
     // create and clean recurrent events
     // this.add({

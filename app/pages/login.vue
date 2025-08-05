@@ -1,8 +1,12 @@
 <script setup lang="ts">
 
 const { fetch: refreshSession } = useUserSession()
-const settings = useState('settings')
+const settings = useState<Settings>('settings')
 const { $notify } = useNuxtApp()
+
+useHead({
+  title: () => `${settings.value.title} - Login`
+})
 
 const credentials = reactive({
   email: '',

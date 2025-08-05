@@ -1,4 +1,4 @@
-import type { UserSessionRequired } from '#auth-utils'
+import type { User, UserSessionRequired } from '#auth-utils'
 import { verifyJwtToken } from './jwt'
 
 type UseSessionEvent = Parameters<typeof useSession>[0]
@@ -24,8 +24,10 @@ export async function getUser(event: UseSessionEvent) {
       return {
         id: payload.userId,
         email: payload.email,
-        role: payload.role
-      }
+        role: payload.role,
+        is_editor: payload.role === 'editor',
+        is_admin: payload.role === 'admin'
+      } as User
 
     } catch (err) {
       console.warn('Invalid JWT:', err)
