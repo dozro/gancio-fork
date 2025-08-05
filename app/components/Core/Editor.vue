@@ -107,6 +107,7 @@ const props = defineProps({
   label: { type: String, default: '' },
   hint: { type: String, default: '' },
   placeholder: { type: String, default: '' },
+  height: { type: String, default: '' },
 })
 
 const emit = defineEmits(['update:modelValue'])

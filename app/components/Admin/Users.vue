@@ -99,7 +99,6 @@ async function deleteUser (user) {
       <v-text-field
         v-model="search"
         append-icon="mdi-magnify"
-        variant='outlined'
         rounded
         :label="$t('common.search')"
         single-line

@@ -17,7 +17,7 @@ function showNotification(ev) {
 
 </script>
 <template>
-<div style="z-index: 10000; position: absolute; right: 1em; bottom: 80px;" class="mb-2">
+<div style="z-index: 10000; position: fixed; right: 1em; bottom: 1rem; opacity: 0.9;" class="mb-2">
   <v-alert
     variant="flat" border='start' elevation="2"
     class='mb-2'  min-width="350px" max-width="800px"

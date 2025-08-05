@@ -1,6 +1,11 @@
 <script setup lang="ts">
 const settings = useState<Settings>('settings')
 const theme = useTheme()
+const { $notify, $confirm } = useNuxtApp()
+
+const link = reactive({ href: '', label: '' })
+const valid = ref(false)
+
 // <!-- 
 // export default {
 //   name: 'Theme',
@@ -28,22 +33,6 @@ const theme = useTheme()
 //         this.setLocalSetting({ key: 'theme.is_dark', value })
 //       }
 //     },
-//     hide_thumbs: {
-//       get () { return this.settings.hide_thumbs },
-//       set (value) { this.setSetting({ key: 'hide_thumbs', value }) }
-//     },
-//     hide_calendar: {
-//       get () { return this.settings.hide_calendar },
-//       set (value) { this.setSetting({ key: 'hide_calendar', value }) }
-//     },
-//     custom_js: {
-//       get () { return this.settings.custom_js },
-//       set (value) { this.setSetting({ key: 'custom_js', value })}
-//     },
-//     custom_css: {
-//       get () { return this.settings.custom_css },
-//       set (value) { this.setSetting({ key: 'custom_css', value })}
-//     }    
 //   },
 //   methods: {
 //     ...mapActions(['setSetting', 'setLocalSetting']),
@@ -60,14 +49,12 @@ const theme = useTheme()
 
 const linkModal = ref(false)
 function resetFooterLinks () {
-  //       this.setSetting({
-  //         key: 'footerLinks',
-  //         value: [
-  //           { href: '/', label: 'common.home' },
-  //           { href: '/about', label: 'common.about' }
-  //         ]
-  //       })
-
+  return $fetch('/api/settings', { method: 'PUT', body: { key: 'footerLink',
+    value: [
+      { href: '/', label: 'common.home' },
+      { href: '/about', label: 'common.about' }
+    ]
+}})
 }
 
 function updateColor (theme, color, value) {
@@ -75,13 +62,20 @@ function updateColor (theme, color, value) {
   // this.updateSettingColor(theme, color, value)
 }
 
-function resetHeaderImage () {
-
+async function resetHeaderImage () {
+  try {
+    await $fetch('/api/settings', { method: 'PUT', body: { key: 'headerimage', value: null } })
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
 }
-function resetLogo () {
-  //       this.setSetting({ key: 'logo', value: null })
-//         .then(this.forceLogoReload)
-//       e.stopPropagation()
+
+async function resetLogo () {
+  try {
+    await $fetch('/api/settings', { method: 'PUT', body: { key: 'logo', value: null } })
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
 }
 function resetFallbackImage () {
 
@@ -93,34 +87,50 @@ function openLinkModal () {
 }
 
 function addFooterLink () {
-  // const link = Object.assign({}, this.link)
-  // this.setSetting({ key: 'footerLinks', value: this.settings.footerLinks.concat(link) })
-  // // this.link = { href: '', label: '' }
-  // this.$refs.linkModalForm.reset()
+  $fetch('/api/settings', { method: 'PUT', body: {
+    key: 'footerLinks',
+    value: settings.value.footerLinks.concat(link)
+  } })
+  link.href = ''
+  link.label = ''
   linkModal.value = false
 }
 
 async function removeFooterLink (item) {
-  // const ret = await this.$root.$confirm('admin.delete_footer_link_confirm')
-  // if (!ret) { return }
-  // const footerLinks = this.settings.footerLinks.filter(l => l.label !== item.label)
-  // this.setSetting({ key: 'footerLinks', value: footerLinks })
+  const ret = await $confirm('admin.delete_footer_link_confirm')
+  if (!ret) { return }
+  const footerLinks = settings.value.footerLinks.filter(l => l.label !== item.label)
+  return $fetch('/api/settings', { method: 'PUT', body: { 
+    key: 'footerLink',
+    value: footerLinks
+  }})
 }
 
-async function moveUpFooterLink (item, idx) {
-  // const footerLinks = [...this.settings.footerLinks]
-  // footerLinks[idx] = footerLinks[idx-1]
-  // footerLinks[idx-1] = this.settings.footerLinks[idx]
-  // this.setSetting({ key: 'footerLinks', value: footerLinks })
+async function moveUpFooterLink (item, idx: number) {
+  const footerLinks = [...settings.value.footerLinks]
+  footerLinks[idx] = footerLinks[idx-1]
+  footerLinks[idx-1] = settings.value.footerLinks[idx]
+  return $fetch('/api/settings', { method: 'PUT', body: { 
+    key: 'footerLink',
+    value: footerLinks
+  }})
 }
 
 async function editFooterLink (item) {
-//       this.link = { href: item.href, label: item.label }
-//       this.linkModal = true
+  link.href = item.href
+  link.label = item.label
+  linkModal.value = true
 }
 
 async function uploadLogo (file: File) {
-
+  const formData = new FormData()
+  formData.append('logo', file)
+  try {
+    await $fetch('/api/settings/logo', { method: 'POST', body: formData })
+    $notify('Logo updated!')
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
 }
 
 async function uploadFallbackImage (file: File) {
@@ -132,6 +142,7 @@ async function uploadHeaderImage (file: File) {
   formData.append('headerImage', file)
   try {
     await $fetch('/settings/headerImage', { method: 'POST', body: formData })
+    $notify('Head image updated!')
   //   this.$root.$emit('message', {
   //     message: 'Header image updated'
   //   })
@@ -194,11 +205,11 @@ const custom_js = manageSetting('custom_js')
             class="mt-5"
             ref="upload"
             :label="$t('admin.favicon')"
-            @change="uploadLogo"
+            @update:modelValue="uploadLogo"
             accept="image/*"
           >
-            <template #append-outer>
-              <v-btn color="warning" text @click="resetLogo" prepend-icon='mdi-restore'>
+            <template #append>
+              <v-btn color="warning" variant='text' @click="resetLogo" prepend-icon='mdi-restore'>
                 {{ $t('common.reset') }}
               </v-btn>
             </template>
@@ -218,11 +229,11 @@ const custom_js = manageSetting('custom_js')
             ref="upload"
             :label="$t('admin.fallback_image')"
             persistent-hint
-            @change="uploadFallbackImage"
+            @update:modelValue="uploadFallbackImage"
             accept="image/*"
           >
-            <template #append-outer>
-              <v-btn color="warning" text @click="resetFallbackImage" prepend-icon='mdi-restore'>
+            <template #append>
+              <v-btn color="warning" variant='text' @click="resetFallbackImage" prepend-icon='mdi-restore'>
                 {{$t('common.reset')}}
               </v-btn>
             </template>
@@ -242,18 +253,18 @@ const custom_js = manageSetting('custom_js')
             ref="upload"
             :label="$t('admin.header_image')"
             persistent-hint
-            @change="uploadHeaderImage"
+            @update:modelValue="uploadHeaderImage"
             accept="image/*"
           >
-            <template #append-outer>
-              <v-btn color="warning" text @click="resetHeaderImage" prepend-icon='mdi-restore'>
+            <template #append>
+              <v-btn color="warning" variant='text' @click="resetHeaderImage" prepend-icon='mdi-restore'>
                 {{$t('common.reset')}}
               </v-btn>
             </template>
           </v-file-input>
           <v-img
             class="mt-2"
-            :src="`/headerimage.png`"
+            :src="`/headerimage.svg`"
             max-height="150px"
             contain
           />
@@ -316,9 +327,10 @@ const custom_js = manageSetting('custom_js')
         
   <v-dialog v-model='linkModal' width='500' :fullscreen='$vuetify.display?.mobile'>
     <v-card>
-      <v-card-title> {{$t('admin.footer_links')}}</v-card-title>
+      <v-toolbar :title="$t('admin.footer_links')" />
       <v-card-text>
         <v-form v-model='valid' ref='linkModalForm'>
+          <span>{{valid}}</span>
           <v-text-field v-model='link.label'
             :rules="[$valid.required('common.label')]"
             label='Label' />
@@ -329,8 +341,8 @@ const custom_js = manageSetting('custom_js')
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn outlined @click='linkModal=false' color='error'> {{$t('common.cancel')}}</v-btn>
-        <v-btn outlined @click='addFooterLink' color='primary' :disabled='!valid'> {{$t('common.add')}}</v-btn>
+        <v-btn variant='outlined' @click='linkModal=false' color='error'> {{$t('common.cancel')}}</v-btn>
+        <v-btn variant='outlined' @click='addFooterLink' color='primary' :disabled='!valid'> {{$t('common.add')}}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -348,8 +360,8 @@ const custom_js = manageSetting('custom_js')
             <v-list-item-title>{{link.label}}</v-list-item-title>
             <v-list-item-subtitle>{{link.href}}</v-list-item-subtitle>
           <template v-slot:append>
-            <v-btn size='small' class='left' v-if='idx !== 0' icon='mdi-chevron-up' color='warn' @click.stop='moveUpFooterLink(link, idx)' />
-            <v-btn size='small' class='float-right' icon='mdi-delete-forever' color='error' @click.stop='removeFooterLink(link)' />
+            <v-btn variant='text' size='small' class='left' v-if='idx !== 0' icon='mdi-chevron-up' color='warn' @click.stop='moveUpFooterLink(link, idx)' />
+            <v-btn variant='text' size='small' class='float-right' icon='mdi-delete-forever' color='error' @click.stop='removeFooterLink(link)' />
           </template>
         </v-list-item>
       </v-list>

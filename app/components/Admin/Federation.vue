@@ -15,8 +15,7 @@ const headers = [
 ]
 
 
-// const { data: stats } = useFetch('/api/ap_actors/stats')
-const stats = {}
+const { data: stats } = useFetch('/api/ap_actors/stats')
 const { data: trusted_sources, refresh } = await useFetch('/api/ap_actors/trusted', { deep: true })
 
 const source_url = ref('')

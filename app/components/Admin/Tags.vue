@@ -53,14 +53,14 @@ async function removeTag (tag) {
 
 <template>
 <v-container>
-  <v-card-title> {{ $t('common.tags') }}</v-card-title>
+  <v-card-title> {{ $t('common.tags') }}
     <v-spacer />
     <v-text-field
       v-model='search'
-      append-icon='mdi-magnify' variant='outlined' rounded
+      append-icon='mdi-magnify'
       :label="$t('common.search')"
       single-line hide-details />
-
+  </v-card-title>
   <v-dialog v-model='dialog' width='600' :fullscreen='$vuetify.display?.mobile' v-if='dialog'>
     <v-card>
       <v-card-title> {{$t('admin.edit_tag')}} -

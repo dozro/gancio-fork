@@ -21,7 +21,7 @@ const settings = useState<Settings>('settings')
 </template>
 <style>
   nav#AppBar {
-    background-image: linear-gradient(rgba(0,0,0,.8),hsla(0,0%,8%,.7)),url(/headerimage.png);
+    background-image: linear-gradient(rgba(0,0,0,.8),hsla(0,0%,8%,.7)),url('/headerimage.png');
     background-position: center center;
     background-size: cover;
     /*color: rgb(var(--v-theme-success));*/
@@ -33,7 +33,7 @@ const settings = useState<Settings>('settings')
         rgba(230, 230, 230, 0.95),
         rgba(250, 250, 250, 0.95)
       ),
-      url(/headerimage.png);
+      url('/headerimage.png');
   }
   
   #title {
