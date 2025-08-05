@@ -1,10 +1,12 @@
 import fs from 'fs'
 import path from 'path'
 import mime from 'mime-types'
+import config from '../config'
 
 export default defineEventHandler(async (event) => {
-  const filePath = path.resolve(publicSettings?.logo ?? 'public/logo.png')
-
+  const customLogoPath = path.resolve(config.upload_path, 'logo.png')
+  const customLogoExists = fs.existsSync(customLogoPath)
+  const filePath = customLogoExists ? customLogoPath : path.resolve('static/logo.png')
   const mimeType = mime.lookup(filePath) || 'application/octet-stream'
   setHeader(event, 'Content-Type', mimeType)
   
