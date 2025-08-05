@@ -2,7 +2,6 @@
 /** 
  * This will work in dev and prod
 */
-
 import pkg from './package.json'  with { type: 'json' }
 import path from 'path'
 import yargs from 'yargs'
@@ -26,22 +25,23 @@ yarg.version(pkg.version)
 // set NUXT & NITRO environment
 
 async function start () {
-  return import('./index').catch(e => {
+  return import('./index.mjs').catch(e => {
     console.error(e)
     process.exit(2)
   })
 }
 
-export async function getSequelize () {
+export async function getSequelize(connect = true) {
+  let sequelize
   if (process.env.NODE_ENV === 'dev') {
-    const sequelize = await import("./server/utils/sequelize.ts")
-    await sequelize.connect()
-    return sequelize
+    sequelize = await import("./server/utils/sequelize.ts")
   } else {
-    const { sequelize } = await import("../chunks/nitro/nitro.mjs")
-    await sequelize.connect()
-    return sequelize
+    ({ sequelize } = await import("./chunks/nitro/nitro.mjs"))
   }
+  if (connect) {
+    await sequelize.connect()
+  }
+  return sequelize
 }
 
 async function migrate () {
@@ -49,11 +49,11 @@ async function migrate () {
     console.error('> Cannot run database migration before setup')
     return
   }
-  const sequelize = await getSequelize()
+  const sequelize = await getSequelize(false)
   await sequelize.runMigrations()
 }
 
-console.info(`📅 ${pkg.name} - v${pkg.version} - ${pkg.description} (nodejs: ${process.version})`)
+console.info(`📅 ${pkg.name} - v${pkg.version} - A shared agenda for local communities (nodejs: ${process.version})`)
 
 yarg
   .usage('Usage $0 <command> [options]')

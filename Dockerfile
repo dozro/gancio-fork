@@ -41,7 +41,7 @@
 # Build
 FROM node:lts-alpine AS builder
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 WORKDIR /home/node
 
 COPY package.json yarn.lock ./
@@ -55,13 +55,13 @@ RUN npm run build
 # Run
 FROM node:lts-alpine AS prod
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 USER node
 WORKDIR /home/node
 
 COPY --from=builder --chown=node:node /home/node/package*.json ./
 COPY --from=builder --chown=node:node /home/node/.output/ ./.output/
-
+COPY ./gancio.js ./.output/server/
 EXPOSE 13120
 
-CMD ["node", ".output/server/index.mjs"]
+CMD ["node", ".output/server/gancio.js"]
