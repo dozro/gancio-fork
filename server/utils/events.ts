@@ -135,19 +135,19 @@ export async function getEvents(opts?: EventQueryType | undefined) {
       return []
     })
 
-    return events
-    // return events.map(e => {
-    //   e = e.get()
-    //   e.tags = e.tags ? e.tags.map(t => t && t.tag) : []
-    //   e.end_datetime = Number(e.end_datetime) || null
-    //   if (!e.multidate) {
-    //     delete e.multidate
-    //   }
-    //   if (!e.image_path) {
-    //     delete e.image_path
-    //   }
-    //   return e
-    // })
+    // return events
+    return events.map(e => {
+      e = e.get()
+      e.tags = e.tags ? e.tags.map(t => t && t.tag) : []
+      e.end_datetime = Number(e.end_datetime) || null
+      if (!e.multidate) {
+        delete e.multidate
+      }
+      if (!e.image_path) {
+        delete e.image_path
+      }
+      return e
+    })
 }
 
 export async function getMessages(eventId: Number) {
