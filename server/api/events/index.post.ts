@@ -1,7 +1,7 @@
 import { Event } from "#imports"
 import { mkdirp } from 'mkdirp'
 import config from '~~/server/config'
-import { parseMultipartFormData, saveUploadedFile } from "~~/server/utils/parseMultipartForm"
+import { parseMultipartFormData, saveUploadedEventImage } from "~~/server/utils/parseMultipartForm"
 import { MultiPartData } from "h3"
 import { DateTime } from "luxon"
 import { findOrCreatePlace } from "~~/server/lib/places"
@@ -102,13 +102,13 @@ export default defineEventHandler(async evt => {
   
   const recurrent = body.recurrent ? JSON.parse(body.recurrent as string) : null
 
-  const eventDetails = {
+  const eventDetails: Event = {
     title: body.title?.trim(),
     // sanitize and linkify html
     description: sanitizeHTML(linkifyHtml(body.description as string || '', { target: '_blank', render: { email: ctx => ctx.content }})),
-    multidate: body.multidate,
+    // multidate: body.multidate,
     start_datetime,
-    end_datetime: Number(body.end_datetime) || null,
+    end_datetime: Number(body.end_datetime),
     online_locations: body.online_locations,
     recurrent,
     // publish this event only if authenticated
@@ -121,30 +121,16 @@ export default defineEventHandler(async evt => {
 
   // do we have an image?
   if (body.image) {
-    eventDetails.media = [await saveUploadedFile(body.image as MultiPartData)]
-    // console.error('abbiamo un immagine', typeof form.image.data, form.image.data)
-    // const image_id = `img_${createHash('md5').update(`source_${id}_${new Date()}`).digest('hex')}`
-
-    // const ret = await sharp(form.image.data)
-    //   .resize(500, null, { withoutEnlargement: true } )
-    //   .webp()
-    //   .toFile(path.resolve(uploadPath, 'test' + '.webp'))
-  
+    let focalpoint = body.image_focalpoint ? body.image_focalpoint?.split(',') : ['0', '0']
+    focalpoint = [parseFloat(parseFloat(focalpoint[0]).toFixed(2)), parseFloat(parseFloat(focalpoint[1]).toFixed(2))]
+    const media = await saveUploadedEventImage(body.image as MultiPartData, body?.image_name || body?.title || '', focalpoint)
+    if (media) {
+      eventDetails.media = [ media ]
+    }
   }
-
-
-  // validate
-  // check required fields
   
-  // validate start_datetime and end_datetime
-  
-  // find or create a place
-  
-  //
-  
-  const event = await Event.create(eventDetails, { raw: true })
+  const event = await Event.create(eventDetails)
   await event.setPlace(place)
-  
 
   // create/assign tags
   let tags : Tag[] = []
@@ -154,11 +140,6 @@ export default defineEventHandler(async evt => {
     }
     tags = await findOrCreateTags(body.tags)
     await event.setTags(tags)
-  }
-
-  // associate user to event and reverse
-  if (user) {
-    await event.setUser(user)
   }
 
   // event = event.get()
@@ -173,7 +154,7 @@ export default defineEventHandler(async evt => {
     // eventController._createRecurrent()
   } else {
     // send notifications
-    // notifyEvent('Create', event.id)
+    notifyEvent('Create', event.id)
   }
   
   return event
