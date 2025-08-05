@@ -1,8 +1,14 @@
-// import { connect } from '~/server/utils/sequelize'
-
 import pluginController from "../utils/plugins"
 
-// import pluginController from "../utils/plugins"
+// @tofix
+// this is stupid but it did not found another way to embed deps inside nuxt build (vite external ssr?)
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+import dotenv from 'dotenv'
+hideBin(process.argv)
+yargs.toString()
+dotenv.config()
+
 
 export default defineNitroPlugin(async () => {
   const log = useLogger('init')
