@@ -33,9 +33,10 @@ const mediaPreview = computed( () => {
 
 const top = computed(() => (focalpoint.value[1]) * 50 + '%')
 const left = computed(() => (focalpoint.value[1]) * 50 + '%')
+
 const savedPosition = computed(() => {
-    const focalpoint = event?.value?.media?.[0]?.focalpoint || [0, 0]
-    return `${(focalpoint[0] + 1) * 50}% ${(value[1] + 1) * 50}%`
+  const focalpoint = event?.value?.media?.[0]?.focalpoint || [0, 0]
+  return `${(focalpoint[0] + 1) * 50}% ${(focalpoint[1] + 1) * 50}%`
 })
 
 const position = computed(() => {
@@ -174,15 +175,15 @@ const position = computed(() => {
       inset
       :label="$t('common.show_preview')"
       hide-details
-    ></v-switch>
+    />
     <v-spacer></v-spacer>
     <v-btn text color="primary" @click="openMediaDetails = true">{{ $t('common.edit') }}</v-btn>
     <v-btn text color="error" @click="remove">{{ $t('common.remove') }}</v-btn>
   </v-card-actions>
 
-  <div class="col-12 pt-0" v-if="mediaPreview">
-    <img class="col-12 pa-0" :src="mediaPreview" v-if="!showPreview" />
-    <img class="col-12 mediaPreview pa-0" :src="mediaPreview" v-else :style="{ 'object-position': savedPosition }" />
+  <div class="w-100 pt-0" v-if="mediaPreview">
+    <img class="w-100 pa-0" :src="mediaPreview" v-if="!showPreview" />
+    <img class="w-100 mediaPreview pa-0" :src="mediaPreview" v-else :style="{ 'object-position': savedPosition }" />
     <!-- <span class="text-center">{{ event.media[0].name }}</span> -->
   </div>
 
