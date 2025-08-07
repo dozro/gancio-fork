@@ -275,6 +275,13 @@ async function readableWebToNodeStream(webStream) {
       })
   }
 
+export function isHiddenService(domain) {
+    const pattern = /^(http:\/\/)?[a-zA-Z0-9]+\.(onion|i2p)\/?$/;
+    return pattern.test(url.hostname)
+}
+
+
+
   /**
    * Import events from url
    * It does supports ICS and H-EVENT
