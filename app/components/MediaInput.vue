@@ -31,8 +31,8 @@ const mediaPreview = computed( () => {
   return url
 })
 
+const left = computed(() => (focalpoint.value[0]) * 50 + '%')
 const top = computed(() => (focalpoint.value[1]) * 50 + '%')
-const left = computed(() => (focalpoint.value[1]) * 50 + '%')
 
 const savedPosition = computed(() => {
   const focalpoint = event?.value?.media?.[0]?.focalpoint || [0, 0]
@@ -40,8 +40,8 @@ const savedPosition = computed(() => {
 })
 
 const position = computed(() => {
-  const focalpoint = focalpoint?.value || [0, 0]
-  return `${(focalpoint[0] + 1) * 50}% ${(focalpoint[1] + 1) * 50}%`
+  const fp = focalpoint?.value || [0, 0]
+  return `${(fp[0] + 1) * 50}% ${(fp[1] + 1) * 50}%`
 })
 
     function save () {

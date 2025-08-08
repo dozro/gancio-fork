@@ -48,17 +48,17 @@ const { data: places } = await useFetch<Place[]>('/api/places', { params: { quer
   }})
 
 function selectPlace (place) {
-  console.error('dentro select place')
-  console.error(place)
-  event.value.place = place ?? {}
+  if (typeof place === 'string') {
+    event.value.place = ({ name: place })
+  } else {
+    event.value.place = place ?? {}
+  }
 }
 
 </script>
 <template>
 <v-row class="mb-4">
   <v-col cols="12" md="4">
-      <!-- v-model:search.trim.toLowerCase="search" -->
-       <span>{{ typeof event?.place }} - {{ typeof search }} - {{  event.place }}</span>
     <v-combobox
       ref="place"
       :rules="[$valid.required('common.where')]"

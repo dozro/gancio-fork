@@ -1,12 +1,11 @@
 <script setup>
-// import clipboard from '../assets/clipboard'
-// import { useClipboard } from '@vueuse/core
-// 
-// 
 const theme = useTheme()
 const route = useRoute()
 const { data: events } = await useFetch('/api/events')
 const settings = useState('settings')
+useHead({
+  title: settings.value.title + ' - Share'
+})
 
 const type = ref(route?.hash ?? 'feed')
 const list = reactive({
