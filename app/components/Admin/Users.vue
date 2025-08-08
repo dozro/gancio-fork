@@ -7,7 +7,6 @@ const { t } = useI18n()
 const { data: users, refresh } = await useFetch('/api/users')
 const search = ref('')
 const newUserDialog = ref(false)
-const changeRoleDialog = ref(false)
 const roleColors = { admin: 'error', editor: 'warning', user: 'success' }
 const valid = ref(false)
 const loading = ref(false)
@@ -19,7 +18,7 @@ const headers = [
   { key: 'email', title: t('common.email'), width: 150 },
   { key: 'description', title: t('common.description') },
   { key: 'is_active', title: t('common.enabled'), width: 50 },
-  { key: 'to_notify', title: t('admin.receive_confirm_notification'), width: 50 },
+  { key: 'to_notify', title: t('admin.receive_confirm_notification'), width: 200 },
   { key: 'role', title: t('common.role'), width: 150 },
   // { value: 'is_editor', text: t('common.editor') },
   { key: 'actions', title: t('common.actions'), align: 'right', width: 100, sortable: false }
@@ -46,10 +45,9 @@ async function deleteUser (user) {
     await $fetch(`/api/user/${user.id}`, { method: 'DELETE' })
     refresh()
     $notify('admin.user_remove_ok')
-    // $emit('update')
   } catch (e) {
     // const err = response.data.errors?.[0]?.message ?? e
-    $notify(String(e), Statues.ERROR)
+    $notify(e, Statuses.ERROR)
     loading.value = false
   }
 }
@@ -66,7 +64,6 @@ async function deleteUser (user) {
     try {
       await $fetch('/api/user', { method: 'PUT', body: ({ ...user, role })})
       refresh()
-      // user.role = role
     } catch (e) {
       console.error(e)
     }
@@ -84,7 +81,7 @@ async function deleteUser (user) {
       loading.value = false
       newUserDialog.value = false
     } catch (e) {
-      $notify(e?.statusMessage ?? e?.message ?? e, Statuses.ERROR)
+      $notify(e, Statuses.ERROR)
       loading.value = false
     }
   }
@@ -113,37 +110,33 @@ async function deleteUser (user) {
     <!-- ADD NEW USER -->
     <v-dialog v-model="newUserDialog" :fullscreen="$vuetify.display?.mobile">
       <v-card>
-        <v-card-title>{{$t('common.new_user')}}</v-card-title>
+        <v-card-title class="bg-primary">{{$t('common.new_user')}}</v-card-title>
         <v-card-text>
           <v-form v-model="valid" ref="userForm" validate-on='lazy' @submit.prevent="createUser">
-            <v-col>
               <v-text-field
                 v-model="newUser.email"
                 class="col-4"
                 :label="$t('common.email')"
                 :rules="$valid.email"
               />
-            </v-col>
-            <v-col>
               <v-select
                 v-model="newUser.role"
                 class="col-4"
                 :label="$t('common.role')"
                 :items="['admin', 'editor', 'user']"
               />
-            </v-col>
             <v-text-field
               v-model="newUser.description"
               :label="$t('common.description')"
             />
           </v-form>
           <v-alert type="info" :closable="false" icon="mdi-information">{{$t('admin.user_add_help')}}</v-alert>
-          <v-card-actions>
-            <v-spacer/>
-            <v-btn @click="newUserDialog=false" color="error" variant='outlined'>{{$t('common.cancel')}}</v-btn>
-            <v-btn @click="createUser" :disabled="!valid" color="primary" variant='outlined'>{{$t('common.send')}}</v-btn>
-          </v-card-actions>
         </v-card-text>
+        <v-card-actions>
+          <v-spacer/>
+          <v-btn @click="newUserDialog=false" color="error" variant='outlined'>{{$t('common.cancel')}}</v-btn>
+          <v-btn @click="createUser" :disabled="!valid" color="primary" variant='outlined'>{{$t('common.send')}}</v-btn>
+        </v-card-actions>
       </v-card> 
     </v-dialog>
 
