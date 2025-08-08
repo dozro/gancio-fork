@@ -1,3 +1,4 @@
+import { FetchError } from 'ofetch'
 export default defineNuxtPlugin(() => {
   const { $once, $emit } = useNuxtApp() // nuxtApp
   
@@ -8,7 +9,12 @@ export default defineNuxtPlugin(() => {
     })
   }
   
-  function notify (msg: string | object, status: Statuses = Statuses.SUCCESS, args?: Object) {
+  function notify (msg: string | FetchError, status: Statuses = Statuses.SUCCESS, args?: Object) {
+    if (status === Statuses.ERROR && typeof msg !== 'string') {
+      msg = msg.response?._data?.message ?? msg
+      // remove Sequelize prefix:
+      msg = String(msg).replace(/Sequelize.*:\ ?/,'')
+    }
     $emit('notify', { msg: String(msg), status, args })
   }
 

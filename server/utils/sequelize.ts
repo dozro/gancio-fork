@@ -67,6 +67,7 @@ export async function connect() {
   sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message])
 
   User.addScope('defaultScope', { attributes: { exclude: ['password', 'recover_code'] } })
+  User.addScope('withRecoverCode', { attributes: { exclude: ['password'] } })
   User.addScope('withPassword', { })
 
   return sequelize
