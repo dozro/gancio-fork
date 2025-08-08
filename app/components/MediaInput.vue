@@ -31,8 +31,8 @@ const mediaPreview = computed( () => {
   return url
 })
 
-const left = computed(() => (focalpoint.value[0]) * 50 + '%')
-const top = computed(() => (focalpoint.value[1]) * 50 + '%')
+const left = computed(() => (focalpoint.value[0]+1) * 50 + '%')
+const top = computed(() => (focalpoint.value[1]+1) * 50 + '%')
 
 const savedPosition = computed(() => {
   const focalpoint = event?.value?.media?.[0]?.focalpoint || [0, 0]
@@ -45,8 +45,12 @@ const position = computed(() => {
 })
 
     function save () {
-      // this.$emit('input', { url: this.value.url, image: this.value.image, name: this.name || (this.event.title) || '', focalpoint: [...this.focalpoint] })
-      // this.openMediaDetails = false
+      event.value.media[0] = {
+        ...event.value.media[0],
+        focalpoint: focalpoint.value
+      }
+      // name: this.name || (this.event.title) || '',
+      openMediaDetails.value = false
     }
 
     async function remove () {
@@ -58,18 +62,13 @@ const position = computed(() => {
     }
 
     function selectMedia (v) {
-      console.error(v)
       event.value.media[0] = { image: v, name: event.title, focalpoint: [0, 0]}
-      // this.$emit('input', { image: v, name: this.event.title, focalpoint: [0, 0] })
     }
 
     function selectUrl () {
-      // if (this.validateUrl(this.imgUrlInput) === true) {
-      //   this.$emit('input', {
-      //     ...this.value,
-      //     url: this.imgUrlInput
-      //   })
-      // }
+      if (validateUrl(imgUrlInput.value) === true) {
+        event.value.media[0].url = imgUrlInput.value
+      }
     }
 
     function handleStart (ev) {
@@ -99,8 +98,6 @@ const position = computed(() => {
       x = x < 30 ? 0 : x > boundingClientRect.width - 30 ? boundingClientRect.width : x
       y = y < 30 ? 0 : y > boundingClientRect.height - 30 ? boundingClientRect.height : y
 
-      // // this.relativeFocalpoint = [x + 'px', y + 'px']
-
       // // map to real image coordinate
       const posY = -1 + (y / boundingClientRect.height) * 2
       const posX = -1 + (x / boundingClientRect.width) * 2
@@ -114,17 +111,16 @@ const position = computed(() => {
     }
 
     function validateUrl (value) {
-      // if (!value) return true // empty value is valid, since image is optional
-      // return this.isValidUrl(value) || this.$t('validators.url')
+      if (!value) return true // empty value is valid, since image is optional
+      return isValidUrl(value) || t('validators.url')
     }
 </script>
 <template>
 <span>
   <v-dialog v-model="openMediaDetails" :fullscreen="$vuetify.display?.mobile" width="1000px">
     <v-card>
-      <v-card-title>{{ $t('common.media') }}</v-card-title>
+      <v-toolbar :title="$t('common.media')" />
       <v-card-text>
-        <span>{{focalPoint}}</span>
         <v-row class="mt-1">
           <v-col
             id="focalPointSelector"
@@ -155,7 +151,7 @@ const position = computed(() => {
               persistent-hint
               filled
               :hint="$t('event.alt_text_description')"
-            ></v-textarea>
+            />
             <br />
             <v-card-actions class="justify-space-between">
               <v-btn text @click="openMediaDetails = false" color="warning">Cancel</v-btn>
