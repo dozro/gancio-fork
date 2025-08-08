@@ -36,7 +36,7 @@ async function remove (event, parent) {
 </script>
 
 <template>
-<v-container class="pa-0">
+<v-container>
   <v-card>
     <v-card-title>{{$t('common.my_events')}}</v-card-title>
     <v-card-text class="pa-1 pa-md-3">
