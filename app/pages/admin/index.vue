@@ -1,7 +1,9 @@
 <script setup lang="ts">
-definePageMeta({ middleware: ['authenticated'], name: 'Admin' })
-// const { loadSettings } = useSettings()
-// loadSettings()
+const settings = useState<Settings>('settings')
+definePageMeta({ middleware: ['authenticated'] })
+useHead({
+  title: settings.value.title + ' - Admin'
+})
 const { isAdmin } = useAuth()
 const route = useRoute()
 const selectedTab = ref(route.params.hash) // route.params.hash !??!
@@ -13,7 +15,7 @@ const { data: unconfirmedEvents } = await useFetch('/api/events/unconfirmed')
 
 </script>
 <template>
-<v-container >
+<v-container>
   <v-card>
       <div class="d-flex flex-column">
       <!-- admin alert -->

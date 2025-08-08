@@ -1,21 +1,22 @@
-s<script setup lang="ts">
+<script setup lang="ts">
 
 const settings = useState<Settings>('settings')
 
 
 const route = useRoute()
-const { data: tag } = await useFetch<Tag>(`/api/tag/${route.params.tag}`)
-  if (!tag.value) {
+const tagName = route.params.tag
+const { data: events } = await useFetch<Tag>(`/api/events/tag/${tagName}`)
+  if (!events.value) {
     throw createError({ status: 404, statusMessage: 'Tag not found'})
 }
 
 useHead( () => {
-  const title = `${settings.value.title} - ${tag.value?.tag}`
+  const title = `${settings.value.title} - ${tagName}`
   return {
     title,
     link: [
-      { rel: 'alternate', type: 'application/rss+xml', title, href: settings.value.baseurl + `/feed/rss/tag/${tag.value?.tag}` },
-      { rel: 'alternate', type: 'text/calendar', title, href: settings.value.baseurl + `/feed/ics/tag/${tag.value?.tag}` }
+      { rel: 'alternate', type: 'application/rss+xml', title, href: settings.value.baseurl + `/feed/rss/tag/${tagName}` },
+      { rel: 'alternate', type: 'text/calendar', title, href: settings.value.baseurl + `/feed/ics/tag/${tagName}` }
     ],
   }
 })
@@ -24,57 +25,16 @@ useHead( () => {
 <template>
     <v-container id='home' class='px-2 px-sm-6 pt-0'>
       <h1 class='d-block text-h4 font-weight-black text-center text-uppercase mt-10 mx-auto w-100 text-underline'>
-        <u>{{ tag?.tag}}</u>
+        <u>{{ tagName }}</u>
       </h1>
-      <!-- <span v-if='place?.name!=="online"' class="d-block text-subtitle text-center w-100">{{ place?.address }}</span> -->
-  
+
       <!-- Events -->
-      <!-- <div id="events" class='mt-14'>
-        <v-lazy class='event v-card' :value='idx<9' v-for='(event, idx) in events' :key='event.id' :min-height='hide_thumbs ? 105 : undefined' :options="{ threshold: .5, rootMargin: '500px' }" :class="{ 'theme--dark': is_dark }">
-          <Event :event='event' :lazy='idx > 9' />
-        </v-lazy>
-      </div> -->
+      <v-lazy class='event' :modelValue='idx<9'
+        v-for='(event, idx) in events' :key='event.id'
+        :min-height='settings.hide_thumbs ? 105 : undefined'
+        :options="{ threshold: .5, rootMargin: '500px' }">
+        <!-- :class="{ 'theme--dark': is_dark }"> -->
+        <EventCard :event='event' :lazy='idx>9' />
+      </v-lazy>
     </v-container>
   </template>
-  <!-- <script>
-  
-  import { mapState, mapGetters } from 'vuex'
-  import Event from '@/components/Event'
-  import HowToArriveNav from '@/components/HowToArriveNav.vue'
-  
-  export default {
-    name: 'Place',
-    components: { 
-      Event, 
-      HowToArriveNav,
-      [process.client && 'Map']: () => import('@/components/Map.vue')
-     },
-    data() {
-      return { mapHeight: "14rem" }
-    },
-    head() {
-      const title = `${this.settings.title} - ${this.place.name}`
-      return {
-        title,
-        link: [
-          { rel: 'alternate', type: 'application/rss+xml', title, href: this.settings.baseurl + `/feed/rss/place/${this.place.name}` },
-          { rel: 'alternate', type: 'text/calendar', title, href: this.settings.baseurl + `/feed/ics/place/${this.place.name}` }
-        ],
-      }
-    },
-    computed: {
-      ...mapState(['settings']),
-      ...mapGetters(['hide_thumbs', 'is_dark']),
-    },
-    async asyncData({ $axios, params, error }) {
-      try {
-        const events = await $axios.$get(`/place/${encodeURIComponent(params.place)}`)
-        return events
-      } catch (e) {
-        error({ statusCode: 404, message: 'Place not found!' })
-      }
-    }
-  
-  }
-  </script>
-   -->
