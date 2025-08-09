@@ -1,6 +1,7 @@
 <!-- Choose event location -->
 <script setup lang='ts'>
 import type { Event } from '#build/types/nitro-imports'
+import { refDebounced } from '@vueuse/core'
 
 
 const settings = useState<Settings>('settings')
@@ -33,10 +34,11 @@ const showAdvancedDialogButton = computed(() => {
 })
 
 const search = ref('')
-const { data: places } = await useFetch<Place[]>('/api/places', { params: { query: search },
+const searchDebounced = refDebounced(search, 200)
+const { data: places } = await useFetch<Place[]>('/api/places', { params: { query: searchDebounced },
   dedupe: 'cancel',
   transform: places => {
-    places.push({ online: true, name: 'online', props: { prependIcon: 'mdi-web', color: 'primary' } })
+    places.push({ online: true, name: 'On-line', props: { prependIcon: 'mdi-laptop-account', color: 'primary' } })
     if (!search.value && places.length) { 
       return places 
     }
@@ -57,13 +59,14 @@ function selectPlace (place) {
 
 </script>
 <template>
-<v-row class="mb-4">
+<v-row class="mb-4" v-if="event.place">
   <v-col cols="12" md="4">
     <v-combobox
       ref="place"
       :rules="[$valid.required('common.where')]"
       :label="$t('common.where')"
-      @update:modelValue="selectPlace"
+      :model-value="event.place.name"
+      @update:model-value="selectPlace"
       no-filter
       prepend-icon="mdi-map-marker"
       hide-no-data
