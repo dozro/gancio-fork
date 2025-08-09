@@ -1,27 +1,8 @@
 <script setup lang="ts">
-const settings = useState('settings')
-
 const { locales } = useI18n()
 const filteredTimezones = []
 
 const instanceSettings = await $fetch('/api/settings')
-
-async function setSetting(key: string, value: string) {
-  await $fetch('/api/settings', { method: 'PUT', body: { key, value } })
-  instanceSettings[key] = value
-    // return saveSetting(key, value)
-}
-
-
-function manageSetting(key) {
-  return computed({
-    get: () =>  settings.value[key],
-    set: (value) => {
-      $fetch('/api/settings', { method: 'PUT', body: { key, value } })
-      settings.value[key] = value
-    }
-  })
-}
 
 const title = manageSetting('title')
 const description = manageSetting('description')
@@ -39,7 +20,6 @@ const allow_geolocation = manageSetting('allow_geolocation')
 const show_download_media = manageSetting('show_download_media')
 const enable_moderation = manageSetting('enable_moderation')
 const enable_report = manageSetting('enable_report')
-
 
 </script>
 <template>

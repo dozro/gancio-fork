@@ -1,4 +1,16 @@
 
+export function manageSetting(key: keyof Settings, setCb = null) {
+  const settings = useState<Settings>('settings')
+  return computed({
+    get: () =>  settings.value[key],
+    set: (value) => {
+      $fetch('/api/settings', { method: 'PUT', body: { key, value } })
+      if (typeof setCb === 'function') { setCb(value) }
+      settings.value[key] = value
+    }
+  })
+}
+
 // export const useSettings = (refresh = false) => {
 //   const settings = useState('settings', () => [])
   

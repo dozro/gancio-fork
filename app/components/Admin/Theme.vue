@@ -2,7 +2,7 @@
 const settings = useState<Settings>('settings')
 const theme = useTheme()
 const { $notify, $confirm } = useNuxtApp()
-
+const linkModalForm = ref()
 const link = reactive({ href: '', label: '' })
 const valid = ref(false)
 
@@ -49,7 +49,7 @@ const valid = ref(false)
 
 const linkModal = ref(false)
 function resetFooterLinks () {
-  return $fetch('/api/settings', { method: 'PUT', body: { key: 'footerLink',
+  return $fetch('/api/settings', { method: 'PUT', body: { key: 'footerLinks',
     value: [
       { href: '/', label: 'common.home' },
       { href: '/about', label: 'common.about' }
@@ -77,13 +77,14 @@ async function resetLogo () {
     $notify(e, Statuses.ERROR)
   }
 }
+
 function resetFallbackImage () {
 
 }
 
 function openLinkModal () {
   linkModal.value = true
-  // this.$nextTick(() => this.$refs.linkModalForm.reset())
+  linkModalForm.value.reset()
 }
 
 function addFooterLink () {
@@ -101,7 +102,7 @@ async function removeFooterLink (item) {
   if (!ret) { return }
   const footerLinks = settings.value.footerLinks.filter(l => l.label !== item.label)
   return $fetch('/api/settings', { method: 'PUT', body: { 
-    key: 'footerLink',
+    key: 'footerLinks',
     value: footerLinks
   }})
 }
@@ -111,7 +112,7 @@ async function moveUpFooterLink (item, idx: number) {
   footerLinks[idx] = footerLinks[idx-1]
   footerLinks[idx-1] = settings.value.footerLinks[idx]
   return $fetch('/api/settings', { method: 'PUT', body: { 
-    key: 'footerLink',
+    key: 'footerLinks',
     value: footerLinks
   }})
 }
@@ -147,18 +148,9 @@ async function uploadHeaderImage (file: File) {
   //     message: 'Header image updated'
   //   })
   //   this.forceHeaderImageReload()
-  } catch (e) {}
-}
-
-function manageSetting(key: keyof Settings, setCb = null) {
-  return computed({
-    get: () =>  settings.value[key],
-    set: (value) => {
-      $fetch('/api/settings', { method: 'PUT', body: { key, value } })
-      if (typeof setCb === 'function') { setCb(value) }
-      settings.value[key] = value
-    }
-  })
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
 }
 
 const is_dark = manageSetting('theme.is_dark', () => { theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark' })
@@ -253,7 +245,7 @@ const custom_js = manageSetting('custom_js')
             ref="upload"
             :label="$t('admin.header_image')"
             persistent-hint
-            @update:modelValue="uploadHeaderImage"
+            @update:model-value="uploadHeaderImage"
             accept="image/*"
           >
             <template #append>
@@ -327,10 +319,9 @@ const custom_js = manageSetting('custom_js')
         
   <v-dialog v-model='linkModal' width='500' :fullscreen='$vuetify.display?.mobile'>
     <v-card>
-      <v-toolbar :title="$t('admin.footer_links')" />
+      <v-card-title class="bg-primary">{{$t('admin.footer_links')}}</v-card-title>
       <v-card-text>
         <v-form v-model='valid' ref='linkModalForm'>
-          <span>{{valid}}</span>
           <v-text-field v-model='link.label'
             :rules="[$valid.required('common.label')]"
             label='Label' />
@@ -357,7 +348,7 @@ const custom_js = manageSetting('custom_js')
           v-for='(link, idx) in settings.footerLinks'
           :key='`${link.label}`' @click='editFooterLink(link)'>
             
-            <v-list-item-title>{{link.label}}</v-list-item-title>
+            <v-list-item-title>{{$t(link.label)}}</v-list-item-title>
             <v-list-item-subtitle>{{link.href}}</v-list-item-subtitle>
           <template v-slot:append>
             <v-btn variant='text' size='small' class='left' v-if='idx !== 0' icon='mdi-chevron-up' color='warn' @click.stop='moveUpFooterLink(link, idx)' />
