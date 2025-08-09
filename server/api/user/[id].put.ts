@@ -1,13 +1,19 @@
-    // // user to modify
-    // const user = await User.findByPk(req.body.id)
+export default defineEventHandler(async evt => {
+  await requireAdminSession(evt)
+  const log = useLogger('user update')
+  const id = getRouterParam(evt, 'id')
+  const body = await readBody(evt)
 
-    // if (!user) { return res.status(404).json({ success: false, message: 'User not found!' }) }
+  const user = await User.findByPk(id)
+  if (!user) {
+    log.error('This user does not exist: ', id)
+    throw createError({ status: 404, message: 'This user does not exists' })
+  }
 
-    // if (!req.body.password) { delete req.body.password }
+  log.info(`Update user ${user.email} - ${JSON.stringify(body)}`)
+  if ((!user.is_active && body.is_active)) {
+    enqueueMail(user.email, 'confirm', { user, config: publicSettings }, publicSettings.instance_locale)
+  }
 
-    // if ((!user.is_active && req.body.is_active)) {
-    //   mail.send(user.email, 'confirm', { user, config }, res.locals.settings.locale)
-    // }
-
-    // await user.update(req.body)
-    // res.status(200).send()
+  return user.update(body)
+})

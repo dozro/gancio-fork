@@ -25,7 +25,6 @@ const headers = [
 ]
 
 async function toggle (user) {
-  console.error(user)
   // ask confirmation only to disable
   if (user.is_active) {
 
@@ -33,8 +32,12 @@ async function toggle (user) {
     if (!ret) { return }
   }
   user.is_active = !user.is_active
-  fetch('/api/user', { method: 'PUT', body: user })
-  refresh()
+  try {
+    await $fetch(`/api/user/${user.id}`, { method: 'PUT', body: user })
+    refresh()
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
 }
 
 async function deleteUser (user) {
@@ -53,8 +56,12 @@ async function deleteUser (user) {
 }
 
   async function toggle_to_notify (user) {
-    user.to_notify = !user.to_notify
-    await fetch('/api/user', { method: 'PUT', body: user })
+    try {
+      await $fetch(`/api/user/${user.id}`, { method: 'PUT', body: { to_notify: !user.to_notify } })
+      refresh()
+    } catch (e) {
+      $notify(e, Statuses.ERROR)
+    }
   }
   
   async function changeRole (user, role) {
@@ -62,10 +69,10 @@ async function deleteUser (user) {
     const ret = await $confirm('admin.change_role_confirm', { user: user.email, from_role: user.role, to_role: role })
     if (!ret) { return }
     try {
-      await $fetch('/api/user', { method: 'PUT', body: ({ ...user, role })})
+      await $fetch(`/api/user/${user.id}`, { method: 'PUT', body: ({ role })})
       refresh()
     } catch (e) {
-      console.error(e)
+      $notify(e, Statuses.ERROR)
     }
     return false
   }
