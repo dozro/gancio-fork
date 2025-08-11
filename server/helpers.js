@@ -277,7 +277,7 @@ async function readableWebToNodeStream(webStream) {
 
 export function isHiddenService(domain) {
     const pattern = /^(http:\/\/)?[a-zA-Z0-9]+\.(onion|i2p)\/?$/;
-    return pattern.test(url.hostname)
+    return pattern.test(domain.hostname)
 }
 
 
