@@ -479,25 +479,31 @@ export async function updateActor() {
     return fedi_user
   }
 
-  export async function getNodeInfo (instance_url) {
-      let nodeInfo = await axios.get(`${instance_url}/.well-known/nodeinfo`, { headers: { Accept: 'application/json' } })
-        .then(res => res.data)
-        .catch(e => {
-          log.debug('[FEDI] Node %s does not support nodeInfo', instance_url)
-        })
-      
-      if (nodeInfo?.links) {
-        const supportedVersion = nodeInfo.links.find(l => l.rel === 'http://nodeinfo.diaspora.software/ns/schema/2.1' || 'http://nodeinfo.diaspora.software/ns/schema/2.0')
-        if (!supportedVersion) {
-          return false
-        }
-        const applicationActor = nodeInfo.links.find(l => l.rel === 'https://www.w3.org/ns/activitystreams#Application')
-        nodeInfo = await axios.get(supportedVersion.href).then(res => res.data)
-        log.debug('[FEDI] getNodeInfo "%s", applicationActor: %s, nodeInfo: %s', instance_url, applicationActor?.href, nodeInfo)
-        return { applicationActor: applicationActor?.href, nodeInfo }
-      }
-      throw new Error(nodeInfo)
+export async function getNodeInfo (instance_url) {
+  let nodeInfo = await $fetch(`${instance_url}/.well-known/nodeinfo`, { headers: { Accept: 'application/json' } })
+    .catch(e => {
+      log.debug('[FEDI] Node %s does not support nodeInfo', instance_url)
+    })
+  
+  
+  if (nodeInfo?.links) {
+    log.info('.well-known/nodeinfo with links!')
+    const supportedVersion = nodeInfo.links.find(l => l.rel === 'http://nodeinfo.diaspora.software/ns/schema/2.1' || 'http://nodeinfo.diaspora.software/ns/schema/2.0')
+    if (!supportedVersion) {
+      log.info('No nodeinfo version supported!')
+      return false
     }
+    const applicationActor = nodeInfo.links.find(l => l.rel === 'https://www.w3.org/ns/activitystreams#Application')
+    log.debug('application actor url: ', applicationActor)
+    nodeInfo = await $fetch(supportedVersion.href)
+    log.debug('[FEDI] getNodeInfo "%s", applicationActor: %s, nodeInfo: %s', instance_url, applicationActor?.href, nodeInfo)
+
+    if (nodeInfo) {
+      return { applicationActor: applicationActor?.href, nodeInfo }
+    }
+  }
+  throw new Error(nodeInfo)
+}
 
   export async function getInstance (actor_url, force = false, fail_on_not_cached = false) {
     log.debug(`[FEDI] getInstance for ${actor_url}`)
@@ -516,7 +522,9 @@ export async function updateActor() {
     }
 
     try {
-      const { applicationActor, nodeInfo } = await getNodeInfo(instance_url).catch(e => ({ }))
+      const { applicationActor, nodeInfo } = await getNodeInfo(instance_url).catch(e => {
+        log.warn('get node info failed', e)
+      })
       const [ instance ] = await Instance.upsert({
           name: nodeInfo?.metadata?.nodeName ?? domain,
           domain,
