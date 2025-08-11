@@ -3,7 +3,8 @@ import httpSignature from '@peertube/http-signature'
 import { DateTime } from 'luxon'
 
 import { parseAPLocation } from './places'
-import { getImageFromURL } from '../helpers'
+import { getImageFromURL, sanitizeHTML } from '../helpers'
+import { findOrCreateTags } from '../lib/tags'
 
   const log = useLogger('federation')
   
