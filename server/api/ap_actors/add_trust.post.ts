@@ -31,13 +31,13 @@ export default defineEventHandler(async event => {
     const [ user, instance_url ] = url.replace(/^@/,'').split('@')
     log.debug('[FEDI] Adds user: %s and instance: %s because url was: %s', user, instance_url, url)
     try {
-      var protocol = "https://"
+      let protocol = "https://"
       if (config.hidden_service === "true" && isHiddenService(url)) {
         protocol = "http://"
       }
 
       if (config.hidden_service !== "true" && isHiddenService(url)) {
-        log.warn(`[FEDI] Trying to trust instance {instance_url} but hidden services are not enabled`)
+        log.warn('[FEDI] Trying to trust instance %s but hidden services are not enabled', instance_url)
         throw createError({ status: 403, message: 'Hidden service not allowed' })
       }
 

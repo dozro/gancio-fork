@@ -1,5 +1,9 @@
 import { z } from 'zod'
 import { updateActor } from '../federation/helpers'
+import { promisify } from 'util'
+import crypto from 'crypto'
+const generateKeyPair = promisify(crypto.generateKeyPair)
+
 
 export type Settings = {
   title: string,
@@ -44,15 +48,13 @@ export type Settings = {
   calendar_first_day_of_week?: number,
   default_fedi_hashtags: Array<string>,
   custom_js: string,
-  custom_css: string
+  custom_css: string,
+  publicKey?: string
 }
 
 export type SecretSettings = {
   privateKey?: string,
 }
-
-// export type KeyValueType =
-// | { [key: string]: string | boolean | object | null | number | undefined }
 
 export const settingSchema = z.object({
   key: z.string(),
@@ -119,9 +121,11 @@ export async function getSettings () {
   return Setting.findAll({ raw: true })
 }
 
-export function setSetting<K extends keyof Settings>(
+type AllSettings = Settings & SecretSettings
+
+export function setSetting<K extends keyof AllSettings>(
   key: K,
-  value: Settings[K],
+  value: AllSettings[K],
   is_secret: boolean = false
 ): Promise<[entity: Setting, created: boolean | null]> {
   const log = useLogger('settings')
@@ -146,5 +150,23 @@ export async function loadSettings () {
     } else {
       publicSettings[setting.key] = setting.value
     }
+  }
+
+  // add pub/priv instance key if needed
+  if (!publicSettings.publicKey) {
+    // log.info('Instance priv/pub key not found, generating....')
+    const { publicKey, privateKey } = await generateKeyPair('rsa', {
+      modulusLength: 4096,
+      publicKeyEncoding: {
+        type: 'spki',
+        format: 'pem'
+      },
+      privateKeyEncoding: {
+        type: 'pkcs8',
+        format: 'pem'
+      }
+    })
+    setSetting('publicKey', publicKey)
+    setSetting('privateKey', privateKey, true)
   }
 }
