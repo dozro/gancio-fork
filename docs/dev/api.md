@@ -56,6 +56,39 @@ fetch("http://localhost:4000/api/login/token", {
 
 
 
+## Create a new user.
+the first user being created will automatically become an active admin.
+For subsequent users, a recovery code is generated and sent via email to allow
+the user to set their password and confirm their account creation
+
+**`/api/user`**
+
+POST 
+{: .label .label-orange}
+
+  **AUTH NEEDED**
+  {: .label .label-red}
+
+
+**Params**
+
+| Name | Type | Description |
+| -----|------|------|
+| newUser.email | `string` | User email address |
+| newUser.description | `string` | User description |
+| newUser.role | `string` | User role ('user','admin','editor') |
+
+**Returns**  
+- Created user object  
+
+- 400 error if user creation fails  
+
+
+
+
+
+
+
 ## Get current authenticated user
 
 **`/api/user`**
