@@ -47,10 +47,10 @@ const in_home = computed(() => route.name === 'index')
       <!-- language selection menu -->
       <v-menu transition="slide-y-transition">
         <template #activator="{ props }">
-          <v-btn variant='plain' icon='mdi-translate' v-bind='props' aria-label='Language' tooltip='common.language'>{{locale}}</v-btn>
+          <v-btn variant='plain' icon='mdi-translate' v-bind='props' aria-label='Language' tooltip='common.language' />
         </template>
         <v-list density='compact' max-height="350" width="250">
-          <v-list-item v-for='locale in locales' :key='locale.code' @click="setLocale(locale.code)" :title='locale.name' />
+          <v-list-item v-for='locale in locales' :key='locale.code' @click.prevent="setLocale(locale.code)" :title='locale.name' />
           
           <v-list-item target='_blank' href='https://hosted.weblate.org/engage/gancio/'>
             <v-list-item-subtitle v-text='t("common.help_translate")' />

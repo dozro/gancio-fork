@@ -37,15 +37,17 @@ export default defineNuxtConfig({
           { code: 'it', name: 'Italian', file: 'it.json' }
     ],
     lazy: true,            // enable lazy loading
-    langDir: 'locales/',   // must be set, but won’t be used for actual loading
-    types: 'composition',
-    // pages: undefined,
-    // locales: Object.keys(locales).map(key => ({
-    //   code: key,
-    //   name: locales[key],
-    //   language: locales[key]
-    // })),
-    skipSettingLocaleOnNavigate: true,// 
+    // langDir: 'locales/',   // must be set, but won’t be used for actual loading
+    // types: 'composition',
+    pages: undefined,
+    locales: Object.keys(locales).map(key => ({
+      code: key,
+      name: locales[key],
+      file: 'en.js'
+    })),
+    locale: 'en',
+    fallbackLocale: 'en',
+    // skipSettingLocaleOnNavigate: true,// 
     // dynamicRouteParams: false,
     compilation: {
       strictMessage: false
