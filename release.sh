@@ -76,7 +76,7 @@ npx nuxi cleanup
 # build web UI
 npx nuxi build
 
-mkdir -p "${PKG_MAIN}/upload"
+mkdir -p "${PKG_MAIN}/uploads"
 # mkdir -p "${PKG_MAIN}/prisma"
 cp -ra .output/ "${PKG_MAIN}/.output/"
 
@@ -85,9 +85,14 @@ cp -ra cli "${PKG_MAIN}/.output/server/cli/"
 cp gancio.js "${PKG_MAIN}/.output/server/gancio.js"
 cp .env.example "${PKG_MAIN}/.env"
 cp gancio.sqlite.rel "${PKG_MAIN}/gancio.sqlite"
+cp ./uploads/logo.png "${PKG_MAIN}/uploads/"
+cp ./uploads/logo.png "${PKG_MAIN}/uploads/"
+cp ./uploads/fallbackimage.svg "${PKG_MAIN}/uploads/"
+cp ./uploads/headerimage.svg "${PKG_MAIN}/uploads/"
+
 
 # cp package.json bun.lock yarn.lock .env.example "${PKG_MAIN}/"
-cp gancio.service "${PKG_MAIN}/"
+# cp gancio.service "${PKG_MAIN}/"
 
 if [ "$output" = tgz ]; then
   mkdir -p "$destDir"
@@ -106,5 +111,5 @@ if [ "$releaseType" = stable ]; then
   fi
 
   yarn run docs:build
-  rsync -vr docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2
+  # rsync -vr docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2
 fi
