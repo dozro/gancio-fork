@@ -62,22 +62,7 @@ function isPast() {
   </article>
 </template>
 
-<style scoped>
-.event-card {
-  border: 1px solid #e9e9e9;
-
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  /* width: 330px; */
-  /* max-width: 500px !important; */
-  flex-grow: 1;
-  /* margin-top: 16px;
-  margin-right: 16px; */
-  transition: all .5s;
-  min-height: 288px;
-  overflow: hidden;
-}
+<style>
 
 .event-card a {
   text-decoration: none;

@@ -5,8 +5,13 @@
   margin-right: 20px !important;
 }
 
+
 .v-card .v-icon {
   opacity: 0.6 !important;
+}
+
+.v-table .v-icon {
+  opacity: 1 !important;
 }
 
 .v-card-subtitle {
@@ -15,7 +20,7 @@
 }
 
 .v-theme--light .v-card,
-.v-theme--light .event-card {
+.v-theme--light .event {
   background-color: #f8f8f8 !important;
   border: thin solid rgba(0, 0, 0, 0.12);
 }

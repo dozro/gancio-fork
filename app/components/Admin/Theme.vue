@@ -6,6 +6,9 @@ const linkModalForm = ref()
 const link = reactive({ href: '', label: '' })
 const valid = ref(false)
 
+const dark_menu = ref([false, false, false, false])
+const light_menu = ref([false, false, false, false])
+
 // <!-- 
 // export default {
 //   name: 'Theme',
@@ -57,8 +60,11 @@ function resetFooterLinks () {
 }})
 }
 
-function updateColor (theme, color, value) {
-  // this.$vuetify.theme.themes[theme][color] = value.hex
+function updateColor (t, color, value) {
+  console.error(theme.current.value.colors.primary)
+  theme.current.value.colors.primary = value
+  // theme.themes.value[t].colors[color] = value
+  // theme.current.value.value[t][col or] = value
   // this.updateSettingColor(theme, color, value)
 }
 
@@ -267,7 +273,7 @@ const custom_js = manageSetting('custom_js')
     <v-card-title>{{ $t('admin.colors') }}</v-card-title>
     <!-- choose theme colors -->
     <v-card-text>
-      <!-- <v-theme-provider>
+      <v-theme-provider theme="dark">
         <v-card max-width="465">
           <v-card-text>
             <span class="mr-2" v-for="(color, i) in settings.dark_colors" :key="i">
@@ -281,22 +287,22 @@ const custom_js = manageSetting('custom_js')
                 max-width="290px"
                 min-width="290px"
               >
-                <template v-slot:activator="{ on }">
-                  <v-btn :color="color" dark small v-on="on">{{ i }}</v-btn>
+                <template #activator="{ props }">
+                  <v-btn :color="theme.themes.value.dark.colors[i]" dark size='small' v-bind="props">{{ i }}</v-btn>
                 </template>
                 <v-color-picker
                   mode="hexa"
-                  :value="color"
-                  @update:color="c => updateColor('dark', i, c)"
+                  :model-value="color"
+                  @update:model-value="c => updateColor('dark', i, c)"
                 />
               </v-menu>
             </span>
           </v-card-text>
         </v-card>
-      </v-theme-provider> -->
+      </v-theme-provider>
     </v-card-text>
 
-    <!-- <v-theme-provider light>
+    <v-theme-provider theme="light">
       <v-card class='mt-4' max-width='465'>
         <v-card-text>
           <span class='mr-2' v-for='(color, i) in settings.light_colors' :key='i'>
@@ -307,15 +313,15 @@ const custom_js = manageSetting('custom_js')
                 top right
                 max-width="290px"
                 min-width="290px">
-              <template v-slot:activator='{ on }'>
-                <v-btn :color='color' small v-on='on'> {{i}}</v-btn>
+              <template #activator='{ props }'>
+                <v-btn :color='color' small v-bind="props"> {{i}}</v-btn>
               </template>
-              <v-color-picker mode='hexa' :value='color' @update:color='c => updateColor("light", i, c)' />
+              <v-color-picker mode='hexa' :model-value='color' @update:model-value='c => updateColor("light", i, c)' />
             </v-menu>
           </span>
         </v-card-text>
       </v-card>
-    </v-theme-provider> -->
+    </v-theme-provider>
         
   <v-dialog v-model='linkModal' width='500' :fullscreen='$vuetify.display?.mobile'>
     <v-card>

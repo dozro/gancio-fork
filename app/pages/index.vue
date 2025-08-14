@@ -36,7 +36,6 @@ const isCurrentMonth = computed(() => {
   return false
 })
 
-
 const { data: events } = await useFetch<Event[]>('/api/events', { params,
   onResponse: res => {
     attributes.value = useAttributesFromEvents(res.response._data)
@@ -76,22 +75,35 @@ const { data: announcements } = await useFetch<Announcement[]>('/api/announcemen
         v-for='(event, idx) in visibleEvents' :key='event.id'
         :min-height='settings.hide_thumbs ? 105 : undefined'
         :options="{ threshold: .5, rootMargin: '500px' }">
-        <!-- :class="{ 'theme--dark': is_dark }"> -->
       <EventCard :event='event' :lazy='idx>9' />
       </v-lazy>
     </section>
-    <!-- <section class='text-center' v-else> -->
-      <!-- <v-progress-circular class='mt-5 justify-center align-center mx-auto' color='primary' indeterminate model-value='20' /> -->
-    <!-- </section> -->
     
   </v-container>
 </template>
 <style>
 .events {
-  max-width: 1200px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(350px,1fr));
-  gap: 10px;
+  gap: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  /* display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(350px,1fr)); */
 }
+
+.event {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  max-width: 500px !important;
+  width: 330px;
+  min-height: 288px;
+  position: relative;
+  /* margin-top: 16px;
+  margin-right: 16px; */
+  transition: all .5s;
+  overflow: hidden;
+}
+
 </style>
