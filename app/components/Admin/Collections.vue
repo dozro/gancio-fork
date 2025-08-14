@@ -73,7 +73,7 @@ async function removeCollection(collection) {
 
 async function editCollection(c) {
   collection.value = { ...c }
-  filters.value = await $fetch(`/api/filter/${collection.value.id}`)
+  filters.value = await $fetch(`/api/collections/filters/${collection.value.id}`)
   dialog.value = true
 }
 
@@ -93,8 +93,7 @@ async function addFilter() {
   loading.value = true
   const tags = filterTags.value
   const places = filterPlaces.value.map(p => ({ id: p.id, name: p.name }))
-  // const actors = this.filterActors.map(a => ({ ap_id: a.ap_id, name: a.object?.preferredUsername ?? a.object?.username ?? a?.name, domain: a?.instanceDomain ?? a.domain  }))
-  const actors = []
+  const actors = filterActors.value.map(a => ({ ap_id: a.ap_id, name: a.object?.preferredUsername ?? a.object?.username ?? a?.name, domain: a?.instanceDomain ?? a.domain  }))
   const filter = { collectionId: collection.value.id, tags, places, actors, negate: negateFilter.value }
 
   // tags and places are JSON field and there's no way to use them inside a unique constrain
@@ -106,7 +105,7 @@ async function addFilter() {
   // )
   try {
     if (editFilterId.value !== false) {
-      await $fetch(`/api/filter/${editFilterId.value}`, { body: filter, method: 'PUT' })
+      await $fetch(`/api/filters/${editFilterId.value}`, { body: filter, method: 'PUT' })
     } else {
       // if (alreadyExists) {
       //     this.$root.$message('Already exists', { color: 'warning' })
@@ -114,14 +113,14 @@ async function addFilter() {
       //     return
       //   }
       //   await this.$axios.$post('/filter', filter )
-      await $fetch('/api/filter', { body: filter, method: 'POST' })
+      await $fetch('/api/filters', { body: filter, method: 'POST' })
     }
   } catch (e) {
     loading.value = false
     $notify(String(e), Statuses.ERROR)
   } 
   refresh()
-  filters.value = await $fetch(`/api/filter/${collection.value.id}`)
+  filters.value = await $fetch(`/api/collections/filters/${collection.value.id}`)
   filterTags.value = []
   filterPlaces.value = []
   filterActors.value = []
@@ -187,7 +186,7 @@ async function editFilter(filter) {
 async function removeFilter(filter) {
   loading.value = true
   try {
-    await $fetch(`/api/filter/${filter.id}`, { method: 'DELETE' })
+    await $fetch(`/api/filters/${filter.id}`, { method: 'DELETE' })
     filters.value = filters.value.filter(f => f.id !== filter.id)
   } catch (e) {
     const err = get(e, 'response.data.errors[0].message', e)
@@ -198,10 +197,10 @@ async function removeFilter(filter) {
 }
 
 const searchTags = ref('')
-const { data: tags } = await useFetch('/api/tags', { query: { searchTags } })
+const { data: tags } = await useFetch('/api/tags', { query: { query: searchTags } })
 
 const searchPlaces = ref('')
-const { data: places } = await useFetch('/api/places', { query: { searchPlaces } })
+const { data: places } = await useFetch('/api/places', { query: { query: searchPlaces } })
 
 // get trusted AP actors adding myself
 const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: ret => [{ ap_id: null }, ...ret] })
@@ -253,14 +252,14 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
 
     <v-dialog
       v-model="dialog"
-      max-width="8000"
-      width="800"
+      max-width="1200"
+      width="1000"
       destroy-on-close
       :fullscreen="$vuetify.display?.mobile"
     >
       <v-card>
-        <v-card-title>
-          {{ $t('admin.edit_collection') }}
+        <v-card-title class="bg-primary">
+          {{ $t(!collection.id ? 'admin.new_collection' : 'admin.edit_collection') }}
         </v-card-title>
         <v-card-text>
           <v-form v-model="valid" ref="form" @submit.prevent="saveCollection">
@@ -273,7 +272,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
             >
               <template #append v-if="!collection.id">
                 <v-btn
-                  variant='text'
+                  variant='outlined'
                   @click="saveCollection"
                   color="primary"
                   :loading="loading"
@@ -306,33 +305,24 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
                 :delimiters="[';', ',']"
                 :items="actors"
                 :label="$t('common.trusted_sources')"
-              />
-                <!-- <template v-slot:item="{ item }">
-                  <v-list-item-avatar>
-                    <v-img :src="$format.actor(item, 'icon')" />
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      {{ $format.actor(item, 'title') }}
-                    </v-list-item-title>
-                    <v-list-item-subtitle>
-                      {{ $format.actor(item, 'label') }}
-                    </v-list-item-subtitle>
-                  </v-list-item-content>
-                </template> -->
-                <!-- <template #chip="{ item, attrs, selected, parent }">
+              >
+                <template #item="{ item, props }">
+                  <v-list-item v-bind="props"
+                    :prepend-avatar="format.actor(item.raw, 'icon')" 
+                    :title="format.actor(item.raw, 'title')"
+                    :subtitle="format.actor(item.raw, 'label')"/>
+                </template>
+                <template #chip="{ item, props, selected }">
                   <v-chip
-                    v-bind="attrs"
+                    v-bind="props"
                     closable
-                    @click:close="parent.selectItem(item)"
                     :model-value="selected"
-                    label
                     size='small'
                   >
-                    {{ $format.actor(item, 'label') }}
+                    {{ format.actor(item.raw, 'label') }}
                   </v-chip>
                 </template>
-              </v-autocomplete> -->
+              </v-autocomplete>
             </v-col>
 
             <v-col cols="6">
@@ -435,21 +425,17 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
               <v-chip
                 class="ma-1"
                 size='small'
-                label
                 v-for="tag in item.tags"
-                v-text="tag"
                 :key="tag"
-              />
+              >sd{{ tag }}</v-chip>
             </template>
             <template v-slot:item.places="{ item }">
               <v-chip
                 class="ma-1"
                 size='small'
-                label
                 v-for="place in item.places"
-                v-text="place.name"
                 :key="place.id"
-              />
+              >{{ place.name }}</v-chip>
             </template>
             <template v-slot:item.actors="{ item }">
               <v-chip
@@ -459,8 +445,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
                 v-for="actor in item.actors"
                 :key="actor.ap_id"
               >
-                {{ actor }}
-                <!-- {{ $format.actor(actor, 'filter') }} -->
+                {{ format.actor(actor, 'filter') }}
               </v-chip>
             </template>
           </v-data-table>

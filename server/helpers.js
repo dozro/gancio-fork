@@ -216,17 +216,6 @@ const log = useLogger('helper')
   //   log.debug(`${req.method} ${req.path}`)
   //   next()
   // },
-
-  // col(field) {
-  //   if (config.db.dialect === 'postgres') {
-  //     return '"' + field.split('.').join('"."') + '"'
-  //   } else if (config.db.dialect === 'mariadb') {
-  //     return '`' + field.split('.').join('`.`') + '`'
-  //   } else {
-  //     return field
-  //   }
-  // },
-  // 
   
   
 async function readableWebToNodeStream(webStream) {

@@ -15,7 +15,7 @@ const headers = [
 ]
 
 
-const { data: tags, refresh } = await useFetch('/api/tags')
+const { data: tags, refresh } = await useFetch('/api/tags/list')
 
 function editTag(item) {
   tag.value.tag = item.tag
@@ -75,14 +75,18 @@ async function removeTag (tag) {
             prepend-icon="mdi-tag"
             hide-no-data
             persistent-hint
-            :items="newTag ? tags.filter(t => t.tag.includes(newTag)) : tags"
+            :items="tags"
             :return-object='false'
             item-value='tag'
             item-title='tag'
             :label="$t('common.tag')"
             @keyup.enter='saveTag'>
-              <template #item="{ item }">
-                <span> "{{item.tag}}" <small>({{item.count}})</small></span>
+              <template #item="{ item, props }">
+                <v-list-item v-bind="props">
+                  <template #title>
+                    "{{item.raw.tag}}" <small>({{item.raw.count}})</small>
+                  </template>
+                </v-list-item>
               </template>
             </v-combobox>
         </v-form>

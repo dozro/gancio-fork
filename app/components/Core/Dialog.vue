@@ -44,7 +44,7 @@ function result (value) {
 <template>
   <v-dialog v-model='visible'  width='400'>
     <v-card>
-      <v-toolbar :title="title || $t('common.confirm')" />
+      <v-card-title class="bg-primary">{{title || $t('common.confirm')}}</v-card-title>
       <v-card-text>
         <div v-html='msg' />
         <v-textarea v-if='type === "promptDialog"' variant='underlined' :label='name' v-model='userInput' />

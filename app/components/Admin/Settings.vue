@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const { locales } = useI18n()
-const filteredTimezones = []
+// const filteredTimezones = []
 
-const instanceSettings = await $fetch('/api/settings')
+// const instanceSettings = await $fetch('/api/settings')
 
 const title = manageSetting('title')
 const description = manageSetting('description')
@@ -35,9 +35,9 @@ const enable_report = manageSetting('enable_report')
           :label="$t('common.description')"
           :hint="$t('admin.description_description')" persistent-hint />
 
-        <v-text-field class='mt-5' v-model="instance_name" 
+        <!-- <v-text-field class='mt-5' v-model="instance_name" 
           :label="$t('common.instance_name')"
-          :hint="$t('admin.description_description')" persistent-hint />
+          :hint="$t('admin.description_description')" persistent-hint /> -->
 
         <v-autocomplete class="mt-5" 
             v-model="instance_timezone" 
@@ -64,7 +64,7 @@ const enable_report = manageSetting('enable_report')
             v-model="allow_recurrent_event" 
             :label="$t('admin.allow_recurrent_event')" />
 
-        <v-switch class="mt-1" v-if="instanceSettings.allow_recurrent_event"
+        <v-switch class="mt-1" v-if="allow_recurrent_event"
             v-model="recurrent_event_visible" 
             :label="$t('admin.recurrent_event_visible')" />
 
@@ -92,7 +92,7 @@ const enable_report = manageSetting('enable_report')
             persistent-hint :hint="$t('admin.enable_moderation_hint')" 
             :label="$t('admin.enable_moderation')" />
 
-        <v-switch class="mt-4" v-if="instanceSettings.enable_moderation"
+        <v-switch class="mt-4" v-if="enable_moderation"
           persistent-hint
           :hint="$t('admin.enable_report_hint')"
           v-model='enable_report'
