@@ -81,25 +81,25 @@ export async function getCollectionEvents(opts?: CollectionQueryType | undefined
 
     if (f.actors && f.actors.length) {
       // search for local instance
-      // if (f.actors.find(a => a.ap_id === null)) {
-      //   tmpConditions.push({ [Op.or]: [{ apUserApId: f.actors.map(a => a.ap_id).filter(a => a)}, { apUserApId: null }]})
-      // } else {
-      //   tmpConditions.push({ apUserApId: f.actors.map(a => a.ap_id) })
-      // }
+      if (f.actors.find(a => a.ap_id === null)) {
+        tmpConditions.push({ [Op.or]: [{ apUserApId: f.actors.map(a => a.ap_id).filter(a => a)}, { apUserApId: null }]})
+      } else {
+        tmpConditions.push({ apUserApId: f.actors.map(a => a.ap_id) })
+      }
     }
 
-    // if (!tmpConditions.length) return
-    // if (f.negate) {
-    //   negatedConditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.and]: tmpConditions })
-    // } else {
-    //   conditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.and]: tmpConditions })
-    // }
+    if (!tmpConditions.length) return
+    if (f.negate) {
+      negatedConditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.and]: tmpConditions })
+    } else {
+      conditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.and]: tmpConditions })
+    }
   })
 
-  // where[Op.and] = {
-  //   ...(negatedConditions.length > 0 && { [Op.not]: negatedConditions}),
-  //   ...(conditions.length > 0 && { [Op.or]: conditions })
-  // }
+  where[Op.and] = {
+    ...(negatedConditions.length > 0 && { [Op.not]: negatedConditions}),
+    ...(conditions.length > 0 && { [Op.or]: conditions })
+  }
 
   const events = await Event.findAll({
     where,
