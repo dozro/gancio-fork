@@ -8,7 +8,7 @@ const code = computed(() => `<script src='${settings.value.baseurl}\/gancio-even
 </script>
 <template>
 <v-card>
-  <v-toolbar :title="$t('common.embed_title')" />
+  <v-card-title class="bg-primary">{{$t('common.embed_title')}}</v-card-title>
   <v-card-text>
     <!-- <v-alert class="mb-3 mt-1" type="info" show-icon icon="mdi-information"> -->
       {{$t('common.embed_help')}}

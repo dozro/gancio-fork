@@ -101,7 +101,7 @@ async function report () {
 <template>
 <v-container
   v-if='event'
-  class="h-event pa-2 pa-sm-2 pt-0 pt-sm-0 event"
+  class="h-event pa-2 pa-sm-2 pt-0 pt-sm-0"
   max-width='1200 '
   itemscope
   itemtype="https://schema.org/Event"

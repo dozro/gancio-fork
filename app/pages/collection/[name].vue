@@ -1,10 +1,22 @@
 <script setup lang="ts">
-import type { Event } from '#build/types/nitro-imports';
+import type { Event } from '#build/types/nitro-imports'
+const route = useRoute()
+const settings = useState<Settings>('settings')
 
-
+useHead({
+  title: computed(() => `${settings.value?.title} - ${route.params.name}`),
+  meta: [
+    { property: 'og:title', content: settings.value.title },
+    { property: 'og:url', content: settings.value.baseurl },
+    { property: 'og:image', content: settings.value.baseurl + '/logo.png' }
+  ],
+  link: [
+    { rel: 'alternate', type: 'application/rss+xml', title: settings.value.title, href: settings.value.baseurl + '/feed/rss' },
+    { rel: 'alternate', type: 'text/calendar', title: settings.value.title, href: settings.value.baseurl + '/feed/ics' },
+  ]
+})
 const hide_thumbs = false
 
-const route = useRoute()
 const { data: events } = await useFetch<Event[]>(`/api/collections/${route.params.name}`) 
 
 </script>

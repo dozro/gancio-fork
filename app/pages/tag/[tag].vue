@@ -29,6 +29,7 @@ useHead( () => {
       </h1>
 
       <!-- Events -->
+      <section class='events mt-sm-4 mt-2'>
       <v-lazy class='event' :modelValue='idx<9'
         v-for='(event, idx) in events' :key='event.id'
         :min-height='settings.hide_thumbs ? 105 : undefined'
@@ -36,5 +37,6 @@ useHead( () => {
         <!-- :class="{ 'theme--dark': is_dark }"> -->
         <EventCard :event='event' :lazy='idx>9' />
       </v-lazy>
+      </section>
     </v-container>
   </template>

@@ -170,7 +170,7 @@ const link = computed(() => {
                     :sidebar="list.sidebar" />
                 </v-col>
               </v-row>
-              <v-alert class="pa-5 my-4 blue-grey darken-4 text-body-1 lime--text text--lighten-3">
+              <v-alert class="pa-5 my-4 bg-blue-grey-darken-4 text-body-1 text-lime-lighten-3">
                 <pre>{{code}}</pre>
                 <v-btn class="float-end" variant='text' append-icon='mdi-content-copy' color="primary" @click="$copyToClipboard(code)">
                   {{$t("common.copy")}}

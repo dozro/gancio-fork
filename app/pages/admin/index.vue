@@ -20,9 +20,9 @@ const { data: unconfirmedEvents } = await useFetch('/api/events/unconfirmed')
       <div class="d-flex flex-column">
       <!-- admin alert -->
       <AdminSetupAlert v-if="isAdmin" />
-      <v-tabs v-model="selectedTab" bg-color="note">
+      <v-tabs v-model="selectedTab" show-arrows>
           <!-- <v-tab href="#settings" v-if="isAdmin" value="settings"> {{ $t('common.settings') }}</v-tab> -->
-          <v-tab prepend-icon='mdi-cog' href="#settings" value="settings"> {{ $t('common.settings') }}</v-tab>
+          <v-tab v-if='isAdmin' prepend-icon='mdi-cog' href="#settings" value="settings"> {{ $t('common.settings') }}</v-tab>
           <v-tab prepend-icon='mdi-calendar' href="#events" value="events"> {{ $t('common.events') }}</v-tab>
           <v-tab prepend-icon='mdi-account-group' href="#users" value="users"> {{ $t('common.users') }}</v-tab>
           <v-tab prepend-icon='mdi-group' href="#collections" value="collections"> {{ $t('common.collections') }}</v-tab>
@@ -31,7 +31,7 @@ const { data: unconfirmedEvents } = await useFetch('/api/events/unconfirmed')
           <v-tab prepend-icon='mdi-map-marker' href="#places" value="places"> {{ $t('common.places') }}</v-tab>
           <v-tab prepend-icon='mdi-tag-text' href="#tags" value="tags"> {{ $t('common.tags') }}</v-tab>
           <v-tab prepend-icon='mdi-shape' href="#theme" value="theme"> {{ $t('common.theme') }}</v-tab>
-          <v-tab prepend-icon='mdi-map' href="#geolocation" value="geolocation"> {{ $t('common.geolocation') }}</v-tab>
+          <v-tab prepend-icon='mdi-map' href="#geolocation" value="geolocation"> {{ $t('admin.geolocation') }}</v-tab>
           <v-tab prepend-icon='mdi-post-outline' href="#pages" value="pages"> {{ $t('common.pages') }}</v-tab>
           <v-tab prepend-icon='mdi-bullhorn' href="#announcements" value="announcements"> {{ $t('common.announcements') }}</v-tab>
           <v-tab prepend-icon='mdi-toy-brick' href="#plugins" value="plugins"> {{ $t('common.plugins') }}</v-tab>
