@@ -1,6 +1,6 @@
 import { Event, Message } from "./sequelize"
 import { DateTime } from 'luxon'
-import { Op, literal, col, where, fn, Filterable, InferAttributes, WhereOptions } from '@sequelize/core'
+import { Op, literal, col, where, fn, Filterable, InferAttributes, WhereOptions, sql } from '@sequelize/core'
 
 import { z } from 'zod'
 export const eventQuerySchema = z.object({
@@ -72,22 +72,21 @@ export async function getEvents(opts?: EventQueryType | undefined) {
   }
 
   // // normalize tags
-  // if (args.tags) {
-  //   args.tags = args.tags.split(',').map(t => t.trim())
-  // }
+  if (args.tags) {
+    args.tags = args.tags.map(t => t.trim())
+  }
 
   const replacements = []
   if (args.tags && args.places) {
-  //   condition[Op.and] = [
-  //     { placeId: args.places ? args.places.split(',') : [] },
-  //     fn('EXISTS', literal(`SELECT 1 FROM event_tags WHERE ${Col('event_tags.eventId')}=${Col('event.id')} AND ${Col('tagTag')} in (?)`))
-  //   ]
-  //   replacements.push(args.tags)
+    condition[Op.and] = [
+      { placeId: args.places },
+      sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('event', 'id')} AND ${sql.identifier('tagTag')} in (${sql.list(args.tags)}))`
+    ]
+  
   } else if (args.tags) {
-    // condition[Op.and] = fn('EXISTS', literal(`SELECT 1 FROM event_tags WHERE ${Col('event_tags.eventId')}=${Col('event.id')} AND ${Col('tagTag')} in (?)`))
-    replacements.push(args.tags)
+    condition[Op.and] = sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('event', 'id')} AND ${sql.identifier('tagTag')} in (${sql.list(args.tags)}))`
   } else if (args.places) {
-  //   condition.placeId = args.places.split(',')
+    condition.placeId = args.places
   }
 
   // if (args.query) {
@@ -122,32 +121,36 @@ export async function getEvents(opts?: EventQueryType | undefined) {
       include: [
         {
           model: Tag,
-          // order: [Sequelize.literal('(SELECT COUNT(tagTag) FROM event_tags WHERE tagTag = tag) DESC')],
+          // order: [sql`(SELECT COUNT(tagTag) FROM event_tags WHERE tagTag = tag) DESC)`],
           attributes: ['tag'],
           through: { attributes: [] }
         },
         { model: Place, required: true, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] }
       ],
       ...pagination,
-    //   replacements
+      replacements,
     }).catch(e => {
       console.error('[EVENT]' + String(e))
       return []
     })
 
     // return events
-    return events.map(e => {
-      e = e.get()
-      e.tags = e.tags ? e.tags.map(t => t && t.tag) : []
-      e.end_datetime = Number(e.end_datetime) || null
-      if (!e.multidate) {
-        delete e.multidate
-      }
-      if (!e.image_path) {
-        delete e.image_path
-      }
-      return e
-    })
+    return mapEvents(events)
+}
+
+export async function mapEvents (events: Event[]) {
+  return events.map(event => {
+    const e = event.get()
+    e.tags = e.tags ? e.tags.map(t => t && t.tag) : []
+    e.end_datetime = Number(e.end_datetime) || null
+    if (!e.multidate) {
+      delete e.multidate
+    }
+    if (!e.image_path) {
+      delete e.image_path
+    }
+    return e
+  })
 }
 
 export async function getMessages(eventId: Number) {
