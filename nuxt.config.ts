@@ -1,5 +1,5 @@
 import { version } from './package.json'
-// import locales from './i18n/locales/index'
+import locales from './i18n/locales/index'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -11,12 +11,15 @@ export default defineNuxtConfig({
   // 2025-07-20
   
   devtools: {
-    enabled: false,
+    enabled: true,
     timeline: {
       enabled: true,
     },
   },
-  
+  sourcemap: {
+    server: true,
+    client: true,
+  },
   css: [
     '~/assets/css/main.css',
     // '@mdi/font/css/materialdesignicons.css',
@@ -32,10 +35,6 @@ export default defineNuxtConfig({
   },
   i18n: {
     defaultLocale: 'en',
-    locales: [
-          { code: 'en', name: 'English', file: 'en.js' },
-          { code: 'it', name: 'Italian', file: 'it.json' }
-    ],
     lazy: true,            // enable lazy loading
     // langDir: 'locales/',   // must be set, but won’t be used for actual loading
     // types: 'composition',
