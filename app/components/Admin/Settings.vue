@@ -46,7 +46,12 @@ const enable_report = manageSetting('enable_report')
 
         <v-select class="mt-5" 
             v-model="instance_locale" 
-            :label="$t('admin.instance_locale')" :hint="$t('admin.instance_locale_description')" persistent-hint :items="locales" />
+            :label="$t('admin.instance_locale')"
+            :hint="$t('admin.instance_locale_description')"
+            persistent-hint
+            item-title="name"
+            item-value="code"
+            :items="locales" />
 
         <v-switch class="mt-4"
             v-model="allow_registration" 
