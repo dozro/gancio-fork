@@ -77,15 +77,15 @@ async function editCollection(c) {
   dialog.value = true
 }
 
-function manageSetting(key) {
-  return computed({
-    get: () =>  settings.value[key],
-    set: (value) => {
-      $fetch('/api/settings', { method: 'PUT', body: { key, value } })
-      settings.value[key] = value
-    }
-  })
-}
+// function manageSetting(key) {
+//   return computed({
+//     get: () =>  settings.value[key],
+//     set: (value) => {
+//       $fetch('/api/settings', { method: 'PUT', body: { key, value } })
+//       settings.value[key] = value
+//     }
+//   })
+// }
 
 const collection_in_home = manageSetting('collection_in_home')
 
@@ -427,7 +427,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
                 size='small'
                 v-for="tag in item.tags"
                 :key="tag"
-              >sd{{ tag }}</v-chip>
+              >{{ tag }}</v-chip>
             </template>
             <template v-slot:item.places="{ item }">
               <v-chip
