@@ -34,7 +34,7 @@ export const eventQuerySchema = z.object({
 })
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-export async function getEvents(opts?: EventQueryType | undefined) {
+export async function getEvents(opts?: EventQueryType | undefined): Promise<Event[]> {
 
   const args  = eventQuerySchema.parse(opts)
   const condition = {//} // : WhereOptions<InferAttributes<Event, { omit: never; }>> = {
@@ -80,7 +80,7 @@ export async function getEvents(opts?: EventQueryType | undefined) {
   if (args.tags && args.places) {
     condition[Op.and] = [
       { placeId: args.places },
-      sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('event', 'id')} AND ${sql.identifier('tagTag')} in (${sql.list(args.tags)}))`
+      sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('event', 'id')} AND ${sql.identifier('tagTag')} in ${sql.list(args.tags)})`
     ]
   
   } else if (args.tags) {
@@ -138,7 +138,7 @@ export async function getEvents(opts?: EventQueryType | undefined) {
     return mapEvents(events)
 }
 
-export async function mapEvents (events: Event[]) {
+export function mapEvents (events: Event[]) : Event[] {
   return events.map(event => {
     const e = event.get()
     e.tags = e.tags ? e.tags.map(t => t && t.tag) : []

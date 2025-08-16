@@ -4,16 +4,23 @@ import { exportFeed } from "~~/server/utils/rss"
 
 export default defineCachedEventHandler(async evt => {
   const format = getRouterParam(evt, 'format')
-  const {tags, places, collection, show_recurrent }= getQuery(evt)
+  const {tags, places, collection, show_recurrent } = getQuery(evt)
+  
   const opt = {
-    zone: publicSettings.instance_timezone,
-    locale: publicSettings.instance_locale
+    zone: publicSettings.instance_timezone || 'Europe/Rome',
+    locale: publicSettings.instance_locale || 'en-US'
+  }
+
+  const yesterday = DateTime.local(opt).minus({day: 1}).toSeconds()
+
+  let events
+  if (collection) {
+    events = await getCollectionEvents({ name: collection })
+  } else {
+
+    events = await getEvents({ start: yesterday, tags, places, show_recurrent })
   }
   
-  const where = {}
-  const yesterday = DateTime.local(opt).minus({day: 1}).toUnixInteger()
-
-  const events = await getEvents({})
 
   switch (format) {
     case 'rss':
