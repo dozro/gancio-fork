@@ -61,7 +61,17 @@ WORKDIR /home/node
 
 COPY --from=builder --chown=node:node /home/node/package*.json ./
 COPY --from=builder --chown=node:node /home/node/.output/ ./.output/
-COPY ./gancio.js ./.output/server/
+COPY --from=builder --chown=node:node /home/node/.output/ ./.output/
+RUN mkdir uploads
+COPY ./server/migrations ./.output/server/migrations/
+COPY cli ./.output/server/cli/
+COPY gancio.js ./.output/server/gancio.js
+COPY .env.example ./.env
+COPY gancio.sqlite.rel ./gancio.sqlite
+# COPY ./uploads/logo.png ./uploads/
+# COPY ./uploads/fallbackimage.svg ./uploads/
+# COPY ./uploads/headerimage.svg "./uploads/"
+
 EXPOSE 13120
 
 CMD ["node", ".output/server/gancio.js"]

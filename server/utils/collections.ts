@@ -1,4 +1,4 @@
-import Sequelize, { Op } from "@sequelize/core"
+import Sequelize, { Op, sql } from "@sequelize/core"
 import { Event } from "./sequelize"
 import { DateTime } from "luxon"
 import z from "zod"
@@ -69,11 +69,10 @@ export async function getCollectionEvents(opts?: CollectionQueryType | undefined
 
     let tmpConditions = []
 
-    // if (f.tags && f.tags.length) {
-    //   const tags = Sequelize.fn('EXISTS', Sequelize.literal(`SELECT 1 FROM event_tags WHERE 'event_tags.eventId')}=event.id AND ${Col('tagTag')} in (?)`))
-    //   replacements.push(f.tags)
-    //   tmpConditions.push(tags)
-    // }
+    if (f.tags && f.tags.length) {
+      tmpConditions.push(
+        sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('event', 'id')} AND ${sql.identifier('tagTag')} in ${sql.list(f.tags)})`)
+    }
 
     if (f.places && f.places.length) {
         tmpConditions.push({ placeId: f.places.map(p => p.id) })
@@ -96,10 +95,14 @@ export async function getCollectionEvents(opts?: CollectionQueryType | undefined
     }
   })
 
-  where[Op.and] = {
-    ...(negatedConditions.length > 0 && { [Op.not]: negatedConditions}),
-    ...(conditions.length > 0 && { [Op.or]: conditions })
+  if (negatedConditions.length) {
+    where[Op.not] = negatedConditions
   }
+
+  where[Op.and] = conditions // {
+    // ...(negatedConditions.length > 0 && { [Op.not]: negatedConditions}),
+  //  ...conditions
+  //}
 
   const events = await Event.findAll({
     where,
@@ -120,13 +123,14 @@ export async function getCollectionEvents(opts?: CollectionQueryType | undefined
     ],
     ...( opts?.limit && { limit: args.limit }),
     ...( opts?.page && args.limit && { offset: args.page * args.limit }),
-    replacements
+    replacements,
+    logging: console.log
   }).catch(e => {
     log.error('[EVENT]', e)
     return []
   })
 
-  return events
+  return mapEvents(events)
 }
 
         //     return events.map(e => {

@@ -82,6 +82,7 @@ cp -ra .output/ "${PKG_MAIN}/.output/"
 
 cp -ra ./server/migrations "${PKG_MAIN}/.output/server/migrations/"
 cp -ra cli "${PKG_MAIN}/.output/server/cli/"
+cp -ra i18n "${PKG_MAIN}/i18n/"
 cp gancio.js "${PKG_MAIN}/.output/server/gancio.js"
 cp .env.example "${PKG_MAIN}/.env"
 cp gancio.sqlite.rel "${PKG_MAIN}/gancio.sqlite"
