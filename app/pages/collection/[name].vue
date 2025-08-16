@@ -11,8 +11,8 @@ useHead({
     { property: 'og:image', content: settings.value.baseurl + '/logo.png' }
   ],
   link: [
-    { rel: 'alternate', type: 'application/rss+xml', title: settings.value.title, href: settings.value.baseurl + '/feed/rss' },
-    { rel: 'alternate', type: 'text/calendar', title: settings.value.title, href: settings.value.baseurl + '/feed/ics' },
+    { rel: 'alternate', type: 'application/rss+xml', title: settings.value.title, href: settings.value.baseurl + '/feed/rss?collection=' + route.params.name },
+    { rel: 'alternate', type: 'text/calendar', title: settings.value.title, href: settings.value.baseurl + '/feed/ics?collection=' + route.params.name },
   ]
 })
 const hide_thumbs = false
