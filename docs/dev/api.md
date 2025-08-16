@@ -1,7 +1,7 @@
 ---
 layout: default
 title: API
-permalink: /dev/apiv2
+permalink: /dev/api
 parent: Hacking
 nav_order: 8
 ---
