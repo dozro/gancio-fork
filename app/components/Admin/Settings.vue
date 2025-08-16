@@ -20,6 +20,7 @@ const allow_geolocation = manageSetting('allow_geolocation')
 const show_download_media = manageSetting('show_download_media')
 const enable_moderation = manageSetting('enable_moderation')
 const enable_report = manageSetting('enable_report')
+const showSMTP = ref(false)
 
 </script>
 <template>
@@ -102,6 +103,14 @@ const enable_report = manageSetting('enable_report')
           :hint="$t('admin.enable_report_hint')"
           v-model='enable_report'
           :label="$t('admin.enable_report')" />
+
+        <v-btn variant='outlined' @click='showSMTP=true' color='primary' class="mt-6">
+          {{$t('admin.show_smtp_setup')}}
+        </v-btn>
+
+  <v-dialog v-model='showSMTP' destroy-on-close max-width='700px' :fullscreen='$vuetify.display?.mobile'>
+    <AdminSMTP @close='showSMTP = false' />
+  </v-dialog>
 
 
     </v-card-text>
