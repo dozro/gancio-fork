@@ -5,7 +5,6 @@ import { ca, cs, de, en, es, fr, it, nl, pl, pt, tr, sk, sv, ro, ru, zhHans  } f
 
 import { aliases, md } from 'vuetify/iconsets/md'
 export default () => {
-
 //   const settings = process.server ? (res.locals.settings || {}) : nuxtState.state.settings || {}
 //   const is_dark = nuxtState?.state?.localSettings['theme.is_dark'] ?? settings['theme.is_dark']
 
@@ -32,10 +31,16 @@ return {
       },
       // dark: is_dark,
       themes: {
-    //     dark: settings.dark_colors,
+        // dark: settings.dark_colors,
+        dark: {
+          colors: {
+            primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00',
+          }
+        },
         light: {
           colors: {
-            surface: '#f8f8f8'
+            surface: '#f8f8f8',
+            primary: '#FF4500', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00'
           }
         }
       }
