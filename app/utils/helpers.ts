@@ -1,3 +1,8 @@
+/**
+ * FrontEnd helpers utilities
+ */
+
+
 import type { APUser, Event } from "#build/types/nitro-imports"
 
 export function mediaURL (event: Event, type?: string, format = '.jpg') {
@@ -15,7 +20,24 @@ export function mediaURL (event: Event, type?: string, format = '.jpg') {
   return ''
 }
 
+export function manageSetting(key: keyof Settings, setCb = null) {
+  const settings = useState<Settings>('settings')
+  return computed({
+    get: () =>  settings.value[key],
+    set: (value) => {
+      $fetch('/api/settings', { method: 'PUT', body: { key, value } })
+      if (typeof setCb === 'function') { setCb(value) }
+      settings.value[key] = value
+    }
+  })
+}
+
+
+/**
+ * This is a generic formatter to use especially in templates
+ */
 export const format = {
+  /** Actor formatter, used in Admin > Collections > Filter > Instance autocomplete */
   actor (actor: APUser, context='label') {
     const settings = useState<Settings>('settings')
     if (context === 'title') {
