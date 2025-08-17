@@ -74,7 +74,7 @@ export async function connect() {
 }
 
 export async function runMigrations(sequelize: Sequelize) {
-  log.warn('running migrations!')
+  log.info('Running migrations!')
     const umzug = new Umzug({
         storage: new SequelizeStorage({ sequelize }),
         migrations: { glob: './server/migrations/*.js'},
@@ -409,10 +409,10 @@ InferCreationAttributes<Place>
     @Attribute(DataTypes.STRING)
     declare address: string
     
-    @Attribute(DataTypes.FLOAT)
+    @Attribute(DataTypes.DOUBLE)
     declare latitude: number
     
-    @Attribute(DataTypes.FLOAT)
+    @Attribute(DataTypes.DOUBLE)
     declare longitude: number
     
     @HasMany(() => Event, /* foreign key */ 'placeId')
