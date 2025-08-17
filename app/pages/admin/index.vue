@@ -1,17 +1,20 @@
 <script setup lang="ts">
 const settings = useState<Settings>('settings')
+
 definePageMeta({ middleware: ['authenticated'] })
 useHead({
   title: settings.value.title + ' - Admin'
 })
+
 const { isAdmin } = useAuth()
 const route = useRoute()
-const selectedTab = ref(route.params.hash) // route.params.hash !??!
+const selectedTab = ref(route.query.tab) // route.params.hash !??!
 
-// const { data: users } = await useFetch('/api/users')
+watch(selectedTab, () => {
+  navigateTo({ query: { tab: selectedTab.value }})
+})
+
 const { data: unconfirmedEvents } = await useFetch('/api/events/unconfirmed')
-// const unconfirmedEvents = events?.value.events
-// const unconfirmedOldEvents = events?.value.oldEvents
 
 </script>
 <template>
@@ -22,23 +25,23 @@ const { data: unconfirmedEvents } = await useFetch('/api/events/unconfirmed')
       <AdminSetupAlert v-if="isAdmin" />
       <v-tabs v-model="selectedTab" show-arrows>
           <!-- <v-tab href="#settings" v-if="isAdmin" value="settings"> {{ $t('common.settings') }}</v-tab> -->
-          <v-tab v-if='isAdmin' prepend-icon='mdi-cog' href="#settings" value="settings"> {{ $t('common.settings') }}</v-tab>
-          <v-tab prepend-icon='mdi-calendar' href="#events" value="events"> {{ $t('common.events') }}</v-tab>
-          <v-tab prepend-icon='mdi-account-group' href="#users" value="users"> {{ $t('common.users') }}</v-tab>
-          <v-tab prepend-icon='mdi-group' href="#collections" value="collections"> {{ $t('common.collections') }}</v-tab>
-          <v-tab prepend-icon='mdi-web' href="#federation" value="federation"> {{ $t('common.federation') }}</v-tab>
-          <!-- <v-tab href="#moderation" value="moderation"> {{ $t('common.moderation') }}</v-tab> -->
-          <v-tab prepend-icon='mdi-map-marker' href="#places" value="places"> {{ $t('common.places') }}</v-tab>
-          <v-tab prepend-icon='mdi-tag-text' href="#tags" value="tags"> {{ $t('common.tags') }}</v-tab>
-          <v-tab prepend-icon='mdi-shape' href="#theme" value="theme"> {{ $t('common.theme') }}</v-tab>
-          <v-tab prepend-icon='mdi-map' href="#geolocation" value="geolocation"> {{ $t('admin.geolocation') }}</v-tab>
-          <v-tab prepend-icon='mdi-post-outline' href="#pages" value="pages"> {{ $t('common.pages') }}</v-tab>
-          <v-tab prepend-icon='mdi-bullhorn' href="#announcements" value="announcements"> {{ $t('common.announcements') }}</v-tab>
-          <v-tab prepend-icon='mdi-toy-brick' href="#plugins" value="plugins"> {{ $t('common.plugins') }}</v-tab>
+          <v-tab v-if='isAdmin' prepend-icon='mdi-cog' value="settings"> {{ $t('common.settings') }}</v-tab>
+          <v-tab prepend-icon='mdi-calendar' value="events"> {{ $t('common.events') }}</v-tab>
+          <v-tab prepend-icon='mdi-account-group' value="users"> {{ $t('common.users') }}</v-tab>
+          <v-tab prepend-icon='mdi-group' value="collections"> {{ $t('common.collections') }}</v-tab>
+          <v-tab prepend-icon='mdi-web' value="federation"> {{ $t('common.federation') }}</v-tab>
+          <!-- <v-tab value="moderation"> {{ $t('common.moderation') }}</v-tab> -->
+          <v-tab prepend-icon='mdi-map-marker' value="places"> {{ $t('common.places') }}</v-tab>
+          <v-tab prepend-icon='mdi-tag-text' value="tags"> {{ $t('common.tags') }}</v-tab>
+          <v-tab prepend-icon='mdi-shape' value="theme"> {{ $t('common.theme') }}</v-tab>
+          <v-tab prepend-icon='mdi-map' value="geolocation"> {{ $t('admin.geolocation') }}</v-tab>
+          <v-tab prepend-icon='mdi-post-outline' value="pages"> {{ $t('common.pages') }}</v-tab>
+          <v-tab prepend-icon='mdi-bullhorn' value="announcements"> {{ $t('common.announcements') }}</v-tab>
+          <v-tab prepend-icon='mdi-toy-brick' value="plugins"> {{ $t('common.plugins') }}</v-tab>
       </v-tabs>
       
       
-          <v-tabs-window v-model="selectedTab">
+          <v-tabs-window :modelValue="selectedTab">
             <v-tabs-window-item value="settings">
                 <AdminSettings />
             </v-tabs-window-item>
