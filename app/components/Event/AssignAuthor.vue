@@ -2,7 +2,7 @@
 const props = defineProps({ event: { type: Object, default: () => ({})}})
 const loading = ref(false)
 const selectedUser = ref({})
-const { data: users } = useFetch('/api/users')
+const { data: users } = await useFetch('/api/users')
 
 async function assign () {
   try {
@@ -20,16 +20,16 @@ async function assign () {
 </script>
 <template>
   <v-card>
-    <v-card-title>{{$t('event.assign_to_user')}}</v-card-title>
-    <v-card-subtitle>{{$t('event.assign_to_user_description')}}</v-card-subtitle>
+    <v-card-title class="bg-primary">{{$t('event.assign_to_user')}}</v-card-title>
     <v-card-text>
+      <p class="mb-2">{{$t('event.assign_to_user_description')}}</p>
       <v-form>
         <v-autocomplete
           v-model='selectedUser'
           :items="users"
           :prepend-inner-icon="mdiAccount"
           hide-no-data
-          item-text="email"
+          item-title="email"
           item-value="id"
           placeholder='Choose user'
           :label="$t('common.user')" />
