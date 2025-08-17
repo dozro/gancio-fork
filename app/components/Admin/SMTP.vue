@@ -9,44 +9,44 @@ const smtp = ref({ auth: {} })
 smtp.value = await $fetch('/api/settings/smtp')
 smtp.value = Object.assign({ auth: {}, port: undefined }, smtp.value)
 
-const emit = defineEmits('close')
+const emit = defineEmits(['close'])
 
 const admin_email = manageSetting('admin_email')
 
 async function done (testing: boolean) {
-  const smt = JSON.parse(JSON.stringify(smtp.value))
-  if (!smt.auth.user) {
-    delete smt.auth
+  const tmpSMTP = JSON.parse(JSON.stringify(smtp.value))
+  if (!tmpSMTP.auth.user) {
+    delete tmpSMTP.auth
   }
 
   // override past `ignoreTLS` smtp setting
-  smt.ignoreTLS = false
+  tmpSMTP.ignoreTLS = false
 
-  smt.port = Number(smt.port)
+  tmpSMTP.port = Number(tmpSMTP.port)
   // force encryption based on selected port, see https://framagit.org/les/gancio/-/issues/192
-  if (smt.secure) {
-    if (smt.port === 465) {
-      smt.secure = true
-      smt.requireTLS = false
+  if (tmpSMTP.secure) {
+    if (tmpSMTP.port === 465) {
+      tmpSMTP.secure = true
+      tmpSMTP.requireTLS = false
     } else {
-      smt.secure = false
-      smt.requireTLS = true
+      tmpSMTP.secure = false
+      tmpSMTP.requireTLS = true
     }
   } else {
     // use TLS immediately for port 465
     // this is recommended in nodemailer documentation
-    smt.secure = smt.port === 465
-    smt.requireTLS = false
+    tmpSMTP.secure = tmpSMTP.port === 465
+    tmpSMTP.requireTLS = false
   }
   
   try {
     if (testing) {
       loading.value = true
-        await $fetch('/api/settings/test_smtp', { method: 'POST', body: { smt }})
-        $notify('admin.smtp_test_success', { admin_email })
+        await $fetch('/api/settings/test_smtp', { method: 'POST', body: { tmpSMTP }})
+        $notify('admin.smtp_test_success', Statuses.SUCCESS, { admin_email })
         loading.value = false
       } else {
-        await $fetch('/api/settings', { method: 'PUT', body: { key: 'smtp', value: smt }})
+        await $fetch('/api/settings', { method: 'PUT', body: { key: 'smtp', value: tmpSMTP }})
         emit('close')
       }
     } catch (e) {
@@ -59,7 +59,6 @@ async function done (testing: boolean) {
 <v-card>
   <v-card-title class="bg-primary">SMTP Email configuration</v-card-title>
   <v-card-text>
-    <span>{{ smtp }}</span>
     <p class='mb-2' v-html="$t('admin.smtp_description')"></p>
     <v-form v-model="isValid">
 

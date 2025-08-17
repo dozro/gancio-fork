@@ -4,6 +4,8 @@ const loading = ref(false)
 const dialog = ref(false)
 const valid = ref(false)
 const selectedPlugin = ref({})
+
+const { $notify } = useNuxtApp()
 const { data: plugins } = await useFetch('/api/plugins')
 
 async function saveSettings (close=true) {
