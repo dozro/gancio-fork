@@ -5,7 +5,10 @@ yunohost
 releases
 !releases/latest.tgz
 docs
-uploads
+uploads/*
+!uploads/logo.png
+!uploads/fallbackimage.svg
+!uploads/headerimage.svg
 _nuxt2
 .nuxt
 .output
