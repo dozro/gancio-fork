@@ -53,9 +53,9 @@ function isPast() {
   
       </v-card-text>
 
-      <v-card-actions v-if='event?.tags?.length' class='flex-wrap'>
+      <v-card-actions v-if='event?.tags?.length' class='flex-wrap ga-1'>
           <v-chip
-            class='ml-1 mt-1' v-for='tag in event?.tags?.slice(0, 6)' size='small' label :to='`/tag/${encodeURIComponent(tag)}`'
+            v-for='tag in event?.tags?.slice(0, 6)' size='small' label :to='`/tag/${encodeURIComponent(tag)}`'
             :key='tag' variant='outlined' color='primary'>{{ tag }}</v-chip>
       </v-card-actions>
 

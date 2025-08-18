@@ -14,9 +14,6 @@
   opacity: 1 !important;
 }
 
-.v-card-actions {
-  gap: 0px !important;
-}
 
 .v-card-subtitle {
   /* $card-subtitle-white-space */
