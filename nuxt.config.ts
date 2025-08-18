@@ -85,6 +85,12 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
+    storage: {
+      locales: {
+        driver: 'fs',
+        base: './i18n/locales'
+      }
+    },
     // preset: 'node-listener',
     // externals: {
     //   inline: ['jose', 'yargs'],
