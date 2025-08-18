@@ -17,9 +17,9 @@ const yarg = yargs(hideBin(process.argv))
 yarg.version(pkg.version)
 
 // teleport myself to the correct position
-// process.env.cwd = process.env.GANCIO_DATA || path.resolve('./')
-// const __dirname = path.dirname(new URL(import.meta.url).pathname)
-// process.chdir(path.resolve(__dirname, '..'))
+process.env.cwd = process.env.GANCIO_DATA || path.resolve('./')
+const __dirname = path.dirname(new URL(import.meta.url).pathname)
+process.chdir(path.resolve(__dirname))
 
 
 // set NUXT & NITRO environment

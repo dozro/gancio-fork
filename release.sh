@@ -90,10 +90,10 @@ cp -ra cli "${PKG_MAIN}/.output/server/cli/"
 cp gancio.js "${PKG_MAIN}/.output/server/gancio.js"
 
 # all locales
-cp -ra i18n "${PKG_MAIN}/i18n/"
+cp -ra i18n "${PKG_MAIN}/.output/server/i18n/"
 
 # default db
-cp gancio.sqlite.rel "${PKG_MAIN}/gancio.sqlite"
+# cp gancio.sqlite.rel "${PKG_MAIN}/gancio.sqlite"
 
 # example env
 cp .env.example "${PKG_MAIN}/.env"
@@ -104,7 +104,7 @@ cp ./uploads/fallbackimage.svg "${PKG_MAIN}/uploads/"
 cp ./uploads/headerimage.svg "${PKG_MAIN}/uploads/"
 
 # plugins
-cp -ra ./gancio_plugins "${PKG_MAIN}/plugins/"
+cp -ra ./gancio_plugins "${PKG_MAIN}/.output/server/plugins/"
 
 # cp package.json bun.lock yarn.lock .env.example "${PKG_MAIN}/"
 # cp gancio.service "${PKG_MAIN}/"
