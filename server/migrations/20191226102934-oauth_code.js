@@ -1,18 +1,18 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('oauth_codes', {
     authorizationCode: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       primaryKey: true
     },
-    expiresAt: Sequelize.DATE,
-    scope: Sequelize.STRING,
-    redirect_uri: Sequelize.STRING,
-    createdAt: { type: Sequelize.DATE, allowNull: false },
-    updatedAt: { type: Sequelize.DATE, allowNull: false },
+    expiresAt: DataTypes.DATE,
+    scope: DataTypes.STRING,
+    redirect_uri: DataTypes.STRING,
+    createdAt: { type: DataTypes.DATE, allowNull: false },
+    updatedAt: { type: DataTypes.DATE, allowNull: false },
     clientId: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       references: {
         table: 'oauth_clients',
         key: 'id'
@@ -21,7 +21,7 @@ export function up ({ context: queryInterface }) {
       onDelete: 'CASCADE'
     },
     userId: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       references: {
         table: 'users',
         key: 'id'

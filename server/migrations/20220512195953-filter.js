@@ -1,27 +1,27 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('filters', {
     id: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    cohortId: {
-      type: Sequelize.INTEGER,
+    collectionId: {
+      type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        table: 'cohorts',
+        table: 'collections',
         key: 'id'
       },
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL'
     },
     tags: {
-      type: Sequelize.JSON,
+      type: DataTypes.JSON,
     },
     places: {
-      type: Sequelize.JSON,
+      type: DataTypes.JSON,
     }
   })
 }

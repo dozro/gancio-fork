@@ -1,24 +1,25 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
-  return queryInterface.createTable('cohorts', {
+  return queryInterface.createTable('collections', {
     id: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       allowNull: false,
       autoIncrement: true,
     },
     name: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       unique: true,
       index: true,
       allowNull: false
     },
+    sortIndex: { type: DataTypes.INTEGER },
     isActor: {
-      type: Sequelize.BOOLEAN
+      type: DataTypes.BOOLEAN
     },
     isTop: {
-      type: Sequelize.BOOLEAN
+      type: DataTypes.BOOLEAN
     }
   })
 }

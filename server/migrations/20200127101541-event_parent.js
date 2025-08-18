@@ -1,9 +1,9 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   // return Promise.resolve(1)
   return queryInterface.addColumn('events', 'parentId', {
-    type: Sequelize.INTEGER,
+    type: DataTypes.INTEGER,
     references: {
       table: 'events',
       key: 'id'

@@ -1,4 +1,4 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('announcements', {
@@ -6,20 +6,20 @@ export function up ({ context: queryInterface }) {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
-      type: Sequelize.INTEGER
+      type: DataTypes.INTEGER
     },
-    title: Sequelize.STRING,
+    title: DataTypes.STRING,
     announcement: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
-    visible: Sequelize.BOOLEAN,
+    visible: DataTypes.BOOLEAN,
     createdAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     },
     updatedAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     }
   })
 }

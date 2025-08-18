@@ -1,11 +1,5 @@
-'use strict';
+import { DataTypes } from '@sequelize/core'
 
-/** @type {import('sequelize-cli').Migration} */
-module.exports = {
-  async up (queryInterface, Sequelize) {
-    return queryInterface.dropTable('user_followers')
-  },
-
-  async down (queryInterface, Sequelize) {
-  }
-};
+export async function up ({ context: queryInterface }) {
+  return queryInterface.dropTable('user_followers')
+}

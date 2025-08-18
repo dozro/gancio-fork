@@ -1,26 +1,24 @@
-'use strict';
+import { DataTypes } from '@sequelize/core'
 
-/** @type {import('sequelize-cli').Migration} */
-module.exports = {
-  async up (queryInterface, Sequelize) {
+export async function up ({ context: queryInterface }) {
     await queryInterface.dropTable('event_notifications')
     await queryInterface.createTable('tasks', {
       id: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM(['new', 'sent', 'error', 'sending']),
+        type: DataTypes.ENUM(['new', 'sent', 'error', 'sending']),
         defaultValue: 'new',
         index: true
       },
       error: {
-        type: Sequelize.TEXT
+        type: DataTypes.TEXT
       },
       eventId: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         allowNull: true,
         references: {
           table: 'events',
@@ -31,7 +29,7 @@ module.exports = {
       },
       notificationId: {
         allowNull: true,
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         references: {
           table: 'notifications',
           key: 'id'
@@ -41,16 +39,11 @@ module.exports = {
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       }
     })
-  },
-
-  async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('tasks')
   }
-};

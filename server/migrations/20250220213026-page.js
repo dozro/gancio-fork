@@ -1,37 +1,30 @@
-'use strict';
+import { DataTypes } from '@sequelize/core'
 
-/** @type {import('sequelize-cli').Migration} */
-module.exports = {
-  async up (queryInterface, Sequelize) {
+export async function up ({ context: queryInterface }) {
     return queryInterface.createTable('pages', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER
       },
-      title: Sequelize.STRING,
+      title: DataTypes.STRING,
       content: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
-      visible: Sequelize.BOOLEAN,
+      visible: DataTypes.BOOLEAN,
       slug: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         index: true,
         unique: true
       },      
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       }
     })
-  },
-
-  async down (queryInterface, Sequelize) {
-    return queryInterface.dropTable('pages')
   }
-};

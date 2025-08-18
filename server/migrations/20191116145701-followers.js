@@ -1,8 +1,8 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.addColumn('fed_users', 'follower', {
-    type: Sequelize.BOOLEAN
+    type: DataTypes.BOOLEAN
   })
 }
 

@@ -1,22 +1,14 @@
-const  User = require('../api/models/user')
+import { DataTypes } from '@sequelize/core'
 
-/** @type {import('sequelize-cli').Migration} */
-module.exports = {
-  async up (queryInterface, Sequelize) {
-    async function go () {
-      await queryInterface.addColumn('users', 'role', {
-        type: Sequelize.ENUM(['admin', 'editor', 'user']),
-        defaultValue: 'user'
-      })
+export async function up ({ context: queryInterface }) {
+  async function go () {
+    await queryInterface.addColumn('users', 'role', {
+      type: DataTypes.ENUM(['admin', 'editor', 'user']),
+      defaultValue: 'user'
+    })
 
-      const user = User(queryInterface.sequelize, Sequelize.DataTypes)
-      await user.update({ role: 'admin'}, { where: { is_admin: true } })
-    }
-    return go()
-  },
-
-  async down (queryInterface, Sequelize) {
-    return queryInterface.removeColumn('users', 'role')
-    // await queryInterface.removeColumn('users', 'is_editor')
+    // const user = User(queryInterface.sequelize, DataTypes.DataTypes)
+    // await user.update({ role: 'admin'}, { where: { is_admin: true } })
   }
+  return go()
 }

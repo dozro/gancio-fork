@@ -1,19 +1,19 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('messages',
     {
       id: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
       },
       message: {
-        type: Sequelize.TEXT,
+        type: DataTypes.TEXT,
         allowNull: false
       },
       eventId: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         references: {
           table: 'events',
           key: 'id'
@@ -22,16 +22,16 @@ export function up ({ context: queryInterface }) {
         onDelete: 'SET NULL'
       },
       author: {
-        type: Sequelize.ENUM(['AUTHOR', 'ADMIN', 'ANON', 'REGISTERED'])
+        type: DataTypes.ENUM(['AUTHOR', 'ADMIN', 'ANON', 'REGISTERED'])
       },
-      is_author_visible: Sequelize.BOOLEAN,
+      is_author_visible: DataTypes.BOOLEAN,
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       }
     })
   }

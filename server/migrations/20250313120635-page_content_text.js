@@ -1,19 +1,7 @@
-'use strict';
+import { DataTypes } from '@sequelize/core'
 
-/** @type {import('sequelize-cli').Migration} */
-module.exports = {
-  async up(queryInterface, Sequelize) {
-    return queryInterface.changeColumn('pages', 'content', {
-      type: Sequelize.TEXT
-    })
-  },
-
-  async down(queryInterface, Sequelize) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
-  }
-};
+export async function up ({ context: queryInterface }) {
+  return queryInterface.changeColumn('pages', 'content', {
+    type: DataTypes.TEXT
+  })
+}

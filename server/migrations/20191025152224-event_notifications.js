@@ -1,22 +1,22 @@
-import { Sequelize } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('event_notifications', {
     status: {
-      type: Sequelize.ENUM(['new', 'sent', 'error', 'sending']),
+      type: DataTypes.ENUM(['new', 'sent', 'error', 'sending']),
       defaultValue: 'new',
       index: true
     },
     createdAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     },
     updatedAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: DataTypes.DATE
     },
     eventId: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       references: {
         table: 'events',
@@ -27,7 +27,7 @@ export function up ({ context: queryInterface }) {
     },
     notificationId: {
       primaryKey: true,
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       references: {
         table: 'notifications',
         key: 'id'
