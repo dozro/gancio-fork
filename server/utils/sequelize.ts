@@ -74,14 +74,14 @@ export async function connect() {
 }
 
 export async function runMigrations(sequelize: Sequelize) {
-  log.info('Running migrations!')
-    const umzug = new Umzug({
-        storage: new SequelizeStorage({ sequelize }),
-        migrations: { glob: './server/migrations/*.js'},
-        context: sequelize.queryInterface,
-        logger: console
-    })
-    await umzug.up()
+  log.info('Running migrations! ', process.cwd())
+  const umzug = new Umzug({
+      storage: new SequelizeStorage({ sequelize }),
+      migrations: { glob: './migrations/*.js'},
+      context: sequelize.queryInterface,
+      logger: console
+  })
+  await umzug.up()
 }
 
 @Table({
@@ -737,12 +737,12 @@ InferCreationAttributes<Resource>
     // declare apUser?: NonAttribute<APUser>
 
     @Attribute({
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER.UNSIGNED,
       references: { table: "events", key: "id" },
       onUpdate: "CASCADE",
       onDelete: "CASCADE",
     })
-    declare eventId: string
+    declare eventId: number
 
     @BelongsTo(() => Event, { foreignKey: 'eventId', targetKey: 'id' })
     declare event?: NonAttribute<Event>
