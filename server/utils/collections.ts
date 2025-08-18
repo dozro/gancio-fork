@@ -99,15 +99,14 @@ export async function getCollectionEvents(opts?: CollectionQueryType | undefined
     where[Op.not] = negatedConditions
   }
 
-  where[Op.and] = conditions // {
-    // ...(negatedConditions.length > 0 && { [Op.not]: negatedConditions}),
-  //  ...conditions
-  //}
+  if (conditions.length) {
+    where[Op.and] = conditions
+  }
 
   const events = await Event.findAll({
     where,
     attributes: {
-      exclude: ['likes', 'boost', 'userId', 'is_visible', 'placeId', 'apUserApId',
+      exclude: ['likes', 'boost', 'userId', 'is_visible', 'placeId', 'apUserApId', 
         'createdAt', 'resources', 'ap_object', ...(!args.include_description ? ['description'] : [])]
     },
     order: [['start_datetime', opts?.reverse ? 'DESC' : 'ASC']],
@@ -132,26 +131,3 @@ export async function getCollectionEvents(opts?: CollectionQueryType | undefined
 
   return mapEvents(events)
 }
-
-        //     return events.map(e => {
-        //       e = e.get()
-        //       e.tags = e.tags ? e.tags.map(t => t && t.tag) : []
-        //       if (!e.multidate) {
-        //         delete e.multidate
-        //       }
-        //       if (!e.image_path) {
-        //         delete e.image_path
-        //       }
-        //       if (!e.recurrent) {
-        //         delete e.recurrent
-        //       }
-        //       if (!e.parentId) {
-        //         delete e.parentId
-        //       }
-        //       if (e.ap_user) {
-        //         e.ap_user = { image: e.ap_user?.object?.icon?.url ?? `${e.ap_user?.url}/favicon.ico` }
-        //       }
-        //       return e
-        //     })
-        
-        //   },
