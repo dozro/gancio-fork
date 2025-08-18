@@ -89,9 +89,9 @@ export async function getCollectionEvents(opts?: CollectionQueryType | undefined
 
     if (!tmpConditions.length) return
     if (f.negate) {
-      negatedConditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.and]: tmpConditions })
+      negatedConditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.or]: tmpConditions })
     } else {
-      conditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.and]: tmpConditions })
+      conditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.or]: tmpConditions })
     }
   })
 
