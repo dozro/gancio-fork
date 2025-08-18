@@ -12,9 +12,9 @@ function currentYear () {
 
 function startMonth (year? :number, month?: number) {
   if (year && month) {
-    return DateTime.local(year, month).startOf('month').toSeconds()
+    return DateTime.local(year, month).startOf('month').toUnixInteger()
   } else {
-    return DateTime.local().startOf('month').toSeconds()
+    return DateTime.local().startOf('month').toUnixInteger()
   }
 }
 

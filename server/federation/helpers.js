@@ -354,8 +354,8 @@ export async function updateActor() {
       // create it
       const event = await Event.create({
         title: APEvent?.name?.trim() ?? '',
-        start_datetime: DateTime.fromISO(APEvent.startTime).toSeconds(),
-        end_datetime: APEvent?.endTime ? DateTime.fromISO(APEvent.endTime).toSeconds() : null,
+        start_datetime: DateTime.fromISO(APEvent.startTime).toUnixInteger(),
+        end_datetime: APEvent?.endTime ? DateTime.fromISO(APEvent.endTime).toUnixInteger() : null,
         description: sanitizeHTML(APEvent?.content ?? APEvent?.summary ?? ''),
         online_locations,
         media,

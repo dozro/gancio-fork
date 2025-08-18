@@ -211,7 +211,7 @@ describe('Events', () => {
     response = await fetchWithAuth('/api/events', 'POST')
     expect(response.status).toBe(403)
 
-    response = await fetchWithAuth('/api/event', 'POST', { title: 'test title 2', place_name: 'place name', place_address: 'address', tags: ['test'], start_datetime: DateTime.now().toSeconds() + 1000 })
+    response = await fetchWithAuth('/api/event', 'POST', { title: 'test title 2', place_name: 'place name', place_address: 'address', tags: ['test'], start_datetime: DateTime.now().toUnixInteger() + 1000 })
     expect(response.status).toBe(200)
 
     // expect(response.body.place.id).toBeDefined()
@@ -220,7 +220,7 @@ describe('Events', () => {
     response = await fetchWithAuth('/api/settings', 'PUT', { key: 'allow_anon_event', value: true})
     expect(response.status).toBe(200)
 
-    response = await fetchWithAuth('/api/event', 'POST', { title: 'test title 3', place_name: 'place name 2', place_address: 'address 2', tags: ['test'], start_datetime: DateTime.now().toSeconds() + 1000 })
+    response = await fetchWithAuth('/api/event', 'POST', { title: 'test title 3', place_name: 'place name 2', place_address: 'address 2', tags: ['test'], start_datetime: DateTime.now().toUnixInteger() + 1000 })
     expect(response.status).toBe(200)
 
     // expect(response.body.place.id).toBeDefined()

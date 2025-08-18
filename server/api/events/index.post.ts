@@ -58,7 +58,7 @@ export default defineEventHandler(async evt => {
   }
   
   const isAnonymous = !user
-  const now = DateTime.local().toSeconds()
+  const now = DateTime.local().toUnixInteger()
   const start_datetime = Number(body.start_datetime)
 
   // validate start_datetime and end_datetime

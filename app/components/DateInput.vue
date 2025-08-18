@@ -18,7 +18,7 @@ const frequencies = [
 function fromDateAndTimeToDateTime(dateObj: Date | string, timeStr: string): number {
   const [hours, minutes] = timeStr.split(':').map(Number)
   const dt = DateTime.fromJSDate(typeof dateObj === 'string' ? new Date(dateObj) : dateObj)
-    .set({ hour: hours, minute: minutes, second: 0, millisecond: 0 }).toSeconds()
+    .set({ hour: hours, minute: minutes, second: 0, millisecond: 0 }).toUnixInteger()
   return dt
 }
 

@@ -11,7 +11,7 @@ export default defineCachedEventHandler(async evt => {
     locale: publicSettings.instance_locale || 'en-US'
   }
 
-  const yesterday = DateTime.local(opt).minus({day: 1}).toSeconds()
+  const yesterday = DateTime.local(opt).minus({day: 1}).toUnixInteger()
 
   let events
   if (collection) {
