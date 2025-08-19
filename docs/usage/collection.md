@@ -19,7 +19,7 @@ Collections are groupings of events filtered by tags, places or federated instan
 
 There is a specific section in the administration panel called "Collections" where you can create new collections and manage existing ones.
 
-[![assets/thumbs/event.png](image-1.png)](image-1.png){: data-fancybox="group" data-caption="Event"}
+[![collection-1.png](collection-1.png)](collection-1.png){: data-fancybox="group" data-caption="Collection"}
 
 To create a collection choose a wise name and simply select the characteristics of the events you want to include in that collection.  
 The selectable characteristics are tags, locations, and federated instances.
