@@ -25,8 +25,8 @@ export async function getCollectionEvents(opts?: CollectionQueryType | undefined
   // get the collection from specified name
   const collection = await Collection.findOne({ where: { name: args.name } })
   if (!collection) {
-    log.warn(`"%s" not found`, name)
-    return []
+    log.warn(`"%s" not found`, args.name)
+    throw createError({ status: 404, message: 'Not found' })
   }
 
   // and all related filters
