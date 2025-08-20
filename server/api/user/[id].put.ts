@@ -1,3 +1,10 @@
+/**
+ * Update user activation or role
+ * @auth
+ * @param {boolean} is_active - Activate / Deactivate user
+ * @param {string} role - User role ('user','admin','editor')
+ * @info when user is activated a confirmation e-mail is sent with a link that allow to choose a password
+ */
 export default defineEventHandler(async evt => {
   await requireAdminSession(evt)
   const log = useLogger('user update')

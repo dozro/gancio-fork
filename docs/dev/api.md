@@ -9,8 +9,9 @@ nav_order: 8
 # API documentation
 {: .no_toc }
 
-This API documentation is intented to interact with a Gancio instance from external tool (e.g. to insert events and getting them).  
+This API documentation is intented to interact with a Gancio instance from external tool (e.g. to insert events and getting them).
 Feel free to contribute your own tips or examples to help each others.
+{: .fs-6 .fw-300 }
 
 
 1. TOC
@@ -56,32 +57,29 @@ fetch("http://localhost:4000/api/login/token", {
 
 
 
-## Create a new user.
-the first user being created will automatically become an active admin.
-For subsequent users, a recovery code is generated and sent via email to allow
-the user to set their password and confirm their account creation
+## Update user activation or role
 
-**`/api/user`**
+**`/api/user/[id]`**
 
-POST 
+PUT 
 {: .label .label-orange}
 
   **AUTH NEEDED**
   {: .label .label-red}
 
 
+{: .info-title }
+> info
+>
+> when user is activated a confirmation e-mail is sent with a link that allow to choose a password
+
+
 **Params**
 
 | Name | Type | Description |
 | -----|------|------|
-| newUser.email | `string` | User email address |
-| newUser.description | `string` | User description |
-| newUser.role | `string` | User role ('user','admin','editor') |
-
-**Returns**  
-- Created user object  
-
-- 400 error if user creation fails  
+| is_active | `boolean` | Activate / Deactivate user |
+| role | `string` | User role ('user','admin','editor') |
 
 
 
@@ -98,6 +96,7 @@ GET
 
   **AUTH NEEDED**
   {: .label .label-red}
+
 
 
 
@@ -122,37 +121,33 @@ GET
 
 
 
-## Add a new event
-Allow anyone to add an event (anon event has to be confirmed)
+## Create a new user.
+the first user being created will automatically become an active admin.
+For subsequent users, a recovery code is generated and sent via email to allow
+the user to set their password and confirm their account creation
 
-**`/api/events`**
+**`/api/user`**
 
 POST 
 {: .label .label-orange}
 
-> info "info"
-> `Content-Type` has to be `multipart/form-data` to support image upload
+  **AUTH NEEDED**
+  {: .label .label-red}
+
 
 
 **Params**
 
 | Name | Type | Description |
 | -----|------|------|
-| title | `string` | event's title |
-| description | `string` | event's description (html accepted and sanitized) |
-| place_name | `string` | the name of the place |
-| place_address | `string` | the address of the place |
-| place_latitude | `float` | the latitude of the place |
-| place_longitude | `float` | the longitude of the place |
-| online_locations | `array` | List of online locations |
-| start_datetime | `number` | start timestamp |
-| multidate | `integer` | is a multidate event? |
-| tags | `array` | List of tags |
-| recurrent | `object` | Recurrent event details |
-| recurrent.frequency | `string` | could be `1w` or `2w` |
-| recurrent.days | `array` | array of days |
-| image | `image` | Image |
-| image_url | `string` | Image URL |
+| newUser.email | `string` | User email address |
+| newUser.description | `string` | User description |
+| newUser.role | `string` | User role ('user','admin','editor') |
+
+**Returns**  
+- Created user object  
+
+- status `400` if user creation fails (e.g. email already exists)  
 
 
 
@@ -192,5 +187,46 @@ GET
 **Example**
 - [https://demo.gancio.org/api/events](https://demo.gancio.org/api/events)
 - [usage example](https://framagit.org/les/gancio/-/blob/master/webcomponents/src/GancioEvents.svelte#L18-42)
+
+
+
+
+## Add a new event
+Allow anyone to add an event (anon event has to be confirmed)
+
+**`/api/events`**
+
+POST 
+{: .label .label-orange}
+
+
+{: .info-title }
+> info
+>
+> `Content-Type` has to be `multipart/form-data` to support image upload
+
+
+**Params**
+
+| Name | Type | Description |
+| -----|------|------|
+| title | `string` | event's title |
+| description | `string` | event's description (html accepted and sanitized) |
+| place_name | `string` | the name of the place |
+| place_address | `string` | the address of the place |
+| place_latitude | `float` | the latitude of the place |
+| place_longitude | `float` | the longitude of the place |
+| online_locations | `array` | List of online locations |
+| start_datetime | `number` | start timestamp |
+| multidate | `integer` | is a multidate event? |
+| tags | `array` | List of tags |
+| recurrent | `object` | Recurrent event details |
+| recurrent.frequency | `string` | could be `1w` or `2w` |
+| recurrent.days | `array` | array of days |
+| image | `image` | Image |
+| image_url | `string` | Image URL |
+
+
+
 
 

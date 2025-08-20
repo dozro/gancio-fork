@@ -6,7 +6,7 @@ import babel from '@babel/core'
 import { basename } from 'path'
 const template = fs.readFileSync("./scripts/api_template.hbs", "utf-8")
 
-const apiFiles = globSync(['./server/api/login/**', './server/api/user/**', './server/api/events/**' ])
+const apiFiles = globSync([ './server/api/events/**', './server/api/user/**', './server/api/login/**' ])
 
 const docs = await Promise.all(apiFiles.map(async file => {
   if (!lstatSync(file).isFile()) return
@@ -17,11 +17,9 @@ const docs = await Promise.all(apiFiles.map(async file => {
   if (hasMethod) {
     method = filename.split(".").slice(-2, -1)[0]?.toUpperCase()
   }
-  console.error(method)
-  const tmp_file = file.replace('./server/api/', '')
+  const tmp_file = file.replace('server/api/', '')
   const route = `/api/${tmp_file.replace(/(\/index)?\.?(get|post|put|delete|patch)?\.[tj]s$/, "")}`
 
-  console.error(file, route)
   const tsSource = readFileSync(file).toString()
   // Transpile TypeScript to JS using Babel
   const { code: jsCode } = babel.transformSync(tsSource, {
@@ -34,6 +32,7 @@ const docs = await Promise.all(apiFiles.map(async file => {
     const jsdocData = await jsdoc.explain({ source: jsCode }).catch(e => console.error(e))
     const api = jsdocData.find(m => m?.description)
     if (!api) return
+    console.error(file, method, route)
     const description = api?.description || ""
     const params = api?.params || []
     const tags = api?.tags

@@ -8,10 +8,11 @@ parent: Usage
 
 
 
-## Embed a single event or a list of events in your webpage
+# Embed a single event or a list of events in your webpage
 {: .no_toc }
 
 You can embed a list of filtered events or a specific event card in your webpage using a classic old-school `iframe` or a shiny new webcomponent.
+{: .fs-6 .fw-300 }
 
 1. TOC
 {:toc}

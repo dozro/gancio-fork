@@ -53,3 +53,4 @@ You can add a single event to remind yourself (there is a special “Add to cale
 
 ## Embedd
 You can embed a list of filtered events or a specific event card in your webpage using a classic old-school `iframe` or a shiny new webcomponent.
+Detailed information about this into the [specific page]({% link usage/embed.md %})

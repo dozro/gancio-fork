@@ -32,6 +32,8 @@ plugins:
   - jekyll-default-layout
 
 callouts:
+  info:
+    color: purple
   warning:
     color: red
 
