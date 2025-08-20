@@ -7,6 +7,12 @@ nav_order: 10
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-alpha.2](https://framagit.org/les/gancio/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2025-08-20)
+With this release, version 2.0 is beginning to stabilize and become usable. There has been a significant improvement in language management, a new Dockerfile, and sequelize migrations are working again.
+
+Please note that the documentation for testing is available on the website [https://gancio.org/v2](https://gancio.org/v2).
+
+
 ## [2.0.0-alpha.1]((https://framagit.org/les/gancio/compare/v1.27.0...v2.0.0-alpha.1)) (2025-08-5)
 Okay, here we are, after about 250 commits, 591 modified files, 33,566 lines added, 32,873 removed and a lot of sweat, it's time to release an alpha version of this 2.0.
 
