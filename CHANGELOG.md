@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-alpha.2](https://framagit.org/les/gancio/compare/v2.0.0-stage...v2.0.0-alpha.2) (2025-08-20)
+
+
+### Features
+
+* SMTP setup ([14a9617](https://framagit.org/les/gancio/commit/14a96177862a5b7b1e1c4e44666c99a5a231592a))
+
+
+### Bug Fixes
+
+* add vuetify locales ([e6e70dd](https://framagit.org/les/gancio/commit/e6e70ddc58ca1de0656a6147f0ee5de92ceaabf5))
+* better user creation dialog ([f27e7b3](https://framagit.org/les/gancio/commit/f27e7b3d26c9ebe92776d9a7a895307e3b3e61c0))
+* cleaning user update ([63da78c](https://framagit.org/les/gancio/commit/63da78c9cff47cc9e06c4afacaef8891726fd6ca))
+* DateTime use toUnixInteger instead of toSeconds ([9619d9c](https://framagit.org/les/gancio/commit/9619d9cbe816f1c34cdd7f1d2536f89fdbfb3c92))
+* Dockerfile include logo/flalback image and plugins ([c31a797](https://framagit.org/les/gancio/commit/c31a797af300f3927cbddadbe6cd235e4e888484))
+* download route ([c537f2b](https://framagit.org/les/gancio/commit/c537f2bc3df32579a4f93b685c0a42b0eadb49f7))
+* enqueue register email + doc ([29bdd86](https://framagit.org/les/gancio/commit/29bdd86c57de0da84103ab1388a8718e3c120659))
+* favicon ([e1bb755](https://framagit.org/les/gancio/commit/e1bb755322254bcf2fd7235306c72653457b4384))
+* format actor ([021563f](https://framagit.org/les/gancio/commit/021563f71c4c59fcaf887eb36ae3abe33ef6a05a))
+* getNodeInfo ([ec904e5](https://framagit.org/les/gancio/commit/ec904e5d84f489e81b14b9795beef754d232ad23))
+* i18n language ([6154325](https://framagit.org/les/gancio/commit/61543253708fc9a677268719a802f80380e35138))
+* improve get events filter using sql literal ([f36d4cc](https://framagit.org/les/gancio/commit/f36d4cc219ac02a040585d4dca82e38fabf2337c))
+* include plugins in release ([573224b](https://framagit.org/les/gancio/commit/573224bd73866f471ad1218700ceeac8c0024274))
+* instance locale settings ([61f7835](https://framagit.org/les/gancio/commit/61f7835613010875faa0398f0fda080829f0f53d))
+* list tags for admin panel ([5ad2616](https://framagit.org/les/gancio/commit/5ad26161325040fde599b6d59bc75355acaec34c))
+* negate filter collections ([204e30b](https://framagit.org/les/gancio/commit/204e30b91af37252890e1b7cb1b453b1d6ac5574))
+* pub/priv key generate in settings ([ba24996](https://framagit.org/les/gancio/commit/ba249969b919d1978557804587fd384f7fa12143))
+* selected tab query in admin ([dcbe9fc](https://framagit.org/les/gancio/commit/dcbe9fcfa609e0f1b990c1bf61d1af0ff3b722e8))
+* settings + footerLinks ([7faf763](https://framagit.org/les/gancio/commit/7faf763ec1ea2505a5912071576bcb8017e48b42))
+* support Sequelize BE error in notify ([34afbf2](https://framagit.org/les/gancio/commit/34afbf22c3c19d4a9b8f099581184264856c0a11))
+* tag page ([0051ea2](https://framagit.org/les/gancio/commit/0051ea26db27dc10cf32a36dd1d1ccdb27706318))
+* test plugin api ([15d30d1](https://framagit.org/les/gancio/commit/15d30d1d01670a675790aaa8def415f983a7def1))
+* update sequelize migrations, remove renameColumn... ([7519cd7](https://framagit.org/les/gancio/commit/7519cd784dc24795551c18928aa9c5432457f610))
+* useStorage for locale messages ([cac7acb](https://framagit.org/les/gancio/commit/cac7acbc8f189b6b45865a48cf00ff6057f86d80))
+* where input debounce search ([9ba29f9](https://framagit.org/les/gancio/commit/9ba29f91009ecd994b4accef490ea45376c485eb))
+
 ### [1.18.1](https://framagit.org/les/gancio/compare/v1.18.0...v1.18.1) (2024-06-27)
 
 
