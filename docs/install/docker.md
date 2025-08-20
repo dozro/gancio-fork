@@ -25,27 +25,32 @@ mkdir -p /opt/gancio
 cd /opt/gancio
 ```
 
+<!-- 
 Download `docker-compose.yml` choosing your preferred database dialect between `sqlite`, `postgres` and `mariadb`:
 ```bash
 DB=sqlite
 wget {{site.url}}/docker/$DB/docker-compose.yml
-```
+``` -->
 
 ## Start gancio
 
+```bash
+docker run --rm  -p 13120:13120 -v ./data:/app/data -v ./.env.example:/app/.env cisti/gancio:2.0-alpha
+```
+<!-- 
 Start your container:
 ```bash
 docker-compose up -d
-```
+``` -->
 
-You can take a look at logs using:
+<!-- You can take a look at logs using:
 ```bash
 tail -f  data/logs/gancio.log
 ```
-
+ -->
 You'll need to [setup nginx as a proxy]({% link install/nginx.md %}) then you can point your web browser to your domain :tada:
 
-
+<!-- 
 ## Upgrade
 
 > warning "Backup your data"
@@ -56,4 +61,4 @@ You'll need to [setup nginx as a proxy]({% link install/nginx.md %}) then you ca
 ```bash
 cd /opt/gancio # or where your installation is
 docker-compose pull && docker-compose up -d
-```
+``` -->

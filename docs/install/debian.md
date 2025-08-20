@@ -21,7 +21,7 @@ sudo npm install -g yarn
 ```
 <small>[source](https://github.com/nodesource/distributions/blob/master/README.md)</small>
 
-#### Choose you database (sqlite, postgresql, mariadb, mysql)
+<!-- #### Choose you database (sqlite, postgresql, mariadb, mysql)
 1. Setup using postgreSQL __(optional)__
 ```bash
 sudo apt-get install postgresql
@@ -42,7 +42,7 @@ MariaDB [(none)]> create user gancio identified by 'gancio';
 Query OK, 0 rows affected (0.011 sec)
 MariaDB [(none)]> grant all privileges on gancio.* to gancio;
 Query OK, 0 rows affected (0.009 sec)
-```
+``` -->
 
 1. Create a user to run gancio from
 ```bash
@@ -50,7 +50,7 @@ sudo adduser --group --system --shell /bin/false --home /opt/gancio gancio
 ```
 1. Install Gancio
 ```bash
-sudo yarn global add --network-timeout 1000000000 --silent {{site.url}}/latest.tgz
+sudo yarn global add --network-timeout 1000000000 --silent {{site.url}}/latest-2.0-alpha.tgz
 ```
 
 > Note "Use yarn"
@@ -61,9 +61,9 @@ sudo yarn global add --network-timeout 1000000000 --silent {{site.url}}/latest.t
 
 > info "Package verification"
 > Distributed packages are signed with [this key](/assets/underscore_to.hacklab.asc) you can verify the signature using:  
-> `gpg --verify latest.tgz.sig`
+> `gpg --verify latest-2.0-alpha.tgz.sig`
 
-
+<!-- 
 1. Setup systemd service and reload systemd
 ```bash
 sudo wget http://gancio.org/gancio.service -O /etc/systemd/system/gancio.service
@@ -91,4 +91,4 @@ sudo yarn global remove gancio
 sudo yarn cache clean
 sudo yarn global add --network-timeout 1000000000 --silent {{site.url}}/latest.tgz
 sudo systemctl restart gancio
-```
+``` -->

@@ -41,7 +41,6 @@
 # Build
 FROM node:lts-alpine AS builder
 
-ENV NODE_ENV=production
 WORKDIR /home/node
 
 COPY package.json yarn.lock ./
@@ -49,8 +48,7 @@ COPY package.json yarn.lock ./
 RUN yarn install
 
 COPY . .
-
-RUN npm run build 
+RUN yarn run build 
 
 # Run
 FROM node:lts-alpine AS prod
@@ -65,8 +63,9 @@ RUN mkdir uploads
 COPY ./server/migrations ./.output/server/migrations/
 COPY cli ./.output/server/cli/
 COPY gancio.js ./.output/server/gancio.js
+COPY i18n ./.output/server/i18n/
 COPY .env.example ./.env
-COPY gancio.sqlite.rel ./gancio.sqlite
+# COPY gancio.sqlite.rel ./gancio.sqlite
 
 COPY ./uploads/logo.png ./uploads/
 COPY ./uploads/fallbackimage.svg ./uploads/

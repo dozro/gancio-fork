@@ -6,6 +6,10 @@ has_children: true
 nav_order: 3
 has_toc: false
 ---
+
+# Install
+
+
 ## Pre-requisites
 - a Linux machine with <strong>root access</strong> (a VPS with 500MB of RAM and a cpu should be enough but do not use docker on a small machine :stuck_out_tongue_winking_eye:)
 - a domain name or subdomain (eg. gancio.mydomain.org, [subpath is not yet supported](https://framagit.org/les/gancio/-/issues/430))

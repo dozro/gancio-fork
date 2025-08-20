@@ -1,24 +1,31 @@
 ---
+layout: minimal
 title: Home
 nav_order: 1
 description: "Gancio is a shared agenda for local communities."
 permalink: /
+nav_enabled: false
 ---
 
-# ![](assets/gancio.png) ancio v2
-{: .fs-9 }
+<!-- # ![](assets/gancio.png)  -->
 
-A shared agenda for local communities.
-{: .fs-6 }
-Alpha release  **[2.0.0-alpha.1 - 5 Aug 2025]({% link changelog.md %})**
-
-<!-- [Install]({% link install/install.md %}){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } -->
-<!-- [Demo](https://demo.gancio.org){: .btn .btn-green .fs-5 .mb-4 .mb-md-0 .mr-2 } -->
-[Source](https://framagit.org/les/gancio){: .btn .mb-4 .mb-md-0 .fs-5 }
+# **Gancio**
+A shared agenda for local communities.  
+{: .fs-6 .fw-300 }
 
 
-> warning "Note"
-> This is an alpha release of Gancio v2 and it is **NOT production ready**!
+
+[Install]({% link install/install.md %}){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[Usage]({% link usage/usage.md %}){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[Demo](https://demo.gancio.org){: .btn .btn-green .fs-5 .mb-4 .mb-md-0 .mr-2 }
+
+Last release:
+**[2.0.0-alpha.1 - 5 Aug 2025]({% link changelog.md %})**
+
+{: .warning-title }
+> Note
+> 
+> This is an alpha release of Gancio 2.0 and it is **NOT production ready**!
 > Please read the [changelog]({% link changelog.md %})
 
 Our effort in this project is not to build an alternative that mimics mainstream solutions, we respond to different needs.

@@ -7,20 +7,21 @@ nav_order: 6
 # Contribute
 {: .no_toc }
 
+Thank you for considering contributing to Gancio!
+{: .fs-6 .fw-300 }
+
 1. TOC
 {:toc}
-
-Thank you for considering contributing to Gancio!
 
 
 You can contribute in the following ways:
 
-- Finding and reporting bugs (please use the confidential flag for security related issues)
-- Translating the plugin into various languages
-- Contributing code by fixing bugs or implementing features
-- Writing unit tests
-- Improving the documentation
-- Proposing ideas for new features
+- Find, report, or reply to issues (please use the confidential flag for security related issues)
+- Translate into various languages
+- Contribute code by fixing bugs or implementing features
+- Write unit tests
+- Improve the documentation
+- Propose ideas for new features
 
 
 ## Bug reports
