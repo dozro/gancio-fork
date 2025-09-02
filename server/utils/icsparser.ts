@@ -3,22 +3,31 @@ import { useLogger } from './useLogger'
 // const log = require('../log')
 // const { status } = require('../config')
 
-export function parseIcsData(icsText: string, includePastEvents = true) {
+export function parseIcsData (icsText: string, includePastEvents = true) {
   const log = useLogger('ICS Parser')
   const ret = ical.parse(icsText)
   const component = new ical.Component(ret)
   const events = component.getAllSubcomponents('vevent')
 
-  // TODO: Filter events based on includePastEvents
   // TODO: Handle received not ics Text
 
   log.debug(`[ICS-PARSER] Found ${events.length} event(s)`)
 
-  // const now = Math.floor(Date.now() / 1000)
+  const now = Math.floor(Date.now() / 1000)
 
   return events
     .map(eventData => {
       const event = new ical.Event(eventData)
+      const start_datetime = event.startDate.toUnixTime()
+      const end_datetime = event.endDate.toUnixTime()
+
+      // Time check:
+      // Skip event only if it has fully ended in the past.
+      // That means: both start_datetime AND end_datetime must be less than 'now'.
+      // -> Events that are currently ongoing (start < now && end > now) should still be imported.
+      if (!includePastEvents && start_datetime < now && end_datetime < now) {
+        return null
+      }
 
       // Check if optional organizer is present (RFC 5545:
       // "This property is OPTIONAL and MAY appear in an iCalendar object
@@ -38,12 +47,10 @@ export function parseIcsData(icsText: string, includePastEvents = true) {
         status: event?.status ?? 'CONFIRMED',
         uid: event.uid || '',
         location: event.location || '',
-        start_datetime: event.startDate.toUnixTime(),
-        end_datetime: event.endDate.toUnixTime(),
+        start_datetime,
+        end_datetime,
         modified: event?.lastModified?.toUnixTime() || '',
         is_visible: true
       }
-
-    }
-  )
+    }).filter(Boolean)
 }

@@ -98,21 +98,40 @@ END:VCALENDAR
     // TODO: test for facebook events ics standards (organizer, etc)
   })
   
-  // describe('ICS API (/api/ics-parser)', () => {
-  //   it('should return 1 event from valid input', async () => {
-  //     const { status, headers, body } = await fetch('/api/ics-import', { method: 'POST', body: singleEventIcs })
+  describe('ICS API (/api/ics-parser)', () => {
+    it('should return 1 event from valid input', async () => {
+      const ret = await fetch('/api/ics-import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ icsText: singleEventIcs,  includePastEvents: true }) })
   
-  //     expect(status).toBe(200)
-  //     expect(body?.success).toBe(true)
-  //     expect(body?.events.length).toBe(1)
-  //     expect(body?.events[0].title).toBe('Single Event Test')
-  //     expect(body?.events[0].location).toBe('Test Location')
-  //   })
+      expect(ret.ok).toBe(true)
+      const data = await ret.json()
+      expect(data.events.length).toBe(1)
+      expect(data?.events[0].title).toBe('Single Event Test')
+      expect(data?.events[0].location).toBe('Test Location')
+    })
   
-  //   it('should return 400 if no icsText is provided', async () => {
-  //     const { status, headers, body } = await fetch('/api/ics-import', { method: 'POST', body: {} })
-  
-  //     expect(status).toBe(400)
-  //     expect(body?.success).toBe(false)
-  //   })
-  // })
+    it('should return 400 if no icsText is provided', async () => {
+      const ret = await fetch('/api/ics-import', { method: 'POST', body: "{}" })
+      expect(ret.status).toBe(400)
+    })
+
+    it('should skip events when no includePastEvents flag provided', async () => {
+    const events = parseIcsData(multipleEventsIcs, false)
+    expect(events.length).toBe(0)
+
+    const ret = await fetch('/api/ics-import', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ icsText: singleEventIcs }) })
+
+    expect(ret.status).toBe(200)
+    const data = await ret.json()
+    expect(data.events.length).toBe(0)    
+  })    
+})
