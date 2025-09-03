@@ -3,3 +3,5 @@
 - [ ] manage ENV, config.json, other dbs
 - [ ] how to install plugin dependencies?
 - [ ] docker data backup
+- [ ] setup
+- [ ] switch

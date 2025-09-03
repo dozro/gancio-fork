@@ -37,16 +37,16 @@ function setOptions(plugin) {
   <v-card-title> {{ $t('common.plugins') }}</v-card-title>
   <v-spacer />
   <v-card-subtitle v-html="$t('admin.plugins_description')" />
-  <v-dialog v-if='selectedPlugin.settingsValue' v-model='dialog' width='600' :fullscreen='$vuetify.display?.mobile'>
+  <v-dialog v-if='selectedPlugin.settingsValue' v-model='dialog' width='900' :fullscreen='$vuetify.display?.mobile'>
     <v-card>
       <v-card-title> {{ $t('admin.config_plugin') }} - {{ selectedPlugin.name }}</v-card-title>
       <v-card-text>
         <v-form v-model='valid' ref='form' lazy-validation>
           <v-row v-for='(setting, name) in selectedPlugin.settings' :key='name' class='mt-2'>
-            <v-col class='col-4'>
+            <v-col cols="4">
               <small v-html='setting.hint' />
             </v-col>
-            <v-col class='col-8'>
+            <v-col cols="8">
               <v-text-field v-if='setting.type === "TEXT"' v-model='selectedPlugin.settingsValue[name]'
                 type='text' :label='setting.description'
                 persistent-hint

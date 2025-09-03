@@ -1,4 +1,4 @@
-import { consola, LogLevels } from 'consola'
+import { consola } from 'consola'
 
 export function useLogger(tag: string = 'app') {
   const logger = consola.withDefaults({

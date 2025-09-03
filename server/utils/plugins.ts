@@ -76,14 +76,30 @@ const pluginController = {
     return plugin.routeAPI(req, res, next)
   },
 
-  async testPlugin(pluginName: string) {
-    const plugin = pluginController.plugins.find(p => p.configuration.name === pluginName)
+  async testPlugin(name: string) {
+    const plugin = pluginController.plugins.find(p => p.configuration.name === name)
 
     if (!plugin || typeof plugin.onTest !== 'function') {
       throw createError({ statusCode: 404, message: 'Plugin or test method not found' })
     }
 
+    if (plugin.unload) {
+      plugin.unload()
+    }
+
+    if (plugin.load) {
+      const settings = publicSettings[`plugin_${name}`]
+      await plugin.load({
+        // helpers: await import('../helpers'),
+        log,
+        settings: publicSettings,
+        db: sequelize
+      }, settings)
+    }
     await plugin.onTest()
+    if (plugin.unload) {
+      plugin.unload()
+    }
   },
 
   async unloadPlugin(name: string) {
