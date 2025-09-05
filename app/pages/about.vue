@@ -2,10 +2,17 @@
 
 const { $notify } = useNuxtApp()
 const { isAdmin } = useAuth()
-const { user, loggedIn, session } = useUserSession()
 const { t } = useI18n()
 const { data } = await useFetch<string>('/api/settings/about')
 const about = ref(data || t('about'))
+const settings = useState<Settings>('settings')
+
+useHead({
+  title: settings.value?.title + ' - ' + t('common.about'),
+  meta: [
+    { name: 'description', content: about.value }
+  ]
+})
 
 function save() {
   $notify('common.ok', Statuses.SUCCESS )
