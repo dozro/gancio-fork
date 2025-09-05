@@ -13,7 +13,7 @@ import {
     type InferCreationAttributes,
     type CreationOptional,
     type NonAttribute,
-    InferAttributesOptions,
+    type InferAttributesOptions,
 } from "@sequelize/core"
 
 import {
@@ -35,35 +35,33 @@ import {
     BelongsToMany,
     // BelongsTo,
     Default,
-    BeforeValidate,
     BeforeCreate,
     BelongsTo
 } from "@sequelize/core/decorators-legacy"
 
 import { SqliteDialect } from "@sequelize/sqlite3"
-import { SecretSettings, Settings } from './settings'
+import { MariaDbDialect } from "@sequelize/mariadb"
+
+import type { SecretSettings, Settings } from './settings'
 import { DateTime } from 'luxon'
-
+import config from '../config'
 const log = useLogger('sequelize')
-//   import bcrypt from "bcrypt";
-// const environment = process.env.NODE_ENV || "development";
-
-//   const options = config[environment as keyof typeof config];
-//   export const sequelize = new Sequelize({
-//     ...options,
-//   } as Options<SqliteDialect>);
-import config from '../config.js'
 
 export let sequelize: Sequelize | undefined
 export async function connect() {
   if (sequelize) { return sequelize }
   log.info('connect')
+  
+  const dialectMap = {
+    sqlite: SqliteDialect,
+    mariadb: MariaDbDialect,
+  }
+  
   sequelize = new Sequelize({
-      dialect: SqliteDialect || config?.db_dialect,
+      dialect: dialectMap[config?.db.dialect ?? 'sqlite3'],
       storage: config?.db.storage ?? './gancio.sqlite'
   })
   await sequelize.authenticate()
-  await runMigrations(sequelize).catch(e => { console.error(e)})
   sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message])
 
   User.addScope('defaultScope', { attributes: { exclude: ['password', 'recover_code'] } })
@@ -71,17 +69,6 @@ export async function connect() {
   User.addScope('withPassword', { })
 
   return sequelize
-}
-
-export async function runMigrations(sequelize: Sequelize) {
-  log.info('Running migrations! ', process.cwd())
-  const umzug = new Umzug({
-      storage: new SequelizeStorage({ sequelize }),
-      migrations: { glob: './migrations/*.js'},
-      context: sequelize.queryInterface,
-      logger: console
-  })
-  await umzug.up()
 }
 
 @Table({
@@ -201,10 +188,10 @@ InferCreationAttributes<Event>
     declare online_locations: Array<string>
 
     @Attribute(DataTypes.JSON)
-    declare recurrent?: Object | null
+    declare recurrent?: object | null
 
     @Attribute(DataTypes.JSON)
-    declare ap_object?: Object
+    declare ap_object?: object
 
     /** represent the AP URI */
     @Attribute(DataTypes.STRING)
@@ -268,7 +255,7 @@ InferCreationAttributes<Event>
     @BeforeCreate
     static async generateSlug(event: Event) {
       if (event.title && !event.slug) {
-        let baseSlug = slugify(event.title, { lower: true, strict: true })
+        const baseSlug = slugify(event.title, { lower: true, strict: true })
         let slug = baseSlug
         let count = 1
   
@@ -298,8 +285,8 @@ InferCreationAttributes<Event>
         // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-summary
         const summary = `<p>${this.place && this.place.name}, ${datetime}</p>${this.description}`
         
-        let attachment: Object[] = []
-        let location: Object[] = []
+        let attachment: object[] = []
+        let location: object[] = []
     
         if (this?.online_locations?.length) {
           location = this.online_locations.map(url => ({
@@ -345,11 +332,13 @@ InferCreationAttributes<Event>
           name: '#' + tag,
           href: `${publicSettings.baseurl}/tag/${encodeURIComponent(tag)}`
         })) ?? []
-    
+        
+        console.error('dentro to Ap', this)
+        
         return {
-          id: this?.ap_id ?? `${publicSettings.baseurl}/federation/m/${this.id}`,
+          id: this.ap_id ?? `${publicSettings.baseurl}/federation/m/${this.id}`,
           name: this.title,
-          url: `${publicSettings.baseurl}/event/${this.slug || this.id}`,
+          url: this?.ap_object?.url ?? this?.ap_object?.id ?? `${publicSettings.baseurl}/event/${this.slug || this.id}`,
           type: 'Event',
           startTime: DateTime.fromSeconds(this.start_datetime, opt).toISO(),
           ...( this.end_datetime ? { endTime: DateTime.fromSeconds(this.end_datetime, opt).toISO() } : {} ),
@@ -358,9 +347,9 @@ InferCreationAttributes<Event>
           tag,
           published: this.updatedAt,
           updated: this.updatedAt,
-          attributedTo: `${publicSettings.baseurl}/federation/u/${username}`,
+          attributedTo: this.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
           to: ['https://www.w3.org/ns/activitystreams#Public'],
-          cc: [`${publicSettings.baseurl}/federation/u/${username}/followers`],
+          cc: this.ap_object?.cc ?? [`${publicSettings.baseurl}/federation/u/${username}/followers`],
           content: this.description || '',
           summary
         }
@@ -425,6 +414,7 @@ InferCreationAttributes<Place>
      * @link WIP -> https://codeberg.org/fediverse/fep/src/commit/4a75a1bc50bc6d19fc1e6112f02c52621bc178fe/fep/8a8e/fep-8a8e.md#location
      */
     toAP () {
+      console.error(this)
       return {
         id: this?.ap_id ?? `${config.baseurl}/federation/p/${this.id}`,
         type: 'Place',
