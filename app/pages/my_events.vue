@@ -1,6 +1,5 @@
 <script setup>
 definePageMeta({ middleware: ['authenticated']})
-import time from '~/utils/time'
 const { t } = useI18n()
 const { data: events, refresh } = await useFetch('/api/events/mine')
 const { $confirm, $notify } = useNuxtApp()

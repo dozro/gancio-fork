@@ -196,7 +196,7 @@ async function report () {
         </v-container>
         
         <!-- online events -->
-        <v-list nav dense v-if="hasOnlineLocations">
+        <v-list nav density='compact' v-if="hasOnlineLocations">
           <v-list-item
             v-for="(item, index) in event.online_locations"
             target="_blank"
@@ -228,7 +228,7 @@ async function report () {
 
           <!-- calendar -->
           <v-list-item
-            :href="`/api/event/detail/${event?.slug || event.id}.ics`"
+            :href="`/api/event/detail/${event?.slug || event.id}?format=ics`"
             prepend-icon='mdi-calendar-export'
             :title="$t('common.add_to_calendar')"
           />
