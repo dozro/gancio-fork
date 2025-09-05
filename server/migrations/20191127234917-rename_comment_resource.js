@@ -1,5 +1,4 @@
 export async function up ({ context: queryInterface }) {
-  console.error('dentro renameTable')
   return await queryInterface.renameTable('comments', 'resources')
 }
 

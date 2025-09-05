@@ -3,7 +3,7 @@ import { DataTypes } from '@sequelize/core'
 export function up ({ context: queryInterface }) {
   return queryInterface.createTable('event_notifications', {
     status: {
-      type: DataTypes.ENUM(['new', 'sent', 'error', 'sending']),
+      type: DataTypes.ENUM('new', 'sent', 'error', 'sending'),
       defaultValue: 'new',
       index: true
     },

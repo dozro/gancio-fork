@@ -4,6 +4,6 @@ export async function up ({ context: queryInterface }) {
   return Promise.all(
     [
       await queryInterface.addColumn('events', 'media', { type: DataTypes.JSON }),
-      await queryInterface.sequelize.query("UPDATE events set media=JSON('[{ \"url\": \"' || image_path || '\" }]')")
+      // await queryInterface.sequelize.query("UPDATE events set media=JSON('[{ \"url\": \"' || image_path || '\" }]')")
     ])
   }

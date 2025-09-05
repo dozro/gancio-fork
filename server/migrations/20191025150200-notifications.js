@@ -12,10 +12,10 @@ export function up ({ context: queryInterface }) {
     email: DataTypes.STRING,
     remove_code: DataTypes.STRING,
     action: {
-      type: DataTypes.ENUM(['Create', 'Update', 'Delete'])
+      type: DataTypes.ENUM('Create', 'Update', 'Delete')
     },
     type: {
-      type: DataTypes.ENUM(['mail', 'admin_email', 'ap'])
+      type: DataTypes.ENUM('mail', 'admin_email', 'ap')
     },
     createdAt: {
       allowNull: false,
@@ -28,6 +28,6 @@ export function up ({ context: queryInterface }) {
   })
 }
 
-export function down (queryInterface, Sequelize)  {
+export function down (queryInterface)  {
   return queryInterface.dropTable('notifications')
 }
