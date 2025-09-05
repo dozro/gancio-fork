@@ -3,14 +3,15 @@ HOMEPAGE
 The homepage shows future events by default.
 -->
 <script setup lang="ts">
-import type { Event } from '#build/types/nitro-imports'
 import { DateTime } from 'luxon'
+import type { Event } from '#build/types/nitro-imports'
+import time from '~/utils/time'
 
 // middleware setup!
 
 const settings = useState<Settings>('settings')
 useHead({
-  title: computed(() => settings.value?.title),
+  title: settings.value?.title,
   meta: [
     { name: 'description', content: settings?.value.description },
     { name: 'og:description', content: settings?.value.description },
@@ -26,7 +27,6 @@ useHead({
   ]
 })
 
-import time from '~/utils/time'
 const now = time.nowUnix()
 
 const params = useState('params')
