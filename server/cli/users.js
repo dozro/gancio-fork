@@ -61,21 +61,18 @@
 // }
 
 // import * as sequelize from "../utils/sequelize.ts"
-import { getSequelize } from "../gancio.js"
+// import { getSequelize } from "../gancio.js"
 
 async function list () {
-  const sequelize = await getSequelize()
-  const users = await sequelize.User.findAll()
+  await connect()
+  const users = await User.findAll()
   users.forEach(u => console.log(`${u.id}\trole: ${u.role}\tenabled: ${u.is_active}\temail: ${u.email}`))
-  await sequelize.sequelize.close()
 }
 
 
 async function resetPassword (args) {
-  const sequelize = await getSequelize()
-  // const helpers = require('../helpers')
-  // const { User } = require('../api/models/models')
-  const user = await sequelize.User.findOne({ where: { email: args.email } })
+  await connect()
+  const user = await User.findOne({ where: { email: args.email } })
   console.log()
   if (!user) {
     console.error(`User ${args.email} not found`)
@@ -86,7 +83,6 @@ async function resetPassword (args) {
   user.password = args.password
   await user.save()
   console.log(`New password for user ${user.email} is '${args.password}'`)
-  await sequelize.sequelize.close()
 }
 
 // async function enable (args, enable) {

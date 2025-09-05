@@ -580,7 +580,7 @@ export async function getNodeInfo (instance_url) {
     if (!instance) {
       log.warn(`[FEDI] Verify Signature: Instance not found ${actor_url}`)
       if (isDelete) {
-        return res.sendStatus(201)
+        return true
       }
       throw createError({ status: 401, message: 'Instance not found' })
     }
@@ -597,7 +597,6 @@ export async function getNodeInfo (instance_url) {
       log.info(`[FEDI] Actor ${actor_url} not found`)
       if (isDelete) {
         return true
-        // return res.sendStatus(201)
       }
       throw createError({ status: 401, message: 'Actor not found' })
     }
