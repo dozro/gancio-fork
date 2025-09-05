@@ -75,7 +75,7 @@ async function remove (event) {
     </template>
   </v-data-table>
   
-  <v-card-title>{{$t('common.past_events')}}</v-card-title>
+  <v-card-title v-if='unconfirmedOldEvents.length'>{{$t('common.past_events')}}</v-card-title>
   <v-data-table
     v-if='unconfirmedOldEvents.length'
     :hide-default-footer='unconfirmedOldEvents.length<10'
