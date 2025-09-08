@@ -39,7 +39,7 @@ export async function findOrCreateTags (tags) {
 export async function cleanOrphanTags () {
     const tags = await Tag.findAll({
       include: [{ model: Event, as: 'events', required: false, attributes: [], through: { attributes: [] } }],
-      group: ['tag.tag'],
+      group: ['tag'],
       having: where(fn('COUNT', col('events.id')), Op.eq, 0)
     })
 

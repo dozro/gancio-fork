@@ -43,7 +43,7 @@ export async function findOrCreatePlace (body) {
 export async function cleanOrphanPlaces () {
   const places = await Place.findAll({
     include: [{ model: Event, as: 'events', required: false, attributes: [] }],
-    group: ['place.id'],
+    group: ['Place.id'],
     having: where(fn('COUNT', col('events.id')), Op.eq, 0)
   })
   if (!places.length) { return }

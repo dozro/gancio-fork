@@ -13,7 +13,7 @@ export default defineEventHandler(async event => {
     return Place.findAll({
       order: [[fn('COUNT', col('events.placeId')), 'DESC']],
       include: [{ model: Event, where: { is_visible: true }, required: true, attributes: [] }],
-      group: ['place.id'],
+      group: ['Place.id'],
       raw: true
     })
   } else {
@@ -25,9 +25,9 @@ export default defineEventHandler(async event => {
             where(fn('LOWER', col('address')), Op.like, '%' + query + '%'),
           ]
         },
-        attributes: ['name', 'address', 'latitude', 'longitude', 'id'],
+        attributes: ['name', 'address', 'latitude', 'longitude', 'id', 'ap_id'],
         include: [{ model: Event, where: { is_visible: true }, required: true, attributes: [] }],
-        group: ['place.id'],
+        group: ['Place.id'],
         raw: true,
         limit: 10,
         subQuery: false

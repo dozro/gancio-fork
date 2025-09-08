@@ -19,9 +19,9 @@ export default defineEventHandler(async event => {
       order: [['start_datetime', 'ASC']],
       include: [
         Place,
-        // { model: Message, required: false, attributes: [] }],
+        { model: Message, required: false, attributes: [] }
       ],
-      group: ['event.id', 'place.id'],
+      // group: [col('event', 'id'), col('place.id')],
     })
     
     const now = DateTime.local().toUnixInteger()

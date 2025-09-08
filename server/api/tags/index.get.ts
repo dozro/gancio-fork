@@ -10,13 +10,13 @@ export default defineEventHandler(async event => {
   const { query } = await getValidatedQuery(event, schema.parse)
 
   const tags = await Tag.findAll({
-    order: [[fn('COUNT', col('tag.tag')), 'DESC']],
+    order: [[fn('COUNT', col('tag')), 'DESC']],
     attributes: ['tag'],
     ...( query && { where: {
       tag: { [Op.like]: `%${query}%` }
     }}),
     include: [{ model: Event, where: { is_visible: true }, attributes: [], through: { attributes: [] }, required: true }],
-    group: ['tag.tag'],
+    group: ['tag'],
     limit: 10,
     raw: true,
     subQuery: false
