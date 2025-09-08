@@ -4,7 +4,9 @@ defineProps({
   unconfirmedOldEvents: { type: Array, default: () => [] },
 })
 
-const { $confirm } = useNuxtApp()
+const emit = defineEmits(['confirmed', 'removed'])
+
+const { $confirm, $notify } = useNuxtApp()
 const $route = useRoute()
 const { t } = useI18n()
 
@@ -24,16 +26,14 @@ const headers = [
     { value: 'actions', title: t('common.actions'), align: 'end', sortable: false, width: 280 }
   ]
   
-function edit (event) {
-  navigateTo(`/add/${event.id}`)
-}
-
 async function confirm (event) {
   try {
     await $fetch(`/api/events/${event.id}/confirm`, { method: 'PUT' })
-    $emit('confirmed', event.id)
-    $notify('event.confirmed', { color: 'success' })
-  } catch (e) {}
+    emit('confirmed', event.id)
+    $notify('event.confirmed')
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
 }
     
 async function remove (event) {
@@ -42,7 +42,7 @@ async function remove (event) {
   try {
     await $fetch(`/api/events/${event.id}`, { method: 'DELETE'})
     $notify('admin.event_remove_ok')
-    $emit('removed', event.id)
+    emit('removed', event.id)
   } catch (e) {}
 }
 </script>
@@ -62,10 +62,12 @@ async function remove (event) {
     <template v-slot:item.actions='{ item }'>
       <t-btn @click='confirm(item)' color='success' :tooltip="$t('common.confirm')" icon='mdi-check-bold' />
 
-      <t-btn @click='() => { selectedEvent = item; openModeration=true }' color='warning' :tooltip="$t('common.moderation')" icon='mdi-message-text' />
-        <!-- v-badge(v-if='item?.n_messages' :content="item?.n_messages" overlap bordered)
+      <t-btn
+        @click='() => { selectedEvent = item; openModeration=true }'
+        color='warning' :tooltip="$t('common.moderation')" icon='mdi-message-text' />
+         <!-- v-badge(v-if='item?.n_messages' :content="item?.n_messages" overlap bordered)
           v-icon(v-text='mdiMessageText')
-        v-icon(v-else v-text='mdiMessageText') -->
+        v-icon(v-else v-text='mdiMessageText')  -->
 
       <t-btn :to='`/event/${item.slug || item.id}`' color='info' :tooltip="$t('common.preview')" icon='mdi-eye' />
       
@@ -89,6 +91,19 @@ async function remove (event) {
       <t-btn @click='remove(item)' color='error' :tooltip="$t('common.delete')" icon='mdi-delete-forever' />
     </template>
   </v-data-table>
+  <v-navigation-drawer
+    v-model="openModeration"
+    :fullscreen="$vuetify.display?.mobile"
+    location='right'
+    width="400"
+    temporary
+  >
+    <EventModeration
+      :event="selectedEvent"
+      v-if="openModeration"
+      @close="openModeration=false"
+    />
+  </v-navigation-drawer>
 </v-container>
 
 
