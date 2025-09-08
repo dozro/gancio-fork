@@ -9,9 +9,9 @@ const config = {
     dialect: (process.env.DB_DIALECT || 'sqlite') as 'sqlite' | 'mariadb',
     storage: process.env.DB_STORAGE || 'gancio.sqlite'
   },
-  user_locale: path.resolve(process.env.USER_LOCALE || '', 'user_locale'),
-  upload_path: path.resolve(process.env.UPLOAD_PATH || '', 'uploads'),
-  plugins_path: path.resolve(process.env.PLUGINS_PATH || '', 'plugins'),
+  user_locale: path.resolve(process.env.USER_LOCALE || 'user_locale'),
+  upload_path: path.resolve(process.env.UPLOAD_PATH || 'uploads'),
+  plugins_path: path.resolve(process.env.PLUGINS_PATH || 'plugins'),
   hidden_service: process.env.ALLOW_ACCESS_TO_HIDDEN_SERVICE || '',
   proxy: {
     protocol: process.env.PROXY_PROTOCOL || '',

@@ -79,7 +79,7 @@ export default defineEventHandler(async evt => {
     return event.toAP()
   } else if (format === 'ics') {
     // last arg is alarms/reminder, ref: https://github.com/adamgibbons/ics#attributes (alarms)
-    exportICS(evt, [event], [{
+    return exportICS(evt, [event], [{
       action: 'display',
       description: event.title,
       trigger: { hours: 1, before: true }

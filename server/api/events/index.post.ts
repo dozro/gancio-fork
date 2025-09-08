@@ -2,20 +2,16 @@ import { Event } from "#imports"
 import { mkdirp } from 'mkdirp'
 import config from '~~/server/config'
 import { parseMultipartFormData, saveUploadedEventImage } from "~~/server/utils/parseMultipartForm"
-import { MultiPartData } from "h3"
+import type { MultiPartData } from "h3"
 import { DateTime } from "luxon"
 import { findOrCreatePlace } from "~~/server/lib/places"
 import { getImageFromURL, sanitizeHTML } from "~~/server/helpers"
 import linkifyHtml from "linkify-html"
 import { findOrCreateTags } from "~~/server/lib/tags"
 
-
-
 try {
   mkdirp.sync(config.upload_path + '/thumb')
 } catch (e) {}
-
-
 
 /**
  * Add a new event
@@ -42,22 +38,31 @@ try {
 export default defineEventHandler(async evt => {
   const log = useLogger('New event')
   const user = await getUser(evt)
-
-  const body = await parseMultipartFormData(evt)
-  if (!body) {
-    throw createError({ status: 400 })
+  log.info(user, publicSettings.allow_anon_event)
+  const isAnonymous = !user
+  if (isAnonymous && !publicSettings.allow_anon_event) {
+    log.warn('Anonymous event creation not allowed')
+    throw createError({ status: 403, message: 'Anonymous event creation not allowed', statusMessage: 'Anonymous event creation not allowed' })
   }
 
   
+  const multiPartBody = await parseMultipartFormData(evt)
+  const jsonBody = await readBody(evt)
+  const body = multiPartBody || jsonBody
+  if (!body) {
+    console.error(body)
+    log.info('Validation error')
+    throw createError({ status: 400, message: 'Validation Error' })
+  }
+
   // check for required fields
   const requiredFields = ['title', 'start_datetime']
-  let missingField = requiredFields.find(requiredField => !body[requiredField])
+  const missingField = requiredFields.find(requiredField => !body[requiredField])
   if (missingField) {
     log.warn(`${missingField} required`)
-    throw createError({ status: 400, message: `${missingField} required`})
+    throw createError({ status: 400, message: `${missingField} required`, statusMessage: `${missingField} required` })
   }
   
-  const isAnonymous = !user
   const now = DateTime.local().toUnixInteger()
   const start_datetime = Number(body.start_datetime)
 
@@ -80,7 +85,7 @@ export default defineEventHandler(async evt => {
   }
 
   if (body.end_datetime && !Number(body.end_datetime)) {
-    log.debug('start_datetime has to be a number')
+    log.debug('end_datetime has to be a number')
     throw createError({ status: 400, message: `Wrong format for end datetime`} )
   }
 
@@ -90,12 +95,12 @@ export default defineEventHandler(async evt => {
   }
 
   if(isAnonymous && start_datetime < now) {
-    log.debug('Anonymous users cannot create past events')
+    log.debug('anonymous users cannot create past events')
     throw createError({ status: 400, message: 'Anonymous user cannot create past events'} )
   }
 
   // find or create the place
-  let place = await findOrCreatePlace(body)
+  const place = await findOrCreatePlace(body)
   if (!place) {
     throw createError({ status: 400, message: 'Place not found' })
   }
@@ -108,16 +113,13 @@ export default defineEventHandler(async evt => {
     description: sanitizeHTML(linkifyHtml(body.description as string || '', { target: '_blank', render: { email: ctx => ctx.content }})),
     // multidate: body.multidate,
     start_datetime,
-    end_datetime: Number(body.end_datetime),
+    end_datetime: body.end_datetime && Number(body.end_datetime),
     online_locations: body.online_locations,
     recurrent,
     // publish this event only if authenticated
     is_visible: !isAnonymous,
     ...(user && { userId: user?.id })
   }
-
-
-
 
   // do we have an image?
   if (body.image) {
@@ -128,7 +130,6 @@ export default defineEventHandler(async evt => {
       eventDetails.media = [ media ]
     }
   }
-  
   const event = await Event.create(eventDetails)
   await event.setPlace(place)
 
