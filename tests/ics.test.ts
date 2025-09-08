@@ -1,21 +1,10 @@
 import { describe, expect, it } from "vitest"
-import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
+import { fetch, setup } from '@nuxt/test-utils/e2e'
 
+import { parseIcsData } from  "../server/utils/icsparser.js"
 const base_url = 'http://localhost:13120'
 
-import path from 'path'
-import { parseIcsData } from  "../server/utils/icsparser.js"
-
-// const { parseIcsData } = require('../server/helpers/icsparser.js')
-// const icsController = require('../server/api/controller/ics.js')
-// const request = require('supertest')
-// const express = require('express')
-
-
 await setup({ host: base_url })
-
-// app.post('/api/ics-import', icsController.importICSFile)
-// app.post('/api/ics-import/url', icsController.importICSURL)
 
 const singleEventIcs = `
 BEGIN:VCALENDAR
@@ -133,5 +122,29 @@ END:VCALENDAR
     expect(ret.status).toBe(200)
     const data = await ret.json()
     expect(data.events.length).toBe(0)    
-  })    
+  })
+})
+
+describe('ICS output', () => {
+  it('should return a valid ICS feed', async () => {
+    const icsString = await fetch('/feed/ics')
+
+    expect(icsString.ok).toBe(true)
+    const data = await icsString.text()
+    expect(data).toContain('BEGIN:VCALENDAR')
+    expect(data).toContain('VERSION:2.0')
+    expect(data).toContain('END:VCALENDAR')
+  })
+  
+  it('should return a valid ics for each event detail', async () => {
+    const icsString = await fetch('/api/event/detail/1?format=ics')
+
+    expect(icsString.ok).toBe(true)
+    expect(icsString.headers.get('content-type')).toContain('text/calendar')
+    const data = await icsString.text()
+    expect(data).toContain('BEGIN:VEVENT')
+    // expect(data).toContain('SUMMARY:Single Event Test')
+    // expect(data).toContain('LOCATION:Test Location')
+    expect(data).toContain('END:VEVENT')
+  })
 })

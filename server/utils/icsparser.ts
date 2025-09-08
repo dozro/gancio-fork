@@ -1,7 +1,5 @@
 import ical from 'ical.js'
 import { useLogger } from './useLogger'
-// const log = require('../log')
-// const { status } = require('../config')
 
 export function parseIcsData (icsText: string, includePastEvents = true) {
   const log = useLogger('ICS Parser')
