@@ -46,7 +46,7 @@ const visibleEvents = computed(() => {
   if (selectedDate.value) {
     const min = DateTime.fromJSDate(selectedDate?.value)?.startOf('day')?.toUnixInteger()
     const max = DateTime.fromJSDate(selectedDate?.value)?.endOf('day')?.toUnixInteger()
-    return events.value?.filter(e => (e.start_datetime <= max && (e.end_datetime || (e.start_datetime + 1)) > min))
+    return events.value?.filter(e => (e.start_datetime <= max && (e.end_datetime || e.start_datetime) >= min))
   } else if (isCurrentMonth.value) { // && !query) {
     return events.value?.filter(e => {
       const max_datetime = Math.max(e.start_datetime, e.end_datetime)

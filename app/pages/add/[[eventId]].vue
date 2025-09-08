@@ -3,13 +3,13 @@
  -->
 <script setup lang="ts">
 import type { Event } from '#build/types/nitro-imports'
-import { DateTime } from 'luxon'
 
 const { loggedIn } = useUserSession()
 const { $notify } = useNuxtApp()
 const settings = useState<Settings>('settings')
 
-useHead({ title: `${settings.value.title} - Add Event`})
+const { t } = useI18n()
+useHead({ title: `${settings.value.title} - ${t('common.add_event')}` })
 
 const route = useRoute()
 

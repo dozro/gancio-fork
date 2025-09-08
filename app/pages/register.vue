@@ -1,7 +1,9 @@
 <script setup>
 
+const settings = useState('settings')
+const { t } = useI18n()
 useHead({
-  title: () => `${settings.value.title} - Register`
+  title: `${settings.value.title} - ${t('common.register')}`
 })
 
 
@@ -11,7 +13,6 @@ const loading = ref(false)
 const user = reactive({ email:'', password: '', description: '' })
 const valid = ref(false)
 const { $notify } = useNuxtApp()
-const router = useRouter()
 
 const register = async () => {
   const valid = form.value.validate()

@@ -14,7 +14,7 @@ watch(selectedTab, () => {
   navigateTo({ query: { tab: selectedTab.value }})
 })
 
-const { data: unconfirmedEvents } = await useFetch('/api/events/unconfirmed')
+const { data: unconfirmedEvents, refresh } = await useFetch('/api/events/unconfirmed')
 
 </script>
 <template>
@@ -51,9 +51,12 @@ const { data: unconfirmedEvents } = await useFetch('/api/events/unconfirmed')
             </v-tabs-window-item>
                               
             <v-tabs-window-item value="events">
-              <AdminEvents :unconfirmedEvents='unconfirmedEvents?.events' :unconfirmedOldEvents='unconfirmedEvents?.oldEvents' />
-                <!-- @confirmed='id => { unconfirmedEvents = unconfirmedEvents.filter(e => e.id !== id); unconfirmedOldEvents = unconfirmedOldEvents.filter(e => e.id !== id)}'
-                @removed='id => { unconfirmedEvents = unconfirmedEvents.filter(e => e.id !== id); unconfirmedOldEvents = unconfirmedOldEvents.filter(e => e.id !== id)}' /> -->
+              <AdminEvents
+                :unconfirmed-events='unconfirmedEvents?.events'
+                :unconfirmed-old-events='unconfirmedEvents?.oldEvents'
+                @confirmed='refresh'
+                @removed='refresh'
+              />
             </v-tabs-window-item>
             
             <v-tabs-window-item value='collections'>
