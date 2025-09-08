@@ -1,5 +1,7 @@
 import type { NitroApp } from "nitropack"
 import pluginController from "../utils/plugins"
+import fsDriver from 'unstorage/drivers/fs'
+import config from '../config'
 
 export default defineNitroPlugin(async (nitroApp: NitroApp) => {
 
@@ -16,7 +18,11 @@ export default defineNitroPlugin(async (nitroApp: NitroApp) => {
         
       log.info('Loading plugins')
       pluginController._load()
-        
+
+      const storage = useStorage()
+      const driver = fsDriver({ base: config.user_locale })
+      storage.mount('custom_user_locale', driver)
+      
       return true
     } catch (e) {
       log.error(`Error connecting to database?`)
