@@ -20,7 +20,7 @@ describe('Nodeinfo', () => {
 
   it('shoud implement FEP-2677 - Application Actor', async () => {
     const response = await $fetch('/.well-known/nodeinfo')
-    expect(response.links.find(l => l.rel === 'https://www.w3.org/ns/activitystreams#Application')?.href).toContain('/federation/u/gancio')
+    expect(response.links.find(l => l.rel === 'https://www.w3.org/ns/activitystreams#Application')?.href).toContain('/federation/u/relay')
   })
 
 })

@@ -2,7 +2,6 @@ import type { H3Event, MultiPartData } from "h3"
 import config from "../config"
 import path from "path"
 import sharp from "sharp"
-import { Media } from "./sequelize"
 const log = useLogger('parseMultipartForm')
 
 export async function parseMultipartFormData(event: H3Event) {
@@ -59,7 +58,7 @@ export async function saveUploadedImage(image: MultiPartData, dest: string) {
   return baseImgPath + '.png'
 }
 
-export async function saveUploadedEventImage (image: MultiPartData, name: string, focalpoint: number[]): Promise<Media|null> {
+export async function saveUploadedEventImage (image: MultiPartData, name: string, focalpoint: number[]): Promise<Media|undefined> {
 
   const filename = crypto.randomUUID() + '.jpg'
   const sharpStream = sharp(image.data, { failOnError: true })

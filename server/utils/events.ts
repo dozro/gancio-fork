@@ -80,11 +80,11 @@ export async function getEvents(opts?: EventQueryType | undefined): Promise<Even
   if (args.tags && args.places) {
     condition[Op.and] = [
       { placeId: args.places },
-      sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('event', 'id')} AND ${sql.identifier('tagTag')} in ${sql.list(args.tags)})`
+      sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('Event', 'id')} AND ${sql.identifier('tagTag')} in ${sql.list(args.tags)})`
     ]
   
   } else if (args.tags) {
-    condition[Op.and] = sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('event', 'id')} AND ${sql.identifier('tagTag')} in (${sql.list(args.tags)}))`
+    condition[Op.and] = sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('Event', 'id')} AND ${sql.identifier('tagTag')} in (${sql.list(args.tags)}))`
   } else if (args.places) {
     condition.placeId = args.places
   }
@@ -171,7 +171,7 @@ export function mapEvents (events: Event[]) : Event[] {
   })
 }
 
-export async function getMessages(eventId: Number) {
+export async function getMessages(eventId: number) {
   const event = await Event.findByPk(eventId, { include: [{ model: Message, as: 'messages' } ] })
   if (!event) {
     throw createError({ status: 400 })
