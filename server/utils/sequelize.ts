@@ -14,6 +14,8 @@ import {
     type CreationOptional,
     type NonAttribute,
     type InferAttributesOptions,
+    type AbstractDialect,
+    type Options,
 } from "@sequelize/core"
 
 import {
@@ -50,20 +52,41 @@ const log = useLogger('sequelize')
 export let sequelize: Sequelize | undefined
 export async function connect() {
   if (sequelize) { return sequelize }
-  log.info('connect')
-  
   const dialectMap = {
     sqlite: SqliteDialect,
+    sqlite3: SqliteDialect,
     mariadb: MariaDbDialect,
   }
   
-  sequelize = new Sequelize({
-      dialect: dialectMap[config?.db.dialect ?? 'sqlite3'],
-      storage: config?.db.storage ?? './gancio.sqlite'
-  })
-  await sequelize.authenticate()
-  sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message])
+  const dialectName = process.env.DB_DIALECT ?? 'sqlite3'
+  let dbOptions = {}
+  
+  if (dialectName === 'mariadb') {
+    dbOptions = {
+      dialect: dialectMap[dialectName],
+      database: process.env.DB_NAME || 'gancio',
+      user: process.env.DB_USER || 'gancio',
+      password: process.env.DB_PASSWORD || 'gancio',
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 3306,
+    }
+  } else if (dialectName === 'sqlite3' || dialectName === 'sqlite') {
+    dbOptions = {
+      dialect: dialectMap[dialectName],
+      storage: process.env.DB_STORAGE || './gancio.sqlite',
+    }
+  }
 
+  try {
+    sequelize = new Sequelize(dbOptions as Options<AbstractDialect>)
+      await sequelize.authenticate()
+      log.info('Connection has been established successfully.')
+      sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message])
+    } catch (error) {
+      console.error('Unable to connect to the database:', dbOptions)
+      process.exit(1)
+  }
+  
   User.addScope('defaultScope', { attributes: { exclude: ['password', 'recover_code'] } })
   User.addScope('withRecoverCode', { attributes: { exclude: ['password'] } })
   User.addScope('withPassword', { })

@@ -40,7 +40,7 @@ async function main() {
       await sequelize.authenticate()
       console.log('Connection has been established successfully.')
     } catch (error) {
-      console.error('Unable to connect to the database:', dbOptions)
+      console.error('Unable to connect to the database:', dbOptions, error)
       process.exit(1)
     }
     await runMigrations(sequelize).catch(e => { console.error(e) })
