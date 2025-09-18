@@ -368,14 +368,14 @@ const custom_js = manageSetting('custom_js')
   <v-card-title>{{$t('admin.custom_js')}}</v-card-title>
   <v-card-subtitle v-html="$t('admin.custom_js_help')" />
   <v-card-text>
-    <v-textarea v-model='custom_js' :label='$t("admin.custom_js")' outlined />
+    <v-textarea v-model='custom_js' :label='$t("admin.custom_js")' variant='outlined' />
   </v-card-text>
 
   <!-- custom css -->
   <v-card-title>{{$t('admin.custom_css')}}</v-card-title>
   <v-card-subtitle v-html="$t('admin.custom_css_help')" />
   <v-card-text>
-    <v-textarea v-model='custom_css' :label='$t("admin.custom_css")' outlined />
+    <v-textarea v-model='custom_css' :label='$t("admin.custom_css")' variant='outlined' />
   </v-card-text>
   </v-card-text>
 </v-container>

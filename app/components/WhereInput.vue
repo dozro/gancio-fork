@@ -3,7 +3,6 @@
 import type { Event } from '#build/types/nitro-imports'
 import { refDebounced } from '@vueuse/core'
 
-
 const settings = useState<Settings>('settings')
 
 interface Place {
@@ -29,7 +28,7 @@ const showAdvancedDialogButton = computed(() => {
     return false
   }
   // known places already have coords
-  if (!event?.value?.place?.isNew) return false
+  if (!event?.value?.place?.create) return false
   return true
 })
 
@@ -127,7 +126,7 @@ function selectPlace (place) {
     v-model="whereInputAdvancedDialog"
     destroy-on-close="destroy-on-close"
     max-width="700px" :fullscreen="$vuetify.display.mobile" density="dense">
-    <WhereInputAdvanced ref="whereAdvanced" 
+    <WhereInputAdvanced
       v-model:event="event" @close="whereInputAdvancedDialog = false" />
   </v-dialog>
   
