@@ -180,7 +180,7 @@ module.exports = {
             to: 'https://www.w3.org/ns/activitystreams#Public',
             published: new DateTime(e.createdAt).toISO(),
             actor: `${config.baseurl}/federation/u/${name}`,
-            object: e.toAP(settings)
+            object: e.toAP()
           }))
       })      
     } else {

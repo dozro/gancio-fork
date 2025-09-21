@@ -47,7 +47,6 @@ export default defineEventHandler(async event => {
       log.debug(`[FEDI] Announce incoming from ${event.context.fedi_user.ap_id}`)
       await parseAPMessage(message, event.context.fedi_user)
       return setResponseStatus(event, 201)
-      // return res.status(201).send()
     case 'Note':
       log.debug('[FEDI] Direct Note Activity is not supported: %s', JSON.stringify(message.object))
       break
@@ -77,10 +76,10 @@ export default defineEventHandler(async event => {
       break
     case 'Update':
       if (message.object?.type === 'Event') {
-        log.debug(`[FEDI] Event update is coming from ${res.locals.fedi_user.ap_id}`)
+        log.debug(`[FEDI] Event update is coming from ${event.context.fedi_user.ap_id}`)
         // await Events.update(req, res)
       } else if (message.object?.type === 'Note') {
-        log.debug('[FEDI] Note update is coming from %s', res.locals.fedi_user.ap_id)
+        log.debug('[FEDI] Note update is coming from %s', event.context.fedi_user.ap_id)
         // await Resources.update(req, res)
       } else {
         log.debug('[FEDI] Update unsupported Object: %s', JSON.stringify(message?.object))
@@ -91,8 +90,8 @@ export default defineEventHandler(async event => {
       if (message.object?.type === 'Note') {
         // await Resources.create(req, res)
       } else if (message.object?.type === 'Event') {
-        log.debug(`[FEDI] Create Activity with Event type incoming from ${res.locals.fedi_user.ap_id}`)
-        if (!res.locals.fedi_user.following || !res.locals.fedi_user.trusted) {
+        log.debug(`[FEDI] Create Activity with Event type incoming from ${event.context.fedi_user.ap_id}`)
+        if (!event.context.fedi_user.following || !event.context.fedi_user.trusted) {
           log.warn(`[FEDI] APUser not followed or not trusted`)
           throw createError({ status: 404, message: 'Not followed or not trusted' })
         }

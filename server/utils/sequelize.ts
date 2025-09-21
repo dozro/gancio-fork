@@ -294,7 +294,7 @@ InferCreationAttributes<Event>
       }
     }
     
-    toAP (to = ['https://www.w3.org/ns/activitystreams#Public'], type = 'Create') {
+    toAP () {
     
         const username = publicSettings.instance_name
         const opt = {

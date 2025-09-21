@@ -23,7 +23,7 @@ module.exports = {
     }
   
     log.debug(`[FEDI] Get event details - ${event.slug}`)
-    const eventAp = event.toAP(res.locals.settings)
+    const eventAp = event.toAP()
     eventAp['@context'] = [
       'https://www.w3.org/ns/activitystreams',
       'https://w3id.org/security/v1',
