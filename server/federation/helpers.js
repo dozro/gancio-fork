@@ -188,62 +188,85 @@ export async function updateActor() {
     }
   }
 
+  export async function getFollowersInbox () {
+    const followers = await APUser.findAll({ where: { follower: true } })
+  
+    const recipients = {}
+    for (const follower of followers) {
+      const sharedInbox = follower?.object?.endpoints?.sharedInbox ?? follower?.object?.inbox
+      if (!sharedInbox) continue
+      if (!recipients[sharedInbox]) recipients[sharedInbox] = []
+      recipients[sharedInbox].push(follower.ap_id)
+    }
+  
+    return recipients
+  }
+
+  const APContext = [
+    'https://www.w3.org/ns/activitystreams',
+    'https://w3id.org/security/v1',
+    {
+      toot: 'http://joinmastodon.org/ns#',
+
+      // https://docs.joinmastodon.org/spec/activitypub/#Hashtag
+      "Hashtag": "https://www.w3.org/ns/activitystreams#Hashtag",
+
+      manuallyApprovesFollowers: 'as:manuallyApprovesFollowers',
+
+      // focal point - https://docs.joinmastodon.org/spec/activitypub/#focalPoint
+      "focalPoint": {
+        "@container": "@list",
+        "@id": "toot:focalPoint"
+      }
+    }
+  ]
+  
+  export async function announceEvent (event) {
+    if (!publicSettings.enable_federation) {
+      log.info('[FEDI] Event not sent, federation is disabled')
+      return
+    }
+    
+    const recipients = await getFollowersInbox()
+    for (const sharedInbox in recipients) {
+      log.debug(`Announce ${sharedInbox} with event ${event.title} cc => ${recipients[sharedInbox].length}`)
+      const body = {
+        '@context': APContext,
+        id: `${publicSettings.baseurl}/federation/m/${event.id}#Announce-${Date.now()}`,
+        type: 'Announce',
+        actor: `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
+        to: ['https://www.w3.org/ns/activitystreams#Public'],
+        cc: [...recipients[sharedInbox], `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}/followers`],
+        object: event.toAP() // event?.ap_id ?? event.id // Must point to the original object's ID
+      }
+      signAndSend(JSON.stringify(body), sharedInbox)
+    }
+  }
+  
   export async function sendEvent (event, type = 'Create') {
     if (!publicSettings.enable_federation) {
       log.info('[FEDI] Event not sent, federation is disabled')
       return
     }
 
-    const followers = await APUser.findAll({ where: { follower: true } })
-    log.debug("[FEDI] Sending to %d followers: [%s]", followers.length, followers.map(f => f.ap_id).join(', '))
-    const recipients = {}
-    followers.forEach(follower => {
-      const sharedInbox = follower?.object?.endpoints?.sharedInbox ?? follower?.object?.inbox
-      if (!recipients[sharedInbox]) { recipients[sharedInbox] = [] }
-      recipients[sharedInbox].push(follower.ap_id)
-    })
-
+    const recipients = await getFollowersInbox()
+    
     for (const sharedInbox in recipients) {
       log.debug(`Notify ${sharedInbox} with event ${event.title} cc => ${recipients[sharedInbox].length}`)
       const body = {
+        '@context': APContext,
         id: `${publicSettings.baseurl}/federation/m/${event.id}#${type}-${event.updatedAt.getTime()}`,
         type,
         to: ['https://www.w3.org/ns/activitystreams#Public'],
         cc: [...recipients[sharedInbox], `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}/followers`],
         actor: `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
-        object: event.toAP(recipients[sharedInbox], type)
+        object: event.toAP()
       }
 
-      body['@context'] = [
-        'https://www.w3.org/ns/activitystreams',
-        'https://w3id.org/security/v1',
-        {
-          toot: 'http://joinmastodon.org/ns#',
-
-          // A property-value pair, e.g. representing a feature of a product or place. We use this to publish this very same instance
-          // https://docs.joinmastodon.org/spec/activitypub/#PropertyValue
-          schema: 'http://schema.org#',
-          ProperyValue: 'schema:PropertyValue',
-          value: 'schema:value',
-
-          // https://docs.joinmastodon.org/spec/activitypub/#discoverable
-          "discoverable": "toot:discoverable",
-
-          // https://docs.joinmastodon.org/spec/activitypub/#Hashtag
-          "Hashtag": "https://www.w3.org/ns/activitystreams#Hashtag",
-
-          manuallyApprovesFollowers: 'as:manuallyApprovesFollowers',
-
-          // focal point - https://docs.joinmastodon.org/spec/activitypub/#focalPoint
-          "focalPoint": {
-            "@container": "@list",
-            "@id": "toot:focalPoint"
-          }
-        }]
-
-        signAndSend(JSON.stringify(body), sharedInbox)
+      signAndSend(JSON.stringify(body), sharedInbox)
     }
   }
+
 
   export async function parseAPMessage (APMessage, actor) {
     
@@ -279,7 +302,7 @@ export async function updateActor() {
     try {
       let tmp_actor
       if (!event) {
-        // this is an announce of a remote event, let's get the actor
+        // this is an announce of a remote event, let's get the event
         event = await _signAndSend('', APMessage, 'get')
       }
       if (event?.type === 'Event') {

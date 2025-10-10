@@ -42,7 +42,16 @@ async function toggle (parent = false) {
   }
 }
 
-const opened = ref(['Admin'])
+async function reannounce () {
+  const id = props.event.id
+  try {
+    await $fetch(`/api/events/${id}/reannounce`, { method: 'PUT' })
+    emit('update')
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
+}
+
 </script>
 
 <template>
@@ -95,7 +104,12 @@ const opened = ref(['Admin'])
         v-if="event.isAnon && isAdmin" @click="$emit('openAssignAuthor')"
         prepend-icon='mdi-clipboard-account'
         :title="$t('event.assign_to_user')" />
-
+      
+      <!-- Re-announce event -->
+      <v-list-item
+        v-if="isAdmin" @click="reannounce"
+        prepend-icon='mdi-replay'
+        :title="$t('event.reannounce')" />
 
       <!-- Recurring events -->
       <template v-if="event.parentId">
