@@ -1,6 +1,8 @@
 <script setup>
 
 import time from '~/utils/time'
+import { useTheme } from 'vuetify'
+
 const params = useState('params')
 let selectedDate = useState('selectedDate')
 const attributes = useState('attributes')
@@ -33,15 +35,21 @@ function updatePages (pages) {
 </template>
 
 <style>
-/* .vc-container.vc-is-dark {
-  --gray-900: #111;
-  --gray-700: #333;
+.v-theme--light .vc-container {
+  --vc-border: #ccc !important;
+  --vc-rounded-lg: 4px !important;
+  --vc-bg: rgba(250,250,250,0.5);
+  /* --vc-color: var(vc--gray-900) !important; */
 }
 
-.vc-container {
-  --gray-400: #999 !important;
-  --rounded-lg: 4px !important;
+
+.v-theme--dark .vc-container {
+  --vc-border: #333 !important;
+  --vc-rounded-lg: 4px !important;
+  --vc-bg: rgba(10,10,10,0.5);
+  /* --vc-color: #999 !important; */
 }
+
 
 .vc-opacity-0 {
   opacity: 0.3 !important;
@@ -54,5 +62,5 @@ function updatePages (pages) {
 #calendarButton {
   margin-top: -6px;
   margin-left: -10px;
-} */
+}
 </style>

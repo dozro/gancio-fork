@@ -27,6 +27,15 @@
 }
 
 
+.v-theme--dark .event {
+  border: thin solid #333;
+  background-color: #1e1e1e;
+}
+
+a {
+  color: rgb(var(--v-theme-primary));
+}
+
 pre {
   white-space: break-spaces;
   font-size: 13px;
