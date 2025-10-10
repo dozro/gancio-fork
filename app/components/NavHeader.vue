@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+import { useTheme } from 'vuetify'
 const { loggedIn, user, clear } = useUserSession()
 const { $notify } = useNuxtApp()
 const theme = useTheme()
@@ -7,7 +8,7 @@ const route = useRoute()
 const settings = useState<Settings>('settings')
 const params = useState('params', () => ({ show_recurrent: settings.value.recurrent_event_visible, start: time.startMonth(time.currentYear(),  time.currentMonth()) }))
 
-const { locale, locales, setLocale, t } = useI18n()
+const { locales, setLocale, t } = useI18n()
 
 function logout () {
   clear()
@@ -15,9 +16,6 @@ function logout () {
   navigateTo('/')
 }
 
-function toggleDark () {
-  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
-}
 
 const in_home = computed(() => route.name === 'index')
 </script>
@@ -42,7 +40,7 @@ const in_home = computed(() => route.name === 'index')
       <!-- TODO <t-btn icon='mdi-magnify' to='/search' tooltip='common.search' /> -->
       <t-btn icon="mdi-information" to='/about' tooltip='common.about' :aria-label='t("common.about")' />
       
-      <t-btn icon="mdi-contrast-circle" tooltip='common.dark' @click='toggleDark' />
+      <t-btn icon="mdi-contrast-circle" tooltip='common.dark' @click='theme.toggle' />
 
       <!-- language selection menu -->
       <v-menu transition="slide-y-transition">

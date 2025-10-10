@@ -1,8 +1,10 @@
 <script setup lang='ts'>
 
 import type { Event } from '#build/types/nitro-imports'
-
 import { DateTime } from 'luxon'
+import { useTheme } from 'vuetify'
+
+const theme = useTheme()
 const settings = useState<Settings>('settings')
 const { t } = useI18n()
 const event = defineModel<Event>('event', { type: Object, required: true } )
@@ -117,6 +119,7 @@ const endTime = computed({
             :rules="[$valid.required('common.when')]"
             class='mx-auto'
             v-model='selectedDate'
+            :is-dark="theme.global.current.value.dark"
             :is-range="type === 'multidate'"
             :locale="$i18n.locale"
             is-inline

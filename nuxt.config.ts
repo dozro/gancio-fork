@@ -21,18 +21,15 @@ export default defineNuxtConfig({
     client: true,
   },
   css: [
+    'vuetify/styles',
     '~/assets/css/main.css',
-    // '@mdi/font/css/materialdesignicons.css',
+    '@mdi/font/css/materialdesignicons.css'
   ],
   modules: [
     '@nuxt/eslint',
-    "vuetify-nuxt-module",
     'nuxt-auth-utils',
     '@nuxtjs/i18n'
   ],
-  vuetify: {
-    vuetifyOptions: './vuetify.options.js'
-  },
   i18n: {
     defaultLocale: 'en',
     lazy: true,            // enable lazy loading
@@ -74,6 +71,9 @@ export default defineNuxtConfig({
     public: {
       version
     }
+  },
+  build: {
+    transpile: ['vuetify']
   },
   vite: {
     clearScreen: false,

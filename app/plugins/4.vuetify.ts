@@ -1,49 +1,45 @@
-// const minifyTheme = require('minify-css-string').default
-// import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import { ca, cs, de, en, es, fr, it, nl, pl, pt, tr, sk, sv, ro, ru, zhHans  } from 'vuetify/lib/locale/index.mjs'
-// import { ca, cs, de, en, es, eu, fr, gl, it, nb, nl, pl, pt, tr, sk, sv, ro, ru, zhHans  } from 'vuetify/lib/locale'
 
-import { aliases, md } from 'vuetify/iconsets/md'
-export default () => {
-//   const settings = process.server ? (res.locals.settings || {}) : nuxtState.state.settings || {}
-//   const is_dark = nuxtState?.state?.localSettings['theme.is_dark'] ?? settings['theme.is_dark']
+// import 'vuetify/styles'
+// import '@mdi/font/css/materialdesignicons.css'
 
-return {
-    // lang: { locales: { ca, cs, de, en, es, eu, fr, gl, it, nb, nl, pl, pt, sk, sv, tr, ro, ru, zhHans } },
-    lang: { locales: { ca, cs, de, en, es, fr, it, nl, pl, pt, sk, sv, tr, ro, ru, zhHans } },
-    locales: { ca, cs, it, en },
-    locale: {
-      fallback: 'en',
-      messages: { en, it }
+export default defineNuxtPlugin((nuxtApp) => {
+  // const isDarkCookie = nuxtApp.ssrContext?.event.cookies.get('theme.is_dark')
+  // const isDark = isDarkCookie === 'true'
+  // const isDark = true
+
+  const vuetify = createVuetify({
+    components,
+    directives,
+    icons: {
+      defaultSet: 'mdi',
+      aliases,
+      sets: { mdi }
     },
     theme: {
-      options: {
-        customProperties: false,
-        variations: false,
-        // minifyTheme,
-      },
-      icons: {
-        defaultSet: 'md',
-        aliases,
-        sets: {
-          md,
-        },
-      },
-      // dark: is_dark,
+      defaultTheme: 'system', // isDark ? 'dark' : 'light',
       themes: {
-        // dark: settings.dark_colors,
         dark: {
+          dark: true,
           colors: {
             primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00',
           }
         },
         light: {
+          dark: false,
           colors: {
             surface: '#f8f8f8',
             primary: '#FF4500', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00'
           }
         }
       }
+    },
+    display: {
+      mobileBreakpoint: 800
     },
     defaults: {
       global: {
@@ -126,6 +122,8 @@ return {
           variant: 'text'
         }
       }
-    },  
-  }
-}
+    }
+  })
+
+  nuxtApp.vueApp.use(vuetify)
+})
