@@ -1,6 +1,8 @@
 import { version } from './package.json'
 import locales from './i18n/locales/index'
 
+const isBuild = process.env.NODE_ENV === 'production'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devServer: {
@@ -88,7 +90,7 @@ export default defineNuxtConfig({
     storage: {
       locales: {
         driver: 'fs',
-        base: './i18n/locales'
+        base: isBuild ? './nuxt/server/i18n/locales' : './i18n/locales'
       }
     },
     // preset: 'node-listener',

@@ -94,6 +94,17 @@ export async function connect() {
   return sequelize
 }
 
+export async function runMigrations() {
+  if (!sequelize) return
+  const umzug = new Umzug({
+      storage: new SequelizeStorage({ sequelize }),
+      migrations: { glob: '**/migrations/*.js'},
+      context: sequelize.queryInterface,
+      logger: console
+  })
+  await umzug.up()
+}
+
 @Table({
     tableName: 'announcements',
 })

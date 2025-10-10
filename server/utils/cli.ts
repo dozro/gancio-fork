@@ -29,7 +29,6 @@ export function main(nitro: NitroApp) {
       coerce: config_path => {
         const absolute_config_path = path.resolve(process.env.cwd, config_path)
         process.env.config_path = absolute_config_path
-        console.error(process.env.config_path)
         return absolute_config_path
       }
     })
@@ -40,6 +39,12 @@ export function main(nitro: NitroApp) {
     .help('h')
     .alias('h', 'help')
     .epilog('Made with ❤ by underscore hacklab - https://gancio.org')
+    .strict()
+    .fail((msg, err, yargs) => {
+      console.error('error:', msg || err?.message)
+      console.log(yargs.help())
+      process.exit(1)
+    })
     .recommendCommands()
     .demandCommand(1, '')
     .argv

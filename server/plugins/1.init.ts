@@ -10,6 +10,7 @@ export default defineNitroPlugin(async (nitroApp: NitroApp) => {
     try {
       log.info('Connecting to database')
       await connect()
+      await runMigrations()
       log.info('Loading settings')
       await loadSettings()
     
@@ -30,8 +31,13 @@ export default defineNitroPlugin(async (nitroApp: NitroApp) => {
       process.exit(1)
     }
   }
-  
-  nitroApp.hooks.hook('cli:start', start)
-  
-  await main(nitroApp)
+
+  const isBuild = process.env.NODE_ENV === 'production'
+  if (!isBuild) {
+    await start()
+  } else {
+    nitroApp.hooks.hook('cli:start', start)
+    await main(nitroApp)
+  }
+
 })

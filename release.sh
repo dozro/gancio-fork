@@ -80,17 +80,17 @@ mkdir -p "${PKG_MAIN}/uploads"
 # mkdir -p "${PKG_MAIN}/prisma"
 
 # nuxt built app
-cp -ra .output/ "${PKG_MAIN}/.output/"
+cp -ra .output/ "${PKG_MAIN}/nuxt/"
 
 # db migrations
-cp -ra ./server/migrations "${PKG_MAIN}/.output/server/migrations/"
+cp -ra ./server/migrations "${PKG_MAIN}/nuxt/server/migrations/"
 
 # small cli utility
-cp -ra cli "${PKG_MAIN}/.output/server/cli/"
-cp gancio.js "${PKG_MAIN}/.output/server/gancio.js"
+# cp -ra cli "${PKG_MAIN}/.output/server/cli/"
+# cp gancio.js "${PKG_MAIN}/.output/server/gancio.js"
 
 # all locales
-cp -ra i18n "${PKG_MAIN}/.output/server/i18n/"
+cp -ra i18n "${PKG_MAIN}/nuxt/server/i18n/"
 
 # default db
 # cp gancio.sqlite.rel "${PKG_MAIN}/gancio.sqlite"
@@ -104,7 +104,7 @@ cp ./uploads/fallbackimage.svg "${PKG_MAIN}/uploads/"
 cp ./uploads/headerimage.svg "${PKG_MAIN}/uploads/"
 
 # plugins
-cp -ra ./gancio_plugins "${PKG_MAIN}/.output/server/plugins/"
+cp -ra ./gancio_plugins "${PKG_MAIN}/nuxt/server/plugins/"
 
 # cp package.json bun.lock yarn.lock .env.example "${PKG_MAIN}/"
 # cp gancio.service "${PKG_MAIN}/"
