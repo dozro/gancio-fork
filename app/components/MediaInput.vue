@@ -58,7 +58,10 @@ const position = computed(() => {
       if (!ret) { return }
       useUrl.value = false
       imgUrlInput.value = ''
-      event.value.media = []
+      event.value = {
+        ...event.value,
+        media: []
+      }
     }
 
     function selectMedia (v) {

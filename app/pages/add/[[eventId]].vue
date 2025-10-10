@@ -93,7 +93,7 @@ async function done() {
   //   formData.append('end_datetime', '')
   // }
 
-  if (edit.value) {
+  if (eventId) {
     formData.append('id', evt.id)
   }
 
@@ -101,7 +101,7 @@ async function done() {
   
   // 
   try {
-    const ret = await $fetch('/api/events', { method: edit.value ? 'PUT' : 'POST', body: formData })
+    const ret = await $fetch('/api/events', { method: eventId ? 'PUT' : 'POST', body: formData })
     // navigate to created event in case its already visible and not a recurrent event!
     if (!evt?.recurrent && (ret.is_visible || loggedIn.value)) {
       navigateTo(`/event/${ret.slug}`)
@@ -109,7 +109,7 @@ async function done() {
       navigateTo('/')
     }
     
-    $notify(loggedIn.value ? (edit.value ? 'event.saved' : 'event.added') : 'event.added_anon', Statuses.SUCCESS)
+    $notify(loggedIn.value ? (eventId ? 'event.saved' : 'event.added') : 'event.added_anon', Statuses.SUCCESS)
   } catch (e) {
     console.error(e)
     switch (e?.request?.status) {
@@ -129,7 +129,7 @@ async function done() {
     <v-card>
       <v-card-title>
         <!-- <v-btn variant='outlined' class='float-right' color='primary' @click='openImportDialog = true' prepend-icon="mdi-file-import">{{$t('common.import') }}</v-btn> -->
-        <h4>{{ edit ? $t('common.edit_event') : $t('common.add_event') }}</h4>
+        <h4>{{ eventId ? $t('common.edit_event') : $t('common.add_event') }}</h4>
       </v-card-title>
       <!-- <v-dialog v-model='openImportDialog' :fullscreen='$vuetify.display.mobile'>
         <ImportDialog @close='openImportDialog = false' />
@@ -194,7 +194,7 @@ async function done() {
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='done'>{{ edit ?
+        <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='done'>{{ eventId ?
           $t('common.save') : $t('common.send') }}</v-btn>
       </v-card-actions>
     </v-card>
