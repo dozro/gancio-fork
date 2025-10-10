@@ -19,8 +19,7 @@ import { eventQuerySchema } from "~~/server/utils/events"
 * - [https://demo.gancio.org/api/events](https://demo.gancio.org/api/events)
 * - [usage example](https://framagit.org/les/gancio/-/blob/master/webcomponents/src/GancioEvents.svelte#L18-42)
 */
-export default defineCachedEventHandler(async (event) => {
+export default defineEventHandler(async (event) => {
     const opt = await getValidatedQuery(event, eventQuerySchema.parse)
     return getEvents(opt)
-    // return Event.findAll({ include: [Place, { model: Tag, attributes: ['tag'], through: { attributes: [] } }] })
 })
