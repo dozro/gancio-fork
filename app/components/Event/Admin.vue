@@ -107,7 +107,8 @@ async function reannounce () {
       
       <!-- Re-announce event -->
       <v-list-item
-        v-if="isAdmin" @click="reannounce"
+        v-if="settings.enable_federation && isAdmin"
+        @click="reannounce"
         prepend-icon='mdi-replay'
         :title="$t('event.reannounce')" />
 
