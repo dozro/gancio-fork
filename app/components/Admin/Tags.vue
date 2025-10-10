@@ -8,6 +8,7 @@ const valid = ref(false)
 const tag = ref({})
 const newTag = ref('')
 const search = ref('')
+const form = ref(false)
 const headers = [
   { value: 'tag', title: t('common.tag') },
   { value: 'count', title: 'N.' },
@@ -29,11 +30,11 @@ async function saveTag () {
     return
   }
 
-  $fetch('/api/tag', { method: 'PUT', body: { tag: this.tag.tag, newTag: this.newTag } })
+  await $fetch('/api/tags', { method: 'PUT', body: { tag: tag.value.tag, newTag: newTag.value } })
   dialog.value = false
   refresh()
   loading.value = false
-  $notify('admin.tag_renamed', Statuses.SUCCESS, { oldTag: this.tag.tag, newTag: this.newTag })
+  $notify('admin.tag_renamed', Statuses.SUCCESS, { oldTag: tag.value.tag, newTag: newTag.value })
   newTag.value = ''
 }
 
@@ -41,18 +42,17 @@ async function removeTag (tag) {
   const ret = await $confirm('admin.delete_tag_confirm', { tag: tag.tag, n: tag.count })
   if (!ret) { return }
   try {
-    $fetch(`/api/tag/${encodeURIComponent(tag.value.tag)}`)
+    $fetch(`/api/tags`, { method: 'DELETE', body: { tag: tag.tag } })
     refresh()
   } catch (e) {
-    const err = get(e, 'response.data.errors[0].message', e)
-    $notify(err, { color: 'error' })
-    loading.value = false
+    $notify(err, Statuses.ERROR)
   }
 }    
 </script>
 
 <template>
 <v-container>
+
   <v-card-title> {{ $t('common.tags') }}
     <v-spacer />
     <v-text-field
@@ -61,6 +61,7 @@ async function removeTag (tag) {
       :label="$t('common.search')"
       single-line hide-details />
   </v-card-title>
+
   <v-dialog v-model='dialog' width='600' :fullscreen='$vuetify.display?.mobile' v-if='dialog'>
     <v-card>
       <v-card-title> {{$t('admin.edit_tag')}} -
@@ -105,7 +106,7 @@ async function removeTag (tag) {
     <v-data-table
       :headers='headers'
       :items='tags'
-      :hide-default-footer='tags.length < 5'
+      :hide-default-footer='tags?.length < 5'
       :search='search'>
       <template v-slot:item.actions='{ item }'>
         <t-btn @click='editTag(item)' color='primary' :tooltip="$t('common.edit')" icon='mdi-pencil' />
@@ -114,5 +115,6 @@ async function removeTag (tag) {
       </template>
     </v-data-table>
   </v-card-text>
+
 </v-container>
 </template>
