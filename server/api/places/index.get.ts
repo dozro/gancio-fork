@@ -34,22 +34,3 @@ export default defineEventHandler(async event => {
       })
   }
 })
-
-// export default defineEventHandler(async event => {
-//     const { query } = await getValidatedQuery(event, schema.parse)
-
-//     const tags = await Tag.findAll({
-//         order: [[fn('COUNT', col('tag.tag')), 'DESC']],
-//         attributes: ['tag'],
-//         ...( query && { where: {
-//           tag: { [Op.like]: `%${query}%` }
-//         }}),
-//         include: [{ model: Event, where: { is_visible: true }, attributes: [], through: { attributes: [] }, required: true }],
-//         group: ['tag.tag'],
-//         limit: 10,
-//         raw: true,
-//         subQuery: false
-//       })
-  
-//       return tags.map(t => t.tag)
-// })

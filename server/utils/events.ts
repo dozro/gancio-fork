@@ -17,12 +17,12 @@ export const eventQuerySchema = z.object({
     if (typeof val === 'string') return val.split(',')
     if (typeof val === 'number') return [val]
     return []
-  }, z.array(z.number())).optional(),
+  }, z.array(z.coerce.number())).optional(),
   show_recurrent: z.coerce.boolean().default(publicSettings.recurrent_event_visible).optional(),
   show_multidate: z.coerce.boolean().default(true).optional(),
   show_federated: z.coerce.boolean().default(false).optional(),
-  limit: z.number().optional(),
-  page: z.number().optional(),
+  max: z.coerce.number().optional(),
+  page: z.coerce.number().optional(),
   older: z.coerce.boolean().optional(),
   reverse: z.coerce.boolean().optional(),
   user_id: z.number().optional(),
@@ -31,11 +31,13 @@ export const eventQuerySchema = z.object({
   include_parent: z.coerce.boolean().default(false).optional(),
   include_description: z.coerce.boolean().default(false).optional(),
   inlude_ap_events: z.coerce.boolean().default(false).optional(),
-})
+}).transform( o => ({
+  ...o,
+  ...(o.max && { limit: o.max })
+}))
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
 export async function getEvents(opts?: EventQueryType | undefined): Promise<Event[]> {
-
   const args  = eventQuerySchema.parse(opts)
   const condition = {//} // : WhereOptions<InferAttributes<Event, { omit: never; }>> = {
     [Op.or]: {
@@ -103,39 +105,39 @@ export async function getEvents(opts?: EventQueryType | undefined): Promise<Even
   if (args.limit) {
     pagination = {
       limit: args.limit,
-      offset: args.limit * (args?.page ?? 1),
+      offset: args.limit * (args?.page ?? 0),
     }
   }
 
-    const events = await Event.findAll({
-      where: condition,
-      attributes: {
-        exclude: [
-          'userId', 'createdAt', 'placeId', 'ap_object', 'ap_id',
-          ...(!args.include_parent ? ['recurrent']: []),
-          ...(!args.include_unconfirmed ? ['is_visible']: []),
-          ...(!args.include_description ? ['description']: [])
-        ]
+  const events = await Event.findAll({
+    where: condition,
+    attributes: {
+      exclude: [
+        'userId', 'createdAt', 'placeId', 'ap_object', 'ap_id',
+        ...(!args.include_parent ? ['recurrent']: []),
+        ...(!args.include_unconfirmed ? ['is_visible']: []),
+        ...(!args.include_description ? ['description']: [])
+      ]
+    },
+    order: [['start_datetime', args.reverse ? 'DESC' : 'ASC']],
+    include: [
+      {
+        model: Tag,
+        // order: [sql`(SELECT COUNT(tagTag) FROM event_tags WHERE tagTag = tag) DESC)`],
+        attributes: ['tag'],
+        through: { attributes: [] }
       },
-      order: [['start_datetime', args.reverse ? 'DESC' : 'ASC']],
-      include: [
-        {
-          model: Tag,
-          // order: [sql`(SELECT COUNT(tagTag) FROM event_tags WHERE tagTag = tag) DESC)`],
-          attributes: ['tag'],
-          through: { attributes: [] }
-        },
-        { model: Place, required: true, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] }
-      ],
-      ...pagination,
-      replacements,
-    }).catch(e => {
-      console.error('[EVENT]' + String(e))
-      return []
-    })
+      { model: Place, required: true, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] }
+    ],
+    ...pagination,
+    replacements,
+  }).catch(e => {
+    console.error('[EVENT]' + String(e))
+    return []
+  })
 
-    // return events
-    return mapEvents(events)
+  // return events
+  return mapEvents(events)
 }
 
 

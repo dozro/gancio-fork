@@ -1,5 +1,5 @@
 <script setup>
-const theme = useTheme()
+// const theme = useTheme()
 const route = useRoute()
 const { data: events } = await useFetch('/api/events')
 const settings = useState('settings')
