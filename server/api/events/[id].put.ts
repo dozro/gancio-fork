@@ -31,6 +31,7 @@ import { findOrCreateTags } from "~~/server/lib/tags"
  */
 export default defineEventHandler(async evt => {
   const log = useLogger('Update event')
+  const id = getRouterParam(evt, 'id')
   const user = await getUser(evt)
   const isAnonymous = !user
   if (isAnonymous) {
@@ -46,9 +47,9 @@ export default defineEventHandler(async evt => {
     throw createError({ status: 400, message: 'Validation Error' })
   }
 
-  const event = await Event.findByPk(body.id)
+  const event = await Event.findByPk(id)
   if (!event) {
-    log.warn('Event not found: %s', body?.id)
+    log.warn('Event not found: %s', id)
     throw createError({ status: 404, message: 'Event not found' })
   }
 
@@ -108,7 +109,6 @@ export default defineEventHandler(async evt => {
     title: body.title?.trim(),
     // sanitize and linkify html
     description: sanitizeHTML(linkifyHtml(body.description as string || '', { target: '_blank', render: { email: ctx => ctx.content }})),
-    // multidate: body.multidate,
     start_datetime,
     end_datetime: body.end_datetime && Number(body.end_datetime),
     online_locations: body.online_locations,
@@ -140,12 +140,6 @@ export default defineEventHandler(async evt => {
     await event.setTags(tags)
   }
 
-  // event = event.get()
-  // event.tags = tags.map(t => t.tag)
-  // event.place = place
-  // return created event to the client
-  // res.json(event)
-
   // create recurrent instances of event if needed
   // without waiting for the task manager
   if (event?.recurrent && event.is_visible) {
@@ -155,5 +149,5 @@ export default defineEventHandler(async evt => {
     notifyEvent('Update', event.id)
   }
   
-  return event
+  return mapEvent(event, place, tags)
 })

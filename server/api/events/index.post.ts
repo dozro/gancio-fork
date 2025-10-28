@@ -8,6 +8,7 @@ import { findOrCreatePlace } from "~~/server/lib/places"
 import { getImageFromURL, sanitizeHTML } from "~~/server/helpers"
 import linkifyHtml from "linkify-html"
 import { findOrCreateTags } from "~~/server/lib/tags"
+import { mapEvent } from "~~/server/utils/events"
 
 try {
   mkdirp.sync(config.upload_path + '/thumb')
@@ -143,11 +144,6 @@ export default defineEventHandler(async evt => {
     await event.setTags(tags)
   }
 
-  // event = event.get()
-  // event.tags = tags.map(t => t.tag)
-  // event.place = place
-  // return created event to the client
-  // res.json(event)
 
   // create recurrent instances of event if needed
   // without waiting for the task manager
@@ -158,5 +154,5 @@ export default defineEventHandler(async evt => {
     notifyEvent('Create', event.id)
   }
   
-  return event
+  return mapEvent(event, place, tags)
 })
