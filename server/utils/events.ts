@@ -142,9 +142,13 @@ export async function getEvents(opts?: EventQueryType | undefined): Promise<Even
 }
 
 
-export function mapEvent (event: Event, place: Place, tags: Tag[]): Event {
+export function mapEvent (event: Event, place?: Place, tags?: Tag[]): Event {
   const e = event.get()
   
+  if (e.tags) {
+    e.tags = e.tags.map(t => t && t.tag)
+  }
+
   if (tags) {
     e.tags = tags.map(t => t && t.tag)
   }
@@ -167,6 +171,14 @@ export function mapEvent (event: Event, place: Place, tags: Tag[]): Event {
     delete e.parentId
   }
 
+  if (!e.media) {
+    delete e.media
+  }
+
+  if (!e.online_locations) {
+    delete e.online_locations
+  }
+
   if (e.ap_user) {
     e.ap_user = { image: e.ap_user?.object?.icon?.url ?? `${e.ap_user?.url}/favicon.ico` }
   }
@@ -175,12 +187,11 @@ export function mapEvent (event: Event, place: Place, tags: Tag[]): Event {
     e.place = place.toJSON()
   }
 
-
   return e 
 }
 
 export function mapEvents (events: Event[]) : Event[] {
-  return events.map(mapEvent)
+  return events.map(e => mapEvent(e))
 }
 
 export async function getMessages(eventId: number) {

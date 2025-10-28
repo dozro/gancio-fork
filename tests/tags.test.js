@@ -1,6 +1,4 @@
 import { describe, expect, it } from "vitest"
-import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
-import { DateTime } from "luxon"
 import dayjs from 'dayjs'
 import { fetchWithAuth } from './setup.js'
 

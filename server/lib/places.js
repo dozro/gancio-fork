@@ -22,7 +22,7 @@ export async function findOrCreatePlace (body) {
   const place_name = body.place_name && body.place_name.trim()
   const place_address = body.place_address && body.place_address.trim()
   if (!place_name || !place_address && place_name?.toLocaleLowerCase() !== 'online') {
-    throw createError({ status: 400, message: 'place_id or place_name and place_address are required' })
+    throw createError({ status: 400, statusMessage: 'place_id or place_name and place_address are required' })
   }
   
   let place = await Place.findOne({ where: where(fn('LOWER', col('name')), Op.eq, place_name.toLocaleLowerCase()) })

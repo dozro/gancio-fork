@@ -144,7 +144,6 @@ export default defineEventHandler(async evt => {
     await event.setTags(tags)
   }
 
-
   // create recurrent instances of event if needed
   // without waiting for the task manager
   if (event?.recurrent && event.is_visible) {
