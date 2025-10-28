@@ -139,6 +139,7 @@ describe('ICS output', () => {
   it('should return a valid ics for each event detail', async () => {
     const icsString = await fetch('/api/event/detail/1?format=ics')
 
+    expect(icsString.status).toBe(200)
     expect(icsString.ok).toBe(true)
     expect(icsString.headers.get('content-type')).toContain('text/calendar')
     const data = await icsString.text()
