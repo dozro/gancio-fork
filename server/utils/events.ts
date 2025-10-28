@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import { Op, literal, col, where, fn, Filterable, InferAttributes, WhereOptions, sql } from '@sequelize/core'
 
 import { z } from 'zod'
+import { EventAttributes } from "ics"
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
   end: z.coerce.number().optional(),
@@ -141,36 +142,45 @@ export async function getEvents(opts?: EventQueryType | undefined): Promise<Even
 }
 
 
+export function mapEvent (event: Event, place: Place, tags: Tag[]): Event {
+  const e = event.get()
+  
+  if (tags) {
+    e.tags = tags.map(t => t && t.tag)
+  }
+
+  e.end_datetime = Number(e.end_datetime) || null
+
+  if (!e.multidate) {
+    delete e.multidate
+  }
+
+  if (!e.image_path) {
+    delete e.image_path
+  }
+
+  if (!e.recurrent) {
+    delete e.recurrent
+  }
+
+  if (!e.parentId) {
+    delete e.parentId
+  }
+
+  if (e.ap_user) {
+    e.ap_user = { image: e.ap_user?.object?.icon?.url ?? `${e.ap_user?.url}/favicon.ico` }
+  }
+
+  if (place) {
+    e.place = place.toJSON()
+  }
+
+
+  return e 
+}
+
 export function mapEvents (events: Event[]) : Event[] {
-  return events.map(event => {
-    
-    const e = event.get()
-    e.tags = e.tags ? e.tags.map(t => t && t.tag) : []
-
-    e.end_datetime = Number(e.end_datetime) || null
-    
-    if (!e.multidate) {
-      delete e.multidate
-    }
-    
-    if (!e.image_path) {
-      delete e.image_path
-    }
-
-    if (!e.recurrent) {
-      delete e.recurrent
-    }
-
-    if (!e.parentId) {
-      delete e.parentId
-    }
-
-    if (e.ap_user) {
-      e.ap_user = { image: e.ap_user?.object?.icon?.url ?? `${e.ap_user?.url}/favicon.ico` }
-    }
-
-    return e
-  })
+  return events.map(mapEvent)
 }
 
 export async function getMessages(eventId: number) {

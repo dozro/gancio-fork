@@ -27,7 +27,6 @@ if (!event?.value) {
 
 const date = ref()
 const valid = ref(false)
-const edit = ref(false)
 const loading = ref(false)
 const form = ref()
 
@@ -93,15 +92,18 @@ async function done() {
   //   formData.append('end_datetime', '')
   // }
 
-  if (eventId) {
-    formData.append('id', evt.id)
-  }
+  // if (eventId) {
+  //   formData.append('id', evt.id)
+  // }
 
   if (evt.tags) { evt.tags.forEach(tag => formData.append('tags[]', tag?.tag ?? tag)) }
   
   // 
   try {
-    const ret = await $fetch('/api/events', { method: eventId ? 'PUT' : 'POST', body: formData })
+    const ret = eventId ? 
+      await $fetch(`/api/events/${eventId}`, { method: 'PUT', body: formData }) :
+      await $fetch('/api/events', { method: 'POST', body: formData })
+
     // navigate to created event in case its already visible and not a recurrent event!
     if (!evt?.recurrent && (ret.is_visible || loggedIn.value)) {
       navigateTo(`/event/${ret.slug}`)
