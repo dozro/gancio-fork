@@ -32,9 +32,9 @@ const now = time.nowUnix()
 const params = useState('params')
 const selectedDate = useState<Date|null|undefined>('selectedDate', () => undefined)
 const attributes = useState('attributes')
-const isCurrentMonth = computed(() => {
-  return false
-})
+
+// check if current month is selected
+const isCurrentMonth = computed(() => params.value.start === time.startMonth())
 
 const { data: events } = await useFetch<Event[]>('/api/events', { params,
   onResponse: res => {
@@ -47,16 +47,15 @@ const visibleEvents = computed(() => {
     const min = DateTime.fromJSDate(selectedDate?.value)?.startOf('day')?.toUnixInteger()
     const max = DateTime.fromJSDate(selectedDate?.value)?.endOf('day')?.toUnixInteger()
     return events.value?.filter(e => (e.start_datetime <= max && (e.end_datetime || e.start_datetime) >= min))
-  } else if (isCurrentMonth.value) { // && !query) {
+  } else if (isCurrentMonth.value) {
     return events.value?.filter(e => {
-      const max_datetime = Math.max(e.start_datetime, e.end_datetime)
+      const max_datetime = Math.max(e.start_datetime, e?.end_datetime ?? 0)
       return (e.end_datetime ? max_datetime >= now : e.start_datetime + 3 * 60 * 60 >= now)
     })
   } else {
     return events.value
   }
 })
-
 
 const { data: announcements } = await useFetch<Announcement[]>('/api/announcements')
 
