@@ -44,6 +44,8 @@ async function toggle (parent = false) {
 
 async function reannounce () {
   const id = props.event.id
+  const ret = await $confirm('event.reannounce', { event: props.event?.title })
+  if (!ret) { return }
   try {
     await $fetch(`/api/events/${id}/reannounce`, { method: 'PUT' })
     emit('update')
