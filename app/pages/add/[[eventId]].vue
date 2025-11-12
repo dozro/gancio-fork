@@ -84,17 +84,11 @@ async function done() {
     formData.append('end_datetime', evt.end_datetime)
   }
 
-  // if (!!this.date.multidate) {
-  //   formData.append('end_datetime', this.$time.fromDateInput(this.date.due, this.date.dueHour || '23:59'))
-  // } else if (this.date.dueHour && this.date.due) {
-    // formData.append('end_datetime', this.$time.fromDateInput(this.date.due, this.date.dueHour))
-  // } else {
-  //   formData.append('end_datetime', '')
-  // }
-
-  // if (eventId) {
-  //   formData.append('id', evt.id)
-  // }
+  if (normalizedTags?.value?.length) {
+    normalizedTags.value?.forEach(tag => formData.append('tags[]', tag))
+  } else {
+    formData.append('tags[]', '')
+  }
 
   if (evt.tags) { evt.tags.forEach(tag => formData.append('tags[]', tag?.tag ?? tag)) }
   
@@ -124,6 +118,21 @@ async function done() {
   }
   loading.value = false
 }
+const normalizedTags = computed({
+  get: () => event?.value?.tags,
+  set: (newTags: [string]) => {
+    const seen = new Set()
+    const tags = []
+    for (const tag of newTags) {
+      const norm = tag.toLocaleLowerCase()
+      if (!seen.has(norm)) {
+        seen.add(norm)
+        tags.push(tag)
+      }
+    }
+    event.value = { ...event.value, tags }
+  }
+})
 
 </script>
 <template>
@@ -177,15 +186,10 @@ async function done() {
 
               <!-- TAGS -->
               <v-col cols=12 md=6>
-                <v-combobox
-                  v-model:search="searchTag" v-model="event.tags" prepend-icon="mdi-tag-multiple" chips
-                  multiple closable-chips hide-no-data hide-selected persistent-hint
-                  :loading="statusTags === 'pending'" :delimiters="[',', ';']" :items="tags || []"
-                  :menu-props="{ maxWidth: 400, eager: true }" :label="$t('common.tags')">
-                  <!-- <template v-slot:selection="{ item, on, attrs, selected, parent }">
-                    <v-chip v-bind="attrs" close :close-icon='mdiCloseCircle' @click:close='parent.selectItem(item)'
-                      :input-value="selected" label small>{{ item }}</v-chip>
-                  </template> -->
+                <v-combobox v-model:search="searchTag" v-model="normalizedTags" prepend-icon="mdi-tag-multiple" chips
+                  multiple closable-chips hide-no-data hide-selected persistent-hint :loading="statusTags === 'pending'"
+                  :delimiters="[',', ';']" :items="tags || []" :menu-props="{ maxWidth: 400, eager: true }"
+                  :label="$t('common.tags')">
                 </v-combobox>
               </v-col>
 
