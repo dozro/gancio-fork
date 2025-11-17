@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2025-07-20',
   // 2025-07-20
-  
+
   devtools: {
     enabled: true,
     timeline: {
@@ -27,11 +27,22 @@ export default defineNuxtConfig({
     '~/assets/css/main.css',
     '@mdi/font/css/materialdesignicons.css'
   ],
-  modules: [
-    '@nuxt/eslint',
-    'nuxt-auth-utils',
-    '@nuxtjs/i18n'
-  ],
+  modules: ['@nuxt/eslint', 'nuxt-auth-utils', '@nuxtjs/i18n', '@nuxtjs/sitemap'],
+  sitemap: {
+    cacheMaxAgeSeconds: 3600, // 1 hour
+
+    sources: [
+      '/api/sitemap/events',
+      '/api/sitemap/tags',
+      '/api/sitemap/places'
+    ],
+
+    // Optional defaults
+    defaults: {
+      changefreq: 'weekly',
+      priority: 0.7
+    }
+  },
   i18n: {
     defaultLocale: 'en',
     lazy: true,            // enable lazy loading
@@ -78,6 +89,11 @@ export default defineNuxtConfig({
     transpile: ['vuetify']
   },
   vite: {
+    server: {
+      watch: {
+        usePolling: false
+      },
+    },
     clearScreen: false,
     define: {
       'process.env.DEBUG': false,
