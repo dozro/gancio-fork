@@ -1,7 +1,4 @@
 <script setup>
-// import debounce from 'lodash/debounce'
-// import isEqual from 'lodash/isEqual'
-// import sortBy from 'lodash/sortBy'
 const { t } = useI18n()
 const { $confirm, $notify } = useNuxtApp()
 
@@ -35,8 +32,7 @@ const filterHeaders = [
 ]
 const settings = useState('settings')
 
-const in_home = ref(!isNaN(settings.value?.collection_in_home))
-
+const in_home = ref(!!settings.value?.collection_in_home)
 const { data: collections, refresh } = await useFetch('/api/collections?withFilters=true')
 
 
@@ -76,16 +72,6 @@ async function editCollection(c) {
   filters.value = await $fetch(`/api/collections/filters/${collection.value.id}`)
   dialog.value = true
 }
-
-// function manageSetting(key) {
-//   return computed({
-//     get: () =>  settings.value[key],
-//     set: (value) => {
-//       $fetch('/api/settings', { method: 'PUT', body: { key, value } })
-//       settings.value[key] = value
-//     }
-//   })
-// }
 
 const collection_in_home = manageSetting('collection_in_home')
 
@@ -222,14 +208,13 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
           <v-switch
             v-if="collections.length"
             :label="$t('common.collection_in_home')"
-            inset
+            @update:model-value="collection_in_home = null"
             v-model="in_home"
           />
         </v-col>
         <v-col>
           <v-autocomplete
             v-if="collections.length && in_home"
-            :disabled="!!filters.length"
             v-model="collection_in_home"
             variant='outlined'
             :label="$t('common.collections')"
@@ -399,7 +384,6 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
             <v-col cols="3">
               <v-switch
                 :disabled="!collection.id"
-                inset
                 v-model="negateFilter"
                 label="Not"
               />
@@ -499,7 +483,6 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
             class="float-right"
             :modelValue="item.isTop"
             @update:modelValue="togglePinCollection(item)"
-            inset
             hide-details
           />
         </template>
