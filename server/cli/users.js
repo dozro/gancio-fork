@@ -63,14 +63,14 @@
 // import * as sequelize from "../utils/sequelize.ts"
 // import { getSequelize } from "../gancio.js"
 
-async function list () {
+async function list() {
   await connect()
   const users = await User.findAll()
   users.forEach(u => console.log(`${u.id}\trole: ${u.role}\tenabled: ${u.is_active}\temail: ${u.email}`))
 }
 
 
-async function resetPassword (args) {
+async function resetPassword(args) {
   await connect()
   const user = await User.findOne({ where: { email: args.email } })
   console.log()
@@ -107,13 +107,13 @@ async function resetPassword (args) {
 //   await db.close()
 // }
 
+// TODO: add other old supported commands (set_role, enable, disable, create)
 const usersCLI = yarg => yarg
   .command('list', 'List all users', list)
   .command('reset-password <email> <password>', 'Resets the password of the given user', {
   }, resetPassword)
-  .argv
 
-  export default usersCLI
+export default usersCLI
 
 // const usersCLI = yargs => yargs
 //   .command('enable <email>', 'Enable an user', {}, args => enable(args, true))
