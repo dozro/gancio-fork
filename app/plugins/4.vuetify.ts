@@ -2,16 +2,16 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
-import { ca, cs, de, en, es, fr, it, nl, pl, pt, tr, sk, sv, ro, ru, zhHans  } from 'vuetify/lib/locale/index.mjs'
+import { ca, cs, de, en, es, fr, it, nl, pl, pt, tr, sk, sv, ro, ru, zhHans } from 'vuetify/lib/locale/index.mjs'
 
 // import 'vuetify/styles'
 // import '@mdi/font/css/materialdesignicons.css'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  // const isDarkCookie = nuxtApp.ssrContext?.event.cookies.get('theme.is_dark')
-  // const isDark = isDarkCookie === 'true'
-  // const isDark = true
 
+  const settings = useState('settings', () => null)
+  const cookie = useCookie<'light' | 'dark' | 'system' | undefined>('theme')
+  const defaultTheme = cookie.value ?? (settings?.value?.['theme.is_dark'] ? 'dark' : 'light')
   const vuetify = createVuetify({
     components,
     directives,
@@ -21,7 +21,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       sets: { mdi }
     },
     theme: {
-      defaultTheme: 'system', // isDark ? 'dark' : 'light',
+      defaultTheme,
       themes: {
         dark: {
           dark: true,
@@ -68,7 +68,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       VTextarea: {
         autocomplete: 'off',
         clearable: false,
-        variant: 'underlined'        
+        variant: 'underlined'
       },
       VTextField: {
         autocomplete: 'off',
@@ -80,7 +80,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         autocomplete: 'off',
         clearable: true
       },
-      VAutocomplete :{
+      VAutocomplete: {
         VChip: {
           closable: true,
           closeIcon: "mdi-close-circle",
@@ -113,7 +113,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       VDataTableItem: {
         density: 'compact'
       },
-      VCard: {  
+      VCard: {
         color: 'surface',
         variant: 'flat'
       },

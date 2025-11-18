@@ -1,9 +1,8 @@
 <script setup lang="ts">
 
-import { useTheme } from 'vuetify'
 const { loggedIn, user, clear } = useUserSession()
 const { $notify } = useNuxtApp()
-const theme = useTheme()
+const theme = useAppTheme()
 const route = useRoute()
 const settings = useState<Settings>('settings')
 const params = useState('params', () => ({ show_recurrent: settings.value.recurrent_event_visible, start: time.startMonth(time.currentYear(),  time.currentMonth()) }))
@@ -16,7 +15,6 @@ function logout () {
   navigateTo('/')
 }
 
-
 const in_home = computed(() => route.name === 'index')
 </script>
 <template>
@@ -25,7 +23,7 @@ const in_home = computed(() => route.name === 'index')
       <img :src='`/logo.png`' height='40'>
     </v-btn>
     <v-spacer/>
-    
+
     <div class='d-flex'>
       <v-switch
         class='mr-2'
@@ -36,11 +34,11 @@ const in_home = computed(() => route.name === 'index')
         hide-details
         v-model='params.show_recurrent'
       />
-      
+
       <!-- TODO <t-btn icon='mdi-magnify' to='/search' tooltip='common.search' /> -->
       <t-btn icon="mdi-information" to='/about' tooltip='common.about' :aria-label='t("common.about")' />
-      
-      <t-btn icon="mdi-contrast-circle" tooltip='common.dark' @click='theme.toggle' />
+
+      <t-btn :icon="theme?.theme?.global?.current?.value?.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'" tooltip='common.dark' @click='theme.toggleTheme' />
 
       <!-- language selection menu -->
       <v-menu transition="slide-y-transition">
@@ -49,13 +47,13 @@ const in_home = computed(() => route.name === 'index')
         </template>
         <v-list density='compact' max-height="350" width="250">
           <v-list-item v-for='locale in locales' :key='locale.code' @click.prevent="setLocale(locale.code)" :title='locale.name' />
-          
+
           <v-list-item target='_blank' href='https://hosted.weblate.org/engage/gancio/'>
             <v-list-item-subtitle v-text='t("common.help_translate")' />
           </v-list-item>
         </v-list>
       </v-menu>
-    
+
       <!-- auth menu -->
       <v-menu v-if='loggedIn' transition="slide-y-transition">
         <template v-slot:activator="{ props }">
@@ -63,7 +61,7 @@ const in_home = computed(() => route.name === 'index')
         </template>
         <v-list>
           <v-list-item to='/settings' prepend-icon='mdi-cog' :title="t('common.settings')"/>
-          
+
           <v-list-item to='/my_events'>
             <template v-slot:prepend><v-icon icon='mdi-calendar-account'/></template>
             <v-list-item-title v-text="$t('common.my_events')"/>
@@ -72,14 +70,14 @@ const in_home = computed(() => route.name === 'index')
             <template v-slot:prepend><v-icon icon='mdi-account' /></template>
             <v-list-item-title v-text="$t(`common.${user.role}`)" />
           </v-list-item>
-          
+
           <v-list-item @click='logout'>
             <template v-slot:prepend><v-icon icon='mdi-logout' /></template>
             <v-list-item-title v-text="$t('common.logout')" />
           </v-list-item>
         </v-list>
       </v-menu>
-      
+
       <!-- login button -->
       <v-btn variant="text" class='mr-0' v-if='!loggedIn' icon="mdi-login"  to='/login' :title='$t("common.login")' :aria-label='$t("common.login")' />
     </div>
