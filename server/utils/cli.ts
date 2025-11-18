@@ -7,7 +7,7 @@ import usersCLI from '../cli/users.js'
 /**
  * parse cli command
  */
-export async function main(start) {
+export async function main(start: Function) {
 
   // teleport myself to the correct position
   // process.env.cwd = process.env.GANCIO_DATA || path.resolve('./')
@@ -31,7 +31,7 @@ export async function main(start) {
       }
     })
     // .command(['migrate'], 'Run database migration', migrate)
-    .command(['start', 'run', '$0'], 'Start gancio', {}, start)
+    .command(['start', 'run', '$0'], 'Start gancio', {}, () => start())
     .command(['users'], 'Manage users', usersCLI)
     // .command(['settings'], 'Manage settings', settingsCLI)
     .help('h')
