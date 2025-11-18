@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const settings = useState<Settings>('settings')
-const theme = useTheme()
 const { $notify, $confirm } = useNuxtApp()
 const linkModalForm = ref()
 const link = reactive({ href: '', label: '' })
@@ -159,7 +158,7 @@ async function uploadHeaderImage (file: File) {
   }
 }
 
-const is_dark = manageSetting('theme.is_dark', () => { theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark' })
+const is_dark = manageSetting('theme.is_dark')
 const hide_thumbs = manageSetting('hide_thumbs')
 const hide_calendar = manageSetting('hide_calendar')
 const custom_css = manageSetting('custom_css')
@@ -174,21 +173,20 @@ const custom_js = manageSetting('custom_js')
     <v-switch
       class="mt-5"
       v-model="is_dark"
-      inset
       hide-details
+      persistent-hint
+      :hint="$t('admin.is_dark_help')"
       :label="$t('admin.is_dark')"
     />
     <v-switch
       class="mt-5"
       v-model="hide_thumbs"
-      inset
       hide-details
       :label="$t('admin.hide_thumbs')"
     />
     <v-switch
       class="mt-5"
       v-model="hide_calendar"
-      inset
       hide-details
       :label="$t('admin.hide_calendar')"
     />
@@ -287,9 +285,9 @@ const custom_js = manageSetting('custom_js')
                 max-width="290px"
                 min-width="290px"
               >
-                <template #activator="{ props }">
+                <!-- <template #activator="{ props }">
                   <v-btn :color="theme.themes.value.dark.colors[i]" dark size='small' v-bind="props">{{ i }}</v-btn>
-                </template>
+                </template> -->
                 <v-color-picker
                   mode="hexa"
                   :model-value="color"

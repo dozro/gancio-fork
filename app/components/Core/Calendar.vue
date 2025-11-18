@@ -26,7 +26,7 @@ function updatePages (pages) {
     :locale='$i18n.locale'  
     title-position='left'
     transition='fade'
-    :is-dark="theme.global.current.value.dark"
+    :is-dark="theme?.global?.current?.value?.dark"
     aria-label='Calendar'
     expanded
     :attributes='attributes'

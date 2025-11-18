@@ -1,1 +1,1 @@
-export default defineEventHandler(event => 'OK')
+export default defineEventHandler(() => 'OK')

@@ -171,7 +171,6 @@ const position = computed(() => {
     <v-switch
       class="ml-3 mt-0 pt-0"
       v-model="showPreview"
-      inset
       :label="$t('common.show_preview')"
       hide-details
     />
@@ -211,7 +210,7 @@ const position = computed(() => {
       accept="image/*"
     />
 
-    <v-switch v-model="useUrl" inset :label="$t('event.import_URL')"></v-switch>
+    <v-switch v-model="useUrl" :label="$t('event.import_URL')" />
   </div>
 </span>
 

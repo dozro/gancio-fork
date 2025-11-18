@@ -161,7 +161,6 @@ async function deleteUser (user) {
             :modelValue="item.is_active" 
             readonly 
             @click.prevent="toggle(item)" 
-            inset 
             hide-details
           />
         </template>
@@ -171,7 +170,6 @@ async function deleteUser (user) {
             :modelValue="item.to_notify" 
             readonly 
             @click.prevent="toggle_to_notify(item)" 
-            inset
             hide-details
           />
         </template>

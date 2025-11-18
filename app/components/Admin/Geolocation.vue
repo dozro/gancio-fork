@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 const settings = useState<Settings>('settings')
 const { $notify, $confirm }  = useNuxtApp()

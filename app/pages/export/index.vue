@@ -154,8 +154,8 @@ const link = computed(() => {
                 <v-col class="col-12 col-lg-4">
                   <v-text-field v-model="list.title" :label="$t('common.title')"></v-text-field>
                   <v-text-field v-model="list.maxEvents" type="number" min="1" :label="$t('common.max_events')"></v-text-field>
-                  <v-switch v-model="list.theme" hide-details inset :true-value="'dark'" :false-value="'light'" :label="$t('admin.is_dark')"></v-switch>
-                  <v-switch v-model="list.sidebar" inset :true-value="'true'" :false-value="'false'" :label="$t('admin.widget')"></v-switch>
+                  <v-switch v-model="list.theme" hide-details :true-value="'dark'" :false-value="'light'" :label="$t('admin.is_dark')"></v-switch>
+                  <v-switch v-model="list.sidebar" :true-value="'true'" :false-value="'false'" :label="$t('admin.widget')"></v-switch>
                 </v-col>
                 <v-col class='col-12.col-lg-8'>
                   <gancio-events

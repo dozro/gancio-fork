@@ -97,7 +97,6 @@ async function deleteTrustedSource (trusted_source) {
       v-model="enable_federation"
       :label="$t('admin.enable_federation')"
       persistent-hint
-      inset
       :hint="$t('admin.enable_federation_help')"
     />
 
@@ -145,7 +144,6 @@ async function deleteTrustedSource (trusted_source) {
       prepend-icon="mdi-tag-multiple"
       :label="$t('admin.default_fedi_hashtags')"
       persistent-hint
-      inset
       multiple
       :delimiters="[';', ',']"
       chips
@@ -173,7 +171,6 @@ async function deleteTrustedSource (trusted_source) {
       v-model="trusted_sources_label"
       :label="$t('admin.trusted_sources_label')"
       persistent-hint
-      inset
       :placeholder="$t('admin.trusted_sources_label_default')"
       :hint="$t('admin.trusted_sources_label_help')"
       @blur="save('trusted_sources_label', trusted_sources_label)"
@@ -242,7 +239,6 @@ async function deleteTrustedSource (trusted_source) {
           :disabled="item.loading"
           :loading="item.loading"
           @change="() => toggleFollowing(item)"
-          inset
           hide-details
         />
       </template>

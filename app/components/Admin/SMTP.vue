@@ -68,7 +68,7 @@ async function done (testing: boolean) {
         persistent-hint
         :rules="$valid.email" />
 
-      <v-switch v-model="smtp.sendmail" inset
+      <v-switch v-model="smtp.sendmail"
         :label="$t('admin.smtp_use_sendmail')" />
 
       <v-row v-if="!smtp.sendmail">
@@ -86,7 +86,7 @@ async function done (testing: boolean) {
         </v-col>
 
         <v-col cols="12">
-          <v-switch v-model="smtp.secure" inset
+          <v-switch v-model="smtp.secure"
             :label="$t('admin.smtp_secure')" />
         </v-col>
 
