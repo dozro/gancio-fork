@@ -45,17 +45,14 @@ export default defineNuxtConfig({
   },
   i18n: {
     defaultLocale: 'en',
-    lazy: true,            // enable lazy loading
-    // langDir: 'locales/',   // must be set, but won’t be used for actual loading
-    // types: 'composition',
+    langDir: 'locales/',   // must be set, but won’t be used for actual loading
+    types: 'composition',
     pages: undefined,
     locales: Object.keys(locales).map(key => ({
       code: key,
       name: locales[key],
       file: 'en.js'
     })),
-    locale: 'en',
-    fallbackLocale: 'en',
     // skipSettingLocaleOnNavigate: true,// 
     // dynamicRouteParams: false,
     compilation: {
@@ -104,7 +101,7 @@ export default defineNuxtConfig({
   },
   nitro: {
     storage: {
-      locales: {
+      locale_storage: {
         driver: 'fs',
         base: isBuild ? './nuxt/server/i18n/locales' : './i18n/locales'
       }

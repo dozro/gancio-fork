@@ -1,5 +1,5 @@
 import type { H3Event, MultiPartData } from "h3"
-import config from "../config"
+import { get as getConfig } from "../config"
 import path from "path"
 import sharp from "sharp"
 const log = useLogger('parseMultipartForm')
@@ -41,7 +41,7 @@ export async function parseMultipartFormData(event: H3Event) {
 }
 
 export async function saveUploadedImage(image: MultiPartData, dest: string) {
-
+  const config = getConfig()
   const baseImgPath = path.resolve(config.upload_path, dest)
 
   // convert and resize to png
@@ -54,18 +54,18 @@ export async function saveUploadedImage(image: MultiPartData, dest: string) {
         log.error(err)
       }
     })
-  
+
   return baseImgPath + '.png'
 }
 
-export async function saveUploadedEventImage (image: MultiPartData, name: string, focalpoint: number[]): Promise<Media|undefined> {
-
+export async function saveUploadedEventImage(image: MultiPartData, name: string, focalpoint: number[]): Promise<Media | undefined> {
+  const config = getConfig()
   const filename = crypto.randomUUID() + '.jpg'
   const sharpStream = sharp(image.data, { failOnError: true })
   const promises = [
     sharpStream.clone().rotate().resize(500, null, { withoutEnlargement: true })
       .jpeg({ mozjpeg: true, progressive: true }).toFile(path.resolve(config.upload_path, 'thumb', filename)),
-    sharpStream.clone().rotate().resize(1200, null, { withoutEnlargement: true } )
+    sharpStream.clone().rotate().resize(1200, null, { withoutEnlargement: true })
       .jpeg({ quality: 95, mozjpeg: true, progressive: true }).toFile(path.resolve(config.upload_path, filename))
   ]
 
@@ -73,7 +73,7 @@ export async function saveUploadedEventImage (image: MultiPartData, name: string
     const res = await Promise.all(promises)
     const info = res[1]
     return {
-      name, 
+      name,
       url: filename,
       height: info.height,
       width: info.width,

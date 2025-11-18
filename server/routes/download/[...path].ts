@@ -1,10 +1,11 @@
 import { defineEventHandler, getRouterParam, setHeader, sendRedirect, sendStream, createError } from 'h3'
 import { join } from 'path'
 import { createReadStream, existsSync, statSync } from 'fs'
-import config from '../../config'
+import { get as getConfig } from '../../config'
 
 export default defineEventHandler(async (event) => {
   const path = getRouterParam(event, 'path')
+  const config = getConfig()
   const filePath = join(config.upload_path, path || '')
 
   if (!existsSync(filePath)) {

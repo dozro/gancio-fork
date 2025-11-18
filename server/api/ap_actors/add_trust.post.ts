@@ -1,7 +1,7 @@
 import { z } from "zod"
 // import { APUser } from "~/server/utils/sequelize"
-import { followActor, unfollowActor, getInstance, getActor } from  '~~/server/federation/helpers.js'
-import config from '../../config'
+import { followActor, unfollowActor, getInstance, getActor } from '~~/server/federation/helpers.js'
+import { get as getConfig } from '../../config'
 import { isHiddenService } from '../../helpers'
 
 const schema = z.object({
@@ -9,7 +9,9 @@ const schema = z.object({
 })
 
 export default defineEventHandler(async event => {
-  
+
+  const config = getConfig()
+
   // authenticate
   // await requireAdminSession(event)
 
@@ -28,7 +30,7 @@ export default defineEventHandler(async event => {
 
   // @actor@instance.tld syntax, let's use webfinger
   if (!url.startsWith('http') && url.includes('@')) {
-    const [ user, instance_url ] = url.replace(/^@/,'').split('@')
+    const [user, instance_url] = url.replace(/^@/, '').split('@')
     log.debug('[FEDI] Adds user: %s and instance: %s because url was: %s', user, instance_url, url)
     try {
       let protocol = "https://"
@@ -43,10 +45,10 @@ export default defineEventHandler(async event => {
 
       instance = await getInstance(protocol + instance_url, true)
 
-      if (!instance) { 
+      if (!instance) {
         throw createError({ status: 404, message: 'This ap instance does not exists' })
       }
-      
+
       const webfinger = await $fetch(`${protocol}${instance_url}/.well-known/webfinger?resource=acct:${user}@${instance_url}`)
       if (webfinger?.links) {
         const actor_url = webfinger.links.find(l => l.rel === 'self')
@@ -134,7 +136,7 @@ export default defineEventHandler(async event => {
     }
     throw createError({ status: 404, message: 'No way' })
   } catch (e) {
-    console.error(e) 
+    console.error(e)
     log.error('[FEDI] Error adding trusted actor %s', e?.response?.data ?? String(e))
     throw createError({ status: 404, message: 'Error adding trusted actor' })
   }

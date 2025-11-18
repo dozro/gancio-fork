@@ -2,7 +2,7 @@ import path from 'path'
 import fs from 'fs/promises'
 import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
-import config from '../config'
+import { get as getConfig } from '../config'
 import { sequelize } from './sequelize'
 
 import { createRequire } from 'module'
@@ -141,7 +141,7 @@ const pluginController = {
   async _loadPlugin(filePath: string) {
     try {
       log.info(`Loading plugin ${filePath}`)
-      
+
       // const plugin: Plugin = await import(filePath)
       const plugin: Plugin = require(filePath)
       const { name } = plugin.configuration
@@ -171,6 +171,7 @@ const pluginController = {
   },
 
   async _load() {
+    const config = getConfig()
     const defaultPath = path.resolve(__dirname, '../../gancio_plugins')
     const customPath = path.resolve(config.plugins_path) || path.resolve(process.cwd(), 'plugins')
     const paths = customPath === defaultPath ? [customPath] : [customPath, defaultPath]

@@ -1,6 +1,5 @@
 import { Event } from "#imports"
 import { mkdirp } from 'mkdirp'
-import config from '~~/server/config'
 import { parseMultipartFormData, saveUploadedEventImage } from "~~/server/utils/parseMultipartForm"
 import type { MultiPartData } from "h3"
 import { DateTime } from "luxon"
@@ -10,10 +9,10 @@ import linkifyHtml from "linkify-html"
 import { findOrCreateTags } from "~~/server/lib/tags"
 import { mapEvent } from "~~/server/utils/events"
 
-try {
+/* try {
   mkdirp.sync(config.upload_path + '/thumb')
 } catch (e) {}
-
+*/
 /**
  * Add a new event
  * Allow anyone to add an event (anon event has to be confirmed)
@@ -46,7 +45,7 @@ export default defineEventHandler(async evt => {
     throw createError({ status: 403, message: 'Anonymous event creation not allowed', statusMessage: 'Anonymous event creation not allowed' })
   }
 
-  
+
   const multiPartBody = await parseMultipartFormData(evt)
   const jsonBody = await readBody(evt)
   const body = multiPartBody || jsonBody
@@ -63,7 +62,7 @@ export default defineEventHandler(async evt => {
     log.warn(`${missingField} required`)
     throw createError({ status: 400, message: `${missingField} required`, statusMessage: `${missingField} required` })
   }
-  
+
   const now = DateTime.local().toUnixInteger()
   const start_datetime = Number(body.start_datetime)
 
@@ -71,33 +70,33 @@ export default defineEventHandler(async evt => {
   if (body.end_datetime) {
     if (body.start_datetime > body.end_datetime) {
       log.debug('start_datetime is greated than end_datetime')
-      throw createError({ status: 400, message: `start datetime is greater than end datetime`} )
+      throw createError({ status: 400, message: `start datetime is greater than end datetime` })
     }
 
-    if (Number(body.end_datetime) > 1000*24*60*60*365) {
+    if (Number(body.end_datetime) > 1000 * 24 * 60 * 60 * 365) {
       log.debug('end_datetime is too much in the future')
-      throw createError({ status: 400, message: 'are you sure?'} )
+      throw createError({ status: 400, message: 'are you sure?' })
     }
   }
 
   if (!start_datetime) {
     log.debug('start_datetime has to be a number')
-    throw createError({ status: 400, message: `Wrong format for start datetime`} )
+    throw createError({ status: 400, message: `Wrong format for start datetime` })
   }
 
   if (body.end_datetime && !Number(body.end_datetime)) {
     log.debug('end_datetime has to be a number')
-    throw createError({ status: 400, message: `Wrong format for end datetime`} )
+    throw createError({ status: 400, message: `Wrong format for end datetime` })
   }
 
-  if (start_datetime > 1000*24*60*60*365) {
+  if (start_datetime > 1000 * 24 * 60 * 60 * 365) {
     log.debug('start_datetime is too much in the future')
-    throw createError({ status: 400, message: 'are you sure?'} )
+    throw createError({ status: 400, message: 'are you sure?' })
   }
 
-  if(isAnonymous && start_datetime < now) {
+  if (isAnonymous && start_datetime < now) {
     log.debug('anonymous users cannot create past events')
-    throw createError({ status: 400, message: 'Anonymous user cannot create past events'} )
+    throw createError({ status: 400, message: 'Anonymous user cannot create past events' })
   }
 
   // find or create the place
@@ -105,13 +104,13 @@ export default defineEventHandler(async evt => {
   if (!place) {
     throw createError({ status: 400, message: 'Place not found' })
   }
-  
+
   const recurrent = body.recurrent ? JSON.parse(body.recurrent as string) : null
 
   const eventDetails: Event = {
     title: body.title?.trim(),
     // sanitize and linkify html
-    description: sanitizeHTML(linkifyHtml(body.description as string || '', { target: '_blank', render: { email: ctx => ctx.content }})),
+    description: sanitizeHTML(linkifyHtml(body.description as string || '', { target: '_blank', render: { email: ctx => ctx.content } })),
     // multidate: body.multidate,
     start_datetime,
     end_datetime: body.end_datetime && Number(body.end_datetime),
@@ -128,17 +127,17 @@ export default defineEventHandler(async evt => {
     focalpoint = [parseFloat(parseFloat(focalpoint[0]).toFixed(2)), parseFloat(parseFloat(focalpoint[1]).toFixed(2))]
     const media = await saveUploadedEventImage(body.image as MultiPartData, body?.image_name || body?.title || '', focalpoint)
     if (media) {
-      eventDetails.media = [ media ]
+      eventDetails.media = [media]
     }
   }
   const event = await Event.create(eventDetails)
   await event.setPlace(place)
 
   // create/assign tags
-  let tags : Tag[] = []
+  let tags: Tag[] = []
   if (body.tags) {
     if (!Array.isArray(body.tags)) {
-      throw createError({ status: 400, message: 'tags field must be an array'})
+      throw createError({ status: 400, message: 'tags field must be an array' })
     }
     tags = await findOrCreateTags(body.tags)
     await event.setTags(tags)
@@ -152,6 +151,6 @@ export default defineEventHandler(async evt => {
     // send notifications
     notifyEvent('Create', event.id)
   }
-  
+
   return mapEvent(event, place, tags)
 })

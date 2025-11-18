@@ -40,7 +40,7 @@ export type Settings = {
   light_colors: object // { primary: '#FF4500', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00' },
   hide_thumbs: boolean,
   hide_calendar: boolean,
-  footerLinks: Array<object> 
+  footerLinks: Array<object>
   plugins: Array<object>,
   admin_email: string
   smtp: object,
@@ -61,15 +61,15 @@ export const settingSchema = z.object({
   is_secret: z.boolean().default(false),
   value: z.union([z.string(), z.boolean()])
 })
-
-const config = (await import('../config')).default // useRuntimeConfig()
+import { get as getConfig } from '../config'
+const config = getConfig()
 export type SettingType = z.infer<typeof settingSchema>
 
-export const publicSettings:Settings = {
+export const publicSettings: Settings = {
   title: config?.title || 'Gancio',
   description: config?.description || 'A shared agenda for local communities',
   baseurl: config.baseurl || '',
-  hostname: config.hostname,
+  hostname: '',//config.hostname,
   instance_timezone: 'Europe/Rome',
   instance_locale: 'en',
   instance_name: 'relay',
@@ -103,21 +103,19 @@ export const publicSettings:Settings = {
     { href: '/about', label: 'common.about' }
   ],
   plugins: [],
-  admin_email: config.admin_email || '',
-  smtp: config.smtp || {},
   default_fedi_hashtags: [],
   custom_js: '',
   custom_css: '',
 }
 
-export const secretSettings:Record<keyof SecretSettings, any> = {
+export const secretSettings: Record<keyof SecretSettings, any> = {
   privateKey: null
 }
 
-export function getSetting (key: keyof Settings) {
-    return publicSettings[key]
+export function getSetting(key: keyof Settings) {
+  return publicSettings[key]
 }
-export async function getSettings () {
+export async function getSettings() {
   return Setting.findAll({ raw: true })
 }
 
@@ -134,7 +132,7 @@ export function setSetting<K extends keyof AllSettings>(
     secretSettings[key] = value
   } else {
     // when changing this we have to update the actor
-    if (['description','logo'].includes(key)) {
+    if (['description', 'logo'].includes(key)) {
       updateActor()
     }
     publicSettings[key] = value
@@ -142,7 +140,7 @@ export function setSetting<K extends keyof AllSettings>(
   return Setting.upsert({ key, value, is_secret })
 }
 
-export async function loadSettings () {
+export async function loadSettings() {
   const settings = await Setting.findAll()
   for (const setting of settings) {
     if (setting.is_secret) {

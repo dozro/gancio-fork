@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { Event } from '#build/types/nitro-imports'
 import { refDebounced } from '@vueuse/core'
 
-const event = defineModel<Event>('event', { type: Object, required: true } )
+const event = defineModel<EventDTO>('event', { type: Object, required: true } )
 
 const settings = useState<Settings>('settings')
 const showGeocoded = computed(() => settings.value.allow_geolocation && event?.value?.place.name !== 'online' && event?.value?.place.create)
@@ -13,7 +12,7 @@ const searchDebounced = refDebounced(search, 600)
 
 const { data: addressList, status } = await useFetch('/api/geocode', { params: { q: searchDebounced } })
 
-const prevAddress = ''
+let prevAddress = ''
 function selectAddress (v) {
   if (!v) { return }
   if (typeof v === 'object') {
