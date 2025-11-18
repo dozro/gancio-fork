@@ -68,7 +68,7 @@ mkdir "${PKG_MAIN}"
 
 # clean and reinstall dependencies
 rm -fr node_modules
-bun install
+yarn install
 
 # clean past artifacts
 npx nuxi cleanup
@@ -104,7 +104,7 @@ cp ./uploads/fallbackimage.svg "${PKG_MAIN}/uploads/"
 cp ./uploads/headerimage.svg "${PKG_MAIN}/uploads/"
 
 # plugins
-cp -ra ./gancio_plugins "${PKG_MAIN}/nuxt/server/plugins/"
+cp -ra ./gancio_plugins "${PKG_MAIN}/plugins/"
 
 # cp package.json bun.lock yarn.lock .env.example "${PKG_MAIN}/"
 # cp gancio.service "${PKG_MAIN}/"
