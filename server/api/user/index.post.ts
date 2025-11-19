@@ -5,22 +5,22 @@
  * the user to set their password and confirm their account creation
  * 
  * @auth
- * @param {string} newUser.email - User email address
- * @param {string} newUser.description - User description
- * @param {string} newUser.role - User role ('user','admin','editor')
+ * @param {string} email - User email address
+ * @param {string} description - User description
+ * @param {string} role - User role ('user','admin','editor')
  * @returns Created user object
  * @returns status `400` if user creation fails (e.g. email already exists)
  */
 export default defineEventHandler(async event => {
   await requireAdminSession(event)
   const log = useLogger('user')
-    
+
   const newUser = await readBody(event)
   log.info(newUser)
-    
+
   const n_users = await User.count()
   try {
-  
+
     // the first registered user will be an active admin
     if (n_users === 0) {
       log.info('First user!')
@@ -30,7 +30,7 @@ export default defineEventHandler(async event => {
     } else {
       newUser.recover_code = crypto.randomUUID()
       const user = await User.withScope('withRecoverCode').create(newUser)
-      enqueueMail(user.email, 'user_confirm', { user, config: publicSettings }, publicSettings.instance_locale )
+      enqueueMail(user.email, 'user_confirm', { user, config: publicSettings })
       return user
     }
   } catch (e) {

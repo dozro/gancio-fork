@@ -1,7 +1,7 @@
 import { defineSitemapEventHandler, Event } from '#imports'
 import type { SitemapUrlInput } from '#sitemap/types'
 
-
+// TODO: unit test
 export default defineSitemapEventHandler(async () => {
 
   const events = await Event.findAll({

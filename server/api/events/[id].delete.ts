@@ -11,5 +11,7 @@ export default defineEventHandler(async evt => {
     throw createError({ status: 404, message: 'This event does not exists' })
   }
 
+  // TODO: I cannot phisically remove the item as I need it to send the notification!
+  // notifyEvent('Delete', event.id)
   return event.destroy()
 })

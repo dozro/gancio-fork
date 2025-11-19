@@ -2,19 +2,17 @@
 const settings = useState<Settings>('settings')
 const { locale } = useI18n()
 
-// const custom_script = [{ type: 'application/javascript', defer: true, src: '/custom_js', body: true }]
-// const custom_style = [{ rel: 'stylesheet', href: settings.value.baseurl + '/custom_css'}]
 useHead ({
     htmlAttrs: {
       lang: locale.value
     },
     link: [
       { rel: 'icon', type: 'image/png', href: settings.value.baseurl + '/logo.png' },
-      // ...custom_style
+      { rel: 'stylesheet', href: settings.value.baseurl + '/custom_css'}
     ],
     script: [
       { src: '/gancio-events.es.js', async: true, defer: true, tagPosition: 'bodyClose' },
-      // ...custom_script
+      { type: 'application/javascript', async: true, src: '/custom_js', defer: true, tagPosition: 'bodyClose' }
     ]
   })
 

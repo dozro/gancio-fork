@@ -155,6 +155,76 @@ POST
 
 
 
+## Register a new user
+This will send an email to the user and to all the administrators
+
+**`/api/user/register`**
+
+POST 
+{: .label .label-orange}
+
+
+{: .info-title }
+> info
+>
+> The first registered user will be an active admin
+
+
+**Params**
+
+| Name | Type | Description |
+| -----|------|------|
+| email | `string` | user e-mail |
+| password | `string` | description |
+| description | `string` | description |
+
+
+
+
+
+
+
+## Update an event
+
+**`/api/events/[id]`**
+
+PUT 
+{: .label .label-orange}
+
+
+{: .info-title }
+> info
+>
+> `Content-Type` has to be `multipart/form-data` to support image upload
+
+
+**Params**
+
+| Name | Type | Description |
+| -----|------|------|
+| id | `number` | event id |
+| title | `string` | event's title |
+| description | `string` | event's description (html accepted and sanitized) |
+| place_name | `string` | the name of the place |
+| place_address | `string` | the address of the place |
+| place_latitude | `float` | the latitude of the place |
+| place_longitude | `float` | the longitude of the place |
+| online_locations | `array` | List of online locations |
+| start_datetime | `number` | start timestamp |
+| multidate | `integer` | is a multidate event? |
+| tags | `array` | List of tags |
+| recurrent | `object` | Recurrent event details |
+| recurrent.frequency | `string` | could be `1w` or `2w` |
+| recurrent.days | `array` | array of days |
+| image | `image` | Image |
+| image_url | `string` | Image URL |
+
+
+
+
+
+
+
 ## Get events
 Method to search for events with pagination and filtering
 
