@@ -1,41 +1,42 @@
-import { getHeader, setHeader, send } from 'h3'
+import { getHeader, setHeader } from 'h3'
 import type { H3Event } from 'h3'
 import crypto from 'crypto'
 
 export interface CacheValidationOptions {
-  data?: any        // Optional raw data (for ETag hash)
-  updatedAt?: Date  // Required for Last-Modified / weak ETag
+  data: any,
+  lastModified: Date,
+  etag?: string | boolean,
+
+  /** default: "public, max-age=1, must-revalidate" */
+  cacheControl?: string
 }
 
 /**
- * Sets Last-Modified and ETag headers, handles 304 if client cache is fresh.
- * @returns true if response is fresh (304 sent), false otherwise
+ * sets Last-Modified headers, check if-modified-since and handles 304 if client cache is fresh.
  */
-export function handleHttpCache(event: H3Event, { data, updatedAt }: CacheValidationOptions): boolean {
-  if (!updatedAt) return false
-
-  const lastModified = updatedAt.toUTCString()
-  const etag = data
-    ? generateETag(data)
-    : `"${updatedAt.getTime()}"` // fallback: timestamp as weak etag
+export function handleHttpCache(event: H3Event, { data, lastModified, etag, cacheControl }: CacheValidationOptions): any {
+  // set the last modified header
+  setHeader(event, 'Last-Modified', lastModified.toUTCString())
+  setHeader(event, 'Cache-Control', cacheControl ?? 'public, max-age=1, must-revalidate')
+  // setHeader(event, 'ETag', etag)
+  // const etag = data
+  // ? generateETag(data)
+  // : `"${updatedAt.getTime()}"` // fallback: timestamp as weak etag
 
   const ifModifiedSince = getHeader(event, 'if-modified-since')
-  const ifNoneMatch = getHeader(event, 'if-none-match')
-
-  const modifiedSinceMatch =
-    ifModifiedSince && new Date(ifModifiedSince).getTime() >= updatedAt.getTime()
-  const etagMatch = ifNoneMatch && ifNoneMatch === etag
-
-  // If client cache is valid, respond with 304
-  if (modifiedSinceMatch || etagMatch) {
-    setResponseStatus(event, 304)
-    return true
+  if (!ifModifiedSince) {
+    return data
   }
 
-  // Otherwise set headers
-  setHeader(event, 'Last-Modified', lastModified)
-  setHeader(event, 'ETag', etag)
-  return false
+  const modifiedSinceMatch = ifModifiedSince != lastModified.toUTCString()
+  // const etagMatch = ifNoneMatch && ifNoneMatch === etag
+
+  // if client cache is valid, respond with 304
+  if (!modifiedSinceMatch) {
+    return sendNoContent(event, 304)
+  } else {
+    return data
+  }
 }
 
 function generateETag(data: any): string {

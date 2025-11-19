@@ -43,7 +43,6 @@ TODO
 - utilities helper function without state -->
 
 
-
 ## API / Backend
 In Nuxt3, API endpoints and server routes are defined inside the `/server` directory. For more details, see the [Nuxt Server Directory documentation](https://nuxt.com/docs/guide/directory-structure/server).
 Nuxt3 uses [Nitro](https://nitro.unjs.io/) as the server engine, which automatically scans the `/server` directory for API and route files.
@@ -238,6 +237,8 @@ use `useFetch` if you need SSR (i.e. loading events at home page).
 internally it calls the method only once in SSR and pass the payload to the client that has not to re-fetch the data.
 useFetch has an internal key that uses to refresh the request.
 
+Do not use useFetch inside methods!
+
 use `$fetch` for data needed in client only (i.e. a `v-combobox` with autocompletion)
 
 
@@ -254,3 +255,5 @@ definePageMeta({ middleware: ['authenticated'] })
 const { loggedIn, session, user, clear, fetch } = useUserSession()
 const { isAdmin } = useAuth()
 
+
+### Theme (system / light / dark)
