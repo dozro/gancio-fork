@@ -8,7 +8,7 @@ const generateKeyPair = promisify(crypto.generateKeyPair)
 export type Settings = {
   title: string,
   description: string,
-  /** The path to the logo image for the instance */
+  /** the path to the logo image for the instance */
   logo?: string,
   baseurl: string,
   hostname: string,
@@ -65,6 +65,8 @@ import { get as getConfig } from '../config'
 const config = getConfig()
 export type SettingType = z.infer<typeof settingSchema>
 
+export let publicSettingsLastModified: Partial<Record<keyof Settings, Date>> = {}
+
 export const publicSettings: Settings = {
   title: config?.title || 'Gancio',
   description: config?.description || 'A shared agenda for local communities',
@@ -106,6 +108,8 @@ export const publicSettings: Settings = {
   default_fedi_hashtags: [],
   custom_js: '',
   custom_css: '',
+  admin_email: '',
+  smtp: {}
 }
 
 export const secretSettings: Record<keyof SecretSettings, any> = {
@@ -121,7 +125,7 @@ export async function getSettings() {
 
 type AllSettings = Settings & SecretSettings
 
-export function setSetting<K extends keyof AllSettings>(
+export async function setSetting<K extends keyof AllSettings>(
   key: K,
   value: AllSettings[K],
   is_secret: boolean = false
@@ -137,7 +141,11 @@ export function setSetting<K extends keyof AllSettings>(
     }
     publicSettings[key] = value
   }
-  return Setting.upsert({ key, value, is_secret })
+  const setting = await Setting.upsert({ key, value, is_secret })
+  if (!is_secret) {
+    publicSettingsLastModified[key] = setting[0].updatedAt
+  }
+  return setting
 }
 
 export async function loadSettings() {
@@ -147,6 +155,7 @@ export async function loadSettings() {
       secretSettings[setting.key] = setting.value
     } else {
       publicSettings[setting.key] = setting.value
+      publicSettingsLastModified[setting.key] = setting.updatedAt
     }
   }
 
