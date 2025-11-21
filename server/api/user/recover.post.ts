@@ -6,8 +6,8 @@ export default defineEventHandler(async (event) => {
     log.error('User not found')
     return
   }
-  
+
   await user.generateRecoverCode()
-  enqueueMail(user.email, 'recover', { user, config: publicSettings })
+  enqueueMail(user.email, 'recover', { user, config: publicSettings }, event.context.locale)
 
 })

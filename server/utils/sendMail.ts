@@ -1,8 +1,8 @@
 import Email from 'email-templates'
 import path from 'path'
 import { DateTime } from 'luxon'
-// const locales = require('../../locales')
 const log = useLogger('mail')
+import locales from '~~/i18n/locales/index'
 
 /**
  * Enqueues an email to be sent using the task manager.
@@ -14,12 +14,12 @@ const log = useLogger('mail')
  * @param bcc - Optional. If true, sends the email as BCC instead of TO.
  */
 export function enqueueMail(addresses: string | string[], template: string, locals?: object, locale?: string, bcc?: boolean) {
-  locale = locale || publicSettings!.instance_locale
+  locale = locale ?? publicSettings.instance_locale
   if (process.env.NODE_ENV === 'production' && (!publicSettings.admin_email || !publicSettings.smtp)) {
     log.error(`Cannot send any email: SMTP Email configuration not completed!`)
     return
   }
-  
+
   log.debug(`Enqueue new email ${template} ${locale}`)
   useTaskManager().add({
     name: 'MAIL',
@@ -36,13 +36,15 @@ async function sendMail(addresses: string | string[], template: emailTemplates, 
     'sr-Cyrl': 'Cy-sr-SP',
     'sr-Latn': 'Lt-sr-SP',
   }
-  const settings = publicSettings // settingsController.settings
-  locale = locale || settings!.instance_locale
+  const settings = publicSettings
+  locale = locale ?? settings.instance_locale
   locale = localeMapOverride?.[locale] ?? locale
   log.info(`Send ${template} email to ${addresses} with locale ${locale}`)
   log.debug(settings?.smtp)
   const email = new Email({
-    views: { root: path.join(process.cwd(), 'server/emails') },
+    views: {
+      root: path.join(process.cwd(), 'server/emails')
+    },
     preview: true,
     htmlToText: {},
     juice: true,
@@ -57,6 +59,7 @@ async function sendMail(addresses: string | string[], template: emailTemplates, 
     },
     send: true,
     i18n: {
+      // TODO: support custom locale (ref: https://github.com/mashpie/i18n-node/issues/423 )
       directory: path.join(process.cwd(), 'i18n', 'locales', 'email'),
       objectNotation: true,
       syncFiles: false,
@@ -64,7 +67,7 @@ async function sendMail(addresses: string | string[], template: emailTemplates, 
       updateFiles: false,
       defaultLocale: 'en',
       locale,
-      // locales: Object.keys(locales).map(l => localeMapOverride?.[l] ?? l)
+      locales: Object.keys(locales).map(l => localeMapOverride?.[l] ?? l)
     },
 
     transport: settings.smtp // || {}
