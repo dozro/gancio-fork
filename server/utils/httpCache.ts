@@ -5,41 +5,38 @@ import crypto from 'crypto'
 export interface CacheValidationOptions {
   data: any,
   lastModified: Date,
-  etag?: string | boolean,
+  etag?: string,
 
   /** default: "public, max-age=1, must-revalidate" */
   cacheControl?: string
 }
 
 /**
- * sets Last-Modified headers, check if-modified-since and handles 304 if client cache is fresh.
+ * sets Last-Modified and ETag headers, check if-modified-since and if-none-match and handles 304 if client cache is fresh.
  */
-export function handleHttpCache(event: H3Event, { data, lastModified, etag, cacheControl }: CacheValidationOptions): any {
-  // set the last modified header
+export function handleHttpCache(event: H3Event, { data, etag, lastModified, cacheControl }: CacheValidationOptions): any {
+
+  // set headers (etag could be passed in args or its calculated weak using milliseconds)
+  etag = etag ?? lastModified.getTime().toString()
+  setHeader(event, 'ETag', etag)
   setHeader(event, 'Last-Modified', lastModified.toUTCString())
   setHeader(event, 'Cache-Control', cacheControl ?? 'public, max-age=1, must-revalidate')
-  // setHeader(event, 'ETag', etag)
-  // const etag = data
-  // ? generateETag(data)
-  // : `"${updatedAt.getTime()}"` // fallback: timestamp as weak etag
 
+  // check etag match first
+  const ifNoneMatch = getHeader(event, 'if-none-match')
+  if (ifNoneMatch) {
+    if (ifNoneMatch === etag) {
+      return sendNoContent(event, 304)
+    }
+    return data
+  }
+
+  // then check if-modified-since
   const ifModifiedSince = getHeader(event, 'if-modified-since')
-  if (!ifModifiedSince) {
-    return data
-  }
-
-  const modifiedSinceMatch = ifModifiedSince != lastModified.toUTCString()
-  // const etagMatch = ifNoneMatch && ifNoneMatch === etag
-
-  // if client cache is valid, respond with 304
-  if (!modifiedSinceMatch) {
+  if (ifModifiedSince && new Date(ifModifiedSince).getTime() == lastModified.setMilliseconds(0)) {
     return sendNoContent(event, 304)
-  } else {
-    return data
   }
-}
 
-function generateETag(data: any): string {
-  const hash = crypto.createHash('md5').update(JSON.stringify(data)).digest('hex')
-  return `"${hash}"`
+  return data
+
 }

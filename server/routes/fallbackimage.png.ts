@@ -11,10 +11,7 @@ export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Type', mimeType)
 
   const stats = fs.statSync(logoPath)
-  const lastModified = stats.mtime.toUTCString()
-  const etag = `"${stats.size}-${Number(stats.mtimeMs).toString(16)}"`
-  setHeader(event, 'Last-Modified', lastModified)
-  setHeader(event, 'ETag', etag)
 
-  return sendStream(event, fs.createReadStream(logoPath))
+  const data = sendStream(event, fs.createReadStream(logoPath))
+  return handleHttpCache(event, { data, lastModified: stats.mtime })
 })
