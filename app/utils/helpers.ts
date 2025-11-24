@@ -3,9 +3,9 @@
  */
 
 
-import type { APUser, Event } from "#build/types/nitro-imports"
+import type { APUser } from "#build/types/nitro-imports"
 
-export function mediaURL (event: Event, type?: string, format = '.jpg') {
+export function mediaURL(event: EventAPI, type?: string, format = '.jpg') {
   const settings = useState<Settings>('settings')
   const mediaPath = type === 'download' ? '/download/' : '/media/'
   if (event.media && event.media.length) {
