@@ -18,7 +18,7 @@ export const ProxySchema = z.object({
 })
 
 export const DbSchema = z.object({
-  dialect: z.enum(['sqlite', 'sqlite3', 'mariadb', 'postgres', 'postgresql']).default('sqlite'),
+  dialect: z.enum(['sqlite3', 'mariadb', 'postgresql']).default('sqlite3'),
   storage: z.string().optional(),            // sqlite only
   host: z.string().optional(),
   port: z.coerce.number().optional(),

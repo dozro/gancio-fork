@@ -5,91 +5,72 @@ import { Umzug, SequelizeStorage } from 'umzug'
 import { useLogger } from './useLogger'
 
 import {
-    Sequelize,
-    DataTypes,
-    Op,
-    Model,
-    type InferAttributes,
-    type InferCreationAttributes,
-    type CreationOptional,
-    type NonAttribute,
-    type InferAttributesOptions,
-    type AbstractDialect,
-    type Options,
+  Sequelize,
+  DataTypes,
+  Op,
+  Model,
+  type InferAttributes,
+  type InferCreationAttributes,
+  type CreationOptional,
+  type NonAttribute,
+  type InferAttributesOptions,
+  type AbstractDialect,
+  type Options,
 } from "@sequelize/core"
 
 import {
-    Attribute,
-    HasMany,
-    NotNull,
-    Table,
-    Scopes,
-    CreatedAt,
-    UpdatedAt,
-    PrimaryKey,
-    AutoIncrement,
-    // BeforeCreate,
-    // BeforeUpsert,
-    Index,
-    Unique,
-    BeforeSave,
-    // AllowNull,
-    BelongsToMany,
-    // BelongsTo,
-    Default,
-    BeforeCreate,
-    BelongsTo
+  Attribute,
+  HasMany,
+  NotNull,
+  Table,
+  CreatedAt,
+  UpdatedAt,
+  PrimaryKey,
+  AutoIncrement,
+  // BeforeCreate,
+  // BeforeUpsert,
+  Index,
+  Unique,
+  BeforeSave,
+  // AllowNull,
+  BelongsToMany,
+  // BelongsTo,
+  Default,
+  BeforeCreate,
+  BelongsTo
 } from "@sequelize/core/decorators-legacy"
 
-import { SqliteDialect } from "@sequelize/sqlite3"
-import { MariaDbDialect } from "@sequelize/mariadb"
-
 import type { SecretSettings, Settings } from './settings'
+
 import { DateTime } from 'luxon'
-import config from '../config'
+import { get as getConfig } from '../config'
+const config = getConfig()
 const log = useLogger('sequelize')
 
 export let sequelize: Sequelize | undefined
+
 export async function connect() {
   if (sequelize) { return sequelize }
-  const dialectMap = {
-    sqlite: SqliteDialect,
-    sqlite3: SqliteDialect,
-    mariadb: MariaDbDialect,
-  }
-  
-  const dialectName = process.env.DB_DIALECT ?? 'sqlite3'
-  let dbOptions = {}
-  
-  if (dialectName === 'mariadb') {
-    dbOptions = {
-      dialect: dialectMap[dialectName],
-      database: process.env.DB_NAME || 'gancio',
-      user: process.env.DB_USER || 'gancio',
-      password: process.env.DB_PASSWORD || 'gancio',
-      host: process.env.DB_HOST || 'localhost',
-      port: process.env.DB_PORT || 3306,
-    }
-  } else if (dialectName === 'sqlite3' || dialectName === 'sqlite') {
-    dbOptions = {
-      dialect: dialectMap[dialectName],
-      storage: process.env.DB_STORAGE || './gancio.sqlite',
-    }
+
+  if (['sqlite', 'sqlite3'].includes(config.db.dialect)) {
+    log.info(`Connecting to sqlite db ${config.db.storage}`)
+  } else {
+    log.info(`Connecting to ${config.db.dialect} host: ${config.db.host}:${config.db.port} database: ${config.db.database}`)
   }
 
   try {
-    sequelize = new Sequelize(dbOptions as Options<AbstractDialect>)
-      await sequelize.authenticate()
-      log.info('Connection has been established successfully.')
-      sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message])
-    } catch (error) {
-      console.error('Unable to connect to the database:', dbOptions)
-      process.exit(1)
+    sequelize = new Sequelize(config.db as Options<AbstractDialect>)
+    await sequelize.authenticate()
+    log.info('Connection has been established successfully.')
+    sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message])
+  } catch (error) {
+    console.error('Unable to connect to the database:', config.db, error)
+    process.exit(1)
   }
-  
+
   User.addScope('defaultScope', { attributes: { exclude: ['password', 'recover_code'] } })
   User.addScope('withRecoverCode', { attributes: { exclude: ['password'] } })
-  User.addScope('withPassword', { })
+  User.addScope('withPassword', {})
 
   return sequelize
 }
@@ -97,74 +78,74 @@ export async function connect() {
 export async function runMigrations() {
   if (!sequelize) return
   const umzug = new Umzug({
-      storage: new SequelizeStorage({ sequelize }),
-      migrations: { glob: '**/migrations/*.js'},
-      context: sequelize.queryInterface,
-      logger: console
+    storage: new SequelizeStorage({ sequelize }),
+    migrations: { glob: '**/migrations/*.js' },
+    context: sequelize.queryInterface,
+    logger: console
   })
   await umzug.up()
 }
 
 @Table({
-    tableName: 'announcements',
+  tableName: 'announcements',
 })
 export class Announcement extends Model<
-InferAttributes<Announcement>,
-InferCreationAttributes<Announcement>
+  InferAttributes<Announcement>,
+  InferCreationAttributes<Announcement>
 > {
-    @Attribute(DataTypes.INTEGER.UNSIGNED)
-    @PrimaryKey
-    @AutoIncrement
-    declare readonly id: CreationOptional<number>
-    
-    @Attribute(DataTypes.STRING)
-    @NotNull
-    declare title: string
-    
-    @Attribute(DataTypes.STRING)
-    declare announcement: string
-    
-    @Attribute(DataTypes.BOOLEAN)
-    declare visible: string
-    
+  @Attribute(DataTypes.INTEGER.UNSIGNED)
+  @PrimaryKey
+  @AutoIncrement
+  declare readonly id: CreationOptional<number>
+
+  @Attribute(DataTypes.STRING)
+  @NotNull
+  declare title: string
+
+  @Attribute(DataTypes.STRING)
+  declare announcement: string
+
+  @Attribute(DataTypes.BOOLEAN)
+  declare visible: string
+
 }
 
 @Table({
-    tableName: 'messages'
+  tableName: 'messages'
 })
 export class Message extends Model<
   InferAttributes<Message>,
   InferCreationAttributes<Message>
 > {
-    @Attribute(DataTypes.INTEGER)
-    @PrimaryKey
-    @AutoIncrement
-    declare id: CreationOptional<number>
+  @Attribute(DataTypes.INTEGER)
+  @PrimaryKey
+  @AutoIncrement
+  declare id: CreationOptional<number>
 
-    @Attribute(DataTypes.TEXT)
-    @NotNull
-    declare message: string
+  @Attribute(DataTypes.TEXT)
+  @NotNull
+  declare message: string
 
-    @Attribute(DataTypes.ENUM(['AUTHOR', 'ADMIN', 'ANON', 'REGISTERED']))
-    declare author: 'AUTHOR' | 'ADMIN' | 'ANON' | 'REGISTERED'
+  @Attribute(DataTypes.ENUM(['AUTHOR', 'ADMIN', 'ANON', 'REGISTERED']))
+  declare author: 'AUTHOR' | 'ADMIN' | 'ANON' | 'REGISTERED'
 
-    @Attribute(DataTypes.BOOLEAN)
-    declare is_author_visible: boolean // is this message visible to the author?
-    
-    @Attribute({
-        type: DataTypes.INTEGER.UNSIGNED,
-        references: { table: "events", key: "id" },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-    })
-    declare eventId: number
+  @Attribute(DataTypes.BOOLEAN)
+  declare is_author_visible: boolean // is this message visible to the author?
 
-    @BelongsTo(() => Event, { foreignKey: 'eventId', targetKey: 'id' })
-    declare event: NonAttribute<Event>
+  @Attribute({
+    type: DataTypes.INTEGER.UNSIGNED,
+    references: { table: "events", key: "id" },
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  declare eventId: number
+
+  @BelongsTo(() => Event, { foreignKey: 'eventId', targetKey: 'id' })
+  declare event: NonAttribute<Event>
 }
 
 export interface Media {
-  name: string, 
+  name: string,
   url: string,
   height: number,
   width: number,
@@ -174,522 +155,523 @@ export interface Media {
 
 
 @Table({
-    tableName: 'events'
+  tableName: 'events'
 })
 export class Event extends Model<
-InferAttributes<Event>,
-InferCreationAttributes<Event>
+  InferAttributes<Event>,
+  InferCreationAttributes<Event>
 > {
-    @Attribute(DataTypes.INTEGER.UNSIGNED)
-    @PrimaryKey
-    @AutoIncrement
-    declare readonly id: CreationOptional<number>
+  @Attribute(DataTypes.INTEGER.UNSIGNED)
+  @PrimaryKey
+  @AutoIncrement
+  declare readonly id: CreationOptional<number>
 
-    @CreatedAt
-    declare readonly createdAt: CreationOptional<Date>
+  @CreatedAt
+  declare readonly createdAt: CreationOptional<Date>
 
-    @UpdatedAt
-    declare readonly updatedAt: CreationOptional<Date>
-    
-    /**  title of the event */
-    @Attribute(DataTypes.STRING)
-    @NotNull
-    declare title: string
-    
-    @Attribute(DataTypes.STRING)
-    @Index
-    @Unique
-    declare slug: string
-    
-    @Attribute(DataTypes.INTEGER.UNSIGNED)
-    @Index
-    declare start_datetime: number
-    
-    @Attribute(DataTypes.INTEGER.UNSIGNED)
-    @Index
-    declare end_datetime?: number
-    
-    @Attribute(DataTypes.JSON)
-    declare media?: Media[]
-    
-    @Attribute(DataTypes.TEXT)
-    declare description: string
-    
-    @Attribute(DataTypes.BOOLEAN)
-    declare is_visible: boolean
-    
-    @Attribute(DataTypes.JSON)
-    declare online_locations: Array<string>
+  @UpdatedAt
+  declare readonly updatedAt: CreationOptional<Date>
 
-    @Attribute(DataTypes.JSON)
-    declare recurrent?: object | null
+  /**  title of the event */
+  @Attribute(DataTypes.STRING)
+  @NotNull
+  declare title: string
 
-    @Attribute(DataTypes.JSON)
-    declare ap_object?: object
+  @Attribute(DataTypes.STRING)
+  @Index
+  @Unique
+  declare slug: string
 
-    /** represent the AP URI */
-    @Attribute(DataTypes.STRING)
-    @Index
-    declare ap_id?: string | null
-    
-    @Attribute({
-        type: DataTypes.INTEGER.UNSIGNED,
-        references: { table: "users", key: "id" },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-    })
-    declare userId?: number;
+  @Attribute(DataTypes.INTEGER.UNSIGNED)
+  @Index
+  declare start_datetime: number
 
-    @BelongsTo(() => User, { foreignKey: 'userId', targetKey: 'id' })
-    declare user?: NonAttribute<User>
-    
-    @Attribute({
-        type: DataTypes.INTEGER.UNSIGNED,
-        allowNull: true,
-        references: { table: "events", key: "id" },
-        onUpdate: "CASCADE",
-        onDelete: "SET NULL",
-    })
-    declare parentId: number | null
+  @Attribute(DataTypes.INTEGER.UNSIGNED)
+  @Index
+  declare end_datetime?: number
 
-    @BelongsTo(() => Event, { foreignKey: 'parentId', targetKey: 'id' })
-    declare parent?: NonAttribute<Event>
-    
-    @Attribute({
-        type: DataTypes.INTEGER.UNSIGNED,
-        references: { table: "places", key: "id" },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-    })
-    declare placeId: number;
-    
-    @BelongsTo(() => Place, { foreignKey: 'placeId' })
-    declare place?: NonAttribute<Place>
-    
-    @BelongsToMany(() => Tag, { through: 'event_tags', inverse: { as: 'events' } })
-    declare tags?: NonAttribute<Tag[]>
+  @Attribute(DataTypes.JSON)
+  declare media?: Media[]
 
-    @Attribute({
-        type: DataTypes.STRING,
-        references: { table: "ap_users", key: "ap_id" },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-    })
-    declare apUserApId?: string
+  @Attribute(DataTypes.TEXT)
+  declare description: string
 
-    @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
-    declare apUser?: NonAttribute<APUser>
-    
-    @HasMany(() => Message, { foreignKey: 'eventId', sourceKey: 'id' })
-    declare messages?: NonAttribute<Message[]>
+  @Attribute(DataTypes.BOOLEAN)
+  declare is_visible: boolean
 
-    @HasMany(() => Resource, { foreignKey: 'eventId', sourceKey: 'id' })
-    declare resources?: NonAttribute<Resource[]>
-    
-    @BeforeCreate
-    static async generateSlug(event: Event) {
-      if (event.title && !event.slug) {
-        const baseSlug = slugify(event.title, { lower: true, strict: true })
-        let slug = baseSlug
-        let count = 1
-  
-        // Ensure slug is unique
-        while (
-          await Event.findOne({
-            where: { slug, id: { [Op.ne]: event.id } } }) // skip self in case of update
-        ) {
-          slug = `${baseSlug}-${count++}`
-        }
-  
-        event.slug = slug
+  @Attribute(DataTypes.JSON)
+  declare online_locations: Array<string>
+
+  @Attribute(DataTypes.JSON)
+  declare recurrent?: object | null
+
+  @Attribute(DataTypes.JSON)
+  declare ap_object?: object
+
+  /** represent the AP URI */
+  @Attribute(DataTypes.STRING)
+  @Index
+  declare ap_id?: string | null
+
+  @Attribute({
+    type: DataTypes.INTEGER.UNSIGNED,
+    references: { table: "users", key: "id" },
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  declare userId?: number;
+
+  @BelongsTo(() => User, { foreignKey: 'userId', targetKey: 'id' })
+  declare user?: NonAttribute<User>
+
+  @Attribute({
+    type: DataTypes.INTEGER.UNSIGNED,
+    allowNull: true,
+    references: { table: "events", key: "id" },
+    onUpdate: "CASCADE",
+    onDelete: "SET NULL",
+  })
+  declare parentId: number | null
+
+  @BelongsTo(() => Event, { foreignKey: 'parentId', targetKey: 'id' })
+  declare parent?: NonAttribute<Event>
+
+  @Attribute({
+    type: DataTypes.INTEGER.UNSIGNED,
+    references: { table: "places", key: "id" },
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  declare placeId: number;
+
+  @BelongsTo(() => Place, { foreignKey: 'placeId' })
+  declare place?: NonAttribute<Place>
+
+  @BelongsToMany(() => Tag, { through: 'event_tags', inverse: { as: 'events' } })
+  declare tags?: NonAttribute<Tag[]>
+
+  @Attribute({
+    type: DataTypes.STRING,
+    references: { table: "ap_users", key: "ap_id" },
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  declare apUserApId?: string
+
+  @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
+  declare apUser?: NonAttribute<APUser>
+
+  @HasMany(() => Message, { foreignKey: 'eventId', sourceKey: 'id' })
+  declare messages?: NonAttribute<Message[]>
+
+  @HasMany(() => Resource, { foreignKey: 'eventId', sourceKey: 'id' })
+  declare resources?: NonAttribute<Resource[]>
+
+  @BeforeCreate
+  static async generateSlug(event: Event) {
+    if (event.title && !event.slug) {
+      const baseSlug = slugify(event.title, { lower: true, strict: true })
+      let slug = baseSlug
+      let count = 1
+
+      // Ensure slug is unique
+      while (
+        await Event.findOne({
+          where: { slug, id: { [Op.ne]: event.id } }
+        }) // skip self in case of update
+      ) {
+        slug = `${baseSlug}-${count++}`
       }
+
+      event.slug = slug
     }
-    
-    toAP () {
-    
-        const username = publicSettings.instance_name
-        const opt = {
-          zone: publicSettings.instance_timezone,
-          locale: publicSettings.instance_locale
-        }
-    
-        const datetime = DateTime.fromSeconds(this.start_datetime, opt).toLocaleString({ weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
-        
-        // https://framagit.org/les/gancio/-/issues/304
-        // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-summary
-        const summary = `<p>${this.place && this.place.name}, ${datetime}</p>${this.description}`
-        
-        let attachment: object[] = []
-        let location: object[] = []
-    
-        if (this?.online_locations?.length) {
-          location = this.online_locations.map(url => ({
-            type: 'VirtualLocation',
-            url
-          }))
-          attachment = this.online_locations.map( href => ({
-            type: 'Link',
-            mediaType: 'text/html',
-            name: href,
-            href
-          }))
-        }
-    
-        if (this.place?.name !== 'online') {
-          location.push(this.place?.toAP())
-        }
-    
-        // in case we only have a single location (the common case) do not use an array to simplify federation parser
-        if (location.length === 1) {
-          location = location[0]
-        }
-            
-        if (this?.media?.length) {
-          attachment.push({
-            type: 'Document',
-            mediaType: 'image/jpeg',
-            url: `${config.baseurl}/media/${this.media[0].url}`,
-            name: this.media[0].name || this.title || '',
-            focalPoint: this.media[0].focalPoint || [0, 0]
-          })
-        }
-    
-        let tags = this.tags?.map(tag => tag.tag) ?? []
-        
-        // add default fedi hashtags if needed on local events only
-        if (!this.ap_id && publicSettings.default_fedi_hashtags.length) {
-          tags = [...new Set([...tags, ...publicSettings.default_fedi_hashtags])]
-        }
-    
-        const tag = tags?.map(tag => ({
-          type: 'Hashtag',
-          name: '#' + tag,
-          href: `${publicSettings.baseurl}/tag/${encodeURIComponent(tag)}`
-        })) ?? []
-        
-        console.error('dentro to Ap', this)
-        
-        return {
-          id: this.ap_id ?? `${publicSettings.baseurl}/federation/m/${this.id}`,
-          name: this.title,
-          url: this?.ap_object?.url ?? this?.ap_object?.id ?? `${publicSettings.baseurl}/event/${this.slug || this.id}`,
-          type: 'Event',
-          startTime: DateTime.fromSeconds(this.start_datetime, opt).toISO(),
-          ...( this.end_datetime ? { endTime: DateTime.fromSeconds(this.end_datetime, opt).toISO() } : {} ),
-          location,
-          attachment,
-          tag,
-          published: this.updatedAt,
-          updated: this.updatedAt,
-          attributedTo: this.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
-          to: ['https://www.w3.org/ns/activitystreams#Public'],
-          cc: this.ap_object?.cc ?? [`${publicSettings.baseurl}/federation/u/${username}/followers`],
-          content: this.description || '',
-          summary
-        }
-      }    
+  }
+
+  toAP() {
+
+    const username = publicSettings.instance_name
+    const opt = {
+      zone: publicSettings.instance_timezone,
+      locale: publicSettings.instance_locale
+    }
+
+    const datetime = DateTime.fromSeconds(this.start_datetime, opt).toLocaleString({ weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
+
+    // https://framagit.org/les/gancio/-/issues/304
+    // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-summary
+    const summary = `<p>${this.place && this.place.name}, ${datetime}</p>${this.description}`
+
+    let attachment: object[] = []
+    let location: object[] = []
+
+    if (this?.online_locations?.length) {
+      location = this.online_locations.map(url => ({
+        type: 'VirtualLocation',
+        url
+      }))
+      attachment = this.online_locations.map(href => ({
+        type: 'Link',
+        mediaType: 'text/html',
+        name: href,
+        href
+      }))
+    }
+
+    if (this.place?.name !== 'online') {
+      location.push(this.place?.toAP())
+    }
+
+    // in case we only have a single location (the common case) do not use an array to simplify federation parser
+    if (location.length === 1) {
+      location = location[0]
+    }
+
+    if (this?.media?.length) {
+      attachment.push({
+        type: 'Document',
+        mediaType: 'image/jpeg',
+        url: `${config.baseurl}/media/${this.media[0].url}`,
+        name: this.media[0].name || this.title || '',
+        focalPoint: this.media[0].focalpoint || [0, 0]
+      })
+    }
+
+    let tags = this.tags?.map(tag => tag.tag) ?? []
+
+    // add default fedi hashtags if needed on local events only
+    if (!this.ap_id && publicSettings.default_fedi_hashtags.length) {
+      tags = [...new Set([...tags, ...publicSettings.default_fedi_hashtags])]
+    }
+
+    const tag = tags?.map(tag => ({
+      type: 'Hashtag',
+      name: '#' + tag,
+      href: `${publicSettings.baseurl}/tag/${encodeURIComponent(tag)}`
+    })) ?? []
+
+    console.error('dentro to Ap', this)
+
+    return {
+      id: this.ap_id ?? `${publicSettings.baseurl}/federation/m/${this.id}`,
+      name: this.title,
+      url: this?.ap_object?.url ?? this?.ap_object?.id ?? `${publicSettings.baseurl}/event/${this.slug || this.id}`,
+      type: 'Event',
+      startTime: DateTime.fromSeconds(this.start_datetime, opt).toISO(),
+      ...(this.end_datetime ? { endTime: DateTime.fromSeconds(this.end_datetime, opt).toISO() } : {}),
+      location,
+      attachment,
+      tag,
+      published: this.updatedAt,
+      updated: this.updatedAt,
+      attributedTo: this.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
+      to: ['https://www.w3.org/ns/activitystreams#Public'],
+      cc: this.ap_object?.cc ?? [`${publicSettings.baseurl}/federation/u/${username}/followers`],
+      content: this.description || '',
+      summary
+    }
+  }
 }
 
 @Table({
-    tableName: 'tags'
+  tableName: 'tags'
 })
 export class Tag extends Model<
-InferAttributes<Tag>,
-InferCreationAttributes<Tag>
+  InferAttributes<Tag>,
+  InferCreationAttributes<Tag>
 > {
-    @Attribute(DataTypes.STRING)
-    @PrimaryKey
-    @Index
-    @Unique
-    declare tag: string;
-    
-    // @BelongsToMany(() => Event, { through: 'event_tags' })
-    declare events?: NonAttribute<Event[]>
+  @Attribute(DataTypes.STRING)
+  @PrimaryKey
+  @Index
+  @Unique
+  declare tag: string;
+
+  // @BelongsToMany(() => Event, { through: 'event_tags' })
+  declare events?: NonAttribute<Event[]>
 }
 
 @Table({
-    tableName: 'places'
+  tableName: 'places'
 })
 export class Place extends Model<
-InferAttributes<Place>,
-InferCreationAttributes<Place>
+  InferAttributes<Place>,
+  InferCreationAttributes<Place>
 > {
-    @Attribute(DataTypes.INTEGER.UNSIGNED)
-    @PrimaryKey
-    @AutoIncrement
-    declare readonly id: CreationOptional<number>;
-    
-    @Attribute(DataTypes.STRING)
-    @Index
-    @Unique
-    @NotNull
-    declare name: string
-    
-    @Attribute(DataTypes.STRING)
-    @Index
-    declare ap_id: string
-    
-    @Attribute(DataTypes.STRING)
-    declare address: string
-    
-    @Attribute(DataTypes.DOUBLE)
-    declare latitude: number
-    
-    @Attribute(DataTypes.DOUBLE)
-    declare longitude: number
-    
-    @HasMany(() => Event, /* foreign key */ 'placeId')
-    declare events?: NonAttribute<Event[]>
-    
-    /**
-     * @returns ActivityStream location representation
-     * @link https://www.w3.org/TR/activitystreams-vocabulary/#places
-     * @todo support PostalAddress type
-     * @link WIP -> https://codeberg.org/fediverse/fep/src/commit/4a75a1bc50bc6d19fc1e6112f02c52621bc178fe/fep/8a8e/fep-8a8e.md#location
-     */
-    toAP () {
-      console.error(this)
-      return {
-        id: this?.ap_id ?? `${config.baseurl}/federation/p/${this.id}`,
-        type: 'Place',
-        name: this.name,
-        address: this.address,
-        url: this?.ap_id ?? `${config.baseurl}/place/${this.id}/${encodeURIComponent(this.name)}`,
-        ...( this.latitude && this.longitude && ({ latitude: this.latitude, longitude: this.longitude}))
-      }
-    }
+  @Attribute(DataTypes.INTEGER.UNSIGNED)
+  @PrimaryKey
+  @AutoIncrement
+  declare readonly id: CreationOptional<number>;
 
-    
+  @Attribute(DataTypes.STRING)
+  @Index
+  @Unique
+  @NotNull
+  declare name: string
+
+  @Attribute(DataTypes.STRING)
+  @Index
+  declare ap_id: string
+
+  @Attribute(DataTypes.STRING)
+  declare address: string
+
+  @Attribute(DataTypes.DOUBLE)
+  declare latitude: number
+
+  @Attribute(DataTypes.DOUBLE)
+  declare longitude: number
+
+  @HasMany(() => Event, /* foreign key */ 'placeId')
+  declare events?: NonAttribute<Event[]>
+
+  /**
+   * @returns ActivityStream location representation
+   * @link https://www.w3.org/TR/activitystreams-vocabulary/#places
+   * @todo support PostalAddress type
+   * @link WIP -> https://codeberg.org/fediverse/fep/src/commit/4a75a1bc50bc6d19fc1e6112f02c52621bc178fe/fep/8a8e/fep-8a8e.md#location
+   */
+  toAP() {
+    console.error(this)
+    return {
+      id: this?.ap_id ?? `${config.baseurl}/federation/p/${this.id}`,
+      type: 'Place',
+      name: this.name,
+      address: this.address,
+      url: this?.ap_id ?? `${config.baseurl}/place/${this.id}/${encodeURIComponent(this.name)}`,
+      ...(this.latitude && this.longitude && ({ latitude: this.latitude, longitude: this.longitude }))
+    }
+  }
+
+
 }
 
-type Role = "admin" | "editor" | "user"
+export type UserRole = "admin" | "editor" | "user"
 
 @Table({
-    tableName: "users"
+  tableName: "users"
 })
 export class User extends Model<
-InferAttributes<User>,
-InferCreationAttributes<User>
+  InferAttributes<User>,
+  InferCreationAttributes<User>
 > {
-    @Attribute(DataTypes.INTEGER.UNSIGNED)
-    @PrimaryKey
-    @AutoIncrement
-    declare readonly id: CreationOptional<number>;
-    
-    @Attribute(DataTypes.STRING)
-    declare display_name: string;
-    
-    @Attribute(DataTypes.STRING)
-    @NotNull
-    @Index
-    @Unique({
-      name: 'unique_mail',
-      msg: 'error.email_taken'
-    })
-    declare email: string;
-    
-    @Attribute(DataTypes.STRING)
-    declare password: string
-    
-    @Attribute(DataTypes.STRING)
-    declare recover_code: string
-    
-    @Attribute(DataTypes.BOOLEAN)
-    declare is_active: boolean
-    
-    @Attribute(DataTypes.BOOLEAN)
-    @Default(true)
-    declare to_notify: boolean
-    
-    @Attribute(DataTypes.STRING)
-    declare description: string
-    
-    @Attribute(DataTypes.ENUM(['admin', 'editor', 'user']))
-    declare role: Role
-    
-    @HasMany(() => Event, { foreignKey: 'userId', sourceKey: 'id' })
-    declare events?: NonAttribute<Event[]>
-    
-    @CreatedAt
-    declare readonly createdAt: CreationOptional<Date>
-    
-    @UpdatedAt
-    declare readonly updatedAt: CreationOptional<Date>
-    
-    async generateRecoverCode() {
-      this.recover_code = crypto.randomUUID()
-      await this.save()
-    }
-    
-    async comparePassword(pwd: string) {
-      if (!this.password) { return false }
-      return bcrypt.compare(pwd, this.password)
-    }
-    
-    @BeforeSave
-    static async hashPassword(instance: User) {
-      if (instance.changed('password')) {
-        const password = instance.getDataValue('password')
-        if (password) {
-          log.info('inside hashPassword' , password)
-          const hashedPassword = bcrypt.hashSync(password, 10)
-          instance.setDataValue("password", hashedPassword)
-        }
+  @Attribute(DataTypes.INTEGER.UNSIGNED)
+  @PrimaryKey
+  @AutoIncrement
+  declare readonly id: CreationOptional<number>;
+
+  @Attribute(DataTypes.STRING)
+  declare display_name: string;
+
+  @Attribute(DataTypes.STRING)
+  @NotNull
+  @Index
+  @Unique({
+    name: 'unique_mail',
+    msg: 'error.email_taken'
+  })
+  declare email: string;
+
+  @Attribute(DataTypes.STRING)
+  declare password: string
+
+  @Attribute(DataTypes.STRING)
+  declare recover_code: string
+
+  @Attribute(DataTypes.BOOLEAN)
+  declare is_active: boolean
+
+  @Attribute(DataTypes.BOOLEAN)
+  @Default(true)
+  declare to_notify: boolean
+
+  @Attribute(DataTypes.STRING)
+  declare description: string
+
+  @Attribute(DataTypes.ENUM(['admin', 'editor', 'user']))
+  declare role: UserRole
+
+  @HasMany(() => Event, { foreignKey: 'userId', sourceKey: 'id' })
+  declare events?: NonAttribute<Event[]>
+
+  @CreatedAt
+  declare readonly createdAt: CreationOptional<Date>
+
+  @UpdatedAt
+  declare readonly updatedAt: CreationOptional<Date>
+
+  async generateRecoverCode() {
+    this.recover_code = crypto.randomUUID()
+    await this.save()
+  }
+
+  async comparePassword(pwd: string) {
+    if (!this.password) { return false }
+    return bcrypt.compare(pwd, this.password)
+  }
+
+  @BeforeSave
+  static async hashPassword(instance: User) {
+    if (instance.changed('password')) {
+      const password = instance.getDataValue('password')
+      if (password) {
+        log.info('inside hashPassword', password)
+        const hashedPassword = bcrypt.hashSync(password, 10)
+        instance.setDataValue("password", hashedPassword)
       }
     }
+  }
 }
 
 @Table({
-    tableName: 'instances'
+  tableName: 'instances'
 })
 export class Instance extends Model<
-InferAttributes<Instance>,
-InferCreationAttributes<Instance>
+  InferAttributes<Instance>,
+  InferCreationAttributes<Instance>
 > {
-    @Attribute(DataTypes.STRING)
-    @PrimaryKey
-    declare domain: string
-    
-    @Attribute(DataTypes.STRING)
-    declare name: string
-    
-    @Attribute(DataTypes.BOOLEAN)
-    declare blocked: boolean
-    
-    @Attribute(DataTypes.JSON)
-    declare data: string;
-    
-    @Attribute(DataTypes.STRING)
-    declare applicationActor?: string
-    
-    @HasMany(() => APUser, { foreignKey: 'instanceDomain', sourceKey: 'domain' })
-    declare apUsers?: NonAttribute<APUser[]>
-    
-    // @HasMany(() => Event, /* foreign key */ 'placeId')
-    // declare events?: NonAttribute<Event[]>;
-    
+  @Attribute(DataTypes.STRING)
+  @PrimaryKey
+  declare domain: string
+
+  @Attribute(DataTypes.STRING)
+  declare name: string
+
+  @Attribute(DataTypes.BOOLEAN)
+  declare blocked: boolean
+
+  @Attribute(DataTypes.JSON)
+  declare data: string;
+
+  @Attribute(DataTypes.STRING)
+  declare applicationActor?: string
+
+  @HasMany(() => APUser, { foreignKey: 'instanceDomain', sourceKey: 'domain' })
+  declare apUsers?: NonAttribute<APUser[]>
+
+  // @HasMany(() => Event, /* foreign key */ 'placeId')
+  // declare events?: NonAttribute<Event[]>;
+
 }
 
 
 type APUserObject = {
-    name: string,
-    icon: { url: string },
-    summary?: string,
-    preferredUsername: string,
-    url?: string
+  name: string,
+  icon: { url: string },
+  summary?: string,
+  preferredUsername: string,
+  url?: string
 }
 
 @Table({
-    tableName: 'ap_users'
+  tableName: 'ap_users'
 })
 export class APUser extends Model<
-InferAttributes<APUser>,
-InferCreationAttributes<APUser>
+  InferAttributes<APUser>,
+  InferCreationAttributes<APUser>
 > {
-    @Attribute(DataTypes.STRING)
-    @PrimaryKey
-    declare ap_id: string
-    
-    @Attribute(DataTypes.BOOLEAN)
-    declare follower: boolean
-    
-    @Attribute(DataTypes.BOOLEAN)
-    declare following: boolean
-    
-    @Attribute(DataTypes.BOOLEAN)
-    declare trusted: boolean
-    
-    @Attribute(DataTypes.BOOLEAN)
-    declare blocked: boolean
-    
-    @Attribute(DataTypes.JSON)
-    declare object: APUserObject;
-    
-    @Attribute({
-        type: DataTypes.STRING,
-        references: { table: "instances", key: "domain" },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-    })
-    declare instanceDomain: string
+  @Attribute(DataTypes.STRING)
+  @PrimaryKey
+  declare ap_id: string
 
-    @BelongsTo(() => Instance, { foreignKey: 'instanceDomain', targetKey: 'domain' })
-    declare instance?: NonAttribute<Instance>
-    
-    @HasMany(() => Event, { foreignKey: 'apUserApId', sourceKey: 'ap_id' })
-    declare events?: NonAttribute<Event[]>
-    
-    @HasMany(() => Resource, { foreignKey: 'activitypub_id', sourceKey: 'ap_id' })
-    declare resources?: NonAttribute<Resource[]>
-    
+  @Attribute(DataTypes.BOOLEAN)
+  declare follower: boolean
+
+  @Attribute(DataTypes.BOOLEAN)
+  declare following: boolean
+
+  @Attribute(DataTypes.BOOLEAN)
+  declare trusted: boolean
+
+  @Attribute(DataTypes.BOOLEAN)
+  declare blocked: boolean
+
+  @Attribute(DataTypes.JSON)
+  declare object: APUserObject;
+
+  @Attribute({
+    type: DataTypes.STRING,
+    references: { table: "instances", key: "domain" },
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  declare instanceDomain: string
+
+  @BelongsTo(() => Instance, { foreignKey: 'instanceDomain', targetKey: 'domain' })
+  declare instance?: NonAttribute<Instance>
+
+  @HasMany(() => Event, { foreignKey: 'apUserApId', sourceKey: 'ap_id' })
+  declare events?: NonAttribute<Event[]>
+
+  @HasMany(() => Resource, { foreignKey: 'activitypub_id', sourceKey: 'ap_id' })
+  declare resources?: NonAttribute<Resource[]>
+
 }
 
 @Table({
-    tableName: 'settings'
+  tableName: 'settings'
 })
 export class Setting extends Model<
-InferAttributes<Setting>,
-InferCreationAttributes<Setting>
+  InferAttributes<Setting>,
+  InferCreationAttributes<Setting>
 > {
-    @Attribute(DataTypes.STRING)
-    @PrimaryKey
-    declare key: keyof Settings | keyof SecretSettings
-    
-    @Attribute(DataTypes.JSON)
-    declare value: string | number | boolean | object | null
-    
-    @Attribute(DataTypes.BOOLEAN)
-    @Default(false)
-    declare is_secret: boolean
-    
-    @CreatedAt
-    declare readonly createdAt: CreationOptional<Date>
-    
-    @UpdatedAt
-    declare readonly updatedAt: CreationOptional<Date>
+  @Attribute(DataTypes.STRING)
+  @PrimaryKey
+  declare key: keyof Settings | keyof SecretSettings
+
+  @Attribute(DataTypes.JSON)
+  declare value: string | number | boolean | object | null
+
+  @Attribute(DataTypes.BOOLEAN)
+  @Default(false)
+  declare is_secret: boolean
+
+  @CreatedAt
+  declare readonly createdAt: CreationOptional<Date>
+
+  @UpdatedAt
+  declare readonly updatedAt: CreationOptional<Date>
 }
 
 @Table({
-    tableName: 'collections',
-    timestamps: false
+  tableName: 'collections',
+  timestamps: false
 })
 export class Collection extends Model<
-InferAttributes<Collection>,
-InferCreationAttributes<Collection>
+  InferAttributes<Collection>,
+  InferCreationAttributes<Collection>
 > {
-    
-    @Attribute(DataTypes.INTEGER.UNSIGNED)
-    @PrimaryKey
-    @AutoIncrement
-    declare readonly id: CreationOptional<number>
-    
-    @Attribute(DataTypes.STRING)
-    @Unique
-    @Index
-    @NotNull
-    declare name: string
-    
-    @Attribute(DataTypes.BOOLEAN) // not used yet
-    declare isActor: boolean
-    
-    @Attribute(DataTypes.BOOLEAN) // is this collection shown in the home page navbar? //TODO: rename in showInNavBar or showInHome?
-    declare isTop: boolean
-    
-    @Attribute(DataTypes.INTEGER.UNSIGNED)
-    @Index
-    declare sortIndex: CreationOptional<number>
-    
-    @BeforeCreate
-    static async autoincrementSortIndex (collection: Collection, options: AggregateOptions<InferAttributesOptions<Collection>>) {
-      const maxSort = await Collection.max('sortIndex', { transaction: options.transaction })
-      collection.sortIndex = (maxSort || 0) + 1
-      console.error(collection)
-    }
-    
-    
-    @HasMany(() => Filter, { foreignKey: 'collectionId', sourceKey: 'id' })
-    declare filters?: NonAttribute<Filter[]>
-    
+
+  @Attribute(DataTypes.INTEGER.UNSIGNED)
+  @PrimaryKey
+  @AutoIncrement
+  declare readonly id: CreationOptional<number>
+
+  @Attribute(DataTypes.STRING)
+  @Unique
+  @Index
+  @NotNull
+  declare name: string
+
+  @Attribute(DataTypes.BOOLEAN) // not used yet
+  declare isActor: boolean
+
+  @Attribute(DataTypes.BOOLEAN) // is this collection shown in the home page navbar? //TODO: rename in showInNavBar or showInHome?
+  declare isTop: boolean
+
+  @Attribute(DataTypes.INTEGER.UNSIGNED)
+  @Index
+  declare sortIndex: CreationOptional<number>
+
+  @BeforeCreate
+  static async autoincrementSortIndex(collection: Collection, options: AggregateOptions<InferAttributesOptions<Collection>>) {
+    const maxSort = await Collection.max('sortIndex', { transaction: options.transaction })
+    collection.sortIndex = (maxSort || 0) + 1
+    console.error(collection)
+  }
+
+
+  @HasMany(() => Filter, { foreignKey: 'collectionId', sourceKey: 'id' })
+  declare filters?: NonAttribute<Filter[]>
+
 }
 
 @Table({
@@ -723,106 +705,107 @@ export class Filter extends Model<
   // If collectionId is a foreign key, you may want to add:
   @Attribute(DataTypes.INTEGER)
   declare collectionId: number
-  
+
   @BelongsTo(() => Collection, { foreignKey: 'collectionId', targetKey: 'id' })
   declare collection?: NonAttribute<Collection>
-  
+
 }
 
 
 @Table({
-    tableName: 'resources',
-    timestamps: false
+  tableName: 'resources',
+  timestamps: false
 })
 export class Resource extends Model<
-InferAttributes<Resource>,
-InferCreationAttributes<Resource>
+  InferAttributes<Resource>,
+  InferCreationAttributes<Resource>
 > {
-    
-    @Attribute(DataTypes.STRING)
-    @PrimaryKey
-    declare activitypub_id: string
-    
-    @Attribute(DataTypes.BOOLEAN)
-    declare hidden: boolean
-    
-    @Attribute(DataTypes.JSON)
-    declare data: any // @todo
-    
-    // @Attribute({
-    //     type: DataTypes.STRING,
-    //     references: { table: "ap_users", key: "ap_id" },
-    //     onUpdate: "CASCADE",
-    //     onDelete: "CASCADE",
-    // })
-    // declare apUserApId: string
 
-    // @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
-    // declare apUser?: NonAttribute<APUser>
+  @Attribute(DataTypes.STRING)
+  @PrimaryKey
+  declare activitypub_id: string
 
-    @Attribute({
-      type: DataTypes.INTEGER.UNSIGNED,
-      references: { table: "events", key: "id" },
-      onUpdate: "CASCADE",
-      onDelete: "CASCADE",
-    })
-    declare eventId: number
+  @Attribute(DataTypes.BOOLEAN)
+  declare hidden: boolean
 
-    @BelongsTo(() => Event, { foreignKey: 'eventId', targetKey: 'id' })
-    declare event?: NonAttribute<Event>
+  @Attribute(DataTypes.JSON)
+  declare data: any // @todo
+
+  // @Attribute({
+  //     type: DataTypes.STRING,
+  //     references: { table: "ap_users", key: "ap_id" },
+  //     onUpdate: "CASCADE",
+  //     onDelete: "CASCADE",
+  // })
+  // declare apUserApId: string
+
+  // @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
+  // declare apUser?: NonAttribute<APUser>
+
+  @Attribute({
+    type: DataTypes.INTEGER.UNSIGNED,
+    references: { table: "events", key: "id" },
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  declare eventId: number
+
+  @BelongsTo(() => Event, { foreignKey: 'eventId', targetKey: 'id' })
+  declare event?: NonAttribute<Event>
 }
 
 @Table({
-    tableName: 'pages',
-    timestamps: true
+  tableName: 'pages',
+  timestamps: true
 })
 export class Page extends Model<
-InferAttributes<Page>,
-InferCreationAttributes<Page>
+  InferAttributes<Page>,
+  InferCreationAttributes<Page>
 > {
-    @Attribute(DataTypes.INTEGER.UNSIGNED)
-    @PrimaryKey
-    @AutoIncrement
-    declare readonly id: CreationOptional<number>
+  @Attribute(DataTypes.INTEGER.UNSIGNED)
+  @PrimaryKey
+  @AutoIncrement
+  declare readonly id: CreationOptional<number>
 
-    @Attribute(DataTypes.STRING)
-    declare title: string
-    
-    @Attribute(DataTypes.TEXT)
-    declare content: string
+  @Attribute(DataTypes.STRING)
+  declare title: string
 
-    @Attribute(DataTypes.BOOLEAN)
-    declare visible: boolean
-    
-    @Attribute(DataTypes.STRING)
-    @Index
-    @Unique
-    declare slug: string
+  @Attribute(DataTypes.TEXT)
+  declare content: string
 
-    @BeforeCreate
-    static async generateSlug(page: Page) {
-      if (page.title && !page.slug) {
-        let baseSlug = slugify(page.title, { lower: true, strict: true })
-        let slug = baseSlug
-        let count = 1
-  
-        // Ensure slug is unique
-        while (
-          await Event.findOne({
-            where: { slug, id: { [Op.ne]: page.id } } }) // skip self in case of update
-        ) {
-          slug = `${baseSlug}-${count++}`
-        }
-  
-        page.slug = slug
+  @Attribute(DataTypes.BOOLEAN)
+  declare visible: boolean
+
+  @Attribute(DataTypes.STRING)
+  @Index
+  @Unique
+  declare slug: string
+
+  @BeforeCreate
+  static async generateSlug(page: Page) {
+    if (page.title && !page.slug) {
+      let baseSlug = slugify(page.title, { lower: true, strict: true })
+      let slug = baseSlug
+      let count = 1
+
+      // Ensure slug is unique
+      while (
+        await Event.findOne({
+          where: { slug, id: { [Op.ne]: page.id } }
+        }) // skip self in case of update
+      ) {
+        slug = `${baseSlug}-${count++}`
       }
-    }    
-    
-    @CreatedAt
-    declare readonly createdAt: CreationOptional<Date>
 
-    @UpdatedAt
-    declare readonly updatedAt: CreationOptional<Date>
+      page.slug = slug
+    }
+  }
+
+  @CreatedAt
+  declare readonly createdAt: CreationOptional<Date>
+
+  @UpdatedAt
+  declare readonly updatedAt: CreationOptional<Date>
 }
 
 export const NotificationActionEnum = ['Create', 'Update', 'Delete'] as const
@@ -842,21 +825,21 @@ export type NotificationType = typeof NotificationTypeEnum[number]
   ]
 })
 export class Notification extends Model<
-    InferAttributes<Notification>,
-    InferCreationAttributes<Notification>
+  InferAttributes<Notification>,
+  InferCreationAttributes<Notification>
 > {
-    @Attribute(DataTypes.JSON)
-    declare filters: any
+  @Attribute(DataTypes.JSON)
+  declare filters: any
 
-    @Attribute(DataTypes.STRING)
-    declare email: string
+  @Attribute(DataTypes.STRING)
+  declare email: string
 
-    @Attribute(DataTypes.STRING)
-    declare remove_code: string
+  @Attribute(DataTypes.STRING)
+  declare remove_code: string
 
-    @Attribute(DataTypes.ENUM(...NotificationActionEnum))
-    declare action: NotificationAction
+  @Attribute(DataTypes.ENUM(...NotificationActionEnum))
+  declare action: NotificationAction
 
-    @Attribute(DataTypes.ENUM(...NotificationTypeEnum))
-    declare type: NotificationType
+  @Attribute(DataTypes.ENUM(...NotificationTypeEnum))
+  declare type: NotificationType
 }

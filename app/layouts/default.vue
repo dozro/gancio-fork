@@ -22,7 +22,7 @@ useHead ({
     <CoreAppBar />
     <v-main>
       <CoreDialog />
-      <NuxtPage />
+      <slot />
     </v-main>
     <CoreNotification />
     <CoreFooter />
