@@ -51,8 +51,7 @@ export let sequelize: Sequelize | undefined
 
 export async function connect() {
   if (sequelize) { return sequelize }
-
-  if (['sqlite', 'sqlite3'].includes(config.db.dialect)) {
+  if ('sqlite3' === config.db.dialect) {
     log.info(`Connecting to sqlite db ${config.db.storage}`)
   } else {
     log.info(`Connecting to ${config.db.dialect} host: ${config.db.host}:${config.db.port} database: ${config.db.database}`)
