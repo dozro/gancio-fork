@@ -2,7 +2,6 @@
 
  -->
 <script setup lang="ts">
-import type { Event } from '#build/types/nitro-imports'
 
 const { loggedIn } = useUserSession()
 const { $notify } = useNuxtApp()
@@ -13,19 +12,20 @@ useHead({ title: `${settings.value.title} - ${t('common.add_event')}` })
 
 const route = useRoute()
 
+const event = ref<EventAPI>()
 const eventId = route.params.eventId
-let event
+const { data , error } = await useFetch<EventAPI>(() => `/api/event/detail/${route.params.eventId}`)
 if (route.params.eventId) {
-  ({ data: event } = await useFetch<Event>(() => `/api/event/detail/${route.params.eventId}`))
-} else {
-  event = ref({ title: '', tags: [], place: {}, recurrent: null, media: [] })
+  if (error.value) {
+    throw createError(error.value)
+  }
+  if (!data.value) {
+    throw createError({ status: 404, statusMessage: 'Event not found' })
+  } else {
+    event.value = data.value
+  }
 }
 
-if (!event?.value) {
-  throw createError({ status: 404, message: 'Event not found' })
-}
-
-const date = ref()
 const valid = ref(false)
 const loading = ref(false)
 const form = ref()
@@ -40,32 +40,32 @@ async function done() {
   if (loading.value) {
     return
   }
-  
+
   if (!form.value.validate()) {
     console.error('validation error!')
     return
   }
-  
+
   loading.value = true
 
   const formData = new FormData()
   // formData.append('recurrent', JSON.stringify(evt.date.recurrent))
 
-  if (evt.media.length) {
-    formData.append('image', evt.media[0].image)
-    if (evt.media[0].url) {
+  if (evt?.media?.length) {
+    formData.append('image', evt.media[0]?.image)
+    if (evt.media[0]?.url) {
       formData.append('image_url', evt.media[0].url)
     }
-    formData.append('image_name', evt.media[0].name)
-    formData.append('image_focalpoint', evt.media[0].focalpoint)
+    formData.append('image_name', evt.media[0]?.name)
+    formData.append('image_focalpoint', evt.media[0]?.focalpoint)
   }
 
   formData.append('title', evt.title)
-  if (evt.place.id) {
-    formData.append('place_id', evt.place.id)
+  if (evt.place?.id) {
+    formData.append('place_id', evt.place?.id)
   }
-  formData.append('place_name', evt.place.name.trim())
-  formData.append('place_address', evt.place.address || null)
+  formData.append('place_name', evt.place?.name.trim())
+  formData.append('place_address', evt.place?.address || null)
 
   if (settings.value.allow_geolocation) {
     formData.append('place_latitude', evt.place.latitude || '')
@@ -90,11 +90,9 @@ async function done() {
     formData.append('tags[]', '')
   }
 
-  if (evt.tags) { evt.tags.forEach(tag => formData.append('tags[]', tag?.tag ?? tag)) }
-  
   // 
   try {
-    const ret = eventId ? 
+    const ret: EventAPI = eventId ?
       await $fetch(`/api/events/${eventId}`, { method: 'PUT', body: formData }) :
       await $fetch('/api/events', { method: 'POST', body: formData })
 
@@ -104,16 +102,15 @@ async function done() {
     } else {
       navigateTo('/')
     }
-    
+
     $notify(loggedIn.value ? (eventId ? 'event.saved' : 'event.added') : 'event.added_anon', Statuses.SUCCESS)
   } catch (e) {
-    console.error(e)
     switch (e?.request?.status) {
       case 413:
         $notify('event.image_too_big', Statuses.ERROR)
         break
       default:
-        $notify(e?.response?.data ?? e, Statuses.ERROR)
+        $notify(e, Statuses.ERROR)
     }
   }
   loading.value = false
@@ -156,10 +153,8 @@ const normalizedTags = computed({
 
               <!-- Title -->
               <v-col cols=12>
-                <v-text-field v-model="event.title" prepend-icon='mdi-format-title' 
-                  :label="$t('common.title')"
-                  :rules="[$valid.required('common.title')]"
-                  autofocus ref='title' />
+                <v-text-field v-model="event.title" prepend-icon='mdi-format-title' :label="$t('common.title')"
+                  :rules="[$valid.required('common.title')]" autofocus ref='title' />
               </v-col>
 
               <!-- Where -->
@@ -169,16 +164,13 @@ const normalizedTags = computed({
 
               <!-- When -->
               <DateInput ref="when" v-model:event="event" />
-  
+
               <!-- Description -->
               <v-col class='px-0' cols='12'>
-                <CoreEditor class='px-3 ma-0'
-                  :label="$t('event.description_description')"
-                  v-model='event.description'
-                  :placeholder="$t('event.description_description')"
-                  max-height='400px' />
+                <CoreEditor class='px-3 ma-0' :label="$t('event.description_description')" v-model='event.description'
+                  :placeholder="$t('event.description_description')" max-height='400px' />
               </v-col>
-  
+
               <!-- MEDIA / FLYER / POSTER -->
               <v-col cols=12 md=6>
                 <MediaInput v-model:event='event' />
@@ -188,7 +180,7 @@ const normalizedTags = computed({
               <v-col cols=12 md=6>
                 <v-combobox v-model:search="searchTag" v-model="normalizedTags" prepend-icon="mdi-tag-multiple" chips
                   multiple closable-chips hide-no-data hide-selected persistent-hint :loading="statusTags === 'pending'"
-                  :delimiters="[',', ';']" :items="tags || []" :menu-props="{ maxWidth: 400, eager: true }"
+                  :delimiters="[',', ';']" :items="tags || []"
                   :label="$t('common.tags')">
                 </v-combobox>
               </v-col>
@@ -200,9 +192,9 @@ const normalizedTags = computed({
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='done'>{{ eventId ?
-          $t('common.save') : $t('common.send') }}</v-btn>
-      </v-card-actions>
-    </v-card>
+        <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='done'>{{
+          eventId ?
+            $t('common.save') : $t('common.send') }}</v-btn>
+      </v-card-actions> </v-card>
   </v-container>
 </template>
