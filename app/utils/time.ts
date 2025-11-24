@@ -1,4 +1,3 @@
-import type { Event } from '#build/types/nitro-imports'
 import { DateTime } from 'luxon'
 
 function currentMonth () {
@@ -29,8 +28,8 @@ function timeToISO (time: number) {
 function time (datetime: number) {
   return DateTime.local(datetime).toString()
 }
-  
-function when (event: Event) {
+
+function when(event: EventAPI) {
   const settings = useState<Settings>('settings')
 const { locale } = useI18n()
 
