@@ -1,6 +1,7 @@
 import { Event, Place, Tag, User, Resource, APUser } from "~~/server/utils/sequelize"
 import { Op } from '@sequelize/core'
 import { htmlToText } from 'html-to-text'
+import { EventAPI } from "~~/shared/types/generic"
 
 /**
  * Get event details.
@@ -30,7 +31,7 @@ export default defineEventHandler(async evt => {
   const event = await Event.findOne({
     where,
     attributes: {
-      exclude: ['createdAt', 'updatedAt', 'placeId', 'apUserApId']
+      exclude: ['createdAt', 'placeId', 'apUserApId']
     },
     include: [
       { model: Tag, required: false, attributes: ['tag'], through: { attributes: [] } },
@@ -49,34 +50,24 @@ export default defineEventHandler(async evt => {
   })
 
   if (!event) {
-    throw createError({ status: 404, message: 'Not found' })
+    throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 
-  // admin, editors and event's owner gets the number of messages (could open moderation)
+  // admin, editors and event's owner gets the number of moderation messages (could open moderation)
   let n_messages = 0
   if (isAdminOrEditor || event.userId !== user?.id) {
     n_messages = await Message.count({ where: { eventId: event.id, ...(!isAdminOrEditor && { is_author_visible: true }) } }).catch(() => 0)
   }
 
   if (!event || !event.is_visible && !isAdminOrEditor) {
-    throw createError({ status: 404 })
+    throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 
   if (format === 'json') {
-    const retEvent = event.get()
-    retEvent.isMine = event.userId === user?.id
-    retEvent.isAnon = event.userId === null || !event?.user?.is_active
-    retEvent.n_messages = n_messages
-    retEvent.original_url = event?.ap_object?.url || event?.ap_object?.id
-    delete retEvent.ap_object
-    delete retEvent.user
-    delete retEvent.userId
-    retEvent.tags = retEvent?.tags?.map(t => t.tag)
-    retEvent.end_datetime = Number(retEvent.end_datetime) || null
-    retEvent.plain_description = htmlToText(retEvent.description)
-    return retEvent
+    const data = mapEvent(event)
+    return handleHttpCache(evt, { data, lastModified: event.updatedAt })
   } else if (format === 'jsonld' || format === 'json-ld') {
-    return event.toAP()
+    return handleHttpCache(evt, { data: event.toAP(), lastModified: event.updatedAt })
   } else if (format === 'ics') {
     // last arg is alarms/reminder, ref: https://github.com/adamgibbons/ics#attributes (alarms)
     return exportICS(evt, [event], [{
