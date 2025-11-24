@@ -32,10 +32,8 @@ async function remove(parent = false) {
 
 async function toggle(parent = false) {
   const id = parent ? props.event.parentId : props.event.id
-  const is_visible = parent ? props.event.parent.is_visible : props.event.is_visible
-  const method = is_visible ? 'unconfirm' : 'confirm'
   try {
-    await $fetch(`/api/events/${id}/${method}`, { method: 'PUT' })
+    await $fetch(`/api/events/${id}/toggle`, { method: 'PUT' })
     emit('update')
   } catch (e) {
     $notify(e, Statuses.ERROR)
@@ -59,10 +57,6 @@ async function reannounce() {
 <template>
   <v-list>
     <v-divider>{{ $t('common.admin_actions') }}</v-divider>
-    <!-- <v-list-group value='Admin'>
-      <template v-slot:activator="{ props }" >
-        <v-list-item class="text-overline" v-bind='props'>{{$t('common.admin_actions')}}</v-list-item>
-      </template> -->
 
     <!-- Hide / confirm event -->
     <v-list-item @click="toggle(false)" :prepend-icon="event?.is_visible ?? false ? 'mdi-eye-off' : 'mdi-eye'"
