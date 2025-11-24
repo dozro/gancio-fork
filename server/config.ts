@@ -1,7 +1,8 @@
 import path from 'path'
 import dotenv from 'dotenv'
 import fs from 'fs'
-import { z, ZodError } from 'zod'
+import { z } from 'zod'
+import Sequelize from '@sequelize/core'
 
 export const ProxyAuthSchema = z.object({
   username: z.string().optional().default(""),
@@ -14,12 +15,16 @@ export const ProxySchema = z.object({
   host: z.string().optional().default(""),
   port: z.string().optional().default(""),
   auth: ProxyAuthSchema,
-  headers: z.record(z.any()).optional().default({}),
+  headers: z.record(z.string(), z.string()).optional().default({}),
 })
 
+
+export type DialectName = 'sqlite3' | 'mariadb' | 'postgresql'
 export const DbSchema = z.object({
-  dialect: z.enum(['sqlite3', 'mariadb', 'postgresql']).default('sqlite3'),
-  storage: z.string().optional(),            // sqlite only
+  dialect: z.enum(['sqlite', 'sqlite3', 'mariadb', 'postgresql'])
+    .default('sqlite3')
+    .transform(t => t === 'sqlite' ? 'sqlite3' : t),
+  storage: z.string().optional(), // sqlite only
   host: z.string().optional(),
   port: z.coerce.number().optional(),
   username: z.string().optional(),
@@ -75,7 +80,7 @@ export function get(): Config {
     log_level: process.env.LOG_LEVEL || 'debug',
     log_path: path.resolve(process.env.LOG_PATH || '', 'logs'),
     db: {
-      dialect: (process.env.DB_DIALECT || 'sqlite') as 'sqlite' | 'mariadb',
+      dialect: (process.env.DB_DIALECT || 'sqlite3') as DialectName,
       storage: process.env.DB_STORAGE || 'gancio.sqlite'
     },
     user_locale: path.resolve(process.env.USER_LOCALE || 'user_locale'),
