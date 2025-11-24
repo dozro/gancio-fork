@@ -2,8 +2,10 @@ import { Event, Message } from "./sequelize"
 import { DateTime } from 'luxon'
 import { Op, literal, col, where, fn, Filterable, InferAttributes, WhereOptions, sql } from '@sequelize/core'
 
+import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
 import { EventAttributes } from "ics"
+import { EventAPI } from "~~/shared/types/generic"
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
   end: z.coerce.number().optional(),
@@ -32,15 +34,15 @@ export const eventQuerySchema = z.object({
   include_parent: z.coerce.boolean().default(false).optional(),
   include_description: z.coerce.boolean().default(false).optional(),
   inlude_ap_events: z.coerce.boolean().default(false).optional(),
-}).transform( o => ({
+}).transform(o => ({
   ...o,
   ...(o.max && { limit: o.max })
 }))
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-export async function getEvents(opts?: EventQueryType | undefined): Promise<Event[]> {
-  const args  = eventQuerySchema.parse(opts)
-  const condition = {//} // : WhereOptions<InferAttributes<Event, { omit: never; }>> = {
+export async function getEvents(opts?: EventQueryType | undefined): Promise<EventAPI[]> {
+  const args = eventQuerySchema.parse(opts)
+  const condition: WhereOptions<InferAttributes<Event>> = {//} // : WhereOptions<InferAttributes<Event, { omit: never; }>> = {
     [Op.or]: {
       start_datetime: { [args.older ? Op.lte : Op.gte]: args.start },
       end_datetime: { [args.older ? Op.lte : Op.gte]: args.start }
@@ -48,6 +50,7 @@ export async function getEvents(opts?: EventQueryType | undefined): Promise<Even
   }
 
   if (args.user_id) {
+    // TODO: check why userId does not exists on whereOptions here
     condition.userId = args.user_id
   }
 
@@ -85,7 +88,7 @@ export async function getEvents(opts?: EventQueryType | undefined): Promise<Even
       { placeId: args.places },
       sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('Event', 'id')} AND ${sql.identifier('tagTag')} in ${sql.list(args.tags)})`
     ]
-  
+
   } else if (args.tags) {
     condition[Op.and] = sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('Event', 'id')} AND ${sql.identifier('tagTag')} in (${sql.list(args.tags)}))`
   } else if (args.places) {
@@ -115,9 +118,9 @@ export async function getEvents(opts?: EventQueryType | undefined): Promise<Even
     attributes: {
       exclude: [
         'userId', 'createdAt', 'placeId', 'ap_object', 'ap_id',
-        ...(!args.include_parent ? ['recurrent']: []),
-        ...(!args.include_unconfirmed ? ['is_visible']: []),
-        ...(!args.include_description ? ['description']: [])
+        ...(!args.include_parent ? ['recurrent'] : []),
+        ...(!args.include_unconfirmed ? ['is_visible'] : []),
+        ...(!args.include_description ? ['description'] : [])
       ]
     },
     order: [['start_datetime', args.reverse ? 'DESC' : 'ASC']],
@@ -138,64 +141,44 @@ export async function getEvents(opts?: EventQueryType | undefined): Promise<Even
   })
 
   // return events
-  return mapEvents(events)
+  return mapEvents(events as Event[])
 }
 
+export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User): EventAPI {
+  const response: EventAPI = {
 
-export function mapEvent (event: Event, place?: Place, tags?: Tag[]): Event {
-  const e = event.get()
-  
-  if (e.tags) {
-    e.tags = e.tags.map(t => t && t.tag)
+    id: event?.id,
+
+    title: event.title,
+    description: event.description,
+    media: event.media,
+
+    start_datetime: event.start_datetime,
+    end_datetime: event.end_datetime,
+    plain_description: htmlToText(event.description),
+
+    place: event?.place?.toJSON() ?? place?.toJSON(),
+    tags: (event.tags ?? tags)?.map(t => t.tag),
+    is_mine: event.userId === user?.id,
+    is_anon: event.userId === null || !event?.user?.is_active,
+    is_visible: event.is_visible,
+    original_url: event?.ap_object?.url ?? event?.ap_id,
   }
 
-  if (tags) {
-    e.tags = tags.map(t => t && t.tag)
+  if (event.apUser) {
+    response.ap_user = { image: event?.apUser?.object?.icon?.url ?? `${event?.apUser?.url}/favicon.ico` }
   }
 
-  e.end_datetime = Number(e.end_datetime) || null
+  return response
 
-  if (!e.multidate) {
-    delete e.multidate
-  }
-
-  if (!e.image_path) {
-    delete e.image_path
-  }
-
-  if (!e.recurrent) {
-    delete e.recurrent
-  }
-
-  if (!e.parentId) {
-    delete e.parentId
-  }
-
-  if (!e.media) {
-    delete e.media
-  }
-
-  if (!e.online_locations) {
-    delete e.online_locations
-  }
-
-  if (e.ap_user) {
-    e.ap_user = { image: e.ap_user?.object?.icon?.url ?? `${e.ap_user?.url}/favicon.ico` }
-  }
-
-  if (place) {
-    e.place = place.toJSON()
-  }
-
-  return e 
 }
 
-export function mapEvents (events: Event[]) : Event[] {
+export function mapEvents(events: Event[]): EventAPI[] {
   return events.map(e => mapEvent(e))
 }
 
 export async function getMessages(eventId: number) {
-  const event = await Event.findByPk(eventId, { include: [{ model: Message, as: 'messages' } ] })
+  const event = await Event.findByPk(eventId, { include: [{ model: Message, as: 'messages' }] })
   if (!event) {
     throw createError({ status: 400 })
   }
