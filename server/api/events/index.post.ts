@@ -45,7 +45,6 @@ export default defineEventHandler(async evt => {
     throw createError({ status: 403, message: 'Anonymous event creation not allowed', statusMessage: 'Anonymous event creation not allowed' })
   }
 
-
   const multiPartBody = await parseMultipartFormData(evt)
   const jsonBody = await readBody(evt)
   const body = multiPartBody || jsonBody

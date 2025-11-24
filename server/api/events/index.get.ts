@@ -20,6 +20,6 @@ import { eventQuerySchema } from "~~/server/utils/events"
 * - [usage example](https://framagit.org/les/gancio/-/blob/master/webcomponents/src/GancioEvents.svelte#L18-42)
 */
 export default defineEventHandler(async (event) => {
-    const opt = await getValidatedQuery(event, eventQuerySchema.parse)
-    return getEvents(opt)
+  const opt = await getValidatedQuery(event, eventQuerySchema.parse)
+  return getEvents(opt)
 })
