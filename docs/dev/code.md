@@ -4,6 +4,7 @@ title: Code
 permalink: /dev/code
 parent: Hacking
 nav_order: 2
+has_toc: true
 ---
 
 # Code
@@ -257,3 +258,32 @@ const { isAdmin } = useAuth()
 
 
 ### Theme (system / light / dark)
+## Manage errors
+
+Both in client and in server you can `throw createError` using `statusCode` and `statusMessage` fields.
+Let's say I'm visiting an event that does not exists:  
+in the page component (`app/pages/event/[slug].vue`) we will try to get the event details and throw an error if we fail:
+
+```ts
+const { data: event, refresh, error } = await useFetch<EventAPI>(`/api/event/detail/${route.params.slug}` )
+if (!event.value || error.value) {
+  throw createError({
+    statusCode: error.value?.statusCode ?? 500,
+    statusMessage: error.value?.statusMessage ?? 'Fetch Error'
+  })
+}
+```
+
+In back-end (`server/api/event/detail/[slug_or_id].ts`) we can use the same `createError`:
+
+```javascript
+if (!event) {
+  log.warn(`Event not found: ${slug_or_id}`)
+  throw createError({ statusCode: 404, statusMessage: 'Event not found' })
+}
+```
+
+Note that in UI errors will be rendered in a specific error page in `app/error.vue`
+
+Check nuxt documentation for details => <https://nuxt.com/docs/4.x/getting-started/error-handling>
+
