@@ -1,19 +1,12 @@
 import { describe, expect, it } from "vitest"
 import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
 import { DateTime } from "luxon"
-import { fetchWithAuth } from './setup.js'
+import { fetchWithAuth, admin, setCookie, setToken, cookie } from './setup.js'
 
 const base_url = 'http://localhost:13120'
-
 await setup({ host: base_url })
-
-const admin = JSON.stringify({ email: 'admin', password: 'password', grant_type: 'password', client_id: 'self' })
-let cookie// : string | null
-let token //: string | null
-
-// let app
-let places = []
 let event_id
+let places = []
 
 describe('Basic', () => {
   it('shoud return an empty list', async () => {
@@ -32,8 +25,9 @@ describe('Authentication / Authorization', () => {
     const { status } = await fetch('/api/login', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: 'admin', password: 'wrong' })})
-    
+      body: JSON.stringify({ email: 'admin', password: 'wrong' })
+    })
+
     expect(status).toBe(401)
   })
 
@@ -43,23 +37,23 @@ describe('Authentication / Authorization', () => {
       headers: { 'content-type': 'application/json' },
       body: admin
     })
-    
+
     expect(ret.status).toBe(200)
     const user = await ret.json()
     expect(user?.id).toBeDefined()
   })
 
   it('should authenticate with correct user/password', async () => {
-    const { status, headers }= await fetch('/api/login', {
+    const { status, headers } = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: admin
     })
 
     expect(status).toBe(200)
-    const setCookie = headers.get('set-cookie')
-    expect(setCookie).toContain('nuxt-session=')
-    cookie = setCookie
+    const cookie = headers.get('set-cookie')
+    expect(cookie).toContain('nuxt-session=')
+    setCookie(cookie)
   })
 
   it('should get user when authenticated via cookie', async () => {
@@ -69,7 +63,7 @@ describe('Authentication / Authorization', () => {
     // const user = await response.json()
     // expect(user.email).toBe('admin')
   })
-  
+
   // it('should authenticate with correct user/password and get JWT token', async () => {
   //   const response = await fetch('/api/login/token', {
   //     method: 'POST',
@@ -83,7 +77,7 @@ describe('Authentication / Authorization', () => {
   //   expect(typeof json.access_token).toBe('string')
   //   token = json.access_token
   // })
-  
+
   // it('should get user when authenticated via JWT', async () => {
   //   const response = await fetch('/api/user', { headers: { 'Authorization': `Bearer ${token}` } })
   //   expect(response.ok).toBe(true)
@@ -95,7 +89,7 @@ describe('Authentication / Authorization', () => {
 describe('Settings', () => {
 
   it('should not change settings when not allowed', async () => {
-    const response = await fetch('/api/settings', { method: 'PUT', body: JSON.stringify({ key: 'allow_anon_event', value: false })})
+    const response = await fetch('/api/settings', { method: 'PUT', body: JSON.stringify({ key: 'allow_anon_event', value: false }) })
     expect(response.status).toBe(401)
   })
 
@@ -105,50 +99,50 @@ describe('Settings', () => {
     expect(response.ok).toBe(true)
   })
 
-//   it('should retrieve stored array settings', async () => {
-//     await request(app).post('/api/settings')
-//       .auth(token.access_token, { type: 'bearer' })
-//       .send({ key: 'test', value: [1, 2, 'test'] })
-//       .expect(200)
+  //   it('should retrieve stored array settings', async () => {
+  //     await request(app).post('/api/settings')
+  //       .auth(token.access_token, { type: 'bearer' })
+  //       .send({ key: 'test', value: [1, 2, 'test'] })
+  //       .expect(200)
 
-//     const response = await request(app)
-//       .get('/api/settings')
-//       .auth(token.access_token, { type: 'bearer' })
-//       .expect(200)
+  //     const response = await request(app)
+  //       .get('/api/settings')
+  //       .auth(token.access_token, { type: 'bearer' })
+  //       .expect(200)
 
-//     expect(response.body.test.length).toBe(3)
-//     expect(response.body.test).toStrictEqual([1, 2, 'test'])
-//   })
-
-
-//   it('should retrieve stored object settings', async () => {
-//     await request(app).post('/api/settings')
-//       .auth(token.access_token, { type: 'bearer' })
-//       .send({ key: 'test', value: { name: 'test object' } })
-//       .expect(200)
-
-//     const response = await request(app)
-//       .get('/api/settings')
-//       .auth(token.access_token, { type: 'bearer' })
-//       .expect(200)
-
-//     expect(response.body.test.name).toBe('test object')
-//   })
+  //     expect(response.body.test.length).toBe(3)
+  //     expect(response.body.test).toStrictEqual([1, 2, 'test'])
+  //   })
 
 
-//   it('should retrieve stored string settings', async () => {
-//     await request(app).post('/api/settings')
-//       .auth(token.access_token, { type: 'bearer' })
-//       .send({ key: 'test', value: 'test string' })
-//       .expect(200)
+  //   it('should retrieve stored object settings', async () => {
+  //     await request(app).post('/api/settings')
+  //       .auth(token.access_token, { type: 'bearer' })
+  //       .send({ key: 'test', value: { name: 'test object' } })
+  //       .expect(200)
 
-//     const response = await request(app)
-//       .get('/api/settings')
-//       .auth(token.access_token, { type: 'bearer' })
-//       .expect(200)
+  //     const response = await request(app)
+  //       .get('/api/settings')
+  //       .auth(token.access_token, { type: 'bearer' })
+  //       .expect(200)
 
-//     expect(response.body.test).toBe('test string')
-//   })
+  //     expect(response.body.test.name).toBe('test object')
+  //   })
+
+
+  //   it('should retrieve stored string settings', async () => {
+  //     await request(app).post('/api/settings')
+  //       .auth(token.access_token, { type: 'bearer' })
+  //       .send({ key: 'test', value: 'test string' })
+  //       .expect(200)
+
+  //     const response = await request(app)
+  //       .get('/api/settings')
+  //       .auth(token.access_token, { type: 'bearer' })
+  //       .expect(200)
+
+  //     expect(response.body.test).toBe('test string')
+  //   })
 
 })
 
@@ -162,7 +156,7 @@ describe('Events', () => {
     }
 
     const promises = Object.keys(required_fields).map(async field => {
-      
+
       const response = await fetchWithAuth('/api/events', 'POST', required_fields[field])
       expect(response.status).toBe(400)
       expect(response.statusText).toBe(`${field} required`)
@@ -178,13 +172,13 @@ describe('Events', () => {
     response = await fetchWithAuth('/api/events', 'POST', undefined, 'none')
     expect(response.ok).toBe(false)
 
-    response = await fetchWithAuth('/api/events', 'POST',{ title: 'test title 2', place_name: 'place name', place_address: 'address', tags: ['test'], start_datetime: DateTime.now().toUnixInteger() + 1000 })
+    response = await fetchWithAuth('/api/events', 'POST', { title: 'test title 2', place_name: 'place name', place_address: 'address', tags: ['test'], start_datetime: DateTime.now().toUnixInteger() + 1000 })
     expect(response.ok).toBe(true)
 
     expect(response.data.place.id).toBeDefined()
     places.push(response.data.place.id)
 
-    response = await fetchWithAuth('/api/settings', 'PUT', { key: 'allow_anon_event', value: true})
+    response = await fetchWithAuth('/api/settings', 'PUT', { key: 'allow_anon_event', value: true })
     expect(response.status).toBe(200)
 
     response = await fetchWithAuth('/api/events', 'POST', { title: 'test title 3', place_name: 'place name 2', place_address: 'address 2', tags: ['test'], start_datetime: DateTime.now().toUnixInteger() + 1000 }, 'none')
@@ -199,186 +193,186 @@ describe('Events', () => {
   it('should not confirm anon events', async () => {
     const response = await fetchWithAuth('/api/events', 'POST', { title: 'test title 6', place_id: 1, start_datetime: DateTime.now().toUnixInteger() + 1000 }
       , 'none')
-    
+
     expect(response.data.is_visible).toBe(false)
     event_id = response.data.id
   })
 
-//   it('should not get unconfirmed events', async () => {
-//     let response = await request(app).get(`/api/event/detail/${event_id}`)
-//       .expect(404)
+  //   it('should not get unconfirmed events', async () => {
+  //     let response = await request(app).get(`/api/event/detail/${event_id}`)
+  //       .expect(404)
 
-//       response = await request(app).get(`/api/event/detail/${event_id}`)
-//       .auth(token.access_token, { type: 'bearer' })
-//       .expect(200)      
-//   })
+  //       response = await request(app).get(`/api/event/detail/${event_id}`)
+  //       .auth(token.access_token, { type: 'bearer' })
+  //       .expect(200)      
+  //   })
 
-//   it('should confirm event if allowed', async () => {
-//     let response = await request(app).put(`/api/event/confirm/${event_id}`)
-//       .send()
-//       .expect(403)
+  //   it('should confirm event if allowed', async () => {
+  //     let response = await request(app).put(`/api/event/confirm/${event_id}`)
+  //       .send()
+  //       .expect(403)
 
-//     response = await request(app).put(`/api/event/confirm/${event_id}`)
-//       .auth(token.access_token, { type: 'bearer' })
-//       .send()
-//       .expect(200)      
-//   })
+  //     response = await request(app).put(`/api/event/confirm/${event_id}`)
+  //       .auth(token.access_token, { type: 'bearer' })
+  //       .send()
+  //       .expect(200)      
+  //   })
 
-//   it('should not allow start_datetime greater than end_datetime', async () => {
+  //   it('should not allow start_datetime greater than end_datetime', async () => {
 
-//     const event = {
-//       title: ' test title 5',
-//       place_id: places[0],
-//       start_datetime: dayjs().unix() + 1000,
-//       end_datetime: dayjs().unix(),
-//     }
+  //     const event = {
+  //       title: ' test title 5',
+  //       place_id: places[0],
+  //       start_datetime: dayjs().unix() + 1000,
+  //       end_datetime: dayjs().unix(),
+  //     }
 
-//     const response = await request(app).post('/api/event')
-//       .send(event)
-//       .expect(400)
-    
-//     expect(response.text).toBe('start datetime is greater than end datetime')
-//   })
+  //     const response = await request(app).post('/api/event')
+  //       .send(event)
+  //       .expect(400)
 
-//   it('should not allow start_datetime greater than 3000', async () => {
+  //     expect(response.text).toBe('start datetime is greater than end datetime')
+  //   })
 
-//     const event = {
-//       title: ' test title 5',
-//       start_datetime: dayjs().set('year', 4000).unix(),
-//       place_id: places[0],
-//     }
+  //   it('should not allow start_datetime greater than 3000', async () => {
 
-//     const response = await request(app).post('/api/event')
-//       .send(event)
-//       .expect(400)
+  //     const event = {
+  //       title: ' test title 5',
+  //       start_datetime: dayjs().set('year', 4000).unix(),
+  //       place_id: places[0],
+  //     }
 
-//     expect(response.text).toBe('are you sure?')
-//   })
+  //     const response = await request(app).post('/api/event')
+  //       .send(event)
+  //       .expect(400)
 
-//   it('should validate start_datime', async () => {
-//     const event = {
-//       title: ' test title 5',
-//       start_datetime: "antani",
-//       place_id: places[0],
-//     }
+  //     expect(response.text).toBe('are you sure?')
+  //   })
 
-//     const response = await request(app).post('/api/event')
-//       .send(event)
-//       .expect(400)
-//   })
+  //   it('should validate start_datime', async () => {
+  //     const event = {
+  //       title: ' test title 5',
+  //       start_datetime: "antani",
+  //       place_id: places[0],
+  //     }
 
-
-//   it('should validate end_datime', async () => {
-//     const event = {
-//       title: ' test title 5',
-//       start_datetime: dayjs().unix() + 1000,
-//       end_datetime: "Antani",
-//       place_id: places[0],
-//     }
-
-//     const response = await request(app).post('/api/event')
-//       .send(event)
-//       .expect(400)
-//   })
-
-//   it('should not allow create anonymous event in the past', async() => {
-//     const time_in_past = dayjs().unix() - 1;
-
-//     await request(app).post('/api/event')
-//       .send({
-//         title: 'anonymous event in the past',
-//         place_id: places[0],
-//         start_datetime: time_in_past
-//       })
-//       .expect(400)
-//       .then(response => {
-//         expect(response.text)
-//           .toEqual('Anonymous user cannot create past events')
-//       })
-//   })
-
-//   it('should allow create event in the past when authenticated', async() => {
-//     const time_in_past = dayjs().unix() - 1
-
-//     await request(app).post('/api/event')
-//       .send({
-//         title: 'authenticated event in the past',
-//         place_id: places[0],
-//         start_datetime: time_in_past
-//       })
-//       .auth(token.access_token, { type: 'bearer' })
-//       .expect(200)
-//   })
-
-//   it('should trim tags and title', async () => {
-//     const event = {
-//       title: ' test title 4 ',
-//       place_id: places[0],
-//       start_datetime: dayjs().unix() + 1000,
-//       tags: [' test tag ']
-//     }
-
-//     const response = await request(app).post('/api/event')
-//       .send(event)
-//       .expect(200)
-//       .expect('Content-Type', /json/)
-
-//     expect(response.body.title).toBe('test title 4')
-//     expect(response.body.tags[0]).toBe('test tag')
-//   })
+  //     const response = await request(app).post('/api/event')
+  //       .send(event)
+  //       .expect(400)
+  //   })
 
 
-//   it('should sanitize htlm in description', async () => {
+  //   it('should validate end_datime', async () => {
+  //     const event = {
+  //       title: ' test title 5',
+  //       start_datetime: dayjs().unix() + 1000,
+  //       end_datetime: "Antani",
+  //       place_id: places[0],
+  //     }
 
-//     const event = {
-//       title: 'test title',
-//       place_id: places[0],
-//       start_datetime: dayjs().unix() + 1000,
-//       tags: ['test tags'],
-//       description: `<p wrong-attr="" onclick="alert('test');">inside paragraph</p><a href="https://test.com/?query=true&fbclid=facebook_id">link with fb reference</a>`
-//     }
+  //     const response = await request(app).post('/api/event')
+  //       .send(event)
+  //       .expect(400)
+  //   })
+
+  //   it('should not allow create anonymous event in the past', async() => {
+  //     const time_in_past = dayjs().unix() - 1;
+
+  //     await request(app).post('/api/event')
+  //       .send({
+  //         title: 'anonymous event in the past',
+  //         place_id: places[0],
+  //         start_datetime: time_in_past
+  //       })
+  //       .expect(400)
+  //       .then(response => {
+  //         expect(response.text)
+  //           .toEqual('Anonymous user cannot create past events')
+  //       })
+  //   })
+
+  //   it('should allow create event in the past when authenticated', async() => {
+  //     const time_in_past = dayjs().unix() - 1
+
+  //     await request(app).post('/api/event')
+  //       .send({
+  //         title: 'authenticated event in the past',
+  //         place_id: places[0],
+  //         start_datetime: time_in_past
+  //       })
+  //       .auth(token.access_token, { type: 'bearer' })
+  //       .expect(200)
+  //   })
+
+  //   it('should trim tags and title', async () => {
+  //     const event = {
+  //       title: ' test title 4 ',
+  //       place_id: places[0],
+  //       start_datetime: dayjs().unix() + 1000,
+  //       tags: [' test tag ']
+  //     }
+
+  //     const response = await request(app).post('/api/event')
+  //       .send(event)
+  //       .expect(200)
+  //       .expect('Content-Type', /json/)
+
+  //     expect(response.body.title).toBe('test title 4')
+  //     expect(response.body.tags[0]).toBe('test tag')
+  //   })
 
 
-//     const response = await request(app).post('/api/event')
-//       .send(event)
-//       .expect(200)
-//       .expect('Content-Type', /json/)
+  //   it('should sanitize htlm in description', async () => {
 
-//     event_id = response.body.id
-//     expect(response.body.description).toBe(`<p>inside paragraph</p><a href="https://test.com/?query=true">link with fb reference</a>`)
-
-//   })
-
-//   it('should not update event with invalid start_datetime', async () => {
-//     const event = {
-//       id: event_id,
-//       place_id: places[0],
-//       start_datetime: "antani"
-//     }
-
-//     const response = await request(app).put('/api/event')
-//       .auth(token.access_token, { type: 'bearer' })
-//       .send(event)
-//       .expect(400)
-      
-//     expect(response.text).toBe('Wrong format for start datetime')
-//   })
+  //     const event = {
+  //       title: 'test title',
+  //       place_id: places[0],
+  //       start_datetime: dayjs().unix() + 1000,
+  //       tags: ['test tags'],
+  //       description: `<p wrong-attr="" onclick="alert('test');">inside paragraph</p><a href="https://test.com/?query=true&fbclid=facebook_id">link with fb reference</a>`
+  //     }
 
 
-//   it('should not update event with invalid end_datetime', async () => {
-//     const event = {
-//       id: event_id,
-//       place_id: places[0],
-//       end_datetime: 2
-//     }
+  //     const response = await request(app).post('/api/event')
+  //       .send(event)
+  //       .expect(200)
+  //       .expect('Content-Type', /json/)
 
-//     const response = await request(app).put('/api/event')
-//       .auth(token.access_token, { type: 'bearer' })
-//       .send(event)
-//       .expect(400)
-      
-//     expect(response.text).toBe('start datetime is greater than end datetime')
-//   })
+  //     event_id = response.body.id
+  //     expect(response.body.description).toBe(`<p>inside paragraph</p><a href="https://test.com/?query=true">link with fb reference</a>`)
+
+  //   })
+
+  //   it('should not update event with invalid start_datetime', async () => {
+  //     const event = {
+  //       id: event_id,
+  //       place_id: places[0],
+  //       start_datetime: "antani"
+  //     }
+
+  //     const response = await request(app).put('/api/event')
+  //       .auth(token.access_token, { type: 'bearer' })
+  //       .send(event)
+  //       .expect(400)
+
+  //     expect(response.text).toBe('Wrong format for start datetime')
+  //   })
+
+
+  //   it('should not update event with invalid end_datetime', async () => {
+  //     const event = {
+  //       id: event_id,
+  //       place_id: places[0],
+  //       end_datetime: 2
+  //     }
+
+  //     const response = await request(app).put('/api/event')
+  //       .auth(token.access_token, { type: 'bearer' })
+  //       .send(event)
+  //       .expect(400)
+
+  //     expect(response.text).toBe('start datetime is greater than end datetime')
+  //   })
 
 
 })
@@ -607,7 +601,7 @@ describe('Events', () => {
 //       .send({ key: 'allow_geolocation', value: false })
 //       .auth(token.access_token, { type: 'bearer' })
 //       .expect(200)
-    
+
 
 //     const response = await request(app).get('/api/placeOSM/Nominatim/test')
 //       .expect(403)
