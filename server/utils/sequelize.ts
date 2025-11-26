@@ -16,6 +16,8 @@ import {
   type InferAttributesOptions,
   type AbstractDialect,
   type Options,
+  BelongsToManySetAssociationsMixin,
+  BelongsToSetAssociationMixin,
 } from "@sequelize/core"
 
 import {
@@ -149,7 +151,8 @@ export interface Media {
   height: number,
   width: number,
   size: number,
-  focalpoint: number[]
+  image?: string,
+  focalpoint?: [number, number]
 }
 
 
@@ -179,7 +182,7 @@ export class Event extends Model<
   @Attribute(DataTypes.STRING)
   @Index
   @Unique
-  declare slug: string
+  declare slug: CreationOptional<string>
 
   @Attribute(DataTypes.INTEGER.UNSIGNED)
   @Index
@@ -199,18 +202,18 @@ export class Event extends Model<
   declare is_visible: boolean
 
   @Attribute(DataTypes.JSON)
-  declare online_locations: Array<string>
+  declare online_locations?: Array<string>
 
   @Attribute(DataTypes.JSON)
   declare recurrent?: object | null
 
   @Attribute(DataTypes.JSON)
-  declare ap_object?: object
+  declare ap_object?: { url?: string, attributedTo?: string }
 
   /** represent the AP URI */
   @Attribute(DataTypes.STRING)
   @Index
-  declare ap_id?: string | null
+  declare ap_id?: string
 
   @Attribute({
     type: DataTypes.INTEGER.UNSIGNED,
@@ -241,7 +244,7 @@ export class Event extends Model<
     onUpdate: "CASCADE",
     onDelete: "CASCADE",
   })
-  declare placeId: number;
+  declare placeId: number
 
   @BelongsTo(() => Place, { foreignKey: 'placeId' })
   declare place?: NonAttribute<Place>
@@ -265,6 +268,10 @@ export class Event extends Model<
 
   @HasMany(() => Resource, { foreignKey: 'eventId', sourceKey: 'id' })
   declare resources?: NonAttribute<Resource[]>
+
+  // the mixins Sequelize automatically provides
+  declare setTags: BelongsToManySetAssociationsMixin<Tag, string>
+  declare setPlace: BelongsToSetAssociationMixin<Place, number>
 
   @BeforeCreate
   static async generateSlug(event: Event) {
@@ -347,8 +354,6 @@ export class Event extends Model<
       name: '#' + tag,
       href: `${publicSettings.baseurl}/tag/${encodeURIComponent(tag)}`
     })) ?? []
-
-    console.error('dentro to Ap', this)
 
     return {
       id: this.ap_id ?? `${publicSettings.baseurl}/federation/m/${this.id}`,

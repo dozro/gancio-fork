@@ -1,15 +1,17 @@
 import type { HookResult } from "@nuxt/schema"
-import type { APUser, Event, Place } from "#build/types/nitro-imports"
-import type { InferAttributes } from "@sequelize/core"
+import type { Event, Place } from "#build/types/nitro-imports"
+import type { CreationAttributes } from "@sequelize/core"
 
 
 /**
  * there are two Event interface / type. The first one is named `Event` and its the db model,
  * this is the second one and describes how events are represented in API (and in the frontend)
  */
-export type EventAPI = InferAttributes<Event> & {
+export type EventAPI = Omit<CreationAttributes<Event>, 'placeId' | 'is_visible'> & {
   tags?: string[],
-  place?: InferAttributes<Place>,
+  place?: CreationAttributes<Place>,
+
+  is_visible?: boolean,
 
   /** true if the owner of the event is the current user */
   is_mine?: boolean,
@@ -26,7 +28,7 @@ export type EventAPI = InferAttributes<Event> & {
   /** plain text description */
   plain_description?: string
 
-  ap_user?: APUser
+  ap_user?: { image: string, }
 }
 
 declare module '#app' {

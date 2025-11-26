@@ -148,6 +148,7 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
   const response: EventAPI = {
 
     id: event?.id,
+    slug: event?.slug,
 
     title: event.title,
     description: event.description,
@@ -166,7 +167,7 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
   }
 
   if (event.apUser) {
-    response.ap_user = { image: event?.apUser?.object?.icon?.url ?? `${event?.apUser?.url}/favicon.ico` }
+    response.ap_user = { image: event?.apUser?.object?.icon?.url ?? `${event?.apUser?.object?.url}/favicon.ico` }
   }
 
   return response
