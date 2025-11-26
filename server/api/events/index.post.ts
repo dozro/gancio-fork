@@ -8,6 +8,7 @@ import { getImageFromURL, sanitizeHTML } from "~~/server/helpers"
 import linkifyHtml from "linkify-html"
 import { findOrCreateTags } from "~~/server/lib/tags"
 import { mapEvent } from "~~/server/utils/events"
+import { CreationAttributes } from "@sequelize/core"
 
 /* try {
   mkdirp.sync(config.upload_path + '/thumb')
@@ -42,16 +43,15 @@ export default defineEventHandler(async evt => {
   const isAnonymous = !user
   if (isAnonymous && !publicSettings.allow_anon_event) {
     log.warn('Anonymous event creation not allowed')
-    throw createError({ status: 403, message: 'Anonymous event creation not allowed', statusMessage: 'Anonymous event creation not allowed' })
+    throw createError({ statusCode: 403, statusMessage: 'Anonymous event creation not allowed' })
   }
 
   const multiPartBody = await parseMultipartFormData(evt)
   const jsonBody = await readBody(evt)
   const body = multiPartBody || jsonBody
   if (!body) {
-    console.error(body)
     log.info('Validation error')
-    throw createError({ status: 400, message: 'Validation Error' })
+    throw createError({ statusCode: 400, statusMessage: 'Validation Error' })
   }
 
   // check for required fields
@@ -59,7 +59,7 @@ export default defineEventHandler(async evt => {
   const missingField = requiredFields.find(requiredField => !body[requiredField])
   if (missingField) {
     log.warn(`${missingField} required`)
-    throw createError({ status: 400, message: `${missingField} required`, statusMessage: `${missingField} required` })
+    throw createError({ statusCode: 400, statusMessage: `${missingField} required` })
   }
 
   const now = DateTime.local().toUnixInteger()
@@ -69,44 +69,44 @@ export default defineEventHandler(async evt => {
   if (body.end_datetime) {
     if (body.start_datetime > body.end_datetime) {
       log.debug('start_datetime is greated than end_datetime')
-      throw createError({ status: 400, message: `start datetime is greater than end datetime` })
+      throw createError({ statusCode: 400, statusMessage: `start datetime is greater than end datetime` })
     }
 
     if (Number(body.end_datetime) > 1000 * 24 * 60 * 60 * 365) {
       log.debug('end_datetime is too much in the future')
-      throw createError({ status: 400, message: 'are you sure?' })
+      throw createError({ statusCode: 400, statusMessage: 'are you sure?' })
     }
   }
 
   if (!start_datetime) {
     log.debug('start_datetime has to be a number')
-    throw createError({ status: 400, message: `Wrong format for start datetime` })
+    throw createError({ statusCode: 400, statusMessage: `Wrong format for start datetime` })
   }
 
   if (body.end_datetime && !Number(body.end_datetime)) {
     log.debug('end_datetime has to be a number')
-    throw createError({ status: 400, message: `Wrong format for end datetime` })
+    throw createError({ statusCode: 400, statusMessage: `Wrong format for end datetime` })
   }
 
   if (start_datetime > 1000 * 24 * 60 * 60 * 365) {
     log.debug('start_datetime is too much in the future')
-    throw createError({ status: 400, message: 'are you sure?' })
+    throw createError({ statusCode: 400, statusMessage: 'are you sure?' })
   }
 
   if (isAnonymous && start_datetime < now) {
     log.debug('anonymous users cannot create past events')
-    throw createError({ status: 400, message: 'Anonymous user cannot create past events' })
+    throw createError({ statusCode: 400, statusMessage: 'Anonymous user cannot create past events' })
   }
 
   // find or create the place
   const place = await findOrCreatePlace(body)
   if (!place) {
-    throw createError({ status: 400, message: 'Place not found' })
+    throw createError({ statusCode: 400, statusMessage: 'Place not found' })
   }
 
   const recurrent = body.recurrent ? JSON.parse(body.recurrent as string) : null
 
-  const eventDetails: Event = {
+  const eventDetails: CreationAttributes<Event> = {
     title: body.title?.trim(),
     // sanitize and linkify html
     description: sanitizeHTML(linkifyHtml(body.description as string || '', { target: '_blank', render: { email: ctx => ctx.content } })),
@@ -117,6 +117,7 @@ export default defineEventHandler(async evt => {
     recurrent,
     // publish this event only if authenticated
     is_visible: !isAnonymous,
+    placeId: place.id,
     ...(user && { userId: user?.id })
   }
 
@@ -129,14 +130,14 @@ export default defineEventHandler(async evt => {
       eventDetails.media = [media]
     }
   }
+
   const event = await Event.create(eventDetails)
-  await event.setPlace(place)
 
   // create/assign tags
   let tags: Tag[] = []
   if (body.tags) {
     if (!Array.isArray(body.tags)) {
-      throw createError({ status: 400, message: 'tags field must be an array' })
+      throw createError({ statusCode: 400, statusMessage: 'tags field must be an array' })
     }
     tags = await findOrCreateTags(body.tags)
     await event.setTags(tags)

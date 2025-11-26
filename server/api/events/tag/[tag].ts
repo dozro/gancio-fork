@@ -4,13 +4,13 @@ export default defineEventHandler(async evt => {
 
   if (!tagName) {
     log.warn('Tag not specified')
-    throw createError({ status: 404, message: 'Tag not specified' })
+    throw createError({ statusCode: 404, statusMessage: 'Tag not specified' })
   }
 
   const tag = await Tag.findByPk(tagName)
   if (!tag) {
     log.warn('Tag not found')
-    throw createError({ status: 404, message: 'Tag not found' })
+    throw createError({ statusCode: 404, statusMessage: 'Tag not found' })
   }
 
   const events = await getEvents({ tags: [tagName], show_federated: true })

@@ -2,10 +2,13 @@
 const settings=useState<Settings>('settings')
 
 const route=useRoute()
-const tagName=route.params.tag
-const { data }=await useFetch<Tag>(`/api/events/tag/${tagName}`)
-if(!data.value) {
-  throw createError({ status: 404,statusMessage: 'Tag not found' })
+const tagName = route.params.tag as string
+const { data, error } = await useFetch<Tag>(`/api/events/tag/${tagName}`)
+if(!data.value || error.value) {
+  throw createError({
+    statusCode: error.value?.statusCode ?? 500,
+    statusMessage: error.value?.statusMessage ?? 'Fetch Error'
+  })
 }
 
 useHead(() => {
@@ -18,8 +21,6 @@ useHead(() => {
     ],
   }
 })
-
-
 
 </script>
 <template>

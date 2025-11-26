@@ -50,6 +50,7 @@ export default defineEventHandler(async evt => {
   })
 
   if (!event) {
+    log.warn(`Event not found: ${slug_or_id}`)
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 
