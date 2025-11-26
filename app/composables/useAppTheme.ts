@@ -4,13 +4,14 @@ export const useAppTheme = () => {
   const theme = useTheme()
   const cookie = useCookie<'light' | 'dark' | 'system' | undefined>('theme')
 
-  if (process.client) {
-    theme.global.name.value = cookie.value || 'system'
+  if (import.meta.client) {
+    theme.change(cookie.value || 'system')
   }
 
   const toggleTheme = () => {
     const newTheme = theme.global.current.value.dark ? 'light' : 'dark'
-    theme.toggle()
+    theme.change(newTheme)
+    // theme.toggle()
     cookie.value = newTheme
   }
 
