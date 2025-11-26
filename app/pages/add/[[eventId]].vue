@@ -12,10 +12,10 @@ useHead({ title: `${settings.value.title} - ${t('common.add_event')}` })
 
 const route = useRoute()
 
-const event = ref<EventAPI>()
-const eventId = route.params.eventId
+const event = ref<EventAPI>({ title: '', start_datetime: 0, description: '', media: [], place: {} })
 const { data , error } = await useFetch<EventAPI>(() => `/api/event/detail/${route.params.eventId}`)
-if (route.params.eventId) {
+const eventId = route.params.eventId
+if (eventId) {
   if (error.value) {
     throw createError(error.value)
   }
@@ -51,25 +51,35 @@ async function done() {
   const formData = new FormData()
   // formData.append('recurrent', JSON.stringify(evt.date.recurrent))
 
-  if (evt?.media?.length) {
-    formData.append('image', evt.media[0]?.image)
-    if (evt.media[0]?.url) {
-      formData.append('image_url', evt.media[0].url)
+  if (evt?.media?.[0]) {
+    const media: Media = evt.media[0]
+    if (media?.image) {
+      formData.append('image', media.image)
     }
-    formData.append('image_name', evt.media[0]?.name)
-    formData.append('image_focalpoint', evt.media[0]?.focalpoint)
+
+    if (media?.url) {
+      formData.append('image_url', media.url)
+    }
+
+    if (media?.name) {
+      formData.append('image_name', media.name)
+    }
+
+    if (media?.focalpoint) {
+      formData.append('image_focalpoint', JSON.stringify(media.focalpoint))
+    }
   }
 
   formData.append('title', evt.title)
-  if (evt.place?.id) {
-    formData.append('place_id', evt.place?.id)
+  if (evt?.place?.id) {
+    formData.append('place_id', String(evt.place?.id))
   }
   formData.append('place_name', evt.place?.name.trim())
   formData.append('place_address', evt.place?.address || null)
 
   if (settings.value.allow_geolocation) {
-    formData.append('place_latitude', evt.place.latitude || '')
-    formData.append('place_longitude', evt.place.longitude || '')
+    formData.append('place_latitude', String(evt?.place?.latitude ?? ''))
+    formData.append('place_longitude', String(evt?.place?.longitude ?? ''))
   }
 
   if (evt.online_locations?.length) {
@@ -96,6 +106,7 @@ async function done() {
       await $fetch(`/api/events/${eventId}`, { method: 'PUT', body: formData }) :
       await $fetch('/api/events', { method: 'POST', body: formData })
 
+    console.error(ret)
     // navigate to created event in case its already visible and not a recurrent event!
     if (!evt?.recurrent && (ret.is_visible || loggedIn.value)) {
       navigateTo(`/event/${ret.slug}`)
