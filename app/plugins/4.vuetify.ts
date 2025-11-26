@@ -38,6 +38,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         }
       }
     },
+    ssr: true,
     display: {
       mobileBreakpoint: 800
     },
