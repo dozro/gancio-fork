@@ -4,7 +4,7 @@ import crypto from 'crypto'
 
 export interface CacheValidationOptions {
   data: any,
-  lastModified: Date,
+  lastModified?: Date | null,
   etag?: string,
 
   /** default: "public, max-age=1, must-revalidate" */
@@ -16,6 +16,7 @@ export interface CacheValidationOptions {
  */
 export function handleHttpCache(event: H3Event, { data, etag, lastModified, cacheControl }: CacheValidationOptions): any {
 
+  lastModified = lastModified ?? new Date(0)
   // set headers (etag could be passed in args or its calculated weak using milliseconds)
   etag = etag ?? lastModified.getTime().toString()
   setHeader(event, 'ETag', etag)
