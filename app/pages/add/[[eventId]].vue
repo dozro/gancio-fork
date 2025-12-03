@@ -12,7 +12,13 @@ useHead({ title: `${settings.value.title} - ${t('common.add_event')}` })
 
 const route = useRoute()
 
-const event = ref<EventAPI>({ title: '', start_datetime: 0, description: '', media: [], place: {} })
+const event = ref<EventAPI>({
+  title: '',
+  start_datetime: 0,
+  description: '',
+  media: [{}],
+  place: {}
+})
 const { data , error } = await useFetch<EventAPI>(() => `/api/event/detail/${route.params.eventId}`)
 const eventId = route.params.eventId
 if (eventId) {
@@ -184,7 +190,7 @@ const normalizedTags = computed({
 
               <!-- MEDIA / FLYER / POSTER -->
               <v-col cols=12 md=6>
-                <MediaInput v-model:event='event' />
+                <MediaInput v-model:media='event.media' :event='event' />
               </v-col>
 
               <!-- TAGS -->

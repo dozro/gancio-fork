@@ -118,14 +118,22 @@ export default defineEventHandler(async evt => {
     // publish this event only if authenticated
     is_visible: !isAnonymous,
     placeId: place.id,
+    media: [],
     ...(user && { userId: user?.id })
   }
 
   // do we have an image?
-  if (body.image) {
+  if (body.image || body.image_url) {
+
     let focalpoint = body.image_focalpoint ? body.image_focalpoint?.split(',') : ['0', '0']
     focalpoint = [parseFloat(parseFloat(focalpoint[0]).toFixed(2)), parseFloat(parseFloat(focalpoint[1]).toFixed(2))]
-    const media = await saveUploadedEventImage(body.image as MultiPartData, body?.image_name || body?.title || '', focalpoint)
+
+    let media: Media | undefined
+    if (!body.image && body.image_url) {
+      media = await getImageFromURL(body.image_url, body?.image_name || body?.title, focalpoint)
+    } else if (body.image) {
+      media = await saveUploadedEventImage(body.image as MultiPartData, body?.image_name || body?.title || '', focalpoint)
+    }
     if (media) {
       eventDetails.media = [media]
     }

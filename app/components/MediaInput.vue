@@ -1,144 +1,140 @@
-<script setup>
-// const props = defineProps({
-//   value: { type: Object, default: () => ({ image: null }) },
-//   event: { type: Object, default: () => ({}) }
-// })
+<script setup lang="ts">
+const { t } = useI18n()
+const props = defineProps<{event: EventAPI}>()
+const media = defineModel<Media[]>('media', { required: true, default: () => [] })
 
-const event = defineModel('event', { type: Object, required: true } )
-
-const { $confirm } = useNuxtApp() 
-
+const { $confirm } = useNuxtApp()
 
 const useUrl = ref(false)
 const showPreview = ref(false)
 const openMediaDetails = ref(false)
-const imgUrlInput = ref(event?.value.media?.[0]?.url || '')
-const name = event?.value.media?.[0]?.name || ''
-const focalpoint = ref(event?.value.media?.[0]?.focalpoint || [0, 0])
-const dragging = ref(false)
+const firstMedia = media?.value?.[0]
+const imgUrlInput = ref(firstMedia?.url || '')
 
+const focalpoint = ref<[number, number]>(firstMedia?.focalpoint ?? [0, 0])
+const dragging = ref(false)
 const mediaPreview = computed( () => {
-  if (!event?.value.media?.[0]?.url && !event?.value.media?.[0]?.image) {
+  if (!media.value[0]?.url && !media.value[0]?.image) {
     return false
   }
-  console.error(event.value?.media)
-  const url = event?.value?.media?.[0]?.image
-    ? URL.createObjectURL(event?.value?.media?.[0]?.image)
-    : isValidUrl(event?.value?.media?.[0]?.url)
-      ? event?.value?.media?.[0]?.url
-      : `/media/thumb/${event?.value?.media?.[0]?.url}`
+
+  const url = media.value[0]?.image
+    ? URL.createObjectURL(media.value[0]?.image)
+    : isValidUrl(media.value[0]?.url)
+      ? media.value[0]?.url
+      : `/media/thumb/${media.value[0]?.url}`
 
   return url
 })
 
-const left = computed(() => (focalpoint.value[0]+1) * 50 + '%')
-const top = computed(() => (focalpoint.value[1]+1) * 50 + '%')
+const left = computed(() => (focalpoint?.value?.[0] ?? 0 +1) * 50 + '%')
+const top = computed(() => (focalpoint?.value?.[1] ?? 0 +1) * 50 + '%')
 
 const savedPosition = computed(() => {
-  const focalpoint = event?.value?.media?.[0]?.focalpoint || [0, 0]
+  const focalpoint = firstMedia?.focalpoint || [0, 0]
   return `${(focalpoint[0] + 1) * 50}% ${(focalpoint[1] + 1) * 50}%`
 })
 
 const position = computed(() => {
-  const fp = focalpoint?.value || [0, 0]
-  return `${(fp[0] + 1) * 50}% ${(fp[1] + 1) * 50}%`
+  const fp = focalpoint?.value ?? [0, 0]
+  return `${(fp?.[0] ?? 0 + 1) * 50}% ${(fp[1] ?? 0 + 1) * 50}%`
 })
 
-    function save () {
-      event.value.media[0] = {
-        ...event.value.media[0],
-        focalpoint: focalpoint.value
-      }
-      // name: this.name || (this.event.title) || '',
-      openMediaDetails.value = false
-    }
+function save () {
+  media.value ??= []
+  media.value[0] ??= {} as Media
+  media.value[0].focalpoint = focalpoint.value
+  // media.value[0].name = name.value
 
-    async function remove () {
-      const ret = await $confirm('event.remove_media_confirmation')
-      if (!ret) { return }
-      useUrl.value = false
-      imgUrlInput.value = ''
-      event.value = {
-        ...event.value,
-        media: []
-      }
-    }
+  // name: this.name || (this.event.title) || '',
+  openMediaDetails.value = false
+}
+async function remove () {
+  const ret = await $confirm('event.remove_media_confirmation')
+  if (!ret) { return }
+  useUrl.value = false
+  imgUrlInput.value = ''
+  media.value = []
+}
 
-    function selectMedia (v) {
-      event.value.media[0] = { image: v, name: event.title, focalpoint: [0, 0]}
-    }
+function selectMedia (v: File | File[]) {
+  console.error(v)
 
-    function selectUrl () {
-      if (validateUrl(imgUrlInput.value) === true) {
-        event.value.media[0].url = imgUrlInput.value
-      }
-    }
+  media.value ??= []
+  media.value[0] ??= {} as Media
+  media.value[0] = { image: v as File, name: props.event.title, focalpoint: [0, 0]}
+}
 
-    function handleStart (ev) {
-      ev.preventDefault()
-      dragging.value = true
-      handleMove(ev, true)
-      return false
-    }
+function selectUrl () {
 
-    function handleStop (ev) {
-      dragging.value = false
-    }
+  media.value ??= []
+  media.value[0] ??= {} as Media
 
-    function handleMove (ev, manual = false) {
-      if (!dragging.value && !manual) return
-      ev.stopPropagation()
-      const boundingClientRect = document.getElementById('focalPointSelector').getBoundingClientRect()
+  if (validateUrl(imgUrlInput.value) === true) {
+    media.value[0].url = imgUrlInput.value
+  }
 
-      const clientX = ev.changedTouches ? ev.changedTouches[0].clientX : ev.clientX
-      const clientY = ev.changedTouches ? ev.changedTouches[0].clientY : ev.clientY
+}
+function handleStart (ev: PointerEvent) {
+  ev.preventDefault()
+  dragging.value = true
+  handleMove(ev, true)
+  return false
+}
 
-      // // get relative coordinate
-      let x = Math.ceil(clientX - boundingClientRect.left)
-      let y = Math.ceil(clientY - boundingClientRect.top)
+function handleStop () {
+  dragging.value = false
+}
 
-      // // snap to border
-      x = x < 30 ? 0 : x > boundingClientRect.width - 30 ? boundingClientRect.width : x
-      y = y < 30 ? 0 : y > boundingClientRect.height - 30 ? boundingClientRect.height : y
+function handleMove (ev: PointerEvent, manual = false) {
+  if (!dragging.value && !manual) return
+  ev.stopPropagation()
+  const el = document.getElementById('focalPointSelector')
+  if (!el) return
+  const boundingClientRect = el.getBoundingClientRect()
 
-      // // map to real image coordinate
-      const posY = -1 + (y / boundingClientRect.height) * 2
-      const posX = -1 + (x / boundingClientRect.width) * 2
+  // get relative coordinate
+  let x = Math.ceil(ev.clientX - boundingClientRect.left)
+  let y = Math.ceil(ev.clientY - boundingClientRect.top)
 
-      focalpoint.value = [posX, posY]
-      return false
-    }
+  // snap to border
+  x = x < 30 ? 0 : x > boundingClientRect.width - 30 ? boundingClientRect.width : x
+  y = y < 30 ? 0 : y > boundingClientRect.height - 30 ? boundingClientRect.height : y
 
-    function isValidUrl (url) {
-      return /^https?:\/\/.+/i.test(url)
-    }
+  // map to real image coordinate
+  const posY = -1 + (y / boundingClientRect.height) * 2
+  const posX = -1 + (x / boundingClientRect.width) * 2
 
-    function validateUrl (value) {
-      if (!value) return true // empty value is valid, since image is optional
-      return isValidUrl(value) || t('validators.url')
-    }
+  focalpoint.value = [posX, posY]
+}
+
+function isValidUrl (url?: string) {
+  return /^https?:\/\/.+/i.test(url ?? '')
+}
+
+function validateUrl (value: string) {
+  if (!value) return true // empty value is valid, since image is optional
+  return isValidUrl(value) || t('validators.url')
+}
 </script>
 <template>
 <span>
   <v-dialog v-model="openMediaDetails" :fullscreen="$vuetify.display?.mobile" width="1000px">
     <v-card>
-      <v-toolbar :title="$t('common.media')" />
+      <v-toolbar :title="t('common.media')" />
       <v-card-text>
         <v-row class="mt-1">
           <v-col
             id="focalPointSelector"
-            @mousedown="handleStart"
-            @touchstart="handleStart"
-            @mousemove="handleMove"
-            @touchmove="handleMove"
-            @mouseup="handleStop"
-            @touchend="handleStop"
+            @pointerdown="handleStart"
+            @pointermove="handleMove"
+            @pointerup="handleStop"
           >
             <div class="focalPoint" :style="{ top, left }"></div>
             <img v-if="mediaPreview" :src="mediaPreview" />
           </v-col>
           <v-col cols='12' sm='4'>
-            <p>{{ $t('event.choose_focal_point') }}</p>
+            <p>{{ t('event.choose_focal_point') }}</p>
             <!-- TODO: what if the URL preview goes wrong?
                  this could happen due to cors issues or a simply typo -->
             <img
@@ -153,7 +149,7 @@ const position = computed(() => {
               label="Alternative text"
               persistent-hint
               filled
-              :hint="$t('event.alt_text_description')"
+              :hint="t('event.alt_text_description')"
             />
             <br />
             <v-card-actions class="justify-space-between">
@@ -166,17 +162,17 @@ const position = computed(() => {
     </v-card>
   </v-dialog>
 
-  <h3 class="mb-3 font-weight-regular" v-if="mediaPreview">{{ $t('common.media') }}</h3>
+  <h3 class="mb-3 font-weight-regular" v-if="mediaPreview">{{ t('common.media') }}</h3>
   <v-card-actions v-if="mediaPreview">
     <v-switch
       class="ml-3 mt-0 pt-0"
       v-model="showPreview"
-      :label="$t('common.show_preview')"
+      :label="t('common.show_preview')"
       hide-details
     />
     <v-spacer></v-spacer>
-    <v-btn text color="primary" @click="openMediaDetails = true">{{ $t('common.edit') }}</v-btn>
-    <v-btn text color="error" @click="remove">{{ $t('common.remove') }}</v-btn>
+    <v-btn text color="primary" @click="openMediaDetails = true">{{ t('common.edit') }}</v-btn>
+    <v-btn text color="error" @click="remove">{{ t('common.remove') }}</v-btn>
   </v-card-actions>
 
   <div class="w-100 pt-0" v-if="mediaPreview">
@@ -188,7 +184,7 @@ const position = computed(() => {
   <div v-else>
     <v-text-field
       v-if="useUrl"
-      :label="$t('common.url')"
+      :label="t('common.url')"
       :hint="'https://example.com/image.jpg'"
       prepend-icon="mdi-camera"
       persistent-hint
@@ -201,8 +197,8 @@ const position = computed(() => {
 
     <v-file-input
       v-else
-      :label="$t('common.media')"
-      :hint="$t('event.media_description')"
+      :label="t('common.media')"
+      :hint="t('event.media_description')"
       prepend-icon="mdi-camera"
       @update:modelValue="selectMedia"
       persistent-hint
@@ -210,7 +206,7 @@ const position = computed(() => {
       accept="image/*"
     />
 
-    <v-switch v-model="useUrl" :label="$t('event.import_URL')" />
+    <v-switch v-model="useUrl" :label="t('event.import_URL')" />
   </div>
 </span>
 

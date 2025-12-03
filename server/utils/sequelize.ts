@@ -99,6 +99,12 @@ export class Announcement extends Model<
   @AutoIncrement
   declare readonly id: CreationOptional<number>
 
+  @CreatedAt
+  declare readonly createdAt: CreationOptional<Date>
+
+  @UpdatedAt
+  declare readonly updatedAt: CreationOptional<Date>
+
   @Attribute(DataTypes.STRING)
   @NotNull
   declare title: string
@@ -107,8 +113,7 @@ export class Announcement extends Model<
   declare announcement: string
 
   @Attribute(DataTypes.BOOLEAN)
-  declare visible: string
-
+  declare visible: boolean
 }
 
 @Table({
@@ -146,12 +151,15 @@ export class Message extends Model<
 }
 
 export interface Media {
-  name: string,
-  url: string,
-  height: number,
-  width: number,
-  size: number,
-  image?: string,
+  /** use as alt attribute */
+  name?: string,
+  url?: string,
+  height?: number,
+  width?: number,
+  size?: number,
+  image?: string | Blob | File,
+
+  /** https://docs-p.joinmastodon.org/spec/activitypub/#focalPoint */
   focalpoint?: [number, number]
 }
 
@@ -193,7 +201,8 @@ export class Event extends Model<
   declare end_datetime?: number
 
   @Attribute(DataTypes.JSON)
-  declare media?: Media[]
+  @Default([])
+  declare media: Media[]
 
   @Attribute(DataTypes.TEXT)
   declare description: string

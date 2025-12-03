@@ -5,7 +5,7 @@ export default defineEventHandler(async event => {
   const page = await Page.findByPk(page_id)
 
   if (!page) {
-    throw createError({ status: 400 })
+    throw createError({ statusCode: 404, statusMessage: 'Page not found' })
   }
 
   return page.update(body)

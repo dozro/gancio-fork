@@ -58,7 +58,7 @@ export async function saveUploadedImage(image: MultiPartData, dest: string) {
   return baseImgPath + '.png'
 }
 
-export async function saveUploadedEventImage(image: MultiPartData, name: string, focalpoint: number[]): Promise<Media | undefined> {
+export async function saveUploadedEventImage(image: MultiPartData, name: string, focalpoint: [number, number]): Promise<Media | undefined> {
   const config = getConfig()
   const filename = crypto.randomUUID() + '.jpg'
   const sharpStream = sharp(image.data, { failOnError: true })
