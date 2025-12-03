@@ -28,14 +28,14 @@ const headers = [
   
 async function confirm (event) {
   try {
-    await $fetch(`/api/events/${event.id}/confirm`, { method: 'PUT' })
+    await $fetch(`/api/events/${event.id}/toggle`, { method: 'PUT' })
     emit('confirmed', event.id)
     $notify('event.confirmed')
   } catch (e) {
     $notify(e, Statuses.ERROR)
   }
 }
-    
+ 
 async function remove (event) {
   const ret = await $confirm('event.remove_confirmation', { event: event.title })
   if (!ret) { return }
