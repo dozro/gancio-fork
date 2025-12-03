@@ -1,4 +1,4 @@
-import type { User, UserSessionRequired } from '#auth-utils'
+import type { User, UserSessionRequired, UserSession } from '#auth-utils'
 import { verifyJwtToken } from './jwt'
 
 type UseSessionEvent = Parameters<typeof useSession>[0]
@@ -7,11 +7,16 @@ type UseSessionEvent = Parameters<typeof useSession>[0]
  * Get the user of the request based on `nuxt-session` cookie or JWT Bearer token
  */
 export async function getUser(event: UseSessionEvent) {
-  
+
   const session = await getUserSession(event)
   if (session?.user) {
     return session.user
   }
+
+  // FIX:
+  // deleteCookie(event, 'nuxt-session')
+  // ref: https://github.com/orgs/h3js/discussions/1250
+  clearResponseHeaders(event, ['set-cookie'])
 
   const authHeader = getHeader(event, 'authorization')
   const token = authHeader?.split(' ')[1]
@@ -33,7 +38,7 @@ export async function getUser(event: UseSessionEvent) {
       console.warn('Invalid JWT:', err)
     }
   }
-  
+
   return null
 }
 
@@ -45,8 +50,8 @@ export async function requireUser(event: UseSessionEvent) {
   if (!user) {
     throw createError({ status: 401, message: 'Unauthorized' })
   }
-  
-  return user as UserSessionRequired
+
+  return user
 }
 
 /**
@@ -54,12 +59,12 @@ export async function requireUser(event: UseSessionEvent) {
  */
 export async function requireRole(event: UseSessionEvent, role: string) {
   const user = await requireUser(event)
-  
+
   if (user?.role !== role) {
     throw createError({ status: 401, message: 'Unauthorized' })
   }
-  
-  return user as UserSessionRequired
+
+  return user
 }
 
 /**
@@ -70,8 +75,7 @@ export async function requireRole(event: UseSessionEvent, role: string) {
  * @param opts.message The message to use for the error (defaults to Unauthorized)
  * @see https://github.com/atinux/nuxt-auth-utils
  */
-export async function requireAdminSession(event: UseSessionEvent, opts: { statusCode?: number, message?: string } = {}): Promise<UserSessionRequired> {
-  const log = useLogger('session')
+export async function requireAdminSession(event: UseSessionEvent, opts: { statusCode?: number, message?: string } = {}) {
   const userSession = await getUser(event)
 
   if (!userSession) {
@@ -87,13 +91,13 @@ export async function requireAdminSession(event: UseSessionEvent, opts: { status
       })
     }
   }
-  
+
   if (userSession?.role !== 'admin') {
     throw createError({
       statusCode: opts.statusCode || 401,
       message: opts.message || 'Unauthorized',
-    })    
+    })
   }
 
-  return userSession as UserSessionRequired
+  return userSession
 }
