@@ -228,7 +228,7 @@ async function readableWebToNodeStream(webStream) {
   })
 }
 
-export async function getImageFromURL(url) {
+export async function getImageFromURL(url: string, name: string, focalpoint: [number, number]): Promise<Media | undefined> {
   log.debug(`getImageFromURL ${url}`)
 
   const filename = crypto.randomBytes(16).toString('hex')
@@ -250,12 +250,12 @@ export async function getImageFromURL(url) {
     .then(res => {
       const info = res[1]
       return {
-        destination: config.upload_path,
-        filename: filename + '.jpg',
-        path: path.resolve(config.upload_path, filename + '.jpg'),
+        name,
+        url: filename + '.jpg',
         height: info.height,
         width: info.width,
         size: info.size,
+        focalpoint
       }
     })
     .catch(err => {
