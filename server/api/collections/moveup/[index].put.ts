@@ -6,18 +6,19 @@ export default defineEventHandler(async event => {
   const sortIndex = Number(getRouterParam(event, 'index'))
 
   try {
-    const collections = await Collection.findAll({ where: { sortIndex: { [Op.lte]: sortIndex } }, limit: 2, order:[['sortIndex', 'desc']] })
+    const collections = await Collection.findAll({ where: { sortIndex: { [Op.lte]: sortIndex } }, limit: 2, order: [['sortIndex', 'desc']] })
     if (collections.length !== 2) {
       throw createError({ status: 404 })
     }
-    
+
     const tmpSortIndex = collections[0].sortIndex
     await collections[0].update({ sortIndex: collections[1].sortIndex })
     await collections[1].update({ sortIndex: tmpSortIndex })
-    return setResponseStatus(event, 200)
+
+    return sendNoContent(event, 200)
   } catch (e) {
     log.error(e)
     throw createError({ status: 404 })
   }
-  
+
 })

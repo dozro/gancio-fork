@@ -1,8 +1,8 @@
 import z from "zod"
 
 const queryParams = z.object({
-  withFilters: z.stringbool().optional().default(false),
-  pin: z.stringbool().optional().default(true),
+  withFilters: z.stringbool().optional(),
+  pin: z.stringbool().optional()
 })
 
 export default defineEventHandler(async event => {

@@ -1,3 +1,3 @@
 export default defineEventHandler(event => {
-    return Collection.findAll({ where: { isTop: true }})
+  return Collection.findAll({ where: { isTop: true }, raw: true })
 })
