@@ -142,6 +142,17 @@ export async function getEvents(opts?: EventQueryType | undefined): Promise<Even
 
   // return events
   return mapEvents(events as Event[])
+/**
+ * get the last modified date of items.
+ * this is used to set `Last-Modified` header and check for non modified 304 result
+ */
+export function getLastModified(items: Array<{ updatedAt: Date }>) {
+  if (!items?.length) {
+    return undefined
+  }
+  const lastModified = items.reduce((last: Date, item) => item.updatedAt > last ? item.updatedAt : last, new Date(0))
+  lastModified.setMilliseconds(0)
+  return lastModified
 }
 
 export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User): EventAPI {
