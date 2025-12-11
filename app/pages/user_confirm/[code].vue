@@ -20,7 +20,7 @@ async function change_password () {
 
 }
 
-const { data: user, error } = await useFetch('/api/user/check_recover_code', { method: 'POST', data: { recover_code }})
+const { data: user, error } = await useFetch('/api/user/check_recover_code', { method: 'POST', body: { recover_code }})
 </script>
 <template>
 <v-container>
@@ -32,7 +32,7 @@ const { data: user, error } = await useFetch('/api/user/check_recover_code', { m
           <template v-if='user'>
             <v-card-subtitle>{{user.email}}</v-card-subtitle>
             <v-card-text>
-              <v-text-field type='password' v-model='new_password' :label="$t('common.new_password')" :rules='$valid.password' autofocus />
+              <v-text-field type='password' v-model='new_password' :label="$t('common.new_password')" :rules='[$valid.password]' autofocus />
             </v-card-text>
 
             <v-card-actions>
