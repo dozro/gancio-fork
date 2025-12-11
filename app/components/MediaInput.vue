@@ -9,7 +9,8 @@ const useUrl = ref(false)
 const showPreview = ref(false)
 const openMediaDetails = ref(false)
 const firstMedia = media?.value?.[0]
-const imgUrlInput = ref(firstMedia?.url || '')
+const name = ref(firstMedia?.name ?? '')
+const imgUrlInput = ref(firstMedia?.url ?? '')
 
 const focalpoint = ref<[number, number]>(firstMedia?.focalpoint ?? [0, 0])
 const dragging = ref(false)
@@ -27,24 +28,24 @@ const mediaPreview = computed( () => {
   return url
 })
 
-const left = computed(() => (focalpoint?.value?.[0] ?? 0 +1) * 50 + '%')
-const top = computed(() => (focalpoint?.value?.[1] ?? 0 +1) * 50 + '%')
+const left = computed(() => (focalpoint?.value?.[0] +1) * 50 + '%')
+const top = computed(() => (focalpoint?.value?.[1]+1) * 50 + '%')
 
 const savedPosition = computed(() => {
-  const focalpoint = firstMedia?.focalpoint || [0, 0]
+  const focalpoint = media.value[0]?.focalpoint || [0, 0]
   return `${(focalpoint[0] + 1) * 50}% ${(focalpoint[1] + 1) * 50}%`
 })
 
 const position = computed(() => {
   const fp = focalpoint?.value ?? [0, 0]
-  return `${(fp?.[0] ?? 0 + 1) * 50}% ${(fp[1] ?? 0 + 1) * 50}%`
+  return `${(fp?.[0] + 1) * 50}% ${(fp[1] + 1) * 50}%`
 })
 
 function save () {
   media.value ??= []
   media.value[0] ??= {} as Media
   media.value[0].focalpoint = focalpoint.value
-  // media.value[0].name = name.value
+  media.value[0].name = name.value || props.event.title
 
   // name: this.name || (this.event.title) || '',
   openMediaDetails.value = false
@@ -58,7 +59,6 @@ async function remove () {
 }
 
 function selectMedia (v: File | File[]) {
-  console.error(v)
 
   media.value ??= []
   media.value[0] ??= {} as Media
@@ -119,9 +119,10 @@ function validateUrl (value: string) {
 </script>
 <template>
 <span>
+  <!-- this dialog allows to choose a focal point -->
   <v-dialog v-model="openMediaDetails" :fullscreen="$vuetify.display?.mobile" width="1000px">
     <v-card>
-      <v-toolbar :title="t('common.media')" />
+      <span>{{focalpoint[0]}}</span>
       <v-card-text>
         <v-row class="mt-1">
           <v-col
@@ -144,6 +145,7 @@ function validateUrl (value: string) {
               :style="{ 'object-position': position }"
             />
             <v-textarea
+              v-model='name'
               class="mt-4"
               type="text"
               label="Alternative text"
@@ -178,7 +180,7 @@ function validateUrl (value: string) {
   <div class="w-100 pt-0" v-if="mediaPreview">
     <img class="w-100 pa-0" :src="mediaPreview" v-if="!showPreview" />
     <img class="w-100 mediaPreview pa-0" :src="mediaPreview" v-else :style="{ 'object-position': savedPosition }" />
-    <!-- <span class="text-center">{{ event.media[0].name }}</span> -->
+    <span class="text-center">{{ media?.[0].name }}</span>
   </div>
 
   <div v-else>
