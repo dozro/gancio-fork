@@ -19,15 +19,19 @@ const event = ref<EventAPI>({
   media: [{}],
   place: {}
 })
-const { data , error } = await useFetch<EventAPI>(() => `/api/event/detail/${route.params.eventId}`)
-const eventId = route.params.eventId
+
+let eventId = route.params.eventId
 if (eventId) {
+  const { data , error } = await useFetch<EventAPI>(() => `/api/event/detail/${route.params.eventId}`)
   if (error.value) {
     throw createError(error.value)
   }
   if (!data.value) {
     throw createError({ status: 404, statusMessage: 'Event not found' })
   } else {
+    if (route.query.clone === 'true') {
+      eventId = undefined
+    }
     event.value = data.value
   }
 }
@@ -112,7 +116,6 @@ async function done() {
       await $fetch(`/api/events/${eventId}`, { method: 'PUT', body: formData }) :
       await $fetch('/api/events', { method: 'POST', body: formData })
 
-    console.error(ret)
     // navigate to created event in case its already visible and not a recurrent event!
     if (!evt?.recurrent && (ret.is_visible || loggedIn.value)) {
       navigateTo(`/event/${ret.slug}`)
