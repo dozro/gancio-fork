@@ -7,11 +7,15 @@ import mime from 'mime-types'
 export default defineEventHandler(async (event) => {
   const config = getConfig()
   const logoPath = path.resolve(config.upload_path, 'fallbackimage.svg')
+
+  // TODO: this could be done on upload once for all (optimization)
   const mimeType = mime.lookup(logoPath) || 'application/octet-stream'
   setHeader(event, 'Content-Type', mimeType)
 
   const stats = fs.statSync(logoPath)
 
-  const data = sendStream(event, fs.createReadStream(logoPath))
-  return handleHttpCache(event, { data, lastModified: stats.mtime })
+  stats.mtime.setMilliseconds(0)
+  if (!handleCacheHeaders(event, { modifiedTime: stats.mtime, maxAge: 1000 })) {
+    sendStream(event, fs.createReadStream(logoPath))
+  }
 })
