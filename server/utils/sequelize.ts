@@ -84,7 +84,12 @@ export async function runMigrations() {
     context: sequelize.queryInterface,
     logger: console
   })
-  await umzug.up()
+  try {
+    await umzug.up()
+  } catch (e) {
+    log.error("Error running migrations ", e)
+    throw e
+  }
 }
 
 @Table({
@@ -218,6 +223,12 @@ export class Event extends Model<
 
   @Attribute(DataTypes.JSON)
   declare ap_object?: { url?: string, attributedTo?: string }
+
+  @Attribute(DataTypes.JSON)
+  declare likes?: Array<object>
+
+  @Attribute(DataTypes.JSON)
+  boost?: Array<object>
 
   /** represent the AP URI */
   @Attribute(DataTypes.STRING)
@@ -681,7 +692,6 @@ export class Collection extends Model<
     console.error(collection)
   }
 
-
   @HasMany(() => Filter, { foreignKey: 'collectionId', sourceKey: 'id' })
   declare filters?: NonAttribute<Filter[]>
 
@@ -704,7 +714,7 @@ export class Filter extends Model<
   declare id: CreationOptional<number>
 
   @Attribute(DataTypes.BOOLEAN)
-  declare negate: boolean;
+  declare negate: boolean
 
   @Attribute(DataTypes.JSON)
   declare tags: any
