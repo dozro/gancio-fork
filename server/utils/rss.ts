@@ -1,19 +1,31 @@
+import { Event } from "#imports"
+import { H3Event } from "h3"
 import { DateTime } from "luxon"
 import path from "path"
+import fs from 'fs'
 import pug from 'pug'
+import { InferAttributes } from "@sequelize/core"
 
+// read template at module load time
+const rssTemplateStr = fs.readFileSync(
+  path.resolve('./server/utils/rss.pug'),
+  'utf-8'
+)
 
-export function exportFeed(evt, events, title = publicSettings.title, link = `${publicSettings.baseurl}/feed/rss`) {
+// compile once
+export const rssTemplate = pug.compile(rssTemplateStr)
+
+export function exportFeed(evt: H3Event, events: InferAttributes<Event, { omit: never }>[], title = publicSettings.title, link = `${publicSettings.baseurl}/feed/rss`) {
 
   const opt = {
     zone: publicSettings.instance_timezone,
     locale: publicSettings.instance_locale
   }
 
-  function unixFormat (timestamp: number, format='EEEE d MMMM HH:mm') {
+  function unixFormat(timestamp: number, format = 'EEEE d MMMM HH:mm') {
     return DateTime.fromSeconds(timestamp, opt).toFormat(format)
   }
 
   setHeader(evt, 'Content-Type', 'application/rss+xml; charset=UTF-8')
-  return pug.renderFile(path.resolve('./server/utils/rss.pug'), { events, settings: publicSettings, unixFormat, title, link })
+  return rssTemplate({ events, settings: publicSettings, unixFormat, title, link })
 }
