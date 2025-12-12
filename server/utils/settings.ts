@@ -44,7 +44,7 @@ export type Settings = {
   plugins: Array<object>,
   admin_email: string
   smtp: object,
-  collection_in_home?: number,
+  collection_in_home?: string,
   calendar_first_day_of_week?: number,
   default_fedi_hashtags: Array<string>,
   custom_js: string,
