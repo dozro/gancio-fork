@@ -1,4 +1,4 @@
-import { eventQuerySchema } from "~~/server/utils/events"
+import { eventQuerySchema, sendEvents } from "~~/server/utils/events"
 
 /**
 * Get events
@@ -20,6 +20,16 @@ import { eventQuerySchema } from "~~/server/utils/events"
 * - [usage example](https://framagit.org/les/gancio/-/blob/master/webcomponents/src/GancioEvents.svelte#L18-42)
 */
 export default defineEventHandler(async (event) => {
+  const log = useLogger('get events')
   const opt = await getValidatedQuery(event, eventQuerySchema.parse)
-  return getEvents(opt)
+  if (publicSettings.collection_in_home) {
+    log.debug('get collection events', publicSettings.collection_in_home)
+    return sendEvents(event, await getCollectionEvents({
+      name: publicSettings.collection_in_home,
+      ...opt
+    }))
+  }
+
+  const events = await getEvents(opt)
+  return sendEvents(event, events)
 })
