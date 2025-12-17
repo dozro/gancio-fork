@@ -189,6 +189,35 @@ export function mapEvents(events: Event[]): EventAPI[] {
   return events.map(e => mapEvent(e))
 }
 
+/**
+ * Calculate an ETag from a list of generic items using `id` and `updatedAt` fields to build the hash
+*/
+export function calculateEtag(items: readonly { id: number, updatedAt: Date }[]): string {
+  const base = items
+    .map(e => `${e.id}:${e.updatedAt.toISOString()}`)
+    .join('|')
+
+  return createHash('sha1').update(base).digest('hex')
+}
+
+export function sendEvents(event: H3Event, events: Event[]) {
+  const lastModified = getLastModified(events)
+  const etag = calculateEtag(events)
+
+  if (
+    !handleCacheHeaders(event, {
+      modifiedTime: lastModified,
+      etag,
+      cacheControls: [
+        'stale-while-revalidate=30',
+        'stale-if-error=300',
+      ],
+    })
+  ) {
+    return events.map(e => mapEvent(e))
+  }
+}
+
 export async function getMessages(eventId: number) {
   const event = await Event.findByPk(eventId, { include: [{ model: Message, as: 'messages' }] })
   if (!event) {
