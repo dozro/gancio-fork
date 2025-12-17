@@ -2,6 +2,7 @@ import { Event, Place, Tag, User, Resource, APUser } from "~~/server/utils/seque
 import { Op } from '@sequelize/core'
 import { htmlToText } from 'html-to-text'
 import { EventAPI } from "~~/shared/types/generic"
+import { formatSchema } from "~~/server/types/validator"
 
 /**
  * Get event details.
@@ -10,9 +11,7 @@ import { EventAPI } from "~~/shared/types/generic"
  * @returns Event details in the requested format (JSON, JSON-LD, or ICS)
  * @throws {404} When event is not found or not visible to the current user
  * @example
- * https://roma.convoca.la/api/event/detail/from-every-river-to-every-sea-palestine-will-be-free
- * https://roma.convoca.la/api/event/detail/from-every-river-to-every-sea-palestine-will-be-free?format=json-ld
- * https://roma.convoca.la/api/event/detail/from-every-river-to-every-sea-palestine-will-be-free?format=ics
+ * https://demo.gancio.org/api/event/detail/manifestazione
  */
 export default defineEventHandler(async evt => {
   const log = useLogger('event details!')
@@ -20,7 +19,7 @@ export default defineEventHandler(async evt => {
   const isAdminOrEditor = user?.is_editor || user?.is_admin
 
   const slug_or_id = getRouterParam(evt, 'slug_or_id')
-  const { format = 'json' } = getQuery(evt)
+  const { format } = await getValidatedQuery(evt, formatSchema.parse)
 
   const where: any = { [Op.or]: [{ slug: slug_or_id }] }
   const id = Number(slug_or_id)
@@ -64,12 +63,19 @@ export default defineEventHandler(async evt => {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 
+  // manage cache (https://github.com/h3js/h3/issues/1261)
+  event.updatedAt.setMilliseconds(0)
+  if (handleCacheHeaders(evt, { maxAge: 5, modifiedTime: event.updatedAt })) {
+    return
+  }
+
   if (format === 'json') {
-    const data = mapEvent(event)
-    return handleHttpCache(evt, { data, lastModified: event.updatedAt })
-  } else if (format === 'jsonld' || format === 'json-ld') {
-    return handleHttpCache(evt, { data: event.toAP(), lastModified: event.updatedAt })
+    return mapEvent(event)
+  } else if (format === 'json-ld') {
+    setHeader(evt, 'Content-Type', 'application/activity+json')
+    return event.toAP()
   } else if (format === 'ics') {
+    setHeader(evt, 'Content-Type', 'text/calendar')
     // last arg is alarms/reminder, ref: https://github.com/adamgibbons/ics#attributes (alarms)
     return exportICS(evt, [event], [{
       action: 'display',
