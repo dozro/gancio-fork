@@ -23,6 +23,8 @@ export async function cleanPastEvents () {
   // remove related resources..
   await Resource.destroy({ where: { eventId: eventsId }})
 
+  // TODO: remove related img?
+
   // ...and notiifcations
   // TODO
   // await EventNotification.destroy({ where: { eventId: eventsId }})
@@ -39,7 +41,7 @@ export async function cleanPastEvents () {
 export async function cleanUnusedAPActor () {
   const ap_users = await APUser.findAll({
     limit: 500,
-    where: { 
+    where: {
       follower: { [Op.not]: true },
       following: { [Op.not]: true },
       trusted: { [Op.not]: true },
@@ -54,7 +56,7 @@ export async function cleanUnusedAPActor () {
 
   const ap_ids = ap_users.filter(a => a['events.id'] === null && a['resources.id'] === null).map(a => a.ap_id )
   if (ap_ids.length) {
-      log.debug('[AP] Remove %d not used federated actors', ap_ids.length)
-      await APUser.destroy({ where: { ap_id: ap_ids } })
+    log.debug('[AP] Remove %d not used federated actors', ap_ids.length)
+    await APUser.destroy({ where: { ap_id: ap_ids } })
   }
 }
