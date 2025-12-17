@@ -2,7 +2,20 @@ import type { HookResult } from "@nuxt/schema"
 import type { Event, Place } from "#build/types/nitro-imports"
 import type { CreationAttributes } from "@sequelize/core"
 
+declare module '#app' {
+  interface NuxtApp {
+    $t: {}, // NuxtI18nInstance['t']
+  }
+}
 
+// declare module '@vue/runtime-core' {
+//   interface ComponentCustomProperties {
+//     $t: NuxtI18nInstance['t']
+//   }
+// }
+
+
+export type AnnouncementAPI = CreationAttributes<Announcement>
 /**
  * there are two Event interface / type. The first one is named `Event` and its the db model,
  * this is the second one and describes how events are represented in API (and in the frontend)

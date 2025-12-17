@@ -1,4 +1,4 @@
-import { defineEventHandler, getRouterParam, setHeader, sendRedirect, sendStream, createError } from 'h3'
+import { defineEventHandler, getRouterParam, setHeader, sendRedirect, sendStream } from 'h3'
 import { join } from 'path'
 import { createReadStream, existsSync, statSync } from 'fs'
 import { get as getConfig } from '../../config'
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const stream = createReadStream(filePath)
 
   setHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
-  setHeader(event, 'Content-Length', stat.size.toString())
+  setHeader(event, 'Content-Length', stat.size)
 
   return sendStream(event, stream)
-});
+})

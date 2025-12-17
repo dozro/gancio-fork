@@ -1,5 +1,5 @@
-import Sequelize, { Op, sql } from "@sequelize/core"
-import { Event } from "./sequelize"
+import { InferAttributes, JSON_NULL, Op, WhereOptions, fn, literal, col, sql } from "@sequelize/core"
+import { APUser, Event, Place } from "./sequelize"
 import { DateTime } from "luxon"
 import z from "zod"
 
@@ -18,80 +18,107 @@ export const collectionQuerySchema = z.object({
 })
 export type CollectionQueryType = z.infer<typeof collectionQuerySchema>
 
-export async function getCollectionEvents(opts?: CollectionQueryType | undefined) {
+/**
+ * Transform a Filter into a sequelize conditions + replacements
+ * @param {Filter} filter 
+ * @returns 
+ * @link https://sequelize.org/docs/v7/querying/raw-queries/#replacements
+ * @link https://sequelize.org/docs/v7/querying/select-in-depth/
+ */
+function filterToConditions(filter: InferAttributes<Filter>) {
+
+  const conditions: WhereOptions<InferAttributes<Event>> = []
+  const replacements: Record<string, any> = {}
+
+  // mtch tags
+  // if (filter?.tags?.length) {
+  //   conditions.push({
+  //     '$Tags.tag$': { [Op.in]: filter.tags }
+  //   })
+  // }
+
+  if (filter.tags?.length) {
+    conditions.push(
+      literal(`event.id IN (
+        SELECT eventId
+        FROM event_tags
+        WHERE tagTag IN :tags_${filter.id}
+      )`)
+    )
+    replacements[`tags_${filter.id}`] = sql.list(filter.tags)
+  }
+
+  if (filter.places?.length) {
+    conditions.push({
+      placeId: { [Op.in]: filter.places.map((p: Place) => p.id) }
+    })
+  }
+
+  if (filter.actors?.length) {
+    // search for local instance
+    if (filter.actors.find((a: APUser) => a.ap_id === null)) {
+      conditions.push({ [Op.or]: [{ apUserApId: filter.actors.map(a => a.ap_id).filter(a => a) }, { apUserApId: null }] })
+    } else {
+      conditions.push({ apUserApId: filter.actors.map(a => a.ap_id) })
+    }
+  }
+
+  return { conditions, replacements }
+
+}
+
+export async function getCollectionEvents(opts?: CollectionQueryType) {
   const log = useLogger('collections')
-  const args  = collectionQuerySchema.parse(opts)
+  const args = collectionQuerySchema.parse(opts)
 
   // get the collection from specified name
-  const collection = await Collection.findOne({ where: { name: args.name } })
+  const collection = await Collection.findOne({ where: { name: args.name }, raw: true })
   if (!collection) {
     log.warn(`"%s" not found`, args.name)
-    throw createError({ status: 404, message: 'Not found' })
+    throw createError({ statusCode: 404, statusMessage: 'Not found' })
   }
 
   // and all related filters
   const filters = await Filter.findAll({ where: { collectionId: collection.id } })
-        
+
   // collection is empty if there are no filters
   if (!filters.length) {
     log.debug('[COLLECTION] This collection has no filter!')
     return []
   }
-        
+
   // init stardard filter
-  const where = {
+  const where: WhereOptions<InferAttributes<Event>> = {
     // do not include parent recurrent event
-    // recurrent: null,
+    // recurrent: JSON_NULL,
 
     // confirmed event only
     is_visible: true,
+
     [Op.or]: {
-      start_datetime: { [opts?.older ? Op.lte : Op.gte]: args.start },
-      end_datetime: { [opts?.older ? Op.lte : Op.gte]: args.start }
-    }
-  }
-        
-  // include recurrent events?
-  // if (!opts?.show_recurrent) {
-  //   where.parentId = null
-  // }
+      start_datetime: { [args.older ? Op.lte : Op.gte]: args.start },
+      end_datetime: { [args.older ? Op.lte : Op.gte]: args.start }
+    },
+    ...(args.end && { start_datetime: { [args.older ? Op.gte : Op.lte]: args.end } }),
 
-  if (opts?.end) {
-    where.start_datetime = { [args.older ? Op.gte : Op.lte]: args.end }
+
+    // include recurrent events?
+    ...(!args.show_recurrent && { parentId: null }),
   }
 
-  const replacements = []
-  const conditions = []
-  const negatedConditions = []
+  let replacements: Record<string, any> = {}
+  const conditions: WhereOptions<InferAttributes<Event>> = []
+  const negatedConditions: WhereOptions<InferAttributes<Event>> = []
 
   // collections are a set of filters to match
   filters.forEach(f => {
-
-    let tmpConditions = []
-
-    if (f.tags && f.tags.length) {
-      tmpConditions.push(
-        sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('event', 'id')} AND ${sql.identifier('tagTag')} in ${sql.list(f.tags)})`)
-    }
-
-    if (f.places && f.places.length) {
-        tmpConditions.push({ placeId: f.places.map(p => p.id) })
-    }
-
-    if (f.actors && f.actors.length) {
-      // search for local instance
-      if (f.actors.find(a => a.ap_id === null)) {
-        tmpConditions.push({ [Op.or]: [{ apUserApId: f.actors.map(a => a.ap_id).filter(a => a)}, { apUserApId: null }]})
-      } else {
-        tmpConditions.push({ apUserApId: f.actors.map(a => a.ap_id) })
-      }
-    }
-
+    const { conditions: tmpConditions, replacements: tmpReplacements } = filterToConditions(f)
+    replacements = { ...replacements, ...tmpReplacements }
     if (!tmpConditions.length) return
     if (f.negate) {
-      negatedConditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.or]: tmpConditions })
+      negatedConditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.and]: tmpConditions })
     } else {
-      conditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.or]: tmpConditions })
+      conditions.push(tmpConditions.length === 1 ? tmpConditions[0] : { [Op.and]: tmpConditions })
     }
   })
 
@@ -100,14 +127,14 @@ export async function getCollectionEvents(opts?: CollectionQueryType | undefined
   }
 
   if (conditions.length) {
-    where[Op.and] = conditions
+    where[Op.or] = conditions
   }
 
-  const events = await Event.findAll({
+  return Event.findAll({
     where,
     attributes: {
-      exclude: ['likes', 'boost', 'userId', 'is_visible', 'placeId', 'apUserApId', 
-        'createdAt', 'resources', 'ap_object', ...(!args.include_description ? ['description'] : [])]
+      exclude: ['likes', 'boost', 'userId', 'is_visible', 'placeId',
+        'createdAt']
     },
     order: [['start_datetime', opts?.reverse ? 'DESC' : 'ASC']],
     include: [
@@ -117,17 +144,16 @@ export async function getCollectionEvents(opts?: CollectionQueryType | undefined
         attributes: ['tag'],
         through: { attributes: [] }
       },
-      { model: Place, required: true, attributes: ['id', 'name', 'address'] },
-      // { model: APUser, required: false, attributes: ['object'] }
+      { model: Place, required: true, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] },
+      { model: APUser, required: false, attributes: ['object'], as: 'APUser' }
     ],
-    ...( opts?.limit && { limit: args.limit }),
-    ...( opts?.page && args.limit && { offset: args.page * args.limit }),
-    replacements,
-    logging: console.log
+    ...(opts?.limit && { limit: args.limit }),
+    ...(opts?.page && args.limit && { offset: opts.page * args.limit }),
+    logging: console.log,
+    replacements
   }).catch(e => {
     log.error('[EVENT]', e)
     return []
   })
 
-  return mapEvents(events)
 }

@@ -1,11 +1,13 @@
 import { Event, Message } from "./sequelize"
 import { DateTime } from 'luxon'
-import { Op, literal, col, where, fn, Filterable, InferAttributes, WhereOptions, sql } from '@sequelize/core'
+import { Op, literal, col, where, fn, InferAttributes, WhereOptions, SQL_NULL, JSON_NULL } from '@sequelize/core'
 
 import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
-import { EventAttributes } from "ics"
 import { EventAPI } from "~~/shared/types/generic"
+import { H3Event } from "h3"
+import { createHash } from "crypto"
+
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
   end: z.coerce.number().optional(),
@@ -13,7 +15,7 @@ export const eventQuerySchema = z.object({
   tags: z.preprocess((val) => {
     if (Array.isArray(val)) return val
     if (typeof val === 'string') return val.split(',')
-    return [];
+    return []
   }, z.array(z.string())).optional(),
   places: z.preprocess((val) => {
     if (Array.isArray(val)) return val
@@ -40,70 +42,65 @@ export const eventQuerySchema = z.object({
 }))
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-export async function getEvents(opts?: EventQueryType | undefined): Promise<EventAPI[]> {
+export async function getEvents(opts?: EventQueryType | undefined) {
   const args = eventQuerySchema.parse(opts)
-  const condition: WhereOptions<InferAttributes<Event>> = {//} // : WhereOptions<InferAttributes<Event, { omit: never; }>> = {
+  const condition: WhereOptions<Event> = {
     [Op.or]: {
       start_datetime: { [args.older ? Op.lte : Op.gte]: args.start },
       end_datetime: { [args.older ? Op.lte : Op.gte]: args.start }
     },
+
+    ...(args.end && { start_datetime: { [args.older ? Op.gte : Op.lte]: args.end } }),
+
+    // include uncondirmed
+    ...(!args.include_unconfirmed && { is_visible: true }),
+
+    // include recurrent events?
+    ...(!args.show_recurrent && { parentId: null }),
+
+    // include parent event
+    ...(!args.include_parent && { recurrent: JSON_NULL })
+
   }
 
-  if (args.user_id) {
-    // TODO: check why userId does not exists on whereOptions here
-    condition.userId = args.user_id
-  }
+  // ...(args.user_id && { userId: args.user_id }),
 
-  if (args.include_parent !== true) {
-    // do not include _parent_ recurrent event
-    // condition.recurrent = null
-  }
 
-  if (args.include_unconfirmed !== true) {
-    // confirmed event only
-    condition.is_visible = true
-  }
-
-  // // // include recurrent events?
-  if (!args.show_recurrent) {
-    condition.parentId = null
-  }
+  // if (args.user_id) {
+  //   condition.userId = args.user_id
+  // }
 
   // if (!args.show_multidate) {
   //   condition.multidate = { [Op.not]: true }
   // }
 
-  if (args.end) {
-    condition.start_datetime = { [args.older ? Op.gte : Op.lte]: args.end }
-  }
-
   // // normalize tags
-  if (args.tags) {
-    args.tags = args.tags.map(t => t.trim())
-  }
+  // if (args.tags) {
+  //   args.tags = args.tags.map(t => t.trim())
+  // }
 
   const replacements = []
-  if (args.tags && args.places) {
-    condition[Op.and] = [
-      { placeId: args.places },
-      sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('Event', 'id')} AND ${sql.identifier('tagTag')} in ${sql.list(args.tags)})`
-    ]
+  // if (args.tags && args.places) {
+  //   condition[Op.and] = [
+  //     { placeId: args.places },
+  //     sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('Event', 'id')} AND ${sql.identifier('tagTag')} in ${sql.list(args.tags)})`
+  //   ]
 
-  } else if (args.tags) {
-    condition[Op.and] = sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('Event', 'id')} AND ${sql.identifier('tagTag')} in (${sql.list(args.tags)}))`
-  } else if (args.places) {
-    condition.placeId = args.places
-  }
-
-  // if (args.query) {
-  //   replacements.push(args.query)
-  //   condition[Op.or] =
-  //     [
-  //       { title: where(fn('LOWER', col('title')), 'LIKE', '%' + args.query + '%') },
-  //       where(fn('LOWER', col('name')), 'LIKE', '%' + args.query + '%'),
-  //       fn('EXISTS', literal(`SELECT 1 FROM event_tags WHERE ${Col('event_tags.eventId')}=${Col('event.id')} AND LOWER(${Col('tagTag')}) = LOWER(?)`))
-  //     ]
+  // } else if (args.tags) {
+  //   condition[Op.and] = sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('Event', 'id')} AND ${sql.identifier('tagTag')} in (${sql.list(args.tags)}))`
+  // } else if (args.places) {
+  //   condition.placeId = args.places
   // }
+
+  if (args.query) {
+    replacements.push(args.query)
+    condition[Op.or] =
+      [
+        { title: where(fn('LOWER', col('title')), 'LIKE', '%' + args.query + '%') },
+        where(fn('LOWER', col('name')), 'LIKE', '%' + args.query + '%'),
+        fn('EXISTS', literal(`SELECT 1 FROM event_tags WHERE ${col('event_tags.eventId')}=${col('event.id')} AND LOWER(${col('tagTag')}) = LOWER(?)`))
+      ]
+  }
 
   let pagination = {}
   if (args.limit) {
@@ -113,14 +110,11 @@ export async function getEvents(opts?: EventQueryType | undefined): Promise<Even
     }
   }
 
-  const events = await Event.findAll({
+  return Event.findAll({
     where: condition,
     attributes: {
       exclude: [
-        'userId', 'createdAt', 'placeId', 'ap_object', 'ap_id',
-        ...(!args.include_parent ? ['recurrent'] : []),
-        ...(!args.include_unconfirmed ? ['is_visible'] : []),
-        ...(!args.include_description ? ['description'] : [])
+        'likes', 'boost', 'userId', 'createdAt', 'placeId', 'ap_object', 'ap_id',
       ]
     },
     order: [['start_datetime', args.reverse ? 'DESC' : 'ASC']],
@@ -134,19 +128,16 @@ export async function getEvents(opts?: EventQueryType | undefined): Promise<Even
       { model: Place, required: true, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] }
     ],
     ...pagination,
-    replacements,
-  }).catch(e => {
-    console.error('[EVENT]' + String(e))
-    return []
+    // replacements,
   })
 
-  // return events
-  return mapEvents(events as Event[])
+  // return mapEvents(events as Event[])
+}
 /**
  * get the last modified date of items.
- * this is used to set `Last-Modified` header and check for non modified 304 result
+ * this is used to set `Last-Modified` header and to check for non modified 304 result
  */
-export function getLastModified(items: Array<{ updatedAt: Date }>) {
+export function getLastModified(items: readonly { updatedAt: Date }[]) {
   if (!items?.length) {
     return undefined
   }
@@ -175,10 +166,13 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
     is_anon: event.userId === null || !event?.user?.is_active,
     is_visible: event.is_visible,
     original_url: event?.ap_object?.url ?? event?.ap_id,
+
+    // TODO
+    // n_msgs: event?.,
   }
 
-  if (event.apUser) {
-    response.ap_user = { image: event?.apUser?.object?.icon?.url ?? `${event?.apUser?.object?.url}/favicon.ico` }
+  if (event.APUser) {
+    response.ap_user = { image: event?.APUser?.object?.icon?.url ?? `${event?.APUser?.object?.url}/favicon.ico` }
   }
 
   return response

@@ -18,6 +18,7 @@ import {
   type Options,
   BelongsToManySetAssociationsMixin,
   BelongsToSetAssociationMixin,
+  AggregateOptions,
 } from "@sequelize/core"
 
 import {
@@ -281,7 +282,7 @@ export class Event extends Model<
   declare apUserApId?: string
 
   @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
-  declare apUser?: NonAttribute<APUser>
+  declare APUser?: NonAttribute<APUser>
 
   @HasMany(() => Message, { foreignKey: 'eventId', sourceKey: 'id' })
   declare messages?: NonAttribute<Message[]>
@@ -569,7 +570,7 @@ export class Instance extends Model<
   declare applicationActor?: string
 
   @HasMany(() => APUser, { foreignKey: 'instanceDomain', sourceKey: 'domain' })
-  declare apUsers?: NonAttribute<APUser[]>
+  declare APUsers?: NonAttribute<APUser[]>
 
   // @HasMany(() => Event, /* foreign key */ 'placeId')
   // declare events?: NonAttribute<Event[]>;
@@ -687,9 +688,8 @@ export class Collection extends Model<
 
   @BeforeCreate
   static async autoincrementSortIndex(collection: Collection, options: AggregateOptions<InferAttributesOptions<Collection>>) {
-    const maxSort = await Collection.max('sortIndex', { transaction: options.transaction })
-    collection.sortIndex = (maxSort || 0) + 1
-    console.error(collection)
+    const maxSort: number | null = await Collection.max('sortIndex', { transaction: options.transaction })
+    collection.sortIndex = (maxSort ?? 0) + 1
   }
 
   @HasMany(() => Filter, { foreignKey: 'collectionId', sourceKey: 'id' })
