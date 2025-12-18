@@ -8,6 +8,8 @@ const valid = ref(false)
 const dark_menu = ref([false, false, false, false])
 const light_menu = ref([false, false, false, false])
 
+const imageKeys = reactive({ logo: 0, header: 0, fallback: 0 })
+
 // <!-- 
 // export default {
 //   name: 'Theme',
@@ -69,7 +71,8 @@ function updateColor (t, color, value) {
 
 async function resetHeaderImage () {
   try {
-    await $fetch('/api/settings', { method: 'PUT', body: { key: 'headerimage', value: null } })
+    await $fetch('/api/settings', { method: 'PUT', body: { key: 'header_image', value: null } })
+    imageKeys.header++
   } catch (e) {
     $notify(e, Statuses.ERROR)
   }
@@ -78,13 +81,19 @@ async function resetHeaderImage () {
 async function resetLogo () {
   try {
     await $fetch('/api/settings', { method: 'PUT', body: { key: 'logo', value: null } })
+    imageKeys.logo++
   } catch (e) {
     $notify(e, Statuses.ERROR)
   }
 }
 
-function resetFallbackImage () {
-
+async function resetFallbackImage () {
+  try {
+    await $fetch('/api/settings', { method: 'PUT', body: { key: 'fallback_image', value: null } })
+    imageKeys.fallback++
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
 }
 
 function openLinkModal () {
@@ -102,7 +111,7 @@ function addFooterLink () {
   linkModal.value = false
 }
 
-async function removeFooterLink (item) {
+async function removeFooterLink (item: FooterLink) {
   const ret = await $confirm('admin.delete_footer_link_confirm')
   if (!ret) { return }
   const footerLinks = settings.value.footerLinks.filter(l => l.label !== item.label)
@@ -112,7 +121,7 @@ async function removeFooterLink (item) {
   }})
 }
 
-async function moveUpFooterLink (item, idx: number) {
+async function moveUpFooterLink (item: FooterLink, idx: number) {
   const footerLinks = [...settings.value.footerLinks]
   footerLinks[idx] = footerLinks[idx-1]
   footerLinks[idx-1] = settings.value.footerLinks[idx]
@@ -122,7 +131,7 @@ async function moveUpFooterLink (item, idx: number) {
   }})
 }
 
-async function editFooterLink (item) {
+async function editFooterLink (item: FooterLink) {
   link.href = item.href
   link.label = item.label
   linkModal.value = true
@@ -133,6 +142,7 @@ async function uploadLogo (file: File) {
   formData.append('logo', file)
   try {
     await $fetch('/api/settings/logo', { method: 'POST', body: formData })
+    imageKeys.logo++
     $notify('Logo updated!')
   } catch (e) {
     $notify(e, Statuses.ERROR)
@@ -140,19 +150,24 @@ async function uploadLogo (file: File) {
 }
 
 async function uploadFallbackImage (file: File) {
-  console.error('upload fallback image')
+  const formData = new FormData()
+  formData.append('fallback_image', file)
+  try {
+    await $fetch('/api/settings/fallback_image', { method: 'POST', body: formData })
+    imageKeys.fallback++
+    $notify('Fallback image updated')
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
 }
 
 async function uploadHeaderImage (file: File) {
   const formData = new FormData()
-  formData.append('headerImage', file)
+  formData.append('header_image', file)
   try {
-    await $fetch('/settings/headerImage', { method: 'POST', body: formData })
-    $notify('Head image updated!')
-  //   this.$root.$emit('message', {
-  //     message: 'Header image updated'
-  //   })
-  //   this.forceHeaderImageReload()
+    await $fetch('/api/settings/header_image', { method: 'POST', body: formData })
+    imageKeys.header++
+    $notify('Header image updated!')
   } catch (e) {
     $notify(e, Statuses.ERROR)
   }
@@ -212,7 +227,7 @@ const custom_js = manageSetting('custom_js')
           </v-file-input>
           <v-img
             class="mt-2"
-            :src="`/logo.png`"
+            :src="`/logo.png?${imageKeys.logo}`"
             max-height="60px"
             contain
           />
@@ -236,7 +251,7 @@ const custom_js = manageSetting('custom_js')
           </v-file-input>
           <v-img
             class="mt-2"
-            :src="`/fallbackimage.png`"
+            :src="`/fallbackimage.png?${imageKeys.fallback}`"
             max-height="150px"
             contain
           />
@@ -260,7 +275,7 @@ const custom_js = manageSetting('custom_js')
           </v-file-input>
           <v-img
             class="mt-2"
-            :src="`/headerimage.svg`"
+            :src="`/headerimage.png?${imageKeys.header}`"
             max-height="150px"
             contain
           />

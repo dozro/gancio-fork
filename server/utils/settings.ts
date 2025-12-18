@@ -10,6 +10,8 @@ export type Settings = {
   description: string,
   /** the path to the logo image for the instance */
   logo?: string,
+  header_image?: string,
+  fallback_image?: string,
   baseurl: string,
   hostname: string,
   instance_timezone: string,
@@ -40,7 +42,7 @@ export type Settings = {
   light_colors: object // { primary: '#FF4500', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00' },
   hide_thumbs: boolean,
   hide_calendar: boolean,
-  footerLinks: Array<object>
+  footerLinks: Array<FooterLink>
   plugins: Array<object>,
   admin_email: string
   smtp: object,

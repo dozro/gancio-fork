@@ -122,7 +122,6 @@ function validateUrl (value: string) {
   <!-- this dialog allows to choose a focal point -->
   <v-dialog v-model="openMediaDetails" :fullscreen="$vuetify.display?.mobile" width="1000px">
     <v-card>
-      <span>{{focalpoint[0]}}</span>
       <v-card-text>
         <v-row class="mt-1">
           <v-col
