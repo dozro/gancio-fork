@@ -14,5 +14,7 @@ export default defineEventHandler((event) => {
 
   const lastModified = max([publicSettingsLastModified.instance_name, publicSettingsLastModified.baseurl, publicSettingsLastModified.enable_federation])
 
-  return handleHttpCache(event, { data: nodeinfo, lastModified })
+  if (!handleCacheHeaders( event, { modifiedTime: lastModified })) {
+    return nodeinfo
+  }
 })

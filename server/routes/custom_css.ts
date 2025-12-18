@@ -28,9 +28,7 @@ export default defineEventHandler(async (event) => {
   }
 
   setHeader(event, 'Content-Type', 'text/css')
-
-  return handleHttpCache(event, {
-    data: custom_css,
-    lastModified
-  })
+  if (!handleCacheHeaders(event, { modifiedTime: lastModified })) {
+    return custom_css
+  }
 })

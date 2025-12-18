@@ -28,9 +28,7 @@ export default defineEventHandler(async (event) => {
   }
 
   setHeader(event, 'Content-Type', 'application/javascript')
-
-  return handleHttpCache(event, {
-    data: custom_js,
-    lastModified
-  })
+  if (!handleCacheHeaders(event, { modifiedTime: lastModified })) {
+    return custom_js
+  }
 })

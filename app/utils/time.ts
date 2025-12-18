@@ -31,7 +31,7 @@ function time (datetime: number) {
 
 function when(event: EventAPI) {
   const settings = useState<Settings>('settings')
-const { locale } = useI18n()
+  const { locale } = useI18n()
 
   const cy = currentYear()
   const addTimezone = event?.ap_id || event?.place?.name === 'online'

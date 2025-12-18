@@ -44,11 +44,10 @@ async function remove (event, parent) {
         v-if='events'
         :items="events" :hide-default-footer='events?.length<10' dense :search="search"
         :headers='headers'>
-        <!-- <template v-slot:item.start_datetime='{ item }'> -->
-          <!-- {{item?.start_datetime}} -->
-          <!-- <span v-if='!item.recurrent'>{{$time.when(item)}}</span> -->
-          <!-- <span v-else><v-icon color='success' v-text='mdiRepeat' /> {{$time.recurrentDetail({ parent: item }, 'EEEE, HH:mm')}}</span> -->
-        <!-- </template> -->
+        <template v-slot:item.start_datetime='{ item }'>
+          <span v-if='!item.recurrent'>{{time.when(item)}}</span>  
+          <!-- <span v-else><v-icon color='success' v-text='mdiRepeat' /> {{time.recurrentDetail({ parent: item }, 'EEEE, HH:mm')}}</span>  -->
+        </template>
         <template v-slot:item.actions='{ item }'>
           <template v-if="!item.recurrent">
             <t-btn @click='toggle(item)' v-if='!item.is_visible' color='success' tooltip="common.confirm" icon='mdi-eye' />

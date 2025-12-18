@@ -44,7 +44,7 @@ onMounted(() =>  {
   <div class="v-col" sm="3" cols="12" v-if="settings.allow_recurrent_event">
     <v-switch
       v-if="settings.allow_recurrent_event"
-      v-model="value.show_recurrent"
+      v-model="modelValue.show_recurrent"
       :label="$t('event.show_recurrent')"
     />
   </div>

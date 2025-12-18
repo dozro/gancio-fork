@@ -203,6 +203,7 @@ export function sendEvents(event: H3Event, events: Event[]) {
       modifiedTime: lastModified,
       etag,
       cacheControls: [
+        'must-revalidate',
         'stale-while-revalidate=30',
         'stale-if-error=300',
       ],

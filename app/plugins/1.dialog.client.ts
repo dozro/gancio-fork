@@ -11,7 +11,7 @@ export default defineNuxtPlugin(() => {
   
   function notify (msg: string | FetchError, status: Statuses = Statuses.SUCCESS, args?: Object) {
     if (status === Statuses.ERROR && typeof msg !== 'string') {
-      msg = msg.response?._data?.message ?? msg
+      msg = msg?.response?._data?.message ?? msg
       // remove Sequelize prefix:
       msg = String(msg).replace(/Sequelize.*:\ ?/,'')
     }

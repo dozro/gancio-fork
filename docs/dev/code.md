@@ -266,7 +266,7 @@ const { isAdmin } = useAuth()
 
 ### Cache
 
-You can use `handleHttpCache` utility to manage HTTP cache.
+You can use `handleCacheHeaders` utility to manage HTTP cache.
 
 ## Manage errors
 

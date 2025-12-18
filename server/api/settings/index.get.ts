@@ -20,5 +20,7 @@ export default defineEventHandler(async event => {
     }
   }
 
-  return handleHttpCache(event, { data, lastModified })
+  if (!handleCacheHeaders(event, { modifiedTime: lastModified })) {
+    return data
+  }
 })
