@@ -86,6 +86,10 @@ export default defineNuxtConfig({
     transpile: ['vuetify']
   },
   vite: {
+    optimizeDeps: {
+      include: ['lodash/debounce', 'luxon', 'linkifyjs', 'mitt', 'v-calendar', '@vue/devtools-core',
+        '@vue/devtools-kit', '@tiptap/vue-3', '@tiptap/starter-kit', '@vueuse/core', '@vue-leaflet/vue-leaflet'],
+    },
     server: {
       watch: {
         usePolling: false
