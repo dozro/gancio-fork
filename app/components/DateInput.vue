@@ -4,6 +4,8 @@ import type { Event } from '#build/types/nitro-imports'
 import { DateTime } from 'luxon'
 import { useTheme } from 'vuetify'
 
+const { isAdmin } = useAuth()
+
 const theme = useTheme()
 const settings = useState<Settings>('settings')
 const { t } = useI18n()
@@ -123,11 +125,11 @@ const endTime = computed({
             :is-range="type === 'multidate'"
             :locale="$i18n.locale"
             is-inline
+             :min-date="!isAdmin ? new Date() : undefined" 
             is-expanded
           />
             <!-- :attributes="attributes" -->
             <!-- :is-dark="is_dark" -->
-            <!-- :min-date="!$auth?.user?.is_admin && new Date()" -->
         </template>
       </v-input>
     </div>
