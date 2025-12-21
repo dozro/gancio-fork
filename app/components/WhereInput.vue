@@ -1,6 +1,5 @@
 <!-- Choose event location -->
 <script setup lang='ts'>
-import type { Event } from '#build/types/nitro-imports'
 import { refDebounced } from '@vueuse/core'
 
 const settings = useState<Settings>('settings')
@@ -12,14 +11,14 @@ interface Place {
   create?: boolean
 }
 
-const event = defineModel<Event>('event', { type: Object, required: true } )
+const event = defineModel<EventAPI>('event', { type: Object, required: true } )
 // const modelValue = defineModel('modelValue', { type: Object, default: () => ({ name: '', address: '' }) })
 
 const whereInputAdvancedDialog = ref(false)
 const onlineLocations = ref([])
 
 const disableAddress = computed(() => !!event.value?.place?.id)
-const isOnLine = computed(() => settings.value.allow_online_event && event?.value?.place?.name === 'online')
+const isOnLine = computed(() => settings.value.allow_online_event && 'online' === event?.value?.place?.name)
 
 const showAdvancedDialogButton = computed(() => {
   if (!event?.value?.place?.name) return false
@@ -37,7 +36,7 @@ const searchDebounced = refDebounced(search, 200)
 const { data: places } = await useFetch<Place[]>('/api/places', { params: { query: searchDebounced },
   dedupe: 'cancel',
   transform: places => {
-    places.push({ online: true, name: 'On-line', props: { prependIcon: 'mdi-laptop-account', color: 'primary' } })
+    places.push({ online: true, name: 'online', props: { prependIcon: 'mdi-laptop-account', color: 'primary' } })
     if (!search.value && places.length) { 
       return places 
     }
