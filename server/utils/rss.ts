@@ -6,13 +6,11 @@ import fs from 'fs'
 import pug from 'pug'
 import { InferAttributes } from "@sequelize/core"
 
-// read template at module load time
+const isBuild = process.env.NODE_ENV === 'production'
 const rssTemplateStr = fs.readFileSync(
-  path.resolve('./server/utils/rss.pug'),
+  path.resolve(isBuild ? './nuxt/server/rss.pug' : './server/utils/rss.pug'),
   'utf-8'
 )
-
-// compile once
 export const rssTemplate = pug.compile(rssTemplateStr)
 
 export function exportFeed(evt: H3Event, events: InferAttributes<Event, { omit: never }>[], title = publicSettings.title, link = `${publicSettings.baseurl}/feed/rss`) {

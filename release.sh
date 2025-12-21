@@ -89,8 +89,14 @@ cp -ra ./server/migrations "${PKG_MAIN}/nuxt/server/migrations/"
 # cp -ra cli "${PKG_MAIN}/.output/server/cli/"
 # cp gancio.js "${PKG_MAIN}/.output/server/gancio.js"
 
-# all locales
+## note that this is in an internal folder as users should not access it directly as it would be overwritten by the next build
+# all locales (UI and mails)
 cp -ra i18n "${PKG_MAIN}/nuxt/server/i18n/"
+
+# pug rss template / mail template
+cp -ra ./server/emails "${PKG_MAIN}/nuxt/server/emails/"
+
+cp -ra ./server/utils/rss.pug "${PKG_MAIN}/nuxt/server/rss.pug"
 
 # default db
 # cp gancio.sqlite.rel "${PKG_MAIN}/gancio.sqlite"
