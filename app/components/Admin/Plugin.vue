@@ -37,7 +37,7 @@ function setOptions(plugin) {
   <v-card-title> {{ $t('common.plugins') }}</v-card-title>
   <v-spacer />
   <v-card-subtitle v-html="$t('admin.plugins_description')" />
-  <v-dialog v-if='selectedPlugin.settingsValue' v-model='dialog' width='900' :fullscreen='$vuetify.display?.mobile'>
+  <v-dialog v-if='selectedPlugin.settingsValue' v-model='dialog' max-width='1200px' :fullscreen='$vuetify.display?.mobile'>
     <v-card>
       <v-card-title> {{ $t('admin.config_plugin') }} - {{ selectedPlugin.name }}</v-card-title>
       <v-card-text>
