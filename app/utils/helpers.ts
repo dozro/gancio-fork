@@ -1,8 +1,8 @@
 /**
  * FrontEnd helpers utilities
  */
-
-
+ 
+ 
 import type { APUser } from "#build/types/nitro-imports"
 
 export function mediaURL(event: EventAPI, type?: string, format = '.jpg') {
@@ -12,7 +12,7 @@ export function mediaURL(event: EventAPI, type?: string, format = '.jpg') {
     if (type === 'alt') {
       return event?.media?.[0]?.name
     } else {
-      return settings?.value?.baseurl + mediaPath + (type === 'thumb' ? 'thumb/' : '') + event?.media?.[0]?.url.replace(/.jpg$/, format)
+      return settings?.value?.baseurl + mediaPath + (type === 'thumb' ? 'thumb/' : '') + event?.media?.[0]?.url?.replace(/.jpg$/, format)
     }
   } else if (type !== 'alt') {
     return settings?.value?.baseurl + mediaPath + (type === 'thumb' ? 'thumb/' : '') + 'logo.svg'
@@ -20,7 +20,8 @@ export function mediaURL(event: EventAPI, type?: string, format = '.jpg') {
   return ''
 }
 
-export function manageSetting(key: keyof Settings, setCb = null) {
+
+export function manageSetting(key: keyof Settings, setCb?: Function) {
   const settings = useState<Settings>('settings')
   return computed({
     get: () =>  settings.value[key],
