@@ -1,3 +1,9 @@
+import { Event } from "#imports"
+
+/**
+ * Delete a user by id and disassociate all events created by this user
+ * @auth admin
+ */
 export default defineEventHandler(async event => {
   await requireAdminSession(event)
   const log = useLogger('user delete')
@@ -9,5 +15,6 @@ export default defineEventHandler(async event => {
     throw createError({ status: 404, message: 'This user does not exists' })
   }
 
+  await Event.update({ userId: null }, { where: { userId: user.id } })
   return user.destroy()
 })

@@ -4,7 +4,7 @@ definePageMeta({
   middleware: ['authenticated']
 })
 
-const { $confirm } = useNuxtApp()
+const { $confirm, $notify } = useNuxtApp()
 
 const { user, clear: clearSession } = useUserSession()
 
@@ -31,10 +31,10 @@ async function removeAccount () {
       <v-card-title>{{user.email}}</v-card-title>
       <v-card-text>
         <v-container>
-          <v-btn @click='forgot'>{{$t('login.forgot_password')}}</v-btn><br><br>
-          <v-divider />
-          <p>{{$t('settings.remove_account')}}</p>
-          <v-btn color='warning' @click='removeAccount'>{{$t('common.remove')}}</v-btn>
+          <v-btn variant="outlined" color="warning" @click='forgot'>{{$t('login.forgot_password')}}</v-btn>
+          <v-divider class='my-4' />
+          <p class="font-light">{{$t('settings.remove_account')}}</p>
+          <v-btn variant='outlined' color='error' @click='removeAccount'>{{$t('common.remove')}}</v-btn>
         </v-container>
       </v-card-text>
     </v-card>

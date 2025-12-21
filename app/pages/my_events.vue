@@ -16,9 +16,8 @@ const headers = [
 async function toggle (event) {
   const id = event.id
   const is_visible = event.is_visible
-  const method = is_visible ? 'unconfirm' : 'confirm'
   try {
-    await $fetch(`/api/events/${id}/${method}`, { method: 'PUT' })
+    await $fetch(`/api/events/${id}/toggle`, { method: 'PUT' })
     refresh()
   } catch (e) {
     console.error(e)
