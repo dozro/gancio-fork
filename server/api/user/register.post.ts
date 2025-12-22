@@ -1,16 +1,27 @@
+// import { z } from 'zod'
+import * as linkify from 'linkifyjs'
 /**
  * Register a new user
  * This will send an email to the user and to all the administrators
  * @todo flood protection
  * @info The first registered user will be an active admin
  * @param {string} email - user e-mail
- * @param {string} password - description
+ * @param {string} password - password
  * @param {string} description - description
  */
+ 
+// const userSchema = z.object({
+//   email: z.string().email(),
+//   password: z.string().min(8).max(100),
+//   description: z.string().min(5).max(255).optional()
+// })
 
 export default defineEventHandler(async event => {
   const log = useLogger('register')
+  
+  // const user = await readValidatedBody(event, userSchema.parse)
   const user = await readBody(event)
+  
   if (!publicSettings.allow_registration) { throw createError({ status: 404, message: 'Not found' }) }
 
   const n_users = await User.count()
@@ -30,9 +41,9 @@ export default defineEventHandler(async event => {
     // user.is_admin = false
 
     // check email
-    // if (!linkify.test(user.email, 'email')) {
-    // return res.status(404).json('Invalid email')
-    // }
+    if (!linkify.test(user.email, 'email')) {
+      throw createError({ status: 400, statusMessage: 'Invalid email' })
+    }
 
     log.info('Register user', user.email)
     const userInstance = await User.create(user)

@@ -2,7 +2,6 @@ import path from 'path'
 import dotenv from 'dotenv'
 import fs from 'fs'
 import { z } from 'zod'
-import Sequelize from '@sequelize/core'
 
 export const ProxyAuthSchema = z.object({
   username: z.string().optional().default(""),
@@ -17,7 +16,6 @@ export const ProxySchema = z.object({
   auth: ProxyAuthSchema,
   headers: z.record(z.string(), z.string()).optional().default({}),
 })
-
 
 export type DialectName = 'sqlite3' | 'mariadb' | 'postgresql'
 export const DbSchema = z.object({
