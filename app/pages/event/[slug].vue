@@ -152,7 +152,7 @@ async function report() {
           </v-container>
           <!-- tags, hashtags -->
           <v-container class="pt-0" v-if="event?.tags?.length">
-            <v-chip class="p-category ml-1 mt-1" v-for="tag in event.tags" small label color="primary" outlined
+            <v-chip class="p-category ml-1 mt-1" v-for="tag in event.tags" density='dense' label color="primary" variant='outlined'
               :key="tag" :to="`/tag/${encodeURIComponent(tag)}`">
               {{ tag }}
             </v-chip>

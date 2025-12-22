@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { refDebounced } from '@vueuse/core'
 
-const event = defineModel<EventDTO>('event', { type: Object, required: true } )
+const event = defineModel<EventAPI>('event', { type: Object, required: true } )
 
 const settings = useState<Settings>('settings')
 const showGeocoded = computed(() => settings.value.allow_geolocation && event?.value?.place.name !== 'online' && event?.value?.place.create)
@@ -26,8 +26,7 @@ function selectAddress (v) {
     event.value.place.latitude = event.value.place.longitude = null
   }
 }
-//   }
-// }
+
 </script>
 <template>
 <v-card>
@@ -72,7 +71,7 @@ function selectAddress (v) {
       </v-col>
     </v-row>
     <p class='mt-4' v-if='event?.place?.create' v-html="$t('event.address_geocoded_disclaimer')" />
-
+    
     <!-- //:LMapStyles="{height: mapHeight}" /> -->
     <Map
       class='mt-4'

@@ -32,9 +32,9 @@ const getInstanceInfo = debounce(() => {
 </script>
 <template>
 <v-card>
-  <v-card-title v-text="$t('common.follow_me_title')" />
+  <v-card-title class="bg-primary" v-text="$t('common.follow_me_title')" />
   <v-card-text>
-    <v-alert type="info" border="start" icon="mdi-information">
+    <v-alert class='mb-4' type="info" border="start" icon="mdi-information">
       {{$t('admin.stats', stats)}}
     </v-alert>
 
@@ -69,7 +69,7 @@ const getInstanceInfo = debounce(() => {
 
   <v-card-actions v-if="isDialog">
     <v-btn variant='outlined' color="info" @click='$copyToClipboard(`@${settings.instance_name}@${settings.hostname}`)'>
-      {{$t("common.copy")}}  @{{settings.instance_name}}@{{settings.hostname}}s
+      {{$t("common.copy")}}  @{{settings.instance_name}}@{{settings.hostname}}
     </v-btn>
     <v-spacer/>
     <v-btn v-if="isDialog" variant='outlined' color="warning" @click="$emit('close')">

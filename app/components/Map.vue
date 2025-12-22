@@ -1,7 +1,7 @@
 <script setup>
-
 import "leaflet/dist/leaflet.css"
-import { LMap, LTileLayer, LMarker, LPopup, LControlAttribution } from '@vue-leaflet/vue-leaflet'
+import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet"
+// import { LMap, LTileLayer, LMarker, LPopup, LControlAttribution } from '@vue-leaflet/vue-leaflet'
 // import { Icon } from 'leaflet'
 
 const settings = useState('settings')
@@ -47,38 +47,41 @@ const marker = {
     // }, 200);
   // },
   // methods: {
-// function updateCoords(v) {
-//   this.place.latitude = Number.parseFloat(v.lat).toFixed(7)
-//   this.place.longitude = Number.parseFloat(v.lng).toFixed(7) 
-// }
+function updateCoords(v) {
+  props.place.latitude = Number.parseFloat(v.lat).toFixed(7)
+  props.place.longitude = Number.parseFloat(v.lng).toFixed(7) 
+}
   // }
 </script>
+
 <template>
-  <LMap ref="leafletMap"
+    <LMap
+      ref="leafletMap"
       id="leaflet-map"
-      :style="{ 'height': height }"
+      :use-global-leaflet="false"
       :zoom="zoom"
-      :options="{attributionControl: false}"
-      :center="center">
-    <LControlAttribution position='bottomright' prefix="" />
-    <LTileLayer
+      :options="{ attributionControl: false }"
+      :center="center"
+    >
+      <LControlAttribution position="bottomright" prefix="" />
+      <LTileLayer
         @tileload="$emit('tileload')"
         @tileerror="$emit('tileerror')"
         :url="url"
-        :attribution="attribution" />
-    <LMarker
-      v-if="showMarker"
-      :lat-lng="marker.coordinates"
-      @update:lat-lng="updateCoords"
-      :draggable="draggable" />
-  </LMap>
-
+        :attribution="attribution"
+      />
+      <LMarker
+        v-if="showMarker"
+        :lat-lng="marker.coordinates"
+        @update:lat-lng="updateCoords"
+        :draggable="draggable"
+      />
+    </LMap>
 </template>
-
 
 <style>
   #leaflet-map {
-    height: 10rem;
+    height: 10rem !important;
     border-radius: .3rem;
     border: 1px solid #fff;
     z-index: 1;

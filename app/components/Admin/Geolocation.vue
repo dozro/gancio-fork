@@ -78,7 +78,7 @@ async function testTileLayerProvider () {
 // }
 </script>
 <template>
-<v-card>
+<v-container>
   <v-card-title>{{$t('admin.geolocation')}}</v-card-title>
   <v-card-text>
     <span class="mb-6" v-html="$t('admin.geolocation_description')" />
@@ -176,6 +176,6 @@ async function testTileLayerProvider () {
       {{$t('admin.tilelayer_test_button')}}
     </v-btn>
   </v-card-actions>
-</v-card>
+</v-container>
 
 </template>
