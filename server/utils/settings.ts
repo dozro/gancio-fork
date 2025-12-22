@@ -73,7 +73,7 @@ export const publicSettings: Settings = {
   title: config?.title || 'Gancio',
   description: config?.description || 'A shared agenda for local communities',
   baseurl: config.baseurl || '',
-  hostname: '',//config.hostname,
+  hostname: new URL(config.baseurl).hostname,
   instance_timezone: 'Europe/Rome',
   instance_locale: 'en',
   instance_name: 'relay',
