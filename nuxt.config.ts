@@ -15,7 +15,7 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
     timeline: {
-      enabled: true,
+      enabled: false,
     },
   },
   sourcemap: {
@@ -83,7 +83,7 @@ export default defineNuxtConfig({
     }
   },
   build: {
-    transpile: ['vuetify']
+    transpile: ['vuetify', '@vue-leaflet/vue-leaflet']
   },
   vite: {
     optimizeDeps: {
@@ -100,6 +100,9 @@ export default defineNuxtConfig({
       'process.env.DEBUG': false,
     },
     build: {
+      rollupOptions: {
+        external: ['sharp']
+      },
       target: 'esnext',
     },
   },
