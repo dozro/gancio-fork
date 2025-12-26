@@ -40,3 +40,11 @@ pre {
   white-space: break-spaces;
   font-size: 13px;
 }
+
+blockquote {
+  border-left: 4px solid rgba(0, 0, 0, 0.5);
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 16px;
+  opacity: 0.6;
+}
