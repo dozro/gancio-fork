@@ -2,7 +2,7 @@ import { eventQuerySchema, sendEvents } from "~~/server/utils/events"
 
 /**
 * Get events
-* Method to search for events with pagination and filtering
+* by default returns upcoming events from now on or of specific collection if collection in home is set
 * @param {integer} [start] - start timestamp (default: now)
 * @param {integer} [end] - end timestamp (optional)
 * @param {string}  [query] - search for this string in title, place or tags
@@ -22,14 +22,14 @@ import { eventQuerySchema, sendEvents } from "~~/server/utils/events"
 export default defineEventHandler(async (event) => {
   const log = useLogger('get events')
   const opt = await getValidatedQuery(event, eventQuerySchema.parse)
-  if (publicSettings.collection_in_home) {
+  let events
+  
+  if (publicSettings.collection_in_home && !(opt.tags || opt.places || opt.query)) {
     log.debug('get collection events', publicSettings.collection_in_home)
-    return sendEvents(event, await getCollectionEvents({
-      name: publicSettings.collection_in_home,
-      ...opt
-    }))
+    events = await getCollectionEvents({ name: publicSettings.collection_in_home, ...opt })
+  } else {
+    events = await getEvents(opt)
   }
 
-  const events = await getEvents(opt)
   return sendEvents(event, events)
 })

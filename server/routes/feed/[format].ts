@@ -1,99 +1,42 @@
-import { DateTime } from "luxon"
 import { exportICS } from "~~/server/utils/ics"
 import { exportFeed } from "~~/server/utils/rss"
+import { getLastModified } from "~~/server/utils/events"
+import { formatSchema } from "~~/server/types/validator"
 
+/**
+ * Return events in different formats: rss, ics, json
+ * 
+ */
 export default defineCachedEventHandler(async evt => {
-  const format = getRouterParam(evt, 'format')
-  const {tags, places, collection, show_recurrent } = getQuery(evt)
+  const log = useLogger('feed events')
+  const { format } = await getValidatedRouterParams(evt, formatSchema.parse)
   
-  const opt = {
-    zone: publicSettings.instance_timezone || 'Europe/Rome',
-    locale: publicSettings.instance_locale || 'en-US'
-  }
-
-  const yesterday = DateTime.local(opt).minus({day: 1}).toUnixInteger()
-
+  const opt  = await getValidatedQuery(evt, eventQuerySchema.parse)
+  
   let events
-  if (collection) {
-    events = await getCollectionEvents({ name: collection })
+  if (publicSettings.collection_in_home && !(opt.tags || opt.places || opt.query)) {
+    log.debug('get collection events', publicSettings.collection_in_home)
+    events = await getCollectionEvents({ name: publicSettings.collection_in_home, ...opt })
   } else {
-
-    events = await getEvents({ start: yesterday, tags, places, show_recurrent })
+   events = await getEvents(opt)
   }
-  
+
+  const lastModified = getLastModified(events)
+  const etag = calculateEtag(events)
+
+  if (handleCacheHeaders(evt, { modifiedTime: lastModified, etag, maxAge: 60, cacheControls: ['stale-with-revalidate'] })) {
+    return
+  }
 
   switch (format) {
     case 'rss':
-    case 'feed':
-      return exportFeed(evt, events.slice(0, 20))
+      return exportFeed(evt, events)
     case 'ics':
       return exportICS(evt, events)
     case 'json':
-      return events
+      return mapEvents(events)
+    // case 'json-ld':
+    //   return mapEventsJSONLD(events)
   }
   throw createError({ status: 400, message: 'Please specify a valid format: rss, feed, ics or json' })
 })
-
-
-
-//     if (!collection) {
-
-//       if (tags && places) {
-//         where[Op.or] = {
-//           placeId: places ? places.split(',').map(Number).filter(a => a) : [],
-//           '$tags.tag$': tags.split(',')
-//         }
-//       }
-
-//       if (tags) {
-//         where['$tags.tag$'] = tags.split(',')
-//       }
-
-//       if (places) {
-//         where.placeId = places.split(',').map(Number).filter(a => a)
-//       }
-
-//     }
-
-//     if (!show_recurrent) {
-//       where.parentId = null
-//     }
-
-//     let events = []
-
-//     if (collection) {
-//       events = await collectionController._getEvents({ name: collection })
-//     } else {
-//       events = await Event.findAll({
-//         order: ['start_datetime'],
-//         attributes: { exclude: ['is_visible', 'recurrent', 'createdAt', 'likes', 'boost', 'userId', 'placeId'] },
-//         where: {
-//           is_visible: true,
-//           recurrent: null,
-//           apUserApId: null,
-//           start_datetime: { [Op.gte]: yesterday },
-//           ...where
-//         },
-//         include: [
-//           {
-//             model: Tag,
-//             order: [literal('(SELECT COUNT("tagTag") FROM event_tags WHERE tagTag = tag) DESC')],
-//             attributes: ['tag'],
-//             required: !!tags,
-//             through: { attributes: [] }
-//           },
-//           { model: Place, attributes: ['name', 'id', 'address'] }]
-//       })
-//     }
-
-//     switch (format) {
-//       case 'rss':
-//       case 'feed':
-//         return exportController.feed(req, res, events.slice(0, 20))
-//       case 'ics':
-//         return exportController.ics(req, res, events)
-//       case 'json':
-//         return res.json(events)
-//     }
-//     return res.send('Please specify a valid format: rss, feed, ics or json').status(404)
-//   },
