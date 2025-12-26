@@ -434,16 +434,16 @@ export class Place extends Model<
 
   @Attribute(DataTypes.STRING)
   @Index
-  declare ap_id: string
+  declare ap_id?: string
 
   @Attribute(DataTypes.STRING)
   declare address: string
 
   @Attribute(DataTypes.DOUBLE)
-  declare latitude: number
+  declare latitude?: number
 
   @Attribute(DataTypes.DOUBLE)
-  declare longitude: number
+  declare longitude?: number
 
   @HasMany(() => Event, /* foreign key */ 'placeId')
   declare events?: NonAttribute<Event[]>
@@ -583,7 +583,19 @@ type APUserObject = {
   icon: { url: string },
   summary?: string,
   preferredUsername: string,
-  url?: string
+  discoverable?: boolean,
+  indexable?: boolean,
+  attachments?: Array<{
+    type: string,
+    name: string,
+    url: string
+  }>,
+  url?: string,
+  publicKey?: {
+    id: string,
+    owner: string,
+    publicKeyPem: string
+  }
 }
 
 @Table({
@@ -596,6 +608,12 @@ export class APUser extends Model<
   @Attribute(DataTypes.STRING)
   @PrimaryKey
   declare ap_id: string
+
+  @CreatedAt
+  declare readonly createdAt: CreationOptional<Date>
+
+  @UpdatedAt
+  declare readonly updatedAt: CreationOptional<Date>
 
   @Attribute(DataTypes.BOOLEAN)
   declare follower: boolean
