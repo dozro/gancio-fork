@@ -21,10 +21,10 @@ export function mediaURL(event: EventAPI, type?: string, format = '.jpg') {
 }
 
 
-export function manageSetting(key: keyof Settings, setCb?: Function) {
+export function manageSetting<K extends keyof Settings>(key: K, setCb?: Function) {
   const settings = useState<Settings>('settings')
-  return computed({
-    get: () =>  settings.value[key],
+  return computed<Settings[K]>({
+    get: () => settings.value[key],
     set: (value) => {
       $fetch('/api/settings', { method: 'PUT', body: { key, value } })
       if (typeof setCb === 'function') { setCb(value) }

@@ -1,3 +1,55 @@
+<script setup>
+
+const { $prompt } = useNuxtApp()
+import { useEditor, EditorContent } from '@tiptap/vue-3'
+import StarterKit from '@tiptap/starter-kit'
+// import Underline from '@tiptap/extension-underline'
+
+const props = defineProps({
+  modelValue: { type: String, default: '' },
+  label: { type: String, default: '' },
+  hint: { type: String, default: '' },
+  placeholder: { type: String, default: '' },
+  height: { type: String, default: '' },
+})
+
+const emit = defineEmits(['update:modelValue'])
+const link = ref()
+
+const editor = useEditor({
+    content: props.modelValue || '',
+    extensions: [StarterKit],
+    onUpdate: ({ editor }) => {
+      emit('update:modelValue', editor.getHTML())
+    },
+  })
+
+const focused = ref(false)
+
+const isLabelFloating = computed(() => {
+  return focused.value || editor.value?.getText().trim().length > 0
+})
+
+onMounted(() => {
+  editor.value?.on('focus', () => (focused.value = true))
+  editor.value?.on('blur', () => (focused.value = false))
+})
+
+onBeforeUnmount(() => {
+  editor.value?.destroy()
+})
+
+async function askLink () {
+  const url = await $prompt('URL', 'Insert Link', '', editor.value?.getAttributes('link').href || '')
+  if (url === false) return
+  if (url) {
+    editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+  } else {
+    editor.value?.chain().focus().unsetLink().run()
+  }
+}
+</script>
+
 <template>
 <div class='v-editor' :class='{focused}'>
   <label :class="{ float: isLabelFloating }">{{ label }}</label>
@@ -74,7 +126,20 @@
         tabindex='-1'
         icon="mdi-link"
         :active="editor?.isActive('link')"
+        @click='askLink'
       />
+      
+        <!-- v-if="editor?.isActive('link')" -->
+      <!-- <v-text-field
+        ref="link"
+        v-model="linkUrl"
+        @blur="setLink"
+        @keypress.enter.prevent="setLink"
+        placeholder="Enter URL"
+        density="compact"
+        style="width: 150px"
+        hide-details
+      /> -->
       <!-- TODO -->
 
     </v-btn-toggle>
@@ -97,59 +162,6 @@
   
 </div>
 </template>
-<script setup>
-import { useEditor, EditorContent } from '@tiptap/vue-3'
-import StarterKit from '@tiptap/starter-kit'
-// import Underline from '@tiptap/extension-underline'
-
-const props = defineProps({
-  modelValue: { type: String, default: '' },
-  label: { type: String, default: '' },
-  hint: { type: String, default: '' },
-  placeholder: { type: String, default: '' },
-  height: { type: String, default: '' },
-})
-
-const emit = defineEmits(['update:modelValue'])
-
-const editor = useEditor({
-    content: props.modelValue || '',
-    extensions: [StarterKit],
-    onUpdate: ({ editor }) => {
-      emit('update:modelValue', editor.getHTML())
-    },
-  })
-
-const focused = ref(false)
-const showLinkDialog = ref(false)
-const linkUrl = ref('')
-
-function setLink() {
-  if (linkUrl.value) {
-    editor.value?.chain().focus().extendMarkRange('link').setLink({ href: linkUrl.value }).run()
-  } else {
-    editor.value?.chain().focus().unsetLink().run()
-  }
-  showLinkDialog.value = false
-  linkUrl.value = ''
-}
-
-const isLabelFloating = computed(() => {
-  return focused.value || editor.value?.getText().trim().length > 0
-})
-
-
-onMounted(() => {
-  editor.value?.on('focus', () => (focused.value = true))
-  editor.value?.on('blur', () => (focused.value = false))
-})
-
-onBeforeUnmount(() => {
-  editor.value?.destroy()
-})
-
-</script>
-
 <style lang='css'>
 .v-editor {
   position: relative;
@@ -168,10 +180,10 @@ onBeforeUnmount(() => {
 }
 
 .v-editor label {
-  position: absolute;
+  /*position: absolute;*/
   left: 12px;
   top: 16px;
-  font-size: 16px;
+  /*font-size: 16px;*/
   color: #666;
   transition: all 0.2s;
   pointer-events: none;
@@ -180,7 +192,7 @@ onBeforeUnmount(() => {
 .v-editor label.float {
   top: 4px;
   font-size: 12px;
-  color: #1976d2;
+  color: black;
 }
 
 /* .v-editor__content {
@@ -197,8 +209,8 @@ onBeforeUnmount(() => {
 
 .menubar {
   transition: opacity .5s;
-  opacity: 0;
-  visibility: hidden;
+  /*opacity: 0;*/
+  /*visibility: hidden;*/
   overflow: auto;
 }
 

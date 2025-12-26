@@ -18,8 +18,8 @@ export default defineNuxtPlugin(() => {
     $emit('notify', { msg: String(msg), status, args })
   }
 
-  function prompt (msg: string, title: string, label: string = '' ) {
-    $emit('promptDialog', { msg, title, label })
+  function prompt (msg: string, title: string, label?: string, value?: string ) {
+    $emit('promptDialog', { msg, title, label, value })
     return new Promise((resolve, _reject) => {
       $once('promptDialog:result', resolve)
     })

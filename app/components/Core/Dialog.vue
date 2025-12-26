@@ -27,6 +27,7 @@ function promptDialog (ev) {
   msg.value = t(ev.msg, ev.args)
   title.value = t(ev.title)
   name.value = t(ev.label)
+  userInput.value = ev?.value ?? ''
   visible.value = true
 }
 
