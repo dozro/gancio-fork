@@ -24,10 +24,12 @@ const enable_moderation = manageSetting('enable_moderation')
 const enable_report = manageSetting('enable_report')
 const showSMTP = ref(false)
 
+// move the current user timezone to the top of the list
 const filteredTimezones = computed(() => {
   const current_timezone = DateTime.local().zoneName
   tzNames.unshift(current_timezone)
-  return tzNames
+  // remove current_timezone duplicates
+  return Array.from(new Set(tzNames))
 })
 
 </script>
