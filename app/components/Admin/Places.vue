@@ -82,7 +82,7 @@ async function savePlace() {
             v-model="place.address"
             persistent-hint
           />
-          <SearchAddress v-if="settings.allow_geolocation" :place="place" />
+          <SearchAddress v-if="settings.allow_geolocation" v-model:place="place" />
         </v-form>
       </v-card-text>
       <v-card-actions>

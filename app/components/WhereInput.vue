@@ -126,7 +126,7 @@ function selectPlace (place) {
     destroy-on-close="destroy-on-close"
     max-width="700px" :fullscreen="$vuetify.display.mobile" density="dense">
     <WhereInputAdvanced
-      v-model:event="event" @close="whereInputAdvancedDialog = false" />
+      v-model:place="event.place" @close="whereInputAdvancedDialog = false" />
   </v-dialog>
   
 </v-row>
