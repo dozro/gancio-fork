@@ -96,7 +96,7 @@ async function report() {
     await $fetch(`/api/events/messages/${event.value?.id}`, { method: 'POST', body: { message } })
     $notify('common.sent')
   } catch (e) {
-    $notify(String(e))
+    $notify(e, Statuses.ERROR)
   }
 }
 
