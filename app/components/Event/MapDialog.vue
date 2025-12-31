@@ -9,7 +9,7 @@ defineProps({
 <v-card>
   <v-container>
     <div :style="{'height': mapHeight}">
-      <Map :place="place" :LMapStyles="{height: mapHeight}" />
+      <Map :place="place" :height="mapHeight" />
     </div>
     <v-row class="my-4 d-flex flex-column align-center text-center">
       <div class="text-h6">

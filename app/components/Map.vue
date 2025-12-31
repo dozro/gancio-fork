@@ -10,7 +10,7 @@ const attribution = settings.tilelayer_provider_attribution || "<a target=\"_bla
 
 const props = defineProps({
   place: { type: Object, default: () => ({ latitude: 0, longitude: 0 }) },
-  height: { type: String, default: '' },
+  height: { type: String, default: '10rem' },
   showMarker: { type: Boolean, default: true },
   mapCenter: { type: Array, default: () => ([]) },
   zoom: { type: Number, default: () => (16) },
@@ -59,6 +59,7 @@ function updateCoords(v) {
       ref="leafletMap"
       id="leaflet-map"
       :use-global-leaflet="false"
+      :style="{ height: height || '10rem' }"
       :zoom="zoom"
       :options="{ attributionControl: false }"
       :center="center"
@@ -81,7 +82,6 @@ function updateCoords(v) {
 
 <style>
   #leaflet-map {
-    height: 10rem !important;
     border-radius: .3rem;
     border: 1px solid #fff;
     z-index: 1;
