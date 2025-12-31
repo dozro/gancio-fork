@@ -290,6 +290,7 @@
         "trusted_sources_label_default": "Other locations",
         "trusted_sources_label_help": "The default label is 'Other locations'",
         "add_trusted_source": "Add a trusted federated source",
+        "add_trusted_source_help": "Use one of the following syntax: <br/><ul><li>the web address of another Gancio or a software that supports an Application Actor / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (e.g. <u>https://demo.gancio.org</u>)</li><li>an ActivityPub handle like <u>@gancio@mastodon.cisti.org</u></li><li>the url of an account like <u>https://instance.tld/actor</u>.</li></ul><br/>Events published or boosted from these sources will be imported.",
         "delete_trusted_source_confirm": "Do you really want to delete this trusted source?",
         "trusted_source_removed": "Trusted source removed",
         "is_dark": "Dark theme",
