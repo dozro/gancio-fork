@@ -5,5 +5,6 @@
 export default defineEventHandler(async (event) => {
     const user = await requireUser(event)
     
-    return sendEvents(event, await getEvents({ user_id: user.id, include_unconfirmed: true }))
+    const events = await getEvents({ user_id: user.id, include_unconfirmed: true })
+    return events.map(e => mapEvent(e))
 })

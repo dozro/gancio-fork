@@ -676,7 +676,7 @@ export class Setting extends Model<
 
 @Table({
   tableName: 'collections',
-  timestamps: false
+  timestamps: true
 })
 export class Collection extends Model<
   InferAttributes<Collection>,
@@ -703,6 +703,12 @@ export class Collection extends Model<
   @Attribute(DataTypes.INTEGER.UNSIGNED)
   @Index
   declare sortIndex: CreationOptional<number>
+
+  @CreatedAt
+  declare readonly createdAt: CreationOptional<Date>
+
+  @UpdatedAt
+  declare readonly updatedAt: CreationOptional<Date>
 
   @BeforeCreate
   static async autoincrementSortIndex(collection: Collection, options: AggregateOptions<InferAttributesOptions<Collection>>) {

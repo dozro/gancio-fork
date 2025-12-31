@@ -95,7 +95,7 @@ const config = getConfig()
 //     .join('')
 // },
 
-export function sanitizeHTML(html) {
+export function sanitizeHTML(html: string) {
   return domPurify.sanitize(html, {
     ALLOWED_TAGS: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'br', 'i', 'span', 'em',
       'h6', 'b', 'a', 'li', 'ul', 'ol', 'code', 'blockquote', 'u', 's', 'strong'],

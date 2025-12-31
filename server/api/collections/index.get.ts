@@ -11,7 +11,11 @@ export default defineEventHandler(async event => {
     return Collection.findAll({ include: [Filter], order: [['sortIndex', 'asc']] })
   } else {
     if (pin) {
-      return Collection.findAll({ where: { isTop: true }, order: [['sortIndex', 'asc']] })
+      const collections = await Collection.findAll({ where: { isTop: true }, order: [['sortIndex', 'asc']] })
+      const lastModified = getLastModified(collections)
+      if (!handleCacheHeaders(event, { modifiedTime: lastModified, maxAge: 5 })) {
+        return collections
+      }
     } else {
       return Collection.findAll({ order: [['sortIndex', 'asc']] })
     }
