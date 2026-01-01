@@ -14,7 +14,9 @@ export default defineEventHandler(async (event) => {
     return sendRedirect(event, '/fallbackimage.png', 302)
   }
 
-  if (!handleCacheHeaders(event, { maxAge: 31536000, cacheControls: ['public', 'immutable'] })) {
+  const modifiedTime = s.mtime
+  modifiedTime.setMilliseconds(0)
+  if (!handleCacheHeaders(event, { modifiedTime, maxAge: 31536000, cacheControls: ['immutable'] })) {
     setHeader(event, 'Content-Length', s.size)
     return sendStream(event, createReadStream(filePath))
   }
