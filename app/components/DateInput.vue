@@ -96,6 +96,7 @@ const endTime = computed({
       v-if="!event.parentId && !event.recurrent"
       v-model="type"
       color="primary"
+      mandatory
     >
       <v-btn value="normal" label="normal">{{ $t('event.normal') }}</v-btn>
       <v-btn v-if="settings.allow_multidate_event" value="multidate" label="multidate">{{ $t('event.multidate') }}</v-btn>
