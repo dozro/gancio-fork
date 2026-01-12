@@ -17,7 +17,7 @@ useHead({
 })
 const hide_thumbs = false
 
-const { data: events } = await useFetch<Event[]>(`/api/collections/${route.params.name}`) 
+const { data: events } = await useFetch<Event[]>(`/api/collections/${encodeURIComponent(route.params.name)}`) 
 
 </script>
 <template>
