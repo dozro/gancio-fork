@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const settings = useState<Settings>('settings')
+const route = useRoute()
 
 </script>
 <template>
@@ -16,7 +17,7 @@ const settings = useState<Settings>('settings')
     </component>
 
     <NavSearch />
-    <NavBar v-if="!['event-slug','e-slug'].includes($route?.name)"/> 
+    <NavBar v-if="!['event-slug','e-slug'].includes(route.name as string)"/> 
   </nav>
 </template>
 <style>
