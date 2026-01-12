@@ -3,15 +3,30 @@
   const { loggedIn } = useUserSession()
 </script>
 <template>
-  <v-tabs id='navbar' class='mt-4' align-tabs="center">
-    <v-tab v-if='loggedIn || settings.allow_anon_event' to='/add'>
-      <span class='d-none d-sm-flex'>{{$t('common.add_event')}}</span>
+  <div id="navbar" class='d-flex justify-space-between justify-sm-center ga-2 pa-2 mt-2'>
+    <v-btn
+      v-if='loggedIn || settings.allow_anon_event'
+      to='/add'
+      :aria-label="$t('common.add_event')"
+      variant='text'
+      class="icon-button px-3 px-sm-4"
+    >
+      <span class='me-1'>{{$t('common.add_event')}}</span>
       <v-icon color='primary' icon='mdi-plus' />
-    </v-tab>
-    <v-tab to='/export'>
-      <span class='d-none d-sm-flex'>{{$t('common.share')}}</span>
+    </v-btn>
+    <v-btn
+      to='/export'
+      :aria-label="$t('common.share')"
+      variant='text'
+      class="icon-button px-3 px-sm-4"
+    >
+      <span class='d-none d-sm-block me-1'>{{$t('common.share')}}</span>
       <v-icon icon='mdi-share-variant' />
-    </v-tab>
-  </v-tabs>
-  </template>
-  
+    </v-btn>
+  </div>
+</template>
+<style scoped>
+.icon-button {
+  min-width: 0;
+}
+</style>
