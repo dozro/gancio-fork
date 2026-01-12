@@ -44,8 +44,8 @@ export type Settings = {
   hide_calendar: boolean,
   footerLinks: Array<FooterLink>
   plugins: Array<object>,
-  admin_email: string
-  smtp: object,
+  admin_email: string,
+  smtp: { port?: number, host?: string, secure?: boolean, requireTLS?: boolean, auth?: { user: string, pass: string }, from?: string },
   collection_in_home?: string,
   calendar_first_day_of_week?: number,
   default_fedi_hashtags: Array<string>,

@@ -5,9 +5,9 @@ const settings = useState<Settings>('settings')
 const loading = ref(false)
 const isValid = ref(false)
 const { $notify } = useNuxtApp()
-const smtp = ref({ auth: {} })
+const smtp = ref({})
 smtp.value = await $fetch('/api/settings/smtp')
-smtp.value = Object.assign({ auth: {}, port: undefined }, smtp.value)
+smtp.value = Object.assign({ auth: {}, port: undefined, from: '' }, smtp.value)
 
 const emit = defineEmits(['close'])
 
@@ -42,16 +42,17 @@ async function done (testing: boolean) {
   try {
     if (testing) {
       loading.value = true
-        await $fetch('/api/settings/test_smtp', { method: 'POST', body: { tmpSMTP }})
-        $notify('admin.smtp_test_success', Statuses.SUCCESS, { admin_email })
-        loading.value = false
-      } else {
-        await $fetch('/api/settings', { method: 'PUT', body: { key: 'smtp', value: tmpSMTP }})
-        emit('close')
-      }
-    } catch (e) {
-      $notify(e, Statuses.ERROR)
+      await $fetch('/api/settings/test_smtp', { method: 'POST', body: tmpSMTP })
+      $notify('admin.smtp_test_success', Statuses.SUCCESS, { admin_email: admin_email.value })
+      loading.value = false
+    } else {
+      await $fetch('/api/settings', { method: 'PUT', body: { key: 'smtp', value: tmpSMTP }})
+      emit('close')
     }
+  } catch (e) {
+    loading.value = false
+    $notify(e, Statuses.ERROR)
+  }
 }
 
 </script>
@@ -59,20 +60,35 @@ async function done (testing: boolean) {
 <v-card>
   <v-card-title class="bg-primary">SMTP Email configuration</v-card-title>
   <v-card-text>
-    <p class='mb-2' v-html="$t('admin.smtp_description')"></p>
+    <p class='mb-4 text-subtitle-2' v-html="$t('admin.smtp_description')"></p>
     <v-form v-model="isValid">
 
-      <v-text-field v-model="admin_email"
-        :label="$t('admin.admin_email')"
-        :hint="$t('admin.admin_email_help')"
-        persistent-hint
-        :rules="$valid.email" />
+      <v-row>
+        <v-col cols="7">
+          <v-text-field v-model="admin_email"
+            :label="$t('admin.admin_email', { full_admin_email: `${smtp?.from || '📅 ' + settings.title} <${admin_email}>` })"
+            :hint="$t('admin.admin_email_help')"
+            persistent-hint
+            :rules="$valid.email" />
+        </v-col>
+        
+        <v-col cols="5">
+          <v-text-field v-model="smtp.from"
+            :label="$t('admin.smtp_from_address')"
+            :hint="$t('admin.smtp_from_address_help')"
+            :placeholder='"📅 " + settings.title'
+            persistent-hint>
+          </v-text-field>
+        </v-col>
+      </v-row>
+      
+      
 
       <v-switch v-model="smtp.sendmail"
         :label="$t('admin.smtp_use_sendmail')" />
 
       <v-row v-if="!smtp.sendmail">
-        <v-col cols="12" md="9">
+        <v-col cols="12" md="5">
           <v-text-field v-model="smtp.host"
             :label="$t('admin.smtp_hostname')"
             :rules="[$valid.required('admin.smtp_hostname')]" />
@@ -85,7 +101,7 @@ async function done (testing: boolean) {
             :rules="[$valid.required('admin.smtp_port')]" />
         </v-col>
 
-        <v-col cols="12">
+        <v-col cols="12" md="4">
           <v-switch v-model="smtp.secure"
             :label="$t('admin.smtp_secure')" />
         </v-col>

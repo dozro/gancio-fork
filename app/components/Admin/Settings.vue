@@ -118,7 +118,7 @@ const filteredTimezones = computed(() => {
         {{$t('admin.show_smtp_setup')}}
       </v-btn>
       
-      <v-dialog v-model='showSMTP' destroy-on-close max-width='700px' :fullscreen='$vuetify.display?.mobile'>
+      <v-dialog v-model='showSMTP' destroy-on-close max-width='900px' :fullscreen='$vuetify.display?.mobile'>
         <AdminSMTP @close='showSMTP = false' />
       </v-dialog>
       
