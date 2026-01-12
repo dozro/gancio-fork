@@ -162,7 +162,7 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
 
     place: event?.place?.toJSON() ?? place?.toJSON(),
     tags: (event.tags ?? tags)?.map(t => t.tag),
-    is_mine: event.userId === user?.id,
+    is_mine: event.userId ? event.userId === user?.id : false,
     is_anon: event.userId === null || !event?.user?.is_active,
     is_visible: event.is_visible,
     original_url: event?.ap_object?.url ?? event?.ap_id,
