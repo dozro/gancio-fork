@@ -29,7 +29,7 @@ export function enqueueMail(addresses: string | string[], template: string, loca
 }
 
 type emailTemplates = 'register' | 'confirm' | 'user_confirm' | 'recover' | 'admin_register' | 'event_confirm' | 'test'
-async function sendMail(addresses: string | string[], template: emailTemplates, locals?: object, locale?: string, bcc?: boolean) {
+export async function sendMail(addresses: string | string[], template: emailTemplates, locals?: object, locale?: string, bcc?: boolean) {
   // this hack is needed because there are more standards to indicate language code
   // https://framagit.org/les/gancio/-/issues/539#note_2198016
   const localeMapOverride = {
@@ -40,7 +40,8 @@ async function sendMail(addresses: string | string[], template: emailTemplates, 
   locale = locale ?? settings.instance_locale
   locale = localeMapOverride?.[locale] ?? locale
   log.info(`Send ${template} email to ${addresses} with locale ${locale}`)
-  log.debug(settings?.smtp)
+  
+  const from = `"${settings?.smtp?.from || '📅 ' + settings.title}" <${settings.admin_email}>`
   const email = new Email({
     views: {
       root: path.join(process.cwd(), 'server/emails')
@@ -55,7 +56,7 @@ async function sendMail(addresses: string | string[], template: emailTemplates, 
       }
     },
     message: {
-      from: `"📅 ${settings.title}" <${settings.admin_email}>`
+      from
     },
     send: true,
     i18n: {
@@ -91,10 +92,6 @@ async function sendMail(addresses: string | string[], template: emailTemplates, 
     }
   }
   return email.send(msg)
-    .then(e => {
-      console.error('finito mail SENT success!!!')
-      console.error(e)
-    })
     .catch(e => {
       log.error('[MAIL]', e)
       throw e
