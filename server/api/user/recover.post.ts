@@ -1,16 +1,18 @@
 /**
- * enqueue a password recovery email for the logged in user
+ * enqueue a password recovery email for specified email address
  */
 export default defineEventHandler(async (event) => {
   const log = useLogger('user/recover')
-  const user = await requireUser(event)
   
-  const userInstance = await User.findByPk(user.id)
-  if (!userInstance) {
+  const { email } = await readBody(event)
+  const user = await User.findOne({ where: { email, is_active: true } })
+
+  if (!user) {
+    log.warn('User not found', email)
     throw createError({ statusCode: 404, statusMessage: 'User not found' })
   }
 
-  await userInstance.generateRecoverCode()
-  enqueueMail(userInstance.email, 'recover', { user, config: publicSettings }, event.context.locale)
+  await user.generateRecoverCode()
+  enqueueMail(user.email, 'recover', { user, config: publicSettings }, event.context.locale)
 
 })
