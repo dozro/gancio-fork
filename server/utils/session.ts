@@ -48,7 +48,7 @@ export async function getUser(event: UseSessionEvent) {
 export async function requireUser(event: UseSessionEvent) {
   const user = await getUser(event)
   if (!user) {
-    throw createError({ status: 401, message: 'Unauthorized' })
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
   return user
@@ -61,7 +61,7 @@ export async function requireRole(event: UseSessionEvent, role: string) {
   const user = await requireUser(event)
 
   if (user?.role !== role) {
-    throw createError({ status: 401, message: 'Unauthorized' })
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
   return user
@@ -82,7 +82,7 @@ export async function requireAdminSession(event: UseSessionEvent, opts: { status
     if (isEvent(event)) {
       throw createError({
         statusCode: opts.statusCode || 401,
-        message: opts.message || 'Unauthorized',
+        statusMessage: opts.message || 'Unauthorized',
       })
     }
     else {
@@ -95,7 +95,7 @@ export async function requireAdminSession(event: UseSessionEvent, opts: { status
   if (userSession?.role !== 'admin') {
     throw createError({
       statusCode: opts.statusCode || 401,
-      message: opts.message || 'Unauthorized',
+      statusMessage: opts.message || 'Unauthorized',
     })
   }
 
