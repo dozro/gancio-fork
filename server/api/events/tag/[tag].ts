@@ -3,7 +3,7 @@ import max from 'lodash/max'
 import { calculateEtag } from '~~/server/utils/events'
 export default defineEventHandler(async evt => {
   const log = useLogger('events/tag')
-  const tagName = getRouterParam(evt, 'tag')
+  const tagName = getRouterParam(evt, 'tag', { decode: true })
 
   if (!tagName) {
     log.warn('Tag not specified')
@@ -12,7 +12,7 @@ export default defineEventHandler(async evt => {
 
   const tag = await Tag.findByPk(tagName)
   if (!tag) {
-    log.warn('Tag not found')
+    log.warn('Tag not found', tagName)
     throw createError({ statusCode: 404, statusMessage: 'Tag not found' })
   }
 
