@@ -2,6 +2,8 @@ import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import slugify from 'slugify'
 import { Umzug, SequelizeStorage } from 'umzug'
+import fs from 'fs/promises'
+import path from 'path'
 import { useLogger } from './useLogger'
 
 import {
@@ -40,7 +42,8 @@ import {
   // BelongsTo,
   Default,
   BeforeCreate,
-  BelongsTo
+  BelongsTo,
+  BeforeDestroy
 } from "@sequelize/core/decorators-legacy"
 
 import type { SecretSettings, Settings } from './settings'
@@ -240,7 +243,7 @@ export class Event extends Model<
     type: DataTypes.INTEGER.UNSIGNED,
     references: { table: "users", key: "id" },
     onUpdate: "CASCADE",
-    onDelete: "CASCADE",
+    onDelete: "SET NULL",
   })
   declare userId?: number;
 
@@ -294,6 +297,23 @@ export class Event extends Model<
   declare setTags: BelongsToManySetAssociationsMixin<Tag, string>
   declare setPlace: BelongsToSetAssociationMixin<Place, number>
 
+  @BeforeDestroy
+  static async removeImg (instance: Event) {
+    // remove the image files (normal and thumb) associated with this event
+    // if no image is associated, do nothing
+    if (!instance.media || instance.media.length === 0 || !instance.media[0]?.url) { return }
+    for (let media of instance.media) {
+      if (!media?.url) continue
+      const thumbPath = path.resolve(config.upload_path, 'thumb', path.basename(media.url))
+      const normalPath = path.resolve(config.upload_path, path.basename(media.url))
+      log.info(`Removing event images for event ${instance.id}: `, normalPath, thumbPath)
+      await Promise.allSettled([
+        fs.unlink(normalPath),
+        fs.unlink(thumbPath)
+      ])
+    }
+  }
+  
   @BeforeCreate
   static async generateSlug(event: Event) {
     if (event.title && !event.slug) {
@@ -455,7 +475,6 @@ export class Place extends Model<
    * @link WIP -> https://codeberg.org/fediverse/fep/src/commit/4a75a1bc50bc6d19fc1e6112f02c52621bc178fe/fep/8a8e/fep-8a8e.md#location
    */
   toAP() {
-    console.error(this)
     return {
       id: this?.ap_id ?? `${config.baseurl}/federation/p/${this.id}`,
       type: 'Place',
