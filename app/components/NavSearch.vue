@@ -3,12 +3,10 @@
 const settings = useState<Settings>('settings')
 const route = useRoute()
 
-const in_home = computed(() => route.name === 'index')
-const show_calendar = computed(() => !settings.value.hide_calendar && in_home.value)
-
+const show_calendar = computed(() => !settings.value.hide_calendar && route?.name === 'index')
 const { data: collections } = await useFetch<Collection[]>('/api/collections/home')
 
-const show_collections_bar = computed(() => ['index', 'collection-name'].includes(route.name as string))
+const show_collections_bar = computed(() => ['index', 'collection-name'].includes(route?.name))
 
 </script>
 
