@@ -4,8 +4,7 @@ const { loggedIn, user, clear } = useUserSession()
 const { $notify } = useNuxtApp()
 const theme = useAppTheme()
 const route = useRoute()
-const settings = useState<Settings>('settings')
-const params = useState('params', () => ({ show_recurrent: settings.value.recurrent_event_visible, start: time.startMonth(time.currentYear(),  time.currentMonth()) }))
+const { params } = useEvents()
 
 const { locales, setLocale, t } = useI18n()
 

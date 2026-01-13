@@ -3,9 +3,9 @@
 import time from '~/utils/time'
 import { useTheme } from 'vuetify'
 
-const params = useState('params')
 let selectedDate = useState('selectedDate')
-const attributes = useState('attributes')
+const { attributes, params } = useEvents()
+
 const theme = useTheme()
 
 // const { startMonth } = useTime()

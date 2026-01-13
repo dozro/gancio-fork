@@ -23,7 +23,8 @@ const route = useRoute()
 <style>
   nav#AppBar {
     background-image: linear-gradient(rgba(0,0,0,.8),hsla(0,0%,8%,.7)),url('/headerimage.png');
-    background-position: center center;
+    /* background-position: center center; */
+    background-position: top;
     background-size: cover;
     /*color: rgb(var(--v-theme-success));*/
   }

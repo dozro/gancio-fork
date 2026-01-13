@@ -31,16 +31,11 @@ const now = time.nowUnix()
 
 const params = useState('params')
 const selectedDate = useState<Date|null|undefined>('selectedDate', () => undefined)
-const attributes = useState('attributes')
+const { events } = useEvents()
 
 // check if current month is selected
 const isCurrentMonth = computed(() => params.value.start === time.startMonth())
 
-const { data: events } = await useFetch<Event[]>('/api/events', { params,
-  onResponse: res => {
-    attributes.value = useAttributesFromEvents(res.response._data)
-  }
-})
 
 const visibleEvents = computed(() => {
   if (selectedDate.value) {
