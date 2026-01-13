@@ -38,16 +38,16 @@ onMounted(() =>  {
 </script>
 
 <template>
-<div class="v-row">
+<v-row>
 
   <!-- filter recurrent event -->
-  <div class="v-col" sm="3" cols="12" v-if="settings.allow_recurrent_event">
+  <v-col sm="3" cols="12" v-if="settings.allow_recurrent_event">
     <v-switch
       v-if="settings.allow_recurrent_event"
       v-model="modelValue.show_recurrent"
       :label="$t('event.show_recurrent')"
     />
-  </div>
+  </v-col>
 
   <v-col>
     <v-autocomplete
@@ -95,6 +95,6 @@ onMounted(() =>  {
       item-title="name"
     />
   </v-col>
-</div>
+</v-row>
 
 </template>
