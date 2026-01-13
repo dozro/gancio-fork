@@ -3,15 +3,15 @@ const props = defineProps({ error: Object })
 
 let zodIssues = null
 
-if (props.error?.data?.name === 'ZodError') {
-  zodIssues = JSON.parse(props.error?.data?.message)
+if (props?.error?.data?.name === 'ZodError') {
+  zodIssues = JSON.parse(props?.error?.data?.message)
 }
 </script>
 
 <template>
   <NuxtLayout name="default">
     <v-container>
-      <h1>{{ error?.statusMessage }}</h1>
+      <h1>{{ error?.statusMessage ?? error?.message }}</h1>
 
       <div v-if="zodIssues">
         <ul>
@@ -22,7 +22,7 @@ if (props.error?.data?.name === 'ZodError') {
         </ul>
       </div>
 
-      <NuxtLink to="/">{{ $t('common.home') }}</NuxtLink>
+      <v-btn prepend-icon='mdi-arrow-left' to="/">{{ $t('common.home') }}</v-btn>
     </v-container>
   </NuxtLayout>
 </template>
