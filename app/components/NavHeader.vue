@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocale } from 'vuetify'
 
 const { loggedIn, user, clear } = useUserSession()
 const { $notify } = useNuxtApp()
@@ -6,7 +7,13 @@ const theme = useAppTheme()
 const route = useRoute()
 const { params } = useEvents()
 
-const { locales, setLocale, t } = useI18n()
+const { locales, t } = useI18n()
+const { current } = useLocale()
+
+function changeLocale (locale: string) {
+  current.value = locale
+}
+
 
 function logout () {
   clear()
@@ -37,7 +44,7 @@ const in_home = computed(() => route.name === 'index')
       <!-- TODO <t-btn icon='mdi-magnify' to='/search' tooltip='common.search' /> -->
       <t-btn icon="mdi-information" to='/about' tooltip='common.about' :aria-label='t("common.about")' />
 
-      <t-btn :icon="theme?.theme?.global?.current?.value?.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'" tooltip='common.dark' @click='theme.toggleTheme' />
+      <t-btn :icon="theme?.theme.current?.value?.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'" tooltip='common.dark' @click='theme.toggleTheme()' />
 
       <!-- language selection menu -->
       <v-menu transition="slide-y-transition">
@@ -45,7 +52,7 @@ const in_home = computed(() => route.name === 'index')
           <v-btn variant='plain' icon='mdi-translate' v-bind='props' aria-label='Language' tooltip='common.language' />
         </template>
         <v-list density='compact' max-height="350" width="250">
-          <v-list-item v-for='locale in locales' :key='locale.code' @click.prevent="setLocale(locale.code)" :title='locale.name' />
+          <v-list-item v-for='locale in locales' :key='locale.code' @click.prevent="changeLocale(locale.code)" :title='locale.name' />
 
           <v-list-item target='_blank' href='https://hosted.weblate.org/engage/gancio/'>
             <v-list-item-subtitle v-text='t("common.help_translate")' />
@@ -63,22 +70,22 @@ const in_home = computed(() => route.name === 'index')
 
           <v-list-item to='/my_events'>
             <template v-slot:prepend><v-icon icon='mdi-calendar-account'/></template>
-            <v-list-item-title v-text="$t('common.my_events')"/>
+            <v-list-item-title v-text="t('common.my_events')"/>
           </v-list-item>
           <v-list-item v-if='user?.role === "admin" || user?.role === "editor"' to='/admin'>
             <template v-slot:prepend><v-icon icon='mdi-account' /></template>
-            <v-list-item-title v-text="$t(`common.${user.role}`)" />
+            <v-list-item-title v-text="t(`common.${user.role}`)" />
           </v-list-item>
 
           <v-list-item @click='logout'>
             <template v-slot:prepend><v-icon icon='mdi-logout' /></template>
-            <v-list-item-title v-text="$t('common.logout')" />
+            <v-list-item-title v-text="t('common.logout')" />
           </v-list-item>
         </v-list>
       </v-menu>
 
       <!-- login button -->
-      <v-btn variant="text" class='mr-0' v-if='!loggedIn' icon="mdi-login"  to='/login' :title='$t("common.login")' :aria-label='$t("common.login")' />
+      <v-btn variant="text" class='mr-0' v-if='!loggedIn' icon="mdi-login"  to='/login' :title='t("common.login")' :aria-label='t("common.login")' />
     </div>
   </div>
 </template>

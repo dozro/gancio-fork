@@ -1,20 +1,101 @@
-import { createVuetify } from 'vuetify'
+import { createVuetify, type LocaleMessages, type LocaleOptions } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
-import { ca, cs, de, en, es, fr, it, nl, pl, pt, tr, sk, sv, ro, ru, zhHans } from 'vuetify/lib/locale/index.mjs'
+// import { ca, cs, de, en, es, fr, it, nl, pl, pt, tr, sk, sv, ro, ru, zhHans } from 'vuetify/lib/locale/index.mjs'
 
 // import 'vuetify/styles'
 // import '@mdi/font/css/materialdesignicons.css'
 
 export default defineNuxtPlugin((nuxtApp) => {
-
+  
+  const i18n = nuxtApp.$i18n
+  const current = i18n.locale
+  const fallback = i18n.fallbackLocale
+  const messages = i18n.messages
+  const currentLocale = ref(current.value)
+  
   const settings = useState('settings', () => null)
   const cookie = useCookie<'light' | 'dark' | 'system' | undefined>('theme')
   const defaultTheme = cookie.value ?? (settings?.value?.['theme.is_dark'] ? 'dark' : 'light')
+  // const { locale, locales } = useI18n()
+  watch(currentLocale, (val, oldVal) => {
+    if (oldVal)
+      i18n.setLocale(val)
+  }, { immediate: true, flush: 'post' })
+
+  nuxtApp.hook('i18n:localeSwitched', ({ newLocale }) => {
+    currentLocale.value = newLocale
+  })
+
+  function inferDecimalSeparator(n: ReturnType<typeof useI18n>['n']) {
+    return n(0.1).includes(',') ? ',' : '.'
+  }
+
+  // todo: add formatNumber, formatCurrency, formatDateTime, formatDate, formatTime...
+  function createProvideFunction(data: {
+    current: Ref<string>
+    fallback: Ref<string>
+    messages: Ref<LocaleMessages>
+  }) {
+    return (props: LocaleOptions) => {
+      const currentLocale = ref(props.locale ?? data.current.value)
+  
+      const i18n = useI18n({
+        locale: currentLocale.value,
+        fallbackLocale: data.fallback.value,
+        messages: data.messages.value as any,
+        useScope: 'local',
+        legacy: false,
+        inheritLocale: false,
+      })
+  
+      watch(currentLocale, (val, oldVal) => {
+        if (oldVal)
+          i18n.setLocale(val)
+      }, { immediate: true, flush: 'post' })
+  
+      const t = wrapI18n(i18n.t)
+      const n = wrapI18n(i18n.n)
+  
+      return {
+        name: 'nuxt-vue-i18n',
+        current: currentLocale,
+        fallback: data.fallback,
+        messages: data.messages,
+        t,
+        n,
+        decimalSeparator: toRef(() => props.decimalSeparator ?? inferDecimalSeparator(n)),
+        provide: createProvideFunction({ current: currentLocale, fallback: data.fallback, messages: data.messages }),
+      }
+    }
+  }
+  
+  function wrapI18n<T extends (...args: any[]) => any>(t: T): T {
+    return <T>((...args: any[]) => {
+      return t(...args)
+    })
+  }
+  
   const vuetify = createVuetify({
     components,
     directives,
+    locale: {
+      adapter: {
+        name: 'nuxt-vue-i18n',
+        current: currentLocale,
+        fallback,
+        messages,
+        t: (key, ...params) => i18n.t(key, params),
+        n: i18n.n,
+        provide: createProvideFunction({ current: currentLocale, fallback, messages }),
+        decimalSeparator: toRef(() => inferDecimalSeparator(i18n.n)),
+      },
+      rtl: i18n.locales.value.reduce((acc: Record<string, boolean>, locale: any) => {
+        acc[locale.code] = locale.dir === 'rtl'
+        return acc
+      }, {})
+    },
     icons: {
       defaultSet: 'mdi',
       aliases,
@@ -38,10 +119,10 @@ export default defineNuxtPlugin((nuxtApp) => {
         }
       }
     },
-    ssr: true,
     display: {
       mobileBreakpoint: 800
     },
+    ssr: true,
     defaults: {
       global: {
         // variant: 'underlined',

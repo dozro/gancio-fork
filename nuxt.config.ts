@@ -51,6 +51,7 @@ export default defineNuxtConfig({
     locales: Object.keys(locales).map(key => ({
       code: key,
       name: locales[key],
+      dir: ['ar', 'fa', 'ta'].includes(key) ? 'rtl' : 'ltr',
       file: 'en.js'
     })),
     // skipSettingLocaleOnNavigate: true,// 

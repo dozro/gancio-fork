@@ -11,7 +11,6 @@ export const useAppTheme = () => {
   const toggleTheme = () => {
     const newTheme = theme.global.current.value.dark ? 'light' : 'dark'
     theme.change(newTheme)
-    // theme.toggle()
     cookie.value = newTheme
   }
 
