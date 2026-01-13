@@ -1,7 +1,7 @@
 /**
- * @todo cache with httpCache
  */
 import merge from 'lodash.merge'
+import { getMaxLastModifieds } from '~~/server/utils/events'
 export default defineCachedEventHandler(async event => {
   const log = useLogger('locale')
   const localeStorage = useStorage('locale_storage')
@@ -17,10 +17,17 @@ export default defineCachedEventHandler(async event => {
   try {
 
     const fallbackMessages = await localeStorage.getItem('en.json')
+    
+    const localStorageMeta = await localeStorage.getMeta(locale + '.json')
+    const fallbackMessagesMeta = await localeStorage.getMeta('en.json')
+    let lastModifieds = [localStorageMeta?.mtime, fallbackMessagesMeta?.mtime]
+    
     let defaultLocaleMessages
 
     // check if we have a user custom messages
     if (await customUserLocaleStorage.hasItem(locale + '.json')) {
+      const customUserLocaleMeta = await customUserLocaleStorage.getMeta(locale + '.json')
+      lastModifieds.push( customUserLocaleMeta?.mtime )
       defaultLocaleMessages = merge(
         fallbackMessages,
         await localeStorage.getItem(locale + '.json'),
@@ -30,11 +37,19 @@ export default defineCachedEventHandler(async event => {
     }
 
     // embedd vuetify locale
+    let $vuetify = {}
     if (await localeStorage.hasItem('vuetify:' + locale + '.json')) {
-      const $vuetify = await localeStorage.getItem('vuetify:' + locale + '.json')
-      return Object.assign(defaultLocaleMessages, { $vuetify })
+      $vuetify = await localeStorage.getItem('vuetify:' + locale + '.json')
+      const lastModifiedVuetifyMeta = await localeStorage.getMeta('vuetify:' + locale + '.json')
+      lastModifieds.push(lastModifiedVuetifyMeta?.mtime)
     } else {
-      const $vuetify = await localeStorage.getItem('vuetify:en.json')
+      $vuetify = await localeStorage.getItem('vuetify:en.json')
+      const lastModifiedVuetifyMeta = await localeStorage.getMeta('vuetify:' + locale + '.json')
+      lastModifieds.push(lastModifiedVuetifyMeta?.mtime)
+    }
+
+    const modifiedTime = getMaxLastModifieds(lastModifieds)
+    if (!handleCacheHeaders(event, { modifiedTime })) {
       return Object.assign(defaultLocaleMessages, { $vuetify })
     }
 

@@ -146,6 +146,14 @@ export function getLastModified(items: readonly { updatedAt: Date }[]) {
   return lastModified
 }
 
+export function getMaxLastModifieds (lastModifieds: Array<Date | undefined>) {
+  return lastModifieds.reduce((max, current) => {
+    if (!max) return current
+    if (!current) return max
+    return (current > max) ? current : max
+  }, undefined)
+}
+
 export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User): EventAPI {
   const response: EventAPI = {
 
