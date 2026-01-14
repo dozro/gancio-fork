@@ -68,7 +68,7 @@ mkdir "${PKG_MAIN}"
 
 # clean and reinstall dependencies
 rm -fr node_modules
-yarn install
+pnpm install
 
 # clean past artifacts
 npx nuxi cleanup
@@ -131,6 +131,6 @@ if [ "$releaseType" = stable ]; then
     cp "${destArchive}" "${destDir}/gancio-latest.tgz"
   fi
 
-  yarn run docs:build
+  pnpm run docs:build
   # rsync -vr docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2
 fi

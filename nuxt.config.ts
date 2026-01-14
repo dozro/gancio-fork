@@ -101,9 +101,6 @@ export default defineNuxtConfig({
       'process.env.DEBUG': false,
     },
     build: {
-      rollupOptions: {
-        external: ['sharp']
-      },
       target: 'esnext',
     },
   },
