@@ -10,6 +10,10 @@
   opacity: 0.6 !important;
 }
 
+.v-table.v-data-table {
+  background: transparent;
+}
+
 .v-table .v-icon {
   opacity: 1 !important;
 }

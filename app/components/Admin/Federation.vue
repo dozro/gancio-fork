@@ -88,10 +88,8 @@ async function deleteTrustedSource (trusted_source) {
 </script>
 
 <template>
-<v-container>
-  <v-card-title>{{ $t('common.federation') }}</v-card-title>
-  <v-card-text>
-
+<div class="d-flex flex-column ga-12 mt-4">
+  <div>
     <v-switch
       class="mt-0"
       v-model="enable_federation"
@@ -250,11 +248,12 @@ async function deleteTrustedSource (trusted_source) {
         <v-btn icon='mdi-delete-forever' @click="deleteTrustedSource(item)" color="error" />
       </template>
     </v-data-table>
-  </v-card-text>
-  <v-card-title>Stats</v-card-title>
-  <v-card-text>
-    <span>{{ $t('admin.stats', stats) }}</span>
-  </v-card-text>
-</v-container>
+  </div>
+
+  <div>
+    <div class="text-h5 mb-2">Stats</div>
+    <span class="text-body-1">{{ $t('admin.stats', stats) }}</span>
+  </div>
+</div>
 
 </template>

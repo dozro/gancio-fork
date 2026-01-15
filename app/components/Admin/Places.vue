@@ -46,21 +46,12 @@ async function savePlace() {
 }
 </script>
 <template>
-<v-container>
-  <v-card-title>
-    {{ $t('common.places') }}
-    <v-spacer />
-    <v-text-field
-      v-model="search"
-      append-icon="mdi-magnify"
-      outlined
-      rounded
-      :label="$t('common.search')"
-      single-line
-      hide-details
-    />
-  </v-card-title>
-  <v-card-subtitle v-html="$t('admin.place_description')" />
+<div class="d-flex flex-column ga-4">
+  <div class="text-subtitle-2 text-medium-emphasis" v-html="$t('admin.place_description')" />
+
+  <div class="d-flex justify-end">
+    <CoreSearchInput v-model="search" class="w-100 w-sm-25"/>
+  </div>
 
   <v-dialog v-model="dialog" width="600" :fullscreen="$vuetify.display?.mobile">
     <v-card>
@@ -103,7 +94,7 @@ async function savePlace() {
     </v-card>
   </v-dialog>
 
-  <v-card-text>
+  <div>
     <v-data-table
       :headers="headers"
       :items="places"
@@ -115,10 +106,10 @@ async function savePlace() {
       </template>
       <template v-slot:item.actions="{ item }">
         <v-btn @click="editPlace(item)" color="primary" icon='mdi-pencil' />
-        <nuxt-link :to="`/place/${item.id}/${encodeURIComponent(item.name)}`" icon='mdi-eye' />
+        <v-btn :to="`/place/${item.id}/${encodeURIComponent(item.name)}`" icon='mdi-eye' />
       </template>
     </v-data-table>
-  </v-card-text>
-</v-container>
+  </div>
+</div>
 
 </template>

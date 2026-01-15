@@ -1,105 +1,111 @@
 <script setup lang="ts">
+import Settings from '~/components/Core/Settings/Settings.vue'
+import SettingsView from '~/components/Core/Settings/SettingsView.vue'
+import { type SettingsMenuItem } from '~/components/Core/Settings/types'
+
 const settings = useState<Settings>('settings')
 
 definePageMeta({ middleware: ['authenticated'] })
 useHead({
-  title: settings.value.title + ' - Admin'
+  title: settings.value.title + ' - ' + $t('common.admin')
 })
 
 const { isAdmin } = useAuth()
-const route = useRoute()
-const selectedTab = ref(route.query.tab) // route.params.hash !??!
-
-watch(selectedTab, () => {
-  navigateTo({ query: { tab: selectedTab.value }})
-})
 
 const { data: unconfirmedEvents, refresh } = await useFetch('/api/events/unconfirmed')
+
+const menuItems = computed<SettingsMenuItem[]>(() => [
+  {
+    value: "events",
+    title: $t('common.events'),
+    icon: "mdi-calendar",
+    badge: unconfirmedEvents.value?.events?.length  || null,
+  },
+  { value: "users", title: $t('common.users'), icon: "mdi-account-group" },
+
+  { type: "divider" },
+
+  { value: "collections", title: $t('common.collections'), icon: "mdi-group" },
+  { value: "places", title: $t('common.places'), icon: "mdi-map-marker" },
+  { value: "tags", title: $t('common.tags'), icon: "mdi-tag-text" },
+  // { value: "moderation", title: $t('common.moderation') },
+  { value: "announcements", title: $t('common.announcements'), icon: "mdi-bullhorn" },
+  { value: "pages", title: $t('common.pages'), icon: "mdi-post-outline" },
+
+  { type: "divider" },
+
+  ...(isAdmin.value ? [{ value: "settings", title: $t('common.settings'), icon: "mdi-cog" }] : []),
+  { value: "theme", title: $t('common.theme'), icon: "mdi-shape" },
+  { value: "federation", title: $t('common.federation'), icon: "mdi-web" },
+  { value: "geolocation", title: $t('admin.geolocation'), icon: "mdi-map" },
+  { value: "plugins", title: $t('common.plugins'), icon: "mdi-toy-brick" },
+]);
 
 </script>
 <template>
 <v-container>
-  <v-card>
-      <div class="d-flex flex-column">
-      <!-- admin alert -->
-      <AdminSetupAlert v-if="isAdmin" />
-      <v-tabs v-model="selectedTab" show-arrows>
-          <!-- <v-tab href="#settings" v-if="isAdmin" value="settings"> {{ $t('common.settings') }}</v-tab> -->
-          <v-tab v-if='isAdmin' prepend-icon='mdi-cog' value="settings"> {{ $t('common.settings') }}</v-tab>
-          <v-tab prepend-icon='mdi-calendar' value="events"> {{ $t('common.events') }}</v-tab>
-          <v-tab prepend-icon='mdi-account-group' value="users"> {{ $t('common.users') }}</v-tab>
-          <v-tab prepend-icon='mdi-group' value="collections"> {{ $t('common.collections') }}</v-tab>
-          <v-tab prepend-icon='mdi-web' value="federation"> {{ $t('common.federation') }}</v-tab>
-          <!-- <v-tab value="moderation"> {{ $t('common.moderation') }}</v-tab> -->
-          <v-tab prepend-icon='mdi-map-marker' value="places"> {{ $t('common.places') }}</v-tab>
-          <v-tab prepend-icon='mdi-tag-text' value="tags"> {{ $t('common.tags') }}</v-tab>
-          <v-tab prepend-icon='mdi-shape' value="theme"> {{ $t('common.theme') }}</v-tab>
-          <v-tab prepend-icon='mdi-map' value="geolocation"> {{ $t('admin.geolocation') }}</v-tab>
-          <v-tab prepend-icon='mdi-post-outline' value="pages"> {{ $t('common.pages') }}</v-tab>
-          <v-tab prepend-icon='mdi-bullhorn' value="announcements"> {{ $t('common.announcements') }}</v-tab>
-          <v-tab prepend-icon='mdi-toy-brick' value="plugins"> {{ $t('common.plugins') }}</v-tab>
-      </v-tabs>
-      
-      
-          <v-tabs-window :modelValue="selectedTab">
-            <v-tabs-window-item value="settings">
-                <AdminSettings />
-            </v-tabs-window-item>
-            
-            <v-tabs-window-item value="users">
-              <AdminUsers />
-            </v-tabs-window-item>
-                              
-            <v-tabs-window-item value="events">
-              <AdminEvents
-                :unconfirmed-events='unconfirmedEvents?.events'
-                :unconfirmed-old-events='unconfirmedEvents?.oldEvents'
-                @confirmed='refresh'
-                @removed='refresh'
-              />
-            </v-tabs-window-item>
-            
-            <v-tabs-window-item value='collections'>
-              <AdminCollections />
-            </v-tabs-window-item>
-            
-            <v-tabs-window-item value='federation'>
-              <AdminFederation />
-            </v-tabs-window-item>
-            
-            <!-- <v-tabs-window-item value='moderation'>
-              <AdminModeration />
-            </v-tabs-window-item> -->
+  <!-- admin alert -->
+  <AdminSetupAlert v-if="isAdmin" />
 
-            <v-tabs-window-item value='places'>
-              <AdminPlaces />
-            </v-tabs-window-item>
-            
-            <v-tabs-window-item value='tags'>
-              <AdminTags />
-            </v-tabs-window-item>
-            
-            <v-tabs-window-item value='theme'>
-              <AdminTheme />
-            </v-tabs-window-item>
+  <div class="mt-md-4 mb-8">
+    <Settings :menuItems="menuItems" :title="$t('common.admin')" query-param="view">
+      <SettingsView value="settings">
+        <AdminSettings />
+      </SettingsView>
 
-            <v-tabs-window-item value='geolocation'>
-              <AdminGeolocation />
-            </v-tabs-window-item>
+      <SettingsView value="users">
+        <AdminUsers />
+      </SettingsView>
 
-            <v-tabs-window-item value='announcements'>
-              <AdminAnnouncements />
-            </v-tabs-window-item>
-            
-            <v-tabs-window-item value='pages'>
-              <AdminPages />
-            </v-tabs-window-item>
+      <SettingsView value="events">
+        <AdminEvents
+          :unconfirmed-events='unconfirmedEvents?.events'
+          :unconfirmed-old-events='unconfirmedEvents?.oldEvents'
+          @confirmed='refresh'
+          @removed='refresh'
+        />
+      </SettingsView>
 
-            <v-tabs-window-item value='plugins'>
-              <AdminPlugin />
-            </v-tabs-window-item>
-          </v-tabs-window>
-          </div>
-  </v-card>
+      <SettingsView value='collections'>
+        <AdminCollections />
+      </SettingsView>
+
+      <SettingsView value='federation'>
+        <AdminFederation />
+      </SettingsView>
+
+      <!-- <SettingsView value='moderation'>
+        <AdminModeration />
+      </SettingsView> -->
+
+      <SettingsView value='places'>
+        <AdminPlaces />
+      </SettingsView>
+
+      <SettingsView value='tags'>
+        <AdminTags />
+      </SettingsView>
+
+      <SettingsView value='theme'>
+        <AdminTheme />
+      </SettingsView>
+
+      <SettingsView value='geolocation'>
+        <AdminGeolocation />
+      </SettingsView>
+
+      <SettingsView value='announcements'>
+        <AdminAnnouncements />
+      </SettingsView>
+
+      <SettingsView value='pages'>
+        <AdminPages />
+      </SettingsView>
+
+      <SettingsView value='plugins'>
+        <AdminPlugin />
+      </SettingsView>
+    </Settings>
+  </div>
 </v-container>
 </template>

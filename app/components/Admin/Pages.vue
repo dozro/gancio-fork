@@ -33,7 +33,7 @@ function edit(p) {
 async function save() {
   if (!form.value.validate()) { return }
   loading.value = true
-  
+
   try {
     if (editing.value) {
       await $fetch(`/api/pages/${page.id}`, {
@@ -85,9 +85,7 @@ async function toggle(page) {
 
 </script>
 <template>
-<v-container>
-  <v-card-title>{{ $t('common.pages') }}</v-card-title>
-  <v-card-subtitle v-html="$t('admin.page_description')" />
+<div class="d-flex flex-column ga-2">
   <v-dialog v-model="dialog" width="800px" :fullscreen="$vuetify.display?.mobile">
     <v-card>
       <v-card-title>{{ $t('admin.new_page') }}</v-card-title>
@@ -124,10 +122,15 @@ async function toggle(page) {
     </v-card>
   </v-dialog>
 
-  <v-btn @click="openDialog" variant='text' color="primary" prepend-icon='mdi-plus'>
-    {{ $t('common.add') }}
-  </v-btn>
-  <v-card-text>
+  <div class="text-subtitle-2 text-medium-emphasis">{{$t('admin.page_description')}}</div>
+
+  <div class="d-flex justify-end">
+    <v-btn @click="openDialog" variant='text' color="primary" prepend-icon='mdi-plus'>
+      {{ $t('common.add') }}
+    </v-btn>
+  </div>
+
+  <div>
     <v-data-table
       v-if="pages.length"
       :hide-default-footer="pages.length<10"
@@ -146,6 +149,6 @@ async function toggle(page) {
         <t-btn @click="remove(item)" color="error" :tooltip="$t('common.delete')" icon='mdi-delete-forever' />
       </template>
     </v-data-table>
-  </v-card-text>
-</v-container>
+  </div>
+</div>
 </template>

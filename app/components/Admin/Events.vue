@@ -25,7 +25,7 @@ const headers = [
     { value: 'start_datetime', title: t('common.when'), width: 300 },
     { value: 'actions', title: t('common.actions'), align: 'end', sortable: false, width: 280 }
   ]
-  
+
 async function confirm (event) {
   try {
     await $fetch(`/api/events/${event.id}/toggle`, { method: 'PUT' })
@@ -35,7 +35,7 @@ async function confirm (event) {
     $notify(e, Statuses.ERROR)
   }
 }
- 
+
 async function remove (event) {
   const ret = await $confirm('event.remove_confirmation', { event: event.title })
   if (!ret) { return }
@@ -48,9 +48,8 @@ async function remove (event) {
 </script>
 
 <template>
-<v-container>
-  <v-card-title>{{$t('admin.unconfirmed_events')}}</v-card-title>
-  <v-card-subtitle>{{$t('admin.event_confirm_description')}}</v-card-subtitle>
+<div>
+  <div class="text-subtitle-2 text-medium-emphasis">{{$t('admin.event_confirm_description')}}</div>
   <v-data-table
     v-if='unconfirmedEvents.length'
     :hide-default-footer='unconfirmedEvents.length<10'
@@ -58,7 +57,7 @@ async function remove (event) {
     :headers='headers'
   >
     <template v-slot:item.start_datetime='{ item }'>{{time.when(item)}}</template>
-  
+
     <template v-slot:item.actions='{ item }'>
       <t-btn @click='confirm(item)' color='success' :tooltip="$t('common.confirm')" icon='mdi-check-bold' />
 
@@ -70,13 +69,13 @@ async function remove (event) {
         v-icon(v-else v-text='mdiMessageText')  -->
 
       <t-btn :to='`/event/${item.slug || item.id}`' color='info' :tooltip="$t('common.preview')" icon='mdi-eye' />
-      
+
       <t-btn :to='`/add/${item.id}`' color='warning' :tooltip="$t('common.edit')" icon='mdi-pencil' />
-        
+
       <t-btn @click='remove(item)' color='error' :tooltip="$t('common.delete')" icon='mdi-delete-forever' />
     </template>
   </v-data-table>
-  
+
   <v-card-title v-if='unconfirmedOldEvents.length'>{{$t('common.past_events')}}</v-card-title>
   <v-data-table
     v-if='unconfirmedOldEvents.length'
@@ -104,7 +103,7 @@ async function remove (event) {
       @close="openModeration=false"
     />
   </v-navigation-drawer>
-</v-container>
+</div>
 
 
 </template>

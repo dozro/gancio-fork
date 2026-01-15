@@ -47,20 +47,14 @@ async function removeTag (tag) {
   } catch (e) {
     $notify(err, Statuses.ERROR)
   }
-}    
+}
 </script>
 
 <template>
-<v-container>
-
-  <v-card-title> {{ $t('common.tags') }}
-    <v-spacer />
-    <v-text-field
-      v-model='search'
-      append-icon='mdi-magnify'
-      :label="$t('common.search')"
-      single-line hide-details />
-  </v-card-title>
+<div class="d-flex flex-column ga-2 mt-4">
+  <div class="d-flex justify-end">
+    <CoreSearchInput v-model="search" class="w-100 w-sm-25"/>
+  </div>
 
   <v-dialog v-model='dialog' width='600' :fullscreen='$vuetify.display?.mobile' v-if='dialog'>
     <v-card>
@@ -101,8 +95,8 @@ async function removeTag (tag) {
       </v-card-actions>
     </v-card>
   </v-dialog>
-  
-  <v-card-text>
+
+  <div>
     <v-data-table
       :headers='headers'
       :items='tags'
@@ -114,7 +108,7 @@ async function removeTag (tag) {
         <t-btn @click='removeTag(item)' color='error' :tooltip="$t('common.delete')" icon='mdi-delete-forever' />
       </template>
     </v-data-table>
-  </v-card-text>
+  </div>
 
-</v-container>
+</div>
 </template>

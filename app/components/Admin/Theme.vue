@@ -10,7 +10,7 @@ const light_menu = ref([false, false, false, false])
 
 const imageKeys = reactive({ logo: 0, header: 0, fallback: 0 })
 
-// <!-- 
+// <!--
 // export default {
 //   name: 'Theme',
 //   data ({ $store }) {
@@ -115,7 +115,7 @@ async function removeFooterLink (item: FooterLink) {
   const ret = await $confirm('admin.delete_footer_link_confirm')
   if (!ret) { return }
   const footerLinks = settings.value.footerLinks.filter(l => l.label !== item.label)
-  return $fetch('/api/settings', { method: 'PUT', body: { 
+  return $fetch('/api/settings', { method: 'PUT', body: {
     key: 'footerLinks',
     value: footerLinks
   }})
@@ -125,7 +125,7 @@ async function moveUpFooterLink (item: FooterLink, idx: number) {
   const footerLinks = [...settings.value.footerLinks]
   footerLinks[idx] = footerLinks[idx-1]
   footerLinks[idx-1] = settings.value.footerLinks[idx]
-  return $fetch('/api/settings', { method: 'PUT', body: { 
+  return $fetch('/api/settings', { method: 'PUT', body: {
     key: 'footerLinks',
     value: footerLinks
   }})
@@ -182,11 +182,10 @@ const custom_js = manageSetting('custom_js')
 </script>
 
 <template>
-<v-container>
-  <v-card-title>{{ $t('common.theme') }}</v-card-title>
-  <v-card-text>
+<div class="d-flex flex-column ga-12 mt-4">
+
+  <div class="d-flex flex-column ga-4">
     <v-switch
-      class="mt-5"
       v-model="is_dark"
       hide-details
       persistent-hint
@@ -194,21 +193,21 @@ const custom_js = manageSetting('custom_js')
       :label="$t('admin.is_dark')"
     />
     <v-switch
-      class="mt-5"
       v-model="hide_thumbs"
       hide-details
       :label="$t('admin.hide_thumbs')"
     />
     <v-switch
-      class="mt-5"
       v-model="hide_calendar"
       hide-details
       :label="$t('admin.hide_calendar')"
     />
+  </div>
 
-    <v-card-title>{{ $t('admin.default_images') }}</v-card-title>
-    <v-card-subtitle v-html="$t('admin.default_images_help')" />
-    <v-card-text>
+  <div>
+    <div class="text-h5 mb-2">{{ $t('admin.default_images') }}</div>
+    <span class="text-subtitle-2 text-medium-emphasis" v-html="$t('admin.default_images_help')" />
+    <div>
       <v-row>
         <v-col cols="4">
           <!-- LOGO -->
@@ -281,11 +280,14 @@ const custom_js = manageSetting('custom_js')
           />
         </v-col>
       </v-row>
-    </v-card-text>
+    </div>
 
-    <v-card-title>{{ $t('admin.colors') }}</v-card-title>
+  </div>
+
+  <div>
+    <div class="text-h5 mb-4">{{ $t('admin.colors') }}</div>
     <!-- choose theme colors -->
-    <v-card-text>
+    <div>
       <v-theme-provider theme="dark">
         <v-card max-width="465">
           <v-card-text>
@@ -313,7 +315,7 @@ const custom_js = manageSetting('custom_js')
           </v-card-text>
         </v-card>
       </v-theme-provider>
-    </v-card-text>
+    </div>
 
     <v-theme-provider theme="light">
       <v-card class='mt-4' max-width='465'>
@@ -335,7 +337,8 @@ const custom_js = manageSetting('custom_js')
         </v-card-text>
       </v-card>
     </v-theme-provider>
-        
+  </div>
+
   <v-dialog v-model='linkModal' width='500' :fullscreen='$vuetify.display?.mobile'>
     <v-card>
       <v-card-title class="bg-primary">{{$t('admin.footer_links')}}</v-card-title>
@@ -356,40 +359,41 @@ const custom_js = manageSetting('custom_js')
       </v-card-actions>
     </v-card>
   </v-dialog>
-  
-  <v-card-title> {{$t('admin.footer_links')}}</v-card-title>
-  <v-card-text>
-    <v-btn color='primary' variant='text' @click='openLinkModal' prepend-icon='mdi-plus'> {{$t('admin.add_link')}}</v-btn>
-    <v-btn color='warning' variant='text' @click='resetFooterLinks' prepend-icon='mdi-restore'>{{$t('common.reset')}}</v-btn>
-    <v-card>
-      <v-list class='mt-1'>
-        <v-list-item
-          v-for='(link, idx) in settings.footerLinks'
-          :key='`${link.label}`' @click='editFooterLink(link)'>
-            
-            <v-list-item-title>{{$t(link.label)}}</v-list-item-title>
-            <v-list-item-subtitle>{{link.href}}</v-list-item-subtitle>
-          <template v-slot:append>
-            <v-btn variant='text' size='small' class='left' v-if='idx !== 0' icon='mdi-chevron-up' color='warn' @click.stop='moveUpFooterLink(link, idx)' />
-            <v-btn variant='text' size='small' class='float-right' icon='mdi-delete-forever' color='error' @click.stop='removeFooterLink(link)' />
-          </template>
-        </v-list-item>
-      </v-list>
-    </v-card>
-  </v-card-text>
 
-  <v-card-title>{{$t('admin.custom_js')}}</v-card-title>
-  <v-card-subtitle v-html="$t('admin.custom_js_help')" />
-  <v-card-text>
-    <v-textarea v-model='custom_js' :label='$t("admin.custom_js")' variant='outlined' />
-  </v-card-text>
+  <div>
+    <div class="text-h5 mb-4">{{ $t('admin.footer_links') }}</div>
+    <div>
+      <v-btn color='primary' variant='text' @click='openLinkModal' prepend-icon='mdi-plus'> {{$t('admin.add_link')}}</v-btn>
+      <v-btn color='warning' variant='text' @click='resetFooterLinks' prepend-icon='mdi-restore'>{{$t('common.reset')}}</v-btn>
+      <v-card>
+        <v-list class='mt-1'>
+          <v-list-item
+            v-for='(link, idx) in settings.footerLinks'
+            :key='`${link.label}`' @click='editFooterLink(link)'>
 
-  <!-- custom css -->
-  <v-card-title>{{$t('admin.custom_css')}}</v-card-title>
-  <v-card-subtitle v-html="$t('admin.custom_css_help')" />
-  <v-card-text>
-    <v-textarea v-model='custom_css' :label='$t("admin.custom_css")' variant='outlined' />
-  </v-card-text>
-  </v-card-text>
-</v-container>
+              <v-list-item-title>{{$t(link.label)}}</v-list-item-title>
+              <v-list-item-subtitle>{{link.href}}</v-list-item-subtitle>
+            <template v-slot:append>
+              <v-btn variant='text' size='small' class='left' v-if='idx !== 0' icon='mdi-chevron-up' color='warn' @click.stop='moveUpFooterLink(link, idx)' />
+              <v-btn variant='text' size='small' class='float-right' icon='mdi-delete-forever' color='error' @click.stop='removeFooterLink(link)' />
+            </template>
+          </v-list-item>
+        </v-list>
+      </v-card>
+    </div>
+  </div>
+
+  <div>
+    <div class="text-h5 mb-2">{{ $t('admin.custom_js') }}</div>
+    <div class="text-subtitle-2 text-medium-emphasis mb-4" v-html="$t('admin.custom_js_help')" />
+    <v-textarea v-model='custom_js' :label='$t("admin.custom_js")' variant='outlined' hide-details />
+  </div>
+
+  <div>
+    <!-- custom css -->
+    <div class="text-h5 mb-2">{{ $t('admin.custom_css') }}</div>
+    <div class="text-subtitle-2 text-medium-emphasis mb-4" v-html="$t('admin.custom_css_help')" />
+    <v-textarea v-model='custom_css' :label='$t("admin.custom_css")' variant='outlined' hide-details />
+  </div>
+</div>
 </template>
