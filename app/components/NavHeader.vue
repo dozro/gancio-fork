@@ -25,7 +25,7 @@ const in_home = computed(() => route.name === 'index')
 </script>
 <template>
   <div class='d-flex pa-4'>
-    <v-btn icon to='/' variant='text'>
+    <v-btn icon to='/' variant='text' :active="false">
       <img :src='`/logo.png`' height='40'>
     </v-btn>
     <v-spacer/>
