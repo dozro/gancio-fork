@@ -45,6 +45,7 @@ export default defineNuxtConfig({
   },
   i18n: {
     defaultLocale: 'en',
+    lazy: true,
     langDir: 'locales/',   // must be set, but won’t be used for actual loading
     types: 'composition',
     pages: undefined,
@@ -89,7 +90,7 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: ['lodash/debounce', 'luxon', 'linkifyjs', 'mitt', 'v-calendar', '@vue/devtools-core',
-        '@vue/devtools-kit', '@tiptap/vue-3', '@tiptap/starter-kit', '@vueuse/core', '@vue-leaflet/vue-leaflet'],
+        '@vue/devtools-kit', '@tiptap/vue-3', '@tiptap/starter-kit', '@vueuse/core', '@vue-leaflet/vue-leaflet']
     },
     server: {
       watch: {
@@ -101,6 +102,9 @@ export default defineNuxtConfig({
       'process.env.DEBUG': false,
     },
     build: {
+      // rollupOptions: {
+      //   external: ['sharp']
+      // },
       target: 'esnext',
     },
   },
@@ -111,13 +115,15 @@ export default defineNuxtConfig({
         base: isBuild ? './nuxt/server/i18n/locales' : './i18n/locales'
       }
     },
-    // preset: 'node-listener',
-    // externals: {
-    //   inline: ['jose', 'yargs'],
-    //   external: ['yargs', 'dotenv']
+    externals: {
+      external: ['sharp']
+    },
+    // rollupConfig: {
+    //   external: ['sharp']
     // },
     esbuild: {
       options: {
+        exclude: ['sharp'],
         target: 'esnext',
         tsconfigRaw: {
           // See https://github.com/nuxt/nuxt/issues/14126
