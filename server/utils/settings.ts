@@ -52,6 +52,7 @@ export type Settings = {
   custom_js: string,
   custom_css: string,
   publicKey?: string
+  about?: string
 }
 
 export type SecretSettings = {
