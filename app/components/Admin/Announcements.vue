@@ -74,10 +74,9 @@ async function save() {
 </script>
 
 <template>
-<v-container>
-  <v-card-title> {{ t('common.announcements') }}</v-card-title>
-  <v-card-subtitle v-html="t('admin.announcement_description')" />
-  
+<div class="d-flex flex-column ga-2">
+  <div class="text-subtitle-2 text-medium-emphasis" v-html="t('admin.announcement_description')" />
+
   <v-dialog v-model='dialog' width='800px' :fullscreen='$vuetify.display?.mobile'>
     <v-card>
       <v-card-title> {{ t('admin.new_announcement') }}</v-card-title>
@@ -97,16 +96,19 @@ async function save() {
       </v-card-actions>
     </v-card>
   </v-dialog>
-  
-  <v-btn @click='openDialog' variant='text' color='primary' prepend-icon='mdi-plus'> {{ t('common.add') }}</v-btn>
-  <v-card-text>
+
+  <div class="d-flex justify-end">
+    <v-btn @click='openDialog' variant='text' color='primary' prepend-icon='mdi-plus'> {{ t('common.add') }}</v-btn>
+  </div>
+
+  <div class="mt-2">
     <v-data-table
       v-if='announcements'
       :hide-default-footer='announcements.length<10'
       :headers='headers'
       :items='announcements'>
       <template v-slot:item.actions='{ item }'>
-        <t-btn 
+        <t-btn
           @click='toggle(item)'
           :color='item.visible ? "warning" : "success"'
           :tooltip="item.visible ? t('common.disable') : t('common.enable')")
@@ -115,6 +117,6 @@ async function save() {
         <t-btn @click='remove(item)' color='error' :tooltip="t('common.delete')" icon='mdi-delete-forever' />
       </template>
     </v-data-table>
-  </v-card-text>
-</v-container>
+  </div>
+</div>
 </template>

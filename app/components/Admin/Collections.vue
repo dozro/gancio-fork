@@ -83,9 +83,9 @@ async function addFilter() {
   const filter = { collectionId: collection.value.id, tags, places, actors, negate: negateFilter.value }
 
   // tags and places are JSON field and there's no way to use them inside a unique constrain
-  const alreadyExists = false 
+  const alreadyExists = false
   // filters.value.find(f =>
-  //   isEqual(sortBy(f.places, 'id'), sortBy(filter.places, 'id')) && 
+  //   isEqual(sortBy(f.places, 'id'), sortBy(filter.places, 'id')) &&
   //   isEqual(sortBy(f.tags), sortBy(filter.tags)) &&
   //   isEqual(sortBy(f.actors), sortBy(filter.actors))
   // )
@@ -104,7 +104,7 @@ async function addFilter() {
   } catch (e) {
     loading.value = false
     $notify(String(e), Statuses.ERROR)
-  } 
+  }
   refresh()
   filters.value = await $fetch(`/api/collections/filters/${collection.value.id}`)
   filterTags.value = []
@@ -194,46 +194,39 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
 </script>
 <template>
 <div>
-  <v-container>
-    <v-card-title>
-      {{ $t('common.collections') }}
-      <v-spacer />
-    </v-card-title>
+  <div class="d-flex flex-column ga-4">
+    <div class="text-subtitle-2 text-medium-emphasis">{{$t('admin.collections_description')}}</div>
 
-    <v-card-subtitle v-html="$t('admin.collections_description')" />
+    <div v-if="collections.length" class="d-flex flex-wrap ga-4 justify-space-between align-center">
+      <v-switch
+        :label="$t('common.collection_in_home')"
+        @update:model-value="collection_in_home = null"
+        v-model="in_home"
+        hide-details
+      />
+      <div class="w-100 w-sm-50">
+        <v-autocomplete
+          v-if="in_home"
+          v-model="collection_in_home"
+          variant='outlined'
+          :label="$t('common.collections')"
+          hide-details
+          color="primary"
+          hide-selected
+          :menu-props="{ maxWidth: '400' }"
+          :items="collections"
+          hide-no-data
+          clearable
+          item-title="name"
+        />
+      </div>
+    </div>
 
-    <v-card-text>
-      <v-row>
-        <v-col>
-          <v-switch
-            v-if="collections.length"
-            :label="$t('common.collection_in_home')"
-            @update:model-value="collection_in_home = null"
-            v-model="in_home"
-          />
-        </v-col>
-        <v-col>
-          <v-autocomplete
-            v-if="collections.length && in_home"
-            v-model="collection_in_home"
-            variant='outlined'
-            :label="$t('common.collections')"
-            hide-details
-            color="primary"
-            hide-selected
-            :menu-props="{ maxWidth: '400' }"
-            :items="collections"
-            hide-no-data
-            clearable
-            item-title="name"
-          />
-        </v-col>
-      </v-row>
-    </v-card-text>
-
-    <v-btn color="primary" variant='text' @click="newCollection" prepend-icon='mdi-plus'>
-      {{ $t('admin.new_collection') }}
-    </v-btn>
+    <div class="d-flex justify-end">
+      <v-btn color="primary" variant='text' @click="newCollection" prepend-icon='mdi-plus'>
+        {{ $t('admin.new_collection') }}
+      </v-btn>
+    </div>
 
     <v-dialog
       v-model="dialog"
@@ -293,7 +286,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
               >
                 <template #item="{ item, props }">
                   <v-list-item v-bind="props"
-                    :prepend-avatar="format.actor(item.raw, 'icon')" 
+                    :prepend-avatar="format.actor(item.raw, 'icon')"
                     :title="format.actor(item.raw, 'title')"
                     :subtitle="format.actor(item.raw, 'label')"/>
                 </template>
@@ -448,7 +441,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
           >
             {{ $t('common.add') }}
           </v-btn>
-          
+
           <v-btn
             color="primary"
             variant='outlined'
@@ -459,7 +452,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
           >
             {{ $t('common.save') }}
           </v-btn>
-          
+
           <v-btn
             @click="dialog = false"
             variant='outlined'
@@ -472,7 +465,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
       </v-card>
     </v-dialog>
 
-    <v-card-text>
+    <div>
       <v-data-table
         :headers="collectionHeaders"
         :items="collections"
@@ -492,8 +485,8 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
           <v-btn @click="removeCollection(item)" color="error" icon='mdi-delete-forever' />
         </template>
       </v-data-table>
-    </v-card-text>
-  </v-container>
+    </div>
+  </div>
 </div>
 
 </template>

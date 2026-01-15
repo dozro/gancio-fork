@@ -78,15 +78,14 @@ async function testTileLayerProvider () {
 // }
 </script>
 <template>
-<v-container>
-  <v-card-title>{{$t('admin.geolocation')}}</v-card-title>
-  <v-card-text>
-    <span class="mb-6" v-html="$t('admin.geolocation_description')" />
+<div class="d-flex flex-column ga-8 mt-4">
+  <span v-html="$t('admin.geolocation_description')" />
 
+  <div>
     <v-form>
       <v-row>
         <v-col cols="12" md="3">
-          <v-autocomplete 
+          <v-autocomplete
             class="mb-4"
             v-model="geocoding_provider_type"
             @blur="save('geocoding_provider_type', geocoding_provider_type )"
@@ -98,7 +97,7 @@ async function testTileLayerProvider () {
         </v-col>
 
         <v-col cols="12" md="5">
-          <v-text-field 
+          <v-text-field
             class="mb-4"
             v-model="geocoding_provider"
             @blur="save('geocoding_provider', geocoding_provider )"
@@ -109,16 +108,16 @@ async function testTileLayerProvider () {
         </v-col>
 
         <v-col cols="12" md="4">
-          <v-autocomplete 
+          <v-autocomplete
             class="mb-6"
-            v-model="geocoding_countrycodes" 
+            v-model="geocoding_countrycodes"
             :disabled="!(geocoding_provider_type === null || geocoding_provider_type === 'Nominatim')"
             :append-icon="mdiChevronDown"
             @blur="save('geocoding_countrycodes', geocoding_countrycodes )"
             :label="$t('admin.geocoding_countrycodes')"
             :items="countries"
-            multiple 
-            chips 
+            multiple
+            chips
             persistent-hint
             item-value="code"
             item-title="name"
@@ -128,7 +127,7 @@ async function testTileLayerProvider () {
 
       <v-row>
         <v-col cols="12" md="6">
-          <v-text-field 
+          <v-text-field
             class="mb-4"
             v-model="tilelayer_provider"
             @blur="save('tilelayer_provider', tilelayer_provider )"
@@ -139,7 +138,7 @@ async function testTileLayerProvider () {
         </v-col>
 
         <v-col cols="12" md="6">
-          <v-text-field 
+          <v-text-field
             v-model="tilelayer_provider_attribution"
             @blur="save('tilelayer_provider_attribution', tilelayer_provider_attribution )"
             :label="$t('admin.tilelayer_provider_attribution')"
@@ -147,35 +146,34 @@ async function testTileLayerProvider () {
         </v-col>
       </v-row>
 
-      <Map 
-        :key="mapKey" 
+      <Map
+        :key="mapKey"
         v-if="mapPreview"
         @tileerror="tilelayerTestError"
         @tileload="tilelayerTestSuccess"
-        :LMapStyles="{height:'20rem'}" 
-        :showMarker="false" 
-        :mapCenter="mapCenter" 
+        :LMapStyles="{height:'20rem'}"
+        :showMarker="false"
+        :mapCenter="mapCenter"
         :zoom="10" />
     </v-form>
-  </v-card-text>
+  </div>
 
-  <v-card-actions>
-    <v-spacer />
-    <v-btn 
-      color="primary" 
-      @click="testGeocodingProvider" 
-      :loading="isNewGeocodingTest" 
+  <div class="d-flex justify-end ga-4">
+    <v-btn
+      color="primary"
+      @click="testGeocodingProvider"
+      :loading="isNewGeocodingTest"
       variant='outlined'>
       {{$t('admin.geocoding_test_button')}}
     </v-btn>
-    <v-btn 
-      color="primary" 
-      @click="testTileLayerProvider" 
-      :loading="isNewTilelayerTest" 
+    <v-btn
+      color="primary"
+      @click="testTileLayerProvider"
+      :loading="isNewTilelayerTest"
       variant='outlined'>
       {{$t('admin.tilelayer_test_button')}}
     </v-btn>
-  </v-card-actions>
-</v-container>
+  </div>
+</div>
 
 </template>

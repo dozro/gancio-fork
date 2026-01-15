@@ -63,7 +63,7 @@ async function deleteUser (user) {
       $notify(e, Statuses.ERROR)
     }
   }
-  
+
   async function changeRole (user, role) {
     // ask confirmation?
     const ret = await $confirm('admin.change_role_confirm', { user: user.email, from_role: user.role, to_role: role })
@@ -76,7 +76,7 @@ async function deleteUser (user) {
     }
     return false
   }
-  
+
   async function createUser () {
     if (!userForm.value.validate()) { return }
     try {
@@ -96,23 +96,14 @@ async function deleteUser (user) {
 </script>
 
 <template>
-  <v-container>
-    <v-card-title>
-      {{$t('common.users')}}
-      <v-spacer />
-      <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        rounded
-        :label="$t('common.search')"
-        single-line
-        hide-details
-      />
-    </v-card-title>
+  <div>
+    <div class="d-flex align-center justify-end flex-wrap ga-4 mb-4">
+      <v-btn color="primary" variant='text' @click="newUserDialog = true" append-icon='mdi-plus'>
+        {{$t('common.new_user')}}
+      </v-btn>
+      <CoreSearchInput v-model="search" class="w-100 w-sm-auto" />
+    </div>
 
-    <v-btn color="primary" variant='text' @click="newUserDialog = true" append-icon='mdi-plus'>
-      {{$t('common.new_user')}}
-    </v-btn> 
 
     <!-- ADD NEW USER -->
     <v-dialog v-model="newUserDialog" :fullscreen="$vuetify.display?.mobile">
@@ -144,10 +135,10 @@ async function deleteUser (user) {
           <v-btn @click="newUserDialog=false" color="error" variant='outlined'>{{$t('common.cancel')}}</v-btn>
           <v-btn @click="createUser" :disabled="!valid" color="primary" variant='outlined'>{{$t('common.send')}}</v-btn>
         </v-card-actions>
-      </v-card> 
+      </v-card>
     </v-dialog>
 
-    <v-card-text>
+    <div>
       <!-- USERS LIST -->
       <v-data-table
         v-if='users'
@@ -157,29 +148,29 @@ async function deleteUser (user) {
         :hide-default-footer="users.length<5"
       >
         <template v-slot:item.is_active="{item}">
-          <v-switch 
-            :modelValue="item.is_active" 
-            readonly 
-            @click.prevent="toggle(item)" 
+          <v-switch
+            :modelValue="item.is_active"
+            readonly
+            @click.prevent="toggle(item)"
             hide-details
           />
         </template>
         <template v-slot:item.to_notify="{item}">
-          <v-switch 
-            v-if="item.role!=='user'" 
-            :modelValue="item.to_notify" 
-            readonly 
-            @click.prevent="toggle_to_notify(item)" 
+          <v-switch
+            v-if="item.role!=='user'"
+            :modelValue="item.to_notify"
+            readonly
+            @click.prevent="toggle_to_notify(item)"
             hide-details
           />
         </template>
         <template v-slot:item.role="{item}">
           <v-menu offset-y>
             <template v-slot:activator="{ props }">
-              <v-btn 
-                :color="roleColors[item.role]" 
+              <v-btn
+                :color="roleColors[item.role]"
                 variant='outlined'
-                v-bind="props" 
+                v-bind="props"
                 append-icon='mdi-chevron-down'
                 size='small'
                 label
@@ -188,10 +179,10 @@ async function deleteUser (user) {
               </v-btn>
             </template>
             <v-list width="100" nav>
-              <v-list-item 
-                v-for="role in ['admin', 'editor', 'user'].filter(r => r !== item.role)" 
-                :key="role" 
-                link 
+              <v-list-item
+                v-for="role in ['admin', 'editor', 'user'].filter(r => r !== item.role)"
+                :key="role"
+                link
                 @click="changeRole(item, role)"
               >
                 <v-list-item-title>{{ role }}</v-list-item-title>
@@ -200,14 +191,14 @@ async function deleteUser (user) {
           </v-menu>
         </template>
         <template #[`item.actions`]="{item}">
-          <t-btn 
-            color="error" 
+          <t-btn
+            color="error"
             :tooltip="$t('admin.delete_user')"
             icon='mdi-delete-forever'
             @click="deleteUser(item)"
           />
         </template>
       </v-data-table>
-    </v-card-text>
-  </v-container>
+    </div>
+  </div>
 </template>

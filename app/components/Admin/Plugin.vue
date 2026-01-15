@@ -25,7 +25,7 @@ async function testPlugin() {
   $fetch(`/api/plugin/test/${selectedPlugin.value.name}`, { method: 'POST'} )
     .catch( e => $notify(e, { color: 'warning' }))
 }
-    
+
 function setOptions(plugin) {
   selectedPlugin.value = plugin
   dialog.value = true
@@ -33,10 +33,9 @@ function setOptions(plugin) {
 </script>
 
 <template>
-<v-container>
-  <v-card-title> {{ $t('common.plugins') }}</v-card-title>
-  <v-spacer />
-  <v-card-subtitle v-html="$t('admin.plugins_description')" />
+<div>
+  <div class="text-subtitle-2 text-medium-emphasis" v-html="$t('admin.plugins_description')" />
+
   <v-dialog v-if='selectedPlugin.settingsValue' v-model='dialog' max-width='1200px' :fullscreen='$vuetify.display?.mobile'>
     <v-card>
       <v-card-title> {{ $t('admin.config_plugin') }} - {{ selectedPlugin.name }}</v-card-title>
@@ -69,21 +68,22 @@ function setOptions(plugin) {
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <v-card-text class='d-flex flex-wrap'>
-    <v-card v-for='plugin in plugins' :key='plugin.name' outlined width='400' class='mr-2 mb-2 flex-1-1 d-flex flex-column'>
+
+  <div class='d-flex flex-wrap mt-8 ga-4'>
+    <v-card v-for='plugin in plugins' :key='plugin.name' outlined width='400' class='flex-1-1 d-flex flex-column'>
       <v-card-title> {{ plugin.name }}</v-card-title>
       <v-card-text>
         <p> {{ plugin.description }}</p>
         <blockquote> author: {{ plugin.author }}</blockquote>
         <a :href='plugin.url' v-text='plugin.url'/>
       </v-card-text>
-        
+
       <v-spacer />
       <v-card-actions>
         <v-spacer />
         <v-btn text color='primary' @click='setOptions(plugin)'> {{ $t('common.settings') }}</v-btn>
       </v-card-actions>
     </v-card>
-  </v-card-text>
-</v-container>
+  </div>
+</div>
 </template>
