@@ -1,6 +1,6 @@
 import { Event, Message } from "./sequelize"
 import { DateTime } from 'luxon'
-import { Op, literal, col, where, fn, InferAttributes, WhereOptions, SQL_NULL, JSON_NULL } from '@sequelize/core'
+import { Op, literal, col, where, fn, InferAttributes, WhereOptions, SQL_NULL, JSON_NULL, sql } from '@sequelize/core'
 
 import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
@@ -80,17 +80,17 @@ export async function getEvents(opts?: EventQueryType | undefined) {
   // }
 
   const replacements = []
-  // if (args.tags && args.places) {
-  //   condition[Op.and] = [
-  //     { placeId: args.places },
-  //     sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('Event', 'id')} AND ${sql.identifier('tagTag')} in ${sql.list(args.tags)})`
-  //   ]
 
-  // } else if (args.tags) {
-  //   condition[Op.and] = sql`EXISTS(SELECT 1 FROM event_tags WHERE ${sql.identifier('event_tags', 'eventId')}=${sql.identifier('Event', 'id')} AND ${sql.identifier('tagTag')} in (${sql.list(args.tags)}))`
-  // } else if (args.places) {
-  //   condition.placeId = args.places
-  // }
+  if (args.tags && args.places) {
+    condition[Op.and] = [
+      { placeId: args.places },
+      sql`event.id IN (SELECT eventId FROM event_tags WHERE tagTag IN  ${sql.list(args.tags)})`
+    ]
+  } else if (args.places) {
+      condition.placeId = args.places
+  } else if (args.tags) {
+      condition[Op.and] = sql`event.id IN (SELECT eventId FROM event_tags WHERE tagTag IN  ${sql.list(args.tags)})`
+  }
 
   if (args.query) {
     replacements.push(args.query)
@@ -98,7 +98,7 @@ export async function getEvents(opts?: EventQueryType | undefined) {
       [
         { title: where(fn('LOWER', col('title')), 'LIKE', '%' + args.query + '%') },
         where(fn('LOWER', col('name')), 'LIKE', '%' + args.query + '%'),
-        fn('EXISTS', literal(`SELECT 1 FROM event_tags WHERE ${col('event_tags.eventId')}=${col('event.id')} AND LOWER(${col('tagTag')}) = LOWER(?)`))
+        fn('EXISTS', literal(`SELECT 1 FROM event_tags WHERE event_tags.eventId=event.id AND LOWER(${col('tagTag')}) = LOWER(?)`))
       ]
   }
 
@@ -133,13 +133,15 @@ export async function getEvents(opts?: EventQueryType | undefined) {
 
   // return mapEvents(events as Event[])
 }
+
+
 /**
  * get the last modified date of items.
  * this is used to set `Last-Modified` header and to check for non modified 304 result
  */
 export function getLastModified(items: readonly { updatedAt: Date }[]) {
   if (!items?.length) {
-    return undefined
+    return new Date(0)
   }
   const lastModified = items.reduce((last: Date, item) => item.updatedAt > last ? item.updatedAt : last, new Date(0))
   lastModified.setMilliseconds(0)
@@ -210,6 +212,7 @@ export function sendEvents(event: H3Event, events: Event[]) {
     !handleCacheHeaders(event, {
       modifiedTime: lastModified,
       etag,
+      maxAge: 10,
       cacheControls: [
         'must-revalidate',
         'stale-while-revalidate=30',
