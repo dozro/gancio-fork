@@ -2,6 +2,10 @@
 const settings = useState<Settings>('settings')
 const route = useRoute()
 
+const show_calendar = computed(() => !settings.value?.hide_calendar && route?.name === 'index')
+const show_collections_bar = computed(() => ['index', 'collection-name'].includes(route.name as string))
+
+
 </script>
 <template>
   <nav id='AppBar'>
@@ -16,7 +20,7 @@ const route = useRoute()
       />
     </component>
 
-    <NavSearch />
+    <NavSearch v-show='show_collections_bar || show_calendar' />
     <NavBar v-if="!['event-slug','e-slug'].includes(route.name as string)"/> 
   </nav>
 </template>
