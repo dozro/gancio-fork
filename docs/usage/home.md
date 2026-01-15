@@ -51,8 +51,10 @@ You can set whether recurring events are displayed by default on the home page f
 
 ![alt text](image.png)
 
-### Show a subset of events
+### Show a subset of events on the homepage
 
-Esiste la possibilita' di creare sottoinsiemi di eventi (sono chiamate collection nell'interfaccia di amministrazione) che e' possibile mostrare in homepage, c'e' una sezione apposita.
+It is possible to create subsets of events (called collections in the administration interface) that can be displayed on the homepage; there is a [dedicated section](/collections) for this.
 
 ### Is there another way I can stay updated?
+
+Yes, you can subscribe the rss feed of the events, to the iCal feed of the events, or follow the federated activitypub account.
