@@ -6,6 +6,7 @@ const { Event, User, Tag, Place, APUser, Resource, EventNotification } = require
 const tagController = require('../api/controller/tag')
 const Helpers = require('./helpers')
 const { parseAPLocation } = require('./places')
+const { getThumbnailsPath } = require('../utils/directories')
 
 module.exports = {
   
@@ -163,7 +164,7 @@ module.exports = {
     if (event.media && event.media.length && !event.recurrent) {
       try {
         const old_path = path.join(config.upload_path, event.media[0].url)
-        const old_thumb_path = path.join(config.upload_path, 'thumb', event.media[0].url)
+        const old_thumb_path = path.join(getThumbnailsPath(config), event.media[0].url)
         await fs.unlink(old_thumb_path)
         await fs.unlink(old_path)
       } catch (e) {

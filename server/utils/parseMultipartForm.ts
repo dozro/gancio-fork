@@ -2,6 +2,7 @@ import type { H3Event, MultiPartData } from "h3"
 import { get as getConfig } from "../config"
 import path from "path"
 import sharp from "sharp"
+import { getThumbnailsPath } from "./directories"
 const log = useLogger('parseMultipartForm')
 
 export async function parseMultipartFormData(event: H3Event) {
@@ -64,7 +65,7 @@ export async function saveUploadedEventImage(image: MultiPartData, name: string,
   const sharpStream = sharp(image.data, { failOnError: true })
   const promises = [
     sharpStream.clone().rotate().resize(500, null, { withoutEnlargement: true })
-      .jpeg({ mozjpeg: true, progressive: true }).toFile(path.resolve(config.upload_path, 'thumb', filename)),
+      .jpeg({ mozjpeg: true, progressive: true }).toFile(path.resolve(getThumbnailsPath(config), filename)),
     sharpStream.clone().rotate().resize(1200, null, { withoutEnlargement: true })
       .jpeg({ quality: 95, mozjpeg: true, progressive: true }).toFile(path.resolve(config.upload_path, filename))
   ]

@@ -5,6 +5,7 @@ import type { NitroApp } from "nitropack"
 import pluginController from "../utils/plugins"
 import fsDriver from 'unstorage/drivers/fs'
 import { get as getConfig } from '../config'
+import { useCreateDirectoryStructure } from "../utils/directories"
 
 export default defineNitroPlugin(async (nitroApp: NitroApp) => {
 
@@ -18,6 +19,9 @@ export default defineNitroPlugin(async (nitroApp: NitroApp) => {
         await runMigrations()
         log.info('Loading settings')
         await loadSettings()
+
+        log.info('Checking directory structure')
+        useCreateDirectoryStructure()
 
         log.info('Loading task manager')
         useTaskManager().start()
