@@ -2,20 +2,22 @@ import { createVuetify, type LocaleMessages, type LocaleOptions } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import type { Settings } from '~~/server/utils/settings'
 // import { ca, cs, de, en, es, fr, it, nl, pl, pt, tr, sk, sv, ro, ru, zhHans } from 'vuetify/lib/locale/index.mjs'
 
 // import 'vuetify/styles'
 // import '@mdi/font/css/materialdesignicons.css'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  
+
   const i18n = nuxtApp.$i18n
   const current = i18n.locale
   const fallback = i18n.fallbackLocale
   const messages = i18n.messages
   const currentLocale = ref(current.value)
+
+  const settings = useState<Settings | null>('settings', () => null)
   
-  const settings = useState('settings', () => null)
   const cookie = useCookie<'light' | 'dark' | 'system' | undefined>('theme')
   const defaultTheme = cookie.value ?? (settings?.value?.['theme.is_dark'] ? 'dark' : 'light')
   // const { locale, locales } = useI18n()
@@ -40,7 +42,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   }) {
     return (props: LocaleOptions) => {
       const currentLocale = ref(props.locale ?? data.current.value)
-  
+
       const i18n = useI18n({
         locale: currentLocale.value,
         fallbackLocale: data.fallback.value,
@@ -49,15 +51,15 @@ export default defineNuxtPlugin((nuxtApp) => {
         legacy: false,
         inheritLocale: false,
       })
-  
+
       watch(currentLocale, (val, oldVal) => {
         if (oldVal)
           i18n.setLocale(val)
       }, { immediate: true, flush: 'post' })
-  
+
       const t = wrapI18n(i18n.t)
       const n = wrapI18n(i18n.n)
-  
+
       return {
         name: 'nuxt-vue-i18n',
         current: currentLocale,
@@ -70,13 +72,13 @@ export default defineNuxtPlugin((nuxtApp) => {
       }
     }
   }
-  
+
   function wrapI18n<T extends (...args: any[]) => any>(t: T): T {
     return <T>((...args: any[]) => {
       return t(...args)
     })
   }
-  
+
   const vuetify = createVuetify({
     components,
     directives,
@@ -108,13 +110,15 @@ export default defineNuxtPlugin((nuxtApp) => {
           dark: true,
           colors: {
             primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00',
+            ...(settings.value?.dark_colors ?? {}),
           }
         },
         light: {
           dark: false,
           colors: {
             surface: '#f8f8f8',
-            primary: '#FF4500', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00'
+            primary: '#FF4500', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00',
+            ...(settings.value?.light_colors ?? {}),
           }
         }
       }

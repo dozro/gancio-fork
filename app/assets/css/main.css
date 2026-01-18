@@ -7,7 +7,7 @@
 
 
 .v-card .v-icon {
-  opacity: 0.6 !important;
+  --v-icon-opacity: 0.6;
 }
 
 .v-table.v-data-table {
@@ -26,7 +26,7 @@
 
 .v-theme--light .v-card,
 .v-theme--light .event {
-  background-color: #f8f8f8 !important;
+  background-color: #f8f8f8;
   border: thin solid rgba(0, 0, 0, 0.12);
 }
 
