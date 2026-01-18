@@ -35,8 +35,11 @@ const search = ref('')
 const searchDebounced = refDebounced(search, 200)
 const { data: places } = await useFetch<Place[]>('/api/places', { params: { query: searchDebounced },
   dedupe: 'cancel',
-  transform: places => {
-    places.push({ online: true, name: 'online', props: { prependIcon: 'mdi-laptop-account', color: 'primary' } })
+  transform: (originalPlaces) => {
+    const places = originalPlaces.filter(place => place.name?.toLowerCase() !== 'online')
+    if (settings.value.allow_online_event) {
+      places.push({ online: true, name: 'online', props: { prependIcon: 'mdi-laptop-account', color: 'primary' } })
+    }
     if (!search.value && places.length) { 
       return places 
     }

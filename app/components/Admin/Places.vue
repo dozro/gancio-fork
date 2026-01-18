@@ -16,8 +16,9 @@ const headers = [
   { value: 'actions', title: t('common.actions'), align: 'end' }
 ]
 
-// @todo filter online place
-const { data: places, refresh } = await useFetch('/api/places')
+const { data: places, refresh } = await useFetch('/api/places', {
+  transform: places => places.filter(place => place.name?.toLowerCase() !== 'online'),
+})
 
 //   methods: {
 function editPlace(item) {
