@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import ThemeColorsPicker from './components/ThemeColorsPicker.vue'
+import { useTheme } from 'vuetify'
+
+const vTheme = useTheme()
+
 const settings = useState<Settings>('settings')
 const { $notify, $confirm } = useNuxtApp()
 const linkModalForm = ref()
 const link = reactive({ href: '', label: '' })
 const valid = ref(false)
-
-const dark_menu = ref([false, false, false, false])
-const light_menu = ref([false, false, false, false])
 
 const imageKeys = reactive({ logo: 0, header: 0, fallback: 0 })
 
@@ -61,12 +63,23 @@ function resetFooterLinks () {
 }})
 }
 
-function updateColor (t, color, value) {
-  console.error(theme.current.value.colors.primary)
-  theme.current.value.colors.primary = value
-  // theme.themes.value[t].colors[color] = value
-  // theme.current.value.value[t][col or] = value
-  // this.updateSettingColor(theme, color, value)
+async function updateColor (theme: "light" | "dark", color: string, value: string) {
+  const settingsKey = theme === 'light' ? 'light_colors' : 'dark_colors'
+  
+  // Update settings
+  settings.value[settingsKey][color] = value
+
+  // Update Vuetify theme currently displayed
+  if (vTheme.themes.value[theme]) {
+    vTheme.themes.value[theme].colors[color] = value
+  }
+
+  // And update remote settings
+  try {
+    await $fetch('/api/settings', { method: 'PUT', body: { key: settingsKey, value: settings.value[settingsKey] } })
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
 }
 
 async function resetHeaderImage () {
@@ -287,56 +300,12 @@ const custom_js = manageSetting('custom_js')
   <div>
     <div class="text-h5 mb-4">{{ $t('admin.colors') }}</div>
     <!-- choose theme colors -->
-    <div>
-      <v-theme-provider theme="dark">
-        <v-card max-width="465">
-          <v-card-text>
-            <span class="mr-2" v-for="(color, i) in settings.dark_colors" :key="i">
-              <v-menu
-                v-model="dark_menu[i]"
-                :close-on-content-click="false"
-                transition="slide-y-transition"
-                offset-y
-                top
-                right
-                max-width="290px"
-                min-width="290px"
-              >
-                <!-- <template #activator="{ props }">
-                  <v-btn :color="theme.themes.value.dark.colors[i]" dark size='small' v-bind="props">{{ i }}</v-btn>
-                </template> -->
-                <v-color-picker
-                  mode="hexa"
-                  :model-value="color"
-                  @update:model-value="c => updateColor('dark', i, c)"
-                />
-              </v-menu>
-            </span>
-          </v-card-text>
-        </v-card>
-      </v-theme-provider>
+
+    <div class="d-flex flex-wrap ga-4">
+      <theme-colors-picker theme="light" :colors="settings.light_colors" @change="updateColor" />
+      <theme-colors-picker theme="dark" :colors="settings.dark_colors" @change="updateColor" />
     </div>
 
-    <v-theme-provider theme="light">
-      <v-card class='mt-4' max-width='465'>
-        <v-card-text>
-          <span class='mr-2' v-for='(color, i) in settings.light_colors' :key='i'>
-            <v-menu v-model='light_menu[i]'
-                :close-on-content-click="false"
-                transition="slide-y-transition"
-                offset-y
-                top right
-                max-width="290px"
-                min-width="290px">
-              <template #activator='{ props }'>
-                <v-btn :color='color' small v-bind="props"> {{i}}</v-btn>
-              </template>
-              <v-color-picker mode='hexa' :model-value='color' @update:model-value='c => updateColor("light", i, c)' />
-            </v-menu>
-          </span>
-        </v-card-text>
-      </v-card>
-    </v-theme-provider>
   </div>
 
   <v-dialog v-model='linkModal' width='500' :fullscreen='$vuetify.display?.mobile'>

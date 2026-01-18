@@ -38,8 +38,8 @@ export type Settings = {
   enable_resources: boolean,
   hide_boosts: boolean,
   'theme.is_dark': boolean,
-  dark_colors: object //{ primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00' },
-  light_colors: object // { primary: '#FF4500', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00' },
+  dark_colors: ThemeColorPalette
+  light_colors: ThemeColorPalette
   hide_thumbs: boolean,
   hide_calendar: boolean,
   footerLinks: Array<FooterLink>
@@ -54,6 +54,9 @@ export type Settings = {
   publicKey?: string
   about?: string
 }
+
+//{ primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00' },
+export type ThemeColorPalette = { [key: string]: string }
 
 export type SecretSettings = {
   privateKey?: string,
