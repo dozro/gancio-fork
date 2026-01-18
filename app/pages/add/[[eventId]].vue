@@ -85,7 +85,9 @@ async function done() {
     formData.append('place_id', String(evt.place?.id))
   }
   formData.append('place_name', evt.place?.name.trim())
-  formData.append('place_address', evt.place?.address || null)
+  if (evt.place?.address) {
+    formData.append('place_address', evt.place.address)
+  }
 
   if (settings.value.allow_geolocation) {
     formData.append('place_latitude', String(evt?.place?.latitude ?? ''))
