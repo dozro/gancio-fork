@@ -14,7 +14,7 @@ export function parseIcsData (icsText: string, includePastEvents = true) {
   const now = Math.floor(Date.now() / 1000)
 
   return events
-    .map(eventData => {
+    .map((eventData) => {
       const event = new ical.Event(eventData)
       const start_datetime = event.startDate.toUnixTime()
       const end_datetime = event.endDate.toUnixTime()

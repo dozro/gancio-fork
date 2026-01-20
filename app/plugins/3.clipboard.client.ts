@@ -1,10 +1,9 @@
-export default defineNuxtPlugin( () => {
-
+export default defineNuxtPlugin(() => {
   const copyToClipboard = async (text: string) => {
     const { $notify } = useNuxtApp()
     try {
       await navigator.clipboard.writeText(text)
-    } catch (e) {
+    } catch {
       // legacy
       const el = document.createElement('textarea')
       el.addEventListener('focusin', e => e.stopPropagation())
@@ -16,7 +15,6 @@ export default defineNuxtPlugin( () => {
     }
     $notify('common.copied')
   }
-  
-  return { provide: { copyToClipboard }}
-  
+
+  return { provide: { copyToClipboard } }
 })

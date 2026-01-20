@@ -1,4 +1,4 @@
-import type { User, UserSessionRequired, UserSession } from '#auth-utils'
+import type { User } from '#auth-utils'
 import { verifyJwtToken } from './jwt'
 
 type UseSessionEvent = Parameters<typeof useSession>[0]
@@ -7,7 +7,6 @@ type UseSessionEvent = Parameters<typeof useSession>[0]
  * Get the user of the request based on `nuxt-session` cookie or JWT Bearer token
  */
 export async function getUser(event: UseSessionEvent) {
-
   const session = await getUserSession(event)
   if (session?.user) {
     return session.user
@@ -33,7 +32,6 @@ export async function getUser(event: UseSessionEvent) {
         is_editor: payload.role === 'editor',
         is_admin: payload.role === 'admin'
       } as User
-
     } catch (err) {
       console.warn('Invalid JWT:', err)
     }

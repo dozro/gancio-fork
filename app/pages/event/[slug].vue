@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import time from '~/utils/time'
 
-
 const settings = useState<Settings>('settings')
 const { $notify, $prompt } = useNuxtApp()
 const { t } = useI18n()
 const { user } = useUserSession()
 const route = useRoute()
 const { isAdmin } = useAuth()
-const { data: event, refresh, error } = await useFetch<EventAPI>(`/api/event/detail/${route.params.slug}` )
+const { data: event, refresh, error } = await useFetch<EventAPI>(`/api/event/detail/${route.params.slug}`)
 if (!event.value || error.value) {
   throw createError({
     statusCode: error.value?.statusCode ?? 500,
@@ -83,7 +82,7 @@ const hasOnlineLocations = computed(() => event?.value?.online_locations?.length
 //   showResources () {
 //     return this.settings.enable_federation &&
 //     ( (!this.settings.hide_boosts && (this.event.boost?.length || this.event?.likes?.length)) ||
-//     ( this.settings.enable_resources && this.event?.resources?.length))      
+//     ( this.settings.enable_resources && this.event?.resources?.length))
 //   }
 // },
 
@@ -102,126 +101,140 @@ async function report() {
 
 </script>
 <template>
-  <v-container v-if='event' class="h-event pa-2 pa-sm-2 pt-0 pt-sm-0" max-width='1200 ' itemscope
-    itemtype="https://schema.org/Event">
-    <!-- EVENT PAGE -->
-    <!-- gancio supports microformats (http://microformats.org/wiki/h-event) -->
-    <!-- and microdata https://schema.org/Event -->
-    <h1 class="text-center text-md-h4 text-h5 pa-6">
-      <strong class="p-name text--primary" itemprop="name">{{ event?.title }}</strong>
-    </h1>
+<v-container
+  v-if='event' class="h-event pa-2 pa-sm-2 pt-0 pt-sm-0" max-width='1200 ' itemscope
+  itemtype="https://schema.org/Event">
+  <!-- EVENT PAGE -->
+  <!-- gancio supports microformats (http://microformats.org/wiki/h-event) -->
+  <!-- and microdata https://schema.org/Event -->
+  <h1 class="text-center text-md-h4 text-h5 pa-6">
+    <strong class="p-name text--primary" itemprop="name">{{ event?.title }}</strong>
+  </h1>
 
-    <v-row>
-      <v-col cols='12' md='8' class="pr-sm-2 pr-md-0">
-        <!-- <MyPicture v-if="hasMedia" :event="event" /> -->
-        <CoreImg v-if="hasMedia" :event="event" />
-        <div class="p-description text-body-1 pa-3 rounded" v-if="event?.description" itemprop="description"
-          v-html="event?.description" />
-      </v-col>
+  <v-row>
+    <v-col cols='12' md='8' class="pr-sm-2 pr-md-0">
+      <!-- <MyPicture v-if="hasMedia" :event="event" /> -->
+      <CoreImg v-if="hasMedia" :event="event" />
+      <div
+        v-if="event?.description" class="p-description text-body-1 pa-3 rounded" itemprop="description"
+        v-html="event?.description" />
+    </v-col>
 
-      <v-col cols='12' md='4'>
-        <v-card class='border-2'>
-          <v-container class="eventDetails">
-            <v-icon class="float-right" v-if="event?.parentId" color="success" icon="mdi-repeat" />
-            <!-- :datetime="$time.unixFormat(event.start_datetime, 'yyyy-MM-dd HH:mm')" -->
-            <!-- :content="$time.unixFormat(event.start_datetime, 'yyyy-MM-dd\'T\'HH:mm')" -->
-            <time class="dt-start" itemprop="startDate">
-              <v-icon icon="mdi-calendar" />
-              <span class="ml-2 text-uppercase">{{ time.when(event) }}</span>
-              <div class="d-none dt-end" v-if="event?.end_datetime" itemprop="endDate">
-                <!-- :content="$time.unixFormat(event.end_datetime,'yyyy-MM-dd\'T\'HH:mm')" -->
-                <!-- {{$time.unixFormat(event.end_datetime,"yyyy-MM-dd'T'HH:mm")}} -->
-              </div>
-            </time>
-            <div class="font-weight-light mb-3">
-              {{ time.from(event.start_datetime) }}
-              <!-- <small v-if="event.parentId">({{$time.recurrentDetail(event)}})</small> -->
+    <v-col cols='12' md='4'>
+      <v-card class='border-2'>
+        <v-container class="eventDetails">
+          <v-icon v-if="event?.parentId" class="float-right" color="success" icon="mdi-repeat" />
+          <!-- :datetime="$time.unixFormat(event.start_datetime, 'yyyy-MM-dd HH:mm')" -->
+          <!-- :content="$time.unixFormat(event.start_datetime, 'yyyy-MM-dd\'T\'HH:mm')" -->
+          <time class="dt-start" itemprop="startDate">
+            <v-icon icon="mdi-calendar" />
+            <span class="ml-2 text-uppercase">{{ time.when(event) }}</span>
+            <div v-if="event?.end_datetime" class="d-none dt-end" itemprop="endDate">
+              <!-- :content="$time.unixFormat(event.end_datetime,'yyyy-MM-dd\'T\'HH:mm')" -->
+              <!-- {{$time.unixFormat(event.end_datetime,"yyyy-MM-dd'T'HH:mm")}} -->
             </div>
-            <div class="p-location h-adr" itemprop="location" itemscope itemtype="https://schema.org/Place">
-              <v-icon icon="mdi-map-marker" small />
-              <nuxt-link class="vcard ml-2 p-name text-decoration-none text-uppercase"
-                :to="`/place/${event?.place?.id}/${encodeURIComponent(event?.place?.name)}`">
-                <span itemprop="name">{{ event?.place?.name }}</span>
-              </nuxt-link>
-              <div class="font-weight-light p-street-address" v-if='event?.place?.name !== "online"' itemprop="address">
-                {{ event?.place?.address }}
-              </div>
+          </time>
+          <div class="font-weight-light mb-3">
+            {{ time.from(event.start_datetime) }}
+            <!-- <small v-if="event.parentId">({{$time.recurrentDetail(event)}})</small> -->
+          </div>
+          <div class="p-location h-adr" itemprop="location" itemscope itemtype="https://schema.org/Place">
+            <v-icon icon="mdi-map-marker" size="small" />
+            <nuxt-link
+              class="vcard ml-2 p-name text-decoration-none text-uppercase"
+              :to="`/place/${event?.place?.id}/${encodeURIComponent(event?.place?.name)}`">
+              <span itemprop="name">{{ event?.place?.name }}</span>
+            </nuxt-link>
+            <div v-if='event?.place?.name !== "online"' class="font-weight-light p-street-address" itemprop="address">
+              {{ event?.place?.address }}
             </div>
-            <!-- <a class="d-block" v-if="event.ap_object?.url" :href="event.ap_object?.url">{{ event.ap_object?.url }}</a> -->
-            <a v-if="event?.original_url" :href="event?.original_url">{{ event.original_url }}</a>
-          </v-container>
-          <!-- tags, hashtags -->
-          <v-container class="pt-0" v-if="event?.tags?.length">
-            <v-chip class="p-category ml-1 mt-1" v-for="tag in event.tags" density='compact' label color="primary" variant='outlined'
-              :key="tag" :to="`/tag/${encodeURIComponent(tag)}`">
-              {{ tag }}
-            </v-chip>
-          </v-container>
+          </div>
+          <!-- <a class="d-block" v-if="event.ap_object?.url" :href="event.ap_object?.url">{{ event.ap_object?.url }}</a> -->
+          <a v-if="event?.original_url" :href="event?.original_url">{{ event.original_url }}</a>
+        </v-container>
+        <!-- tags, hashtags -->
+        <v-container v-if="event?.tags?.length" class="pt-0">
+          <v-chip
+            v-for="tag in event.tags" :key="tag" class="p-category ml-1 mt-1" density='compact' label color="primary"
+            variant='outlined' :to="`/tag/${encodeURIComponent(tag)}`">
+            {{ tag }}
+          </v-chip>
+        </v-container>
 
-          <!-- online events -->
-          <v-list nav density='compact' v-if="hasOnlineLocations">
-            <v-list-item v-for="(item, index) in event.online_locations" target="_blank" :href="`${item}`" :key="index"
-              prepend-icon='mdi-monitor-account' :title='item' />
-          </v-list>
+        <!-- online events -->
+        <v-list v-if="hasOnlineLocations" nav density='compact'>
+          <v-list-item
+            v-for="(item, index) in event.online_locations" :key="index" target="_blank" :href="`${item}`"
+            prepend-icon='mdi-monitor-account' :title='item' />
+        </v-list>
 
-          <v-divider />
-          <!-- info & actions -->
-          <v-list>
+        <v-divider />
+        <!-- info & actions -->
+        <v-list>
 
-            <!-- copy link -->
-            <v-list-item @click="$copyToClipboard(`${settings.baseurl}/event/${event?.slug || event.id}`)"
-              prepend-icon='mdi-content-copy' :title="$t('common.copy_link')" />
+          <!-- copy link -->
+          <v-list-item
+            prepend-icon='mdi-content-copy'
+            :title="$t('common.copy_link')" @click="$copyToClipboard(`${settings.baseurl}/event/${event?.slug || event.id}`)" />
 
-            <!-- map -->
-            <v-list-item v-if="settings.allow_geolocation && event?.place?.latitude && event.place?.longitude"
-              @click="mapModal = true" prepend-icon='mdi-map' :title="$t('common.show_map')" />
+          <!-- map -->
+          <v-list-item
+            v-if="settings.allow_geolocation && event?.place?.latitude && event.place?.longitude"
+            prepend-icon='mdi-map' :title="$t('common.show_map')" @click="mapModal = true" />
 
-            <!-- calendar -->
-            <v-list-item :href="`/api/event/detail/${event?.slug || event.id}?format=ics`"
-              prepend-icon='mdi-calendar-export' :title="$t('common.add_to_calendar')" />
+          <!-- calendar -->
+          <v-list-item
+            :href="`/api/event/detail/${event?.slug || event.id}?format=ics`"
+            prepend-icon='mdi-calendar-export' :title="$t('common.add_to_calendar')" />
 
-            <!-- Report -->
-            <v-list-item v-if="settings.enable_moderation && settings.enable_report && !showModeration" @click="report"
-              prepend-icon='mdi-message-text-outline' :title="$t('common.report')" />
+          <!-- Report -->
+          <v-list-item
+            v-if="settings.enable_moderation && settings.enable_report && !showModeration" prepend-icon='mdi-message-text-outline'
+            :title="$t('common.report')" @click="report" />
 
-            <!-- download flyer -->
-            <v-list-item v-if="hasMedia && settings.show_download_media" :href="mediaURL(event, 'download')"
-              prepend-icon='mdi-file-download-outline' :title="t('event.download_flyer')" />
+          <!-- download flyer -->
+          <v-list-item
+            v-if="hasMedia && settings.show_download_media" :href="mediaURL(event, 'download')"
+            prepend-icon='mdi-file-download-outline' :title="t('event.download_flyer')" />
 
-            <!-- embed -->
-            <v-list-item @click="showEmbed = true" prepend-icon='mdi-code-tags' :title="$t('common.embed')" />
+          <!-- embed -->
+          <v-list-item prepend-icon='mdi-code-tags' :title="$t('common.embed')" @click="showEmbed = true" />
 
-          </v-list>
-          <!-- admin actions -->
-          <EventAdmin v-if='canEdit' :event="event" @update='refresh' @open-moderation="openModeration = true"
-            @open-assign-author="openAssignAuthor = true" />
-        </v-card>
-      </v-col>
-    </v-row>
+        </v-list>
+        <!-- admin actions -->
+        <EventAdmin
+          v-if='canEdit' :event="event" @update='refresh' @open-moderation="openModeration = true"
+          @open-assign-author="openAssignAuthor = true" />
+      </v-card>
+    </v-col>
+  </v-row>
 
-    <!-- resources from fediverse -->
-    <!-- <EventResource id="resources" class="mt-3" :event="event" v-if="showResources" /> -->
+  <!-- resources from fediverse -->
+  <!-- <EventResource id="resources" class="mt-3" :event="event" v-if="showResources" /> -->
 
-    <v-dialog class='event-embed-dialog' v-model="showEmbed" width="700px" :fullscreen="$vuetify.display?.mobile">
-      <EventEmbed :event="event" @close="showEmbed = false" />
-    </v-dialog>
+  <v-dialog v-model="showEmbed" class='event-embed-dialog' width="700px" :fullscreen="$vuetify.display?.mobile">
+    <EventEmbed :event="event" @close="showEmbed = false" />
+  </v-dialog>
 
-    <v-dialog class='event-map-dialog'
-      v-if="settings.allow_geolocation && event?.place?.latitude && event.place?.longitude" v-model="mapModal"
-      :fullscreen="$vuetify.display?.mobile" destroy-on-close>
-      <EventMapDialog :place="event?.place" @close="mapModal = false" />
-    </v-dialog>
+  <v-dialog
+    v-if="settings.allow_geolocation && event?.place?.latitude && event.place?.longitude"
+    v-model="mapModal" class='event-map-dialog'
+    :fullscreen="$vuetify.display?.mobile" destroy-on-close>
+    <EventMapDialog :place="event?.place" @close="mapModal = false" />
+  </v-dialog>
 
-    <v-dialog class='event-assign-author-dialog' v-if="isAdmin" v-model="openAssignAuthor"
-      :fullscreen="$vuetify.display?.mobile" destroy-on-close width="400">
-      <EventAssignAuthor :event="event" @close="openAssignAuthor = false" />
-    </v-dialog>
+  <v-dialog
+    v-if="isAdmin" v-model="openAssignAuthor" class='event-assign-author-dialog'
+    :fullscreen="$vuetify.display?.mobile" destroy-on-close width="400">
+    <EventAssignAuthor :event="event" @close="openAssignAuthor = false" />
+  </v-dialog>
 
-    <v-navigation-drawer v-model="openModeration" :fullscreen="$vuetify.display?.mobile" location='right' width="400"
-      temporary>
-      <EventModeration :event="event" v-if="openModeration" @close="openModeration = false" />
-    </v-navigation-drawer>
-  </v-container>
+  <v-navigation-drawer
+    v-model="openModeration" :fullscreen="$vuetify.display?.mobile" location='right' width="400"
+    temporary>
+    <EventModeration v-if="openModeration" :event="event" @close="openModeration = false" />
+  </v-navigation-drawer>
+</v-container>
 </template>
 
 <style>

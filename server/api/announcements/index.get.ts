@@ -10,7 +10,7 @@ const querySchema = z.object({
   full_attributes: z.stringbool().default(false).optional()
 })
 
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   const user = await getUser(evt)
   const { error, data } = await getValidatedQuery(evt, querySchema.safeParse)
   if (error) {

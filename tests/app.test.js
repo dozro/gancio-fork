@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it } from 'vitest'
 import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
-import { DateTime } from "luxon"
+import { DateTime } from 'luxon'
 import { fetchWithAuth, admin, setCookie, setToken, cookie } from './setup.js'
 
 const base_url = 'http://localhost:13120'
@@ -87,7 +87,6 @@ describe('Authentication / Authorization', () => {
 })
 
 describe('Settings', () => {
-
   it('should not change settings when not allowed', async () => {
     const response = await fetch('/api/settings', { method: 'PUT', body: JSON.stringify({ key: 'allow_anon_event', value: false }) })
     expect(response.status).toBe(401)
@@ -114,7 +113,6 @@ describe('Settings', () => {
   //     expect(response.body.test).toStrictEqual([1, 2, 'test'])
   //   })
 
-
   //   it('should retrieve stored object settings', async () => {
   //     await request(app).post('/api/settings')
   //       .auth(token.access_token, { type: 'bearer' })
@@ -129,7 +127,6 @@ describe('Settings', () => {
   //     expect(response.body.test.name).toBe('test object')
   //   })
 
-
   //   it('should retrieve stored string settings', async () => {
   //     await request(app).post('/api/settings')
   //       .auth(token.access_token, { type: 'bearer' })
@@ -143,11 +140,9 @@ describe('Settings', () => {
 
   //     expect(response.body.test).toBe('test string')
   //   })
-
 })
 
 describe('Events', () => {
-
   it('should not allow event creation without required fields', async () => {
     const required_fields = {
       'title': {},
@@ -155,8 +150,7 @@ describe('Events', () => {
       'place_id or place_name and place_address are': { title: 'test title', start_datetime: DateTime.now().toUnixInteger(), place_name: 'test place name' },
     }
 
-    const promises = Object.keys(required_fields).map(async field => {
-
+    const promises = Object.keys(required_fields).map(async (field) => {
       const response = await fetchWithAuth('/api/events', 'POST', required_fields[field])
       expect(response.status).toBe(400)
       expect(response.statusText).toBe(`${field} required`)
@@ -186,13 +180,11 @@ describe('Events', () => {
 
     expect(response.data.place.id).toBeDefined()
     places.push(response.data.place.id)
-
   })
 
-
   it('should not confirm anon events', async () => {
-    const response = await fetchWithAuth('/api/events', 'POST', { title: 'test title 6', place_id: 1, start_datetime: DateTime.now().toUnixInteger() + 1000 }
-      , 'none')
+    const response = await fetchWithAuth('/api/events', 'POST', { title: 'test title 6', place_id: 1, start_datetime: DateTime.now().toUnixInteger() + 1000 },
+      'none')
 
     expect(response.data.is_visible).toBe(false)
     event_id = response.data.id
@@ -204,7 +196,7 @@ describe('Events', () => {
 
   //       response = await request(app).get(`/api/event/detail/${event_id}`)
   //       .auth(token.access_token, { type: 'bearer' })
-  //       .expect(200)      
+  //       .expect(200)
   //   })
 
   //   it('should confirm event if allowed', async () => {
@@ -215,7 +207,7 @@ describe('Events', () => {
   //     response = await request(app).put(`/api/event/confirm/${event_id}`)
   //       .auth(token.access_token, { type: 'bearer' })
   //       .send()
-  //       .expect(200)      
+  //       .expect(200)
   //   })
 
   //   it('should not allow start_datetime greater than end_datetime', async () => {
@@ -260,7 +252,6 @@ describe('Events', () => {
   //       .send(event)
   //       .expect(400)
   //   })
-
 
   //   it('should validate end_datime', async () => {
   //     const event = {
@@ -321,7 +312,6 @@ describe('Events', () => {
   //     expect(response.body.tags[0]).toBe('test tag')
   //   })
 
-
   //   it('should sanitize htlm in description', async () => {
 
   //     const event = {
@@ -331,7 +321,6 @@ describe('Events', () => {
   //       tags: ['test tags'],
   //       description: `<p wrong-attr="" onclick="alert('test');">inside paragraph</p><a href="https://test.com/?query=true&fbclid=facebook_id">link with fb reference</a>`
   //     }
-
 
   //     const response = await request(app).post('/api/event')
   //       .send(event)
@@ -358,7 +347,6 @@ describe('Events', () => {
   //     expect(response.text).toBe('Wrong format for start datetime')
   //   })
 
-
   //   it('should not update event with invalid end_datetime', async () => {
   //     const event = {
   //       id: event_id,
@@ -373,8 +361,6 @@ describe('Events', () => {
 
   //     expect(response.text).toBe('start datetime is greater than end datetime')
   //   })
-
-
 })
 
 // let event = {}
@@ -397,7 +383,6 @@ describe('Events', () => {
 //     const response = await request(app).get('/api/places')
 //       .auth(token.access_token, { type: 'bearer' })
 //       .expect(200)
-
 
 //     expect(response.body.length).toBe(2)
 //   })
@@ -462,7 +447,6 @@ describe('Events', () => {
 //       .send({ key: 'allow_geolocation', value: false })
 //       .auth(token.access_token, { type: 'bearer' })
 //       .expect(200)
-
 
 //     const response = await request(app).get('/api/placeOSM/Nominatim/test')
 //       .expect(403)

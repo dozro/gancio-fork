@@ -8,7 +8,7 @@ const recoverCode = route.params.code
 const newPassword = ref('')
 const valid = ref(false)
 
-const user = await $fetch('/api/user/check_recover_code', { method: 'POST', body: { recoverCode }}).catch(e => {})
+const user = await $fetch('/api/user/check_recover_code', { method: 'POST', body: { recoverCode } }).catch(() => {})
 const { $notify } = useNuxtApp()
 
 async function changePassword () {
@@ -23,7 +23,7 @@ async function changePassword () {
 </script>
 <template>
 <v-container>
-  <v-form @submit.prevent="changePassword" v-model='valid'>
+  <v-form v-model='valid' @submit.prevent="changePassword">
     <v-row class='mt-5' align='center' justify='center'>
       <v-col cols='12' md="6" lg="5" xl="4">
         <v-card>
@@ -31,10 +31,11 @@ async function changePassword () {
           <template v-if='user'>
             <v-card-subtitle>{{user.email}}</v-card-subtitle>
             <v-card-text>
-              <v-text-field type='password'
-                :rules="[$valid.password]"
-                autofocus :placeholder='$t("common.new_password")'
-                v-model='newPassword' />
+              <v-text-field
+                v-model='newPassword'
+                type='password'
+                :rules="[$valid.password]" autofocus
+                :placeholder='$t("common.new_password")' />
             </v-card-text>
           </template>
           <template v-else>

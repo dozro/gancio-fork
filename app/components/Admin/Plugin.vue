@@ -8,7 +8,7 @@ const selectedPlugin = ref({})
 const { $notify } = useNuxtApp()
 const { data: plugins } = await useFetch('/api/plugins')
 
-async function saveSettings (close=true) {
+async function saveSettings (close = true) {
   loading.value = true
   await $fetch('/api/settings', { method: 'PUT', body: {
     key: 'plugin_' + selectedPlugin.value.name,
@@ -22,8 +22,8 @@ async function saveSettings (close=true) {
 
 async function testPlugin() {
   await saveSettings(false)
-  $fetch(`/api/plugin/test/${selectedPlugin.value.name}`, { method: 'POST'} )
-    .catch( e => $notify(e, { color: 'warning' }))
+  $fetch(`/api/plugin/test/${selectedPlugin.value.name}`, { method: 'POST' })
+    .catch(e => $notify(e, { color: 'warning' }))
 }
 
 function setOptions(plugin) {
@@ -40,13 +40,14 @@ function setOptions(plugin) {
     <v-card>
       <v-card-title> {{ $t('admin.config_plugin') }} - {{ selectedPlugin.name }}</v-card-title>
       <v-card-text>
-        <v-form v-model='valid' ref='form' lazy-validation>
+        <v-form ref='form' v-model='valid'>
           <v-row v-for='(setting, name) in selectedPlugin.settings' :key='name' class='mt-2'>
             <v-col cols="4">
               <small v-html='setting.hint' />
             </v-col>
             <v-col cols="8">
-              <v-text-field v-if='setting.type === "TEXT"' v-model='selectedPlugin.settingsValue[name]'
+              <v-text-field
+                v-if='setting.type === "TEXT"' v-model='selectedPlugin.settingsValue[name]'
                 type='text' :label='setting.description'
                 persistent-hint
                 :rules="[setting.required ? $valid.required(setting.description) : false]" />
@@ -56,21 +57,22 @@ function setOptions(plugin) {
               <v-select v-if='setting.type === "LIST"' v-model='selectedPlugin.settingsValue[name]' :items='setting.items' :label='setting.description' />
             </v-col>
           </v-row>
-          <v-switch :label="$t('common.enable')" color='primary' v-model='selectedPlugin.settingsValue["enable"]' />
+          <v-switch v-model='selectedPlugin.settingsValue["enable"]' :label="$t('common.enable')" color='primary' />
         </v-form>
       </v-card-text>
       <v-card-actions>
-        <v-btn @click='testPlugin' outlined color='primary'> {{ $t('common.test') }}</v-btn>
+        <v-btn variant="outlined" color='primary' @click='testPlugin'> {{ $t('common.test') }}</v-btn>
         <v-spacer />
-        <v-btn @click='dialog = false' outlined color='warning'> {{ $t('common.close') }}</v-btn>
-        <v-btn @click='saveSettings' outlined color='primary' :loading='loading'
-          :disable='!valid || loading'> {{ $t('common.save') }}</v-btn>
+        <v-btn variant="outlined" color='warning' @click='dialog = false'> {{ $t('common.close') }}</v-btn>
+        <v-btn
+          variant="outlined" color='primary' :loading='loading' :disable='!valid || loading'
+          @click='saveSettings'> {{ $t('common.save') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 
   <div class='d-flex flex-wrap mt-8 ga-4'>
-    <v-card v-for='plugin in plugins' :key='plugin.name' outlined width='400' class='flex-1-1 d-flex flex-column'>
+    <v-card v-for='plugin in plugins' :key='plugin.name' border width='400' class='flex-1-1 d-flex flex-column'>
       <v-card-title> {{ plugin.name }}</v-card-title>
       <v-card-text>
         <p> {{ plugin.description }}</p>
@@ -81,7 +83,7 @@ function setOptions(plugin) {
       <v-spacer />
       <v-card-actions>
         <v-spacer />
-        <v-btn text color='primary' @click='setOptions(plugin)'> {{ $t('common.settings') }}</v-btn>
+        <v-btn variant="text" color='primary' @click='setOptions(plugin)'> {{ $t('common.settings') }}</v-btn>
       </v-card-actions>
     </v-card>
   </div>

@@ -5,7 +5,7 @@ await setup({ host: base_url })
 
 export const admin = JSON.stringify({ email: 'admin', password: 'password', grant_type: 'password', client_id: 'self' })
 export let cookie = '' // : string | null
-let token //: string | null
+let token // : string | null
 // let app
 // let places = []
 // let event_id: number
@@ -28,7 +28,6 @@ export async function registerAdmin() {
 }
 
 export async function login() {
-
   const { headers } = await fetch('/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -40,13 +39,13 @@ export async function login() {
 }
 
 export async function fetchWithAuth(
-  end_point, //: string,
-  method = 'GET', //: string = 'GET',
-  data, //?: any,
-  authType = 'cookie', //: AuthType = 'cookie',
-  contentType = 'application/json', //: 'application/json' | 'multipart/form-data' = 'application/json'
+  end_point, // : string,
+  method = 'GET', // : string = 'GET',
+  data, // ?: any,
+  authType = 'cookie', // : AuthType = 'cookie',
+  contentType = 'application/json', // : 'application/json' | 'multipart/form-data' = 'application/json'
 ) {
-  const headers = {} //: Record<string, string> = {}
+  const headers = {} // : Record<string, string> = {}
   // let authHeader: string | undefined
 
   if (authType === 'cookie') {
@@ -55,7 +54,7 @@ export async function fetchWithAuth(
     headers['Authorization'] = `Bearer ${token}`
   }
 
-  let body //: string | undefined | FormData
+  let body // : string | undefined | FormData
   if (data !== undefined && method !== 'GET') {
     headers['Content-Type'] = contentType
     if (contentType === 'multipart/form-data') {

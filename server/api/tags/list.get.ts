@@ -1,7 +1,7 @@
-import { Event } from "#imports"
-import { Op, fn, col } from "@sequelize/core"
+import { Event } from '#imports'
+import { fn, col } from '@sequelize/core'
 
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   await requireAdminSession(evt)
   const tags = await Tag.findAll({
     order: [[fn('COUNT', col('tag')), 'DESC']],

@@ -1,7 +1,7 @@
-import { DateTime } from "luxon"
+import { DateTime } from 'luxon'
 import ics from 'ics'
-import type { H3Event } from "h3"
-import type { Event } from "./sequelize"
+import type { H3Event } from 'h3'
+import type { Event } from './sequelize'
 import { htmlToText } from 'html-to-text'
 
 /**
@@ -9,20 +9,20 @@ import { htmlToText } from 'html-to-text'
  * @param {Event[]} events array of events from sequelize
  * @param {*} alarms https://github.com/adamgibbons/ics#attributes (alarms)
  */
-export function exportICS (evt: H3Event, events: Event[], alarms: any = []) {
-  const eventsMap = events.map(e => {
+export function exportICS (evt: H3Event, events: Event[], alarms: ics.Alarm[] | undefined) {
+  const eventsMap = events.map((e) => {
     const tmpStart = DateTime.fromSeconds(e.start_datetime, { zone: 'UTC' })
-    const start : [number, number, number, number, number] = [ tmpStart.year, tmpStart.month, tmpStart.day, tmpStart.hour, tmpStart.minute ]
+    const start: [number, number, number, number, number] = [tmpStart.year, tmpStart.month, tmpStart.day, tmpStart.hour, tmpStart.minute]
 
     const location = e?.place ? (e.place?.name !== 'online' ? `${e.place?.name} - ${e.place?.address}` : `${e.place?.name} - ${e?.online_locations?.[0]}`) : ''
-    const ret : ics.EventAttributes = {
+    const ret: ics.EventAttributes = {
       uid: `${e.id}@${publicSettings.hostname}`,
       start,
       startInputType: 'utc',
       endInputType: 'utc',
       title: e.title,
       description: htmlToText(e.description),
-      htmlContent: e.description && e.description.replace(/\n/g,"<br>"),
+      htmlContent: e.description && e.description.replace(/\n/g, '<br>'),
       location,
       url: `${publicSettings.baseurl}/event/${e.slug || e.id}`,
       status: 'CONFIRMED',
@@ -36,7 +36,7 @@ export function exportICS (evt: H3Event, events: Event[], alarms: any = []) {
 
     if (e.end_datetime) {
       const tmpEnd = DateTime.fromSeconds(e.end_datetime, { zone: 'UTC' })
-      const end = [ tmpEnd.year, tmpEnd.month, tmpEnd.day, tmpEnd.hour, tmpEnd.minute ]
+      const end = [tmpEnd.year, tmpEnd.month, tmpEnd.day, tmpEnd.hour, tmpEnd.minute]
       ret.end = end
     }
 
@@ -46,7 +46,7 @@ export function exportICS (evt: H3Event, events: Event[], alarms: any = []) {
   setHeader(evt, 'Content-Type', 'text/calendar; charset=UTF-8')
   return ics.createEvents(eventsMap, (err, value) => {
     if (err) {
-      throw createError({ status: 401, message: String(err)})
+      throw createError({ status: 401, message: String(err) })
     }
     return value
   })

@@ -1,6 +1,7 @@
 // server/utils/jwt.ts
 
-import { JWTPayload, jwtVerify, SignJWT } from 'jose'
+import type { JWTPayload } from 'jose'
+import { jwtVerify, SignJWT } from 'jose'
 
 const secret = new TextEncoder().encode(process.env.NUXT_SESSION_SECRET)
 
@@ -11,7 +12,7 @@ export async function signJwt(payload: JWTPayload, expiresIn = '1m') {
     .sign(secret)
 }
 
-export async function verifyJwtToken(token: string): Promise<any> {
+export async function verifyJwtToken(token: string) {
   const { payload } = await jwtVerify(token, secret)
   return payload
 }

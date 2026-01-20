@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const props = defineProps<{event: EventAPI}>()
+const props = defineProps<{ event: EventAPI }>()
 const media = defineModel<Media[]>('media', { required: true, default: () => [] })
 
 const { $confirm } = useNuxtApp()
@@ -14,7 +14,7 @@ const imgUrlInput = ref(firstMedia?.url ?? '')
 
 const focalpoint = ref<[number, number]>(firstMedia?.focalpoint ?? [0, 0])
 const dragging = ref(false)
-const mediaPreview = computed( () => {
+const mediaPreview = computed(() => {
   if (!media.value[0]?.url && !media.value[0]?.image) {
     return false
   }
@@ -28,8 +28,8 @@ const mediaPreview = computed( () => {
   return url
 })
 
-const left = computed(() => (focalpoint?.value?.[0] +1) * 50 + '%')
-const top = computed(() => (focalpoint?.value?.[1]+1) * 50 + '%')
+const left = computed(() => (focalpoint?.value?.[0] + 1) * 50 + '%')
+const top = computed(() => (focalpoint?.value?.[1] + 1) * 50 + '%')
 
 const savedPosition = computed(() => {
   const focalpoint = media.value[0]?.focalpoint || [0, 0]
@@ -52,28 +52,27 @@ function save () {
 }
 async function remove () {
   const ret = await $confirm('event.remove_media_confirmation')
-  if (!ret) { return }
+  if (!ret) {
+    return
+  }
   useUrl.value = false
   imgUrlInput.value = ''
   media.value = []
 }
 
 function selectMedia (v: File | File[]) {
-
   media.value ??= []
   media.value[0] ??= {} as Media
-  media.value[0] = { image: v as File, name: props.event.title, focalpoint: [0, 0]}
+  media.value[0] = { image: v as File, name: props.event.title, focalpoint: [0, 0] }
 }
 
 function selectUrl () {
-
   media.value ??= []
   media.value[0] ??= {} as Media
 
   if (validateUrl(imgUrlInput.value) === true) {
     media.value[0].url = imgUrlInput.value
   }
-
 }
 function handleStart (ev: PointerEvent) {
   ev.preventDefault()
@@ -130,8 +129,8 @@ function validateUrl (value: string) {
             @pointermove="handleMove"
             @pointerup="handleStop"
           >
-            <div class="focalPoint" :style="{ top, left }"></div>
-            <img v-if="mediaPreview" :src="mediaPreview" />
+            <div class="focalPoint" :style="{ top, left }"/>
+            <img v-if="mediaPreview" :src="mediaPreview" >
           </v-col>
           <v-col cols='12' sm='4'>
             <p>{{ t('event.choose_focal_point') }}</p>
@@ -142,20 +141,20 @@ function validateUrl (value: string) {
               class="mediaPreview d-none d-sm-block"
               :src="mediaPreview"
               :style="{ 'object-position': position }"
-            />
+            >
             <v-textarea
               v-model='name'
               class="mt-4"
               type="text"
               label="Alternative text"
               persistent-hint
-              filled
+              variant="filled"
               :hint="t('event.alt_text_description')"
             />
-            <br />
+            <br >
             <v-card-actions class="justify-space-between">
-              <v-btn text @click="openMediaDetails = false" color="warning">Cancel</v-btn>
-              <v-btn text color="primary" @click="save">Save</v-btn>
+              <v-btn variant="text" color="warning" @click="openMediaDetails = false">Cancel</v-btn>
+              <v-btn variant="text" color="primary" @click="save">Save</v-btn>
             </v-card-actions>
           </v-col>
         </v-row>
@@ -163,37 +162,37 @@ function validateUrl (value: string) {
     </v-card>
   </v-dialog>
 
-  <h3 class="mb-3 font-weight-regular" v-if="mediaPreview">{{ t('common.media') }}</h3>
+  <h3 v-if="mediaPreview" class="mb-3 font-weight-regular">{{ t('common.media') }}</h3>
   <v-card-actions v-if="mediaPreview">
     <v-switch
-      class="ml-3 mt-0 pt-0"
       v-model="showPreview"
+      class="ml-3 mt-0 pt-0"
       :label="t('common.show_preview')"
       hide-details
     />
-    <v-spacer></v-spacer>
-    <v-btn text color="primary" @click="openMediaDetails = true">{{ t('common.edit') }}</v-btn>
-    <v-btn text color="error" @click="remove">{{ t('common.remove') }}</v-btn>
+    <v-spacer/>
+    <v-btn variant="text" color="primary" @click="openMediaDetails = true">{{ t('common.edit') }}</v-btn>
+    <v-btn variant="text" color="error" @click="remove">{{ t('common.remove') }}</v-btn>
   </v-card-actions>
 
-  <div class="w-100 pt-0" v-if="mediaPreview">
-    <img class="w-100 pa-0" :src="mediaPreview" v-if="!showPreview" />
-    <img class="w-100 mediaPreview pa-0" :src="mediaPreview" v-else :style="{ 'object-position': savedPosition }" />
+  <div v-if="mediaPreview" class="w-100 pt-0">
+    <img v-if="!showPreview" class="w-100 pa-0" :src="mediaPreview" >
+    <img v-else class="w-100 mediaPreview pa-0" :src="mediaPreview" :style="{ 'object-position': savedPosition }" >
     <span class="text-center">{{ media?.[0].name }}</span>
   </div>
 
   <div v-else>
     <v-text-field
       v-if="useUrl"
+      v-model="imgUrlInput"
       :label="t('common.url')"
       :hint="'https://example.com/image.jpg'"
       prepend-icon="mdi-camera"
       persistent-hint
       type="url"
-      v-model="imgUrlInput"
-      @change="selectUrl"
       placeholder="https://example.com/image.jpg"
       :rules="[validateUrl]"
+      @change="selectUrl"
     />
 
     <v-file-input
@@ -201,10 +200,10 @@ function validateUrl (value: string) {
       :label="t('common.media')"
       :hint="t('event.media_description')"
       prepend-icon="mdi-camera"
-      @update:modelValue="selectMedia"
       persistent-hint
       variant="underlined"
       accept="image/*"
+      @update:model-value="selectMedia"
     />
 
     <v-switch v-model="useUrl" :label="t('event.import_URL')" />

@@ -9,5 +9,5 @@ export default defineConfig({
       name: 'GancioEvents'
     }
   },
-  plugins: [svelte({compilerOptions: { customElement: true }})]
+  plugins: [svelte({ compilerOptions: { customElement: true } })]
 })

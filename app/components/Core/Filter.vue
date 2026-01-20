@@ -1,7 +1,7 @@
 <script setup>
 import debounce from 'lodash/debounce'
 
-const modelValue = defineModel('modelValue' , { type: Object, default: () => ({ }) })
+const modelValue = defineModel('modelValue', { type: Object, default: () => ({ }) })
 const settings = useState('settings')
 
 const { data: collections } = await useFetch('/api/collections')
@@ -17,7 +17,6 @@ const fetchTags = debounce(async () => {
   }
 }, 200)
 
-
 const searchPlace = ref('')
 const places = ref([])
 const fetchPlaces = debounce(async () => {
@@ -29,19 +28,18 @@ const fetchPlaces = debounce(async () => {
   }
 }, 200)
 
-onMounted(() =>  {
+onMounted(() => {
   fetchTags()
   fetchPlaces()
 })
 
- 
 </script>
 
 <template>
 <v-row>
 
   <!-- filter recurrent event -->
-  <v-col sm="3" cols="12" v-if="settings.allow_recurrent_event">
+  <v-col v-if="settings.allow_recurrent_event" sm="3" cols="12">
     <v-switch
       v-if="settings.allow_recurrent_event"
       v-model="modelValue.show_recurrent"
@@ -51,6 +49,7 @@ onMounted(() =>  {
 
   <v-col>
     <v-autocomplete
+      v-model="modelValue.tags"
       :label="$t('common.tags')"
       variant='outlined'
       chips
@@ -58,31 +57,30 @@ onMounted(() =>  {
       multiple
       :items="tags"
       @update:search="searchTag"
-      v-model="modelValue.tags"
     />
   </v-col>
 
   <v-col>
     <v-autocomplete
+      v-model="modelValue.places"
       :label="$t('common.places')"
       variant="outlined"
       chips
       closable-chips
       multiple
       :items="places"
-      @update:search="searchPlace"
-      v-model="modelValue.places"
       item-value="id"
       item-id="id"
       item-title="name"
       item-subtitle="address"
+      @update:search="searchPlace"
     />
   </v-col>
-  
-  <v-col sm="4" cols="12" v-if='collections?.length'>
+
+  <v-col v-if='collections?.length' sm="4" cols="12">
     <v-autocomplete
-      class="p-0"
       v-model="modelValue.collection"
+      class="p-0"
       variant='outlined'
       :label="$t('common.collections')"
       hide-details

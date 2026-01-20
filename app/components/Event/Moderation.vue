@@ -1,12 +1,13 @@
 <script setup>
-const props = defineProps({ event: { type: Object, default: () => ({})}})
+const props = defineProps({ event: { type: Object, default: () => ({}) } })
+defineEmits(['close'])
 const { isAdmin } = useAuth()
 
 const { $notify } = useNuxtApp()
 
 const message = ref('')
 const loading = ref(false)
-const { data: messages, refresh } = useFetch( () => `/api/events/messages/${props.event.id}` )
+const { data: messages, refresh } = useFetch(() => `/api/events/messages/${props.event.id}`)
 
 async function sendMessage(is_author_visible) {
   if (loading.value) return
@@ -34,20 +35,20 @@ async function sendMessage(is_author_visible) {
   <v-card-text class="d-flex flex-column flex-grow-1 overflow-auto">
     <span>{{ $t(isAdmin ? 'event.message_hint' : 'event.message_author_hint') }}</span>
     <v-textarea
-      :label="$t('event.message')"
-      v-model='message' rows="2" class="mb-2" />
+      v-model='message'
+      :label="$t('event.message')" rows="2" class="mb-2" />
 
     <template v-if="isAdmin">
-        <v-btn class='mb-1' outlined :disabled='!message || loading' :loading='loading' @click="sendMessage(false)" color="primary">{{$t('event.send_to_admins')}}</v-btn>
-        <v-btn v-if='!event.isAnon' class='mb-1' outlined :disabled='!message || loading' :loading='loading' @click="sendMessage(true)" color="primary">{{$t('event.send_to_author_too')}}</v-btn>
+      <v-btn class='mb-1' variant="outlined" :disabled='!message || loading' :loading='loading' color="primary" @click="sendMessage(false)">{{$t('event.send_to_admins')}}</v-btn>
+      <v-btn v-if='!event.isAnon' class='mb-1' variant="outlined" :disabled='!message || loading' :loading='loading' color="primary" @click="sendMessage(true)">{{$t('event.send_to_author_too')}}</v-btn>
     </template>
 
-    <v-btn v-else small outlined :disabled='!message || loading' :loading='loading' @click="sendMessage(true)" color="primary">send</v-btn><br/>
-    
-    <v-list dense class='messageList'>
-        <v-list-item v-for="(item, index) in messages" :key="index" class="px-2" :class="item.author" :title='item?.message'>
-          <v-list-item-subtitle class="font-weight-light">{{ time.format(item.createdAt) }} / {{ item.author }}</v-list-item-subtitle>
-        </v-list-item>
+    <v-btn v-else size="small" variant="outlined" :disabled='!message || loading' :loading='loading' color="primary" @click="sendMessage(true)">send</v-btn><br>
+
+    <v-list density="compact" class='messageList'>
+      <v-list-item v-for="(item, index) in messages" :key="index" class="px-2" :class="item.author" :title='item?.message'>
+        <v-list-item-subtitle class="font-weight-light">{{ time.format(item.createdAt) }} / {{ item.author }}</v-list-item-subtitle>
+      </v-list-item>
     </v-list>
   </v-card-text>
 </v-card>
@@ -85,6 +86,5 @@ async function sendMessage(is_author_visible) {
     border-left: 2px solid lightblue;
     background-color: rgba(35, 193, 255, 0.1);
 }
-
 
 </style>

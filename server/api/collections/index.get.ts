@@ -1,11 +1,11 @@
-import z from "zod"
+import z from 'zod'
 
 const queryParams = z.object({
   withFilters: z.stringbool().optional(),
   pin: z.stringbool().optional()
 })
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   const { withFilters, pin } = await getValidatedQuery(event, queryParams.parse)
   if (withFilters) {
     return Collection.findAll({ include: [Filter], order: [['sortIndex', 'asc']] })

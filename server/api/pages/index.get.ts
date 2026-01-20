@@ -1,6 +1,6 @@
-export default defineEventHandler(async event => {
-  
+export default defineEventHandler(async () => {
   return Page.findAll({
+    where: { visible: true },
     raw: true
   })
 })

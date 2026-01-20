@@ -1,6 +1,6 @@
-import Negotiator from 'negotiator'
+// import Negotiator from 'negotiator'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (_event) => {
   // TODO: use negotiator to redirect in case accept different mime type!
 
   // const supported = ['text/html', 'application/rss+xml', 'text/calendar']

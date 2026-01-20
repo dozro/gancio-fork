@@ -1,4 +1,4 @@
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   const collectionId = getRouterParam(event, 'collection_id')
-  return Filter.findAll({ where: { collectionId }})
+  return Filter.findAll({ where: { collectionId } })
 })

@@ -1,11 +1,11 @@
-import { Event } from "#imports"
+import { Event } from '#imports'
 
 /**
  * toggle event confirmation status
  * note that this could be called by an editor, an admin or the event owner
  * @auth
  */
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   const log = useLogger('Event toggle confirmation')
   const id = getRouterParam(evt, 'id')
 
@@ -23,5 +23,4 @@ export default defineEventHandler(async evt => {
   }
 
   return event.update({ is_visible: !event.is_visible })
-
 })

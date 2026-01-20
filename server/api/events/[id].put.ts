@@ -1,12 +1,12 @@
-import { Event } from "#imports"
-import { InferCreationAttributes } from "@sequelize/core"
-import { parseMultipartFormData, saveUploadedEventImage } from "~~/server/utils/parseMultipartForm"
-import type { MultiPartData } from "h3"
-import { DateTime } from "luxon"
-import { findOrCreatePlace } from "~~/server/lib/places"
-import { getImageFromURL, sanitizeHTML } from "~~/server/helpers"
-import linkifyHtml from "linkify-html"
-import { findOrCreateTags } from "~~/server/lib/tags"
+import { Event } from '#imports'
+import type { InferCreationAttributes } from '@sequelize/core'
+import { parseMultipartFormData, saveUploadedEventImage } from '~~/server/utils/parseMultipartForm'
+import type { MultiPartData } from 'h3'
+import { DateTime } from 'luxon'
+import { findOrCreatePlace } from '~~/server/lib/places'
+import { sanitizeHTML } from '~~/server/helpers'
+import linkifyHtml from 'linkify-html'
+import { findOrCreateTags } from '~~/server/lib/tags'
 
 /**
  * Update an event
@@ -30,7 +30,7 @@ import { findOrCreateTags } from "~~/server/lib/tags"
  * @param {string} [image_url] - Image URL
  * @todo Multiple images upload
  */
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   const log = useLogger('Update event')
   const id = getRouterParam(evt, 'id')
   const user = await getUser(evt)

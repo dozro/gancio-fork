@@ -1,6 +1,7 @@
-import { sendEvent } from "../federation/helpers"
-import { Event, Notification, NotificationAction } from "./sequelize"
-import intersection from "lodash.intersection"
+import { sendEvent } from '../federation/helpers'
+import type { NotificationAction } from './sequelize'
+import { Event, Notification } from './sequelize'
+import intersection from 'lodash.intersection'
 
 const log = useLogger('notifier')
 
@@ -16,7 +17,6 @@ export async function notifyAdmins (template: string, locals: object) {
   return enqueueMail(emails, template, locals)
 }
 
-
 export async function sendNotification (notification: Notification, event: Event) {
   log.info(`Send ${notification.type} notification ${notification.action}`)
   switch (notification.type) {
@@ -29,7 +29,6 @@ export async function sendNotification (notification: Notification, event: Event
   }
 }
 
-
 /**
  * Internal function to retrieve the list of notifications that should be sent for a given event and action.
  *
@@ -40,55 +39,67 @@ export async function sendNotification (notification: Notification, event: Event
  * @param {Event} event - The event for which notifications are being determined.
  * @param {NotificationAction} action - The action that triggered the notification (e.g., 'create', 'update').
  * @returns {Promise<Notification[]>} A promise that resolves to an array of matching Notification objects.
+ * @todo filter by places
  * @internal
  */
-export async function getNotifications(event: Event, action: NotificationAction) : Promise<Notification[] | undefined> {
+export async function getNotifications(event: Event, action: NotificationAction): Promise<Notification[] | undefined> {
   log.debug(`getNotifications ${event.title} ${action}`)
-  function match(event: Event, filters) {
+  function match(event: Event, filters: Notification['filters']) {
     // matches if no filter specified
-    if (!filters) { return true }
+    if (!filters) {
+      return true
+    }
 
     // check for visibility
-    if (typeof filters.is_visible !== 'undefined' && filters.is_visible !== event.is_visible) { return false }
-
-    if (!filters.tags && !filters.places) { return true }
-    if (!filters.tags.length && !filters.places.length) { return true }
-    if (filters.tags.length) {
-      const m = intersection(event?.tags.map(t => t.tag), filters.tags)
-      if (m.length > 0) { return true }
+    if (typeof filters.is_visible !== 'undefined' && filters.is_visible !== event.is_visible) {
+      return false
     }
-    if (filters.places.length) {
-      if (filters.places.find(p => p === event?.place.name)) {
+
+    if (!filters.tags && !filters.places) {
+      return true
+    }
+    if (!filters.tags?.length) {
+    // if (!filters.tags?.length && !filters.places?.length) {
+      return true
+    }
+    if (filters.tags?.length) {
+      const m = intersection(event.tags?.map(t => t.tag), filters.tags)
+      if (m.length > 0) {
         return true
       }
     }
+
+    // if (filters.places?.length) {
+    //   if (filters.places?.find(p => p === event.place?.name)) {
+    //     return true
+    //   }
+    // }
   }
 
-  const notifications = await Notification.findAll({ where: { action }})
+  const notifications = await Notification.findAll({ where: { action } })
 
   // get notification that matches with selected event
   return notifications.filter(notification => match(event, notification.filters))
 }
 
-
 /**
  * Notifies all relevant parties about an event based on the specified action.
- * 
+ *
  * This function retrieves the event by its ID, determines which notifications are applicable
  * for the event and action, and sends those notifications. It logs warnings if the event does not exist,
  * and logs debug information about the notification process.
- * 
+ *
  * @param {NotificationAction} action - The action that triggered the notification (e.g., 'create', 'update').
  * @param {number} eventId - The ID of the event to notify about.
  * @returns {Promise<any[]>} A promise that resolves when all notifications have been processed.
  */
 export async function notifyEvent (action: NotificationAction, eventId: number): Promise<[] | undefined> {
-  const event = await Event.findByPk(eventId, { 
-    include: [ 
-      { model: Tag, attributes: ['tag'], through: { attributes: [] } }, 
-      Place 
+  const event = await Event.findByPk(eventId, {
+    include: [
+      { model: Tag, attributes: ['tag'], through: { attributes: [] } },
+      Place
     ],
-    attributes: { exclude: [ 'placeId', 'media']}
+    attributes: { exclude: ['placeId', 'media'] }
     // attributes: { exclude: ['userId', 'placeId', 'image_path', 'ap_object', 'ap_id', 'apUserApId', 'likes', 'boost'] },
   })
 
@@ -143,9 +154,7 @@ export async function notifyEvent (action: NotificationAction, eventId: number):
 // const log = require('./log')
 // const fediverseHelpers = require('./federation/helpers')
 
-
 // const { Event, Notification, EventNotification, User, Place, Tag } = require('./api/models/models')
-
 
 // // const settingsController = require('./api/controller/settings')
 

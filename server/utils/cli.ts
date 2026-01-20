@@ -1,4 +1,4 @@
-import pkg from '../../package.json'  with { type: 'json' }
+import pkg from '../../package.json' with { type: 'json' }
 import path from 'path'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
@@ -7,8 +7,7 @@ import usersCLI from '../cli/users.js'
 /**
  * parse cli command
  */
-export async function main(start: Function) {
-
+export async function main(start: () => void) {
   // teleport myself to the correct position
   // process.env.cwd = process.env.GANCIO_DATA || path.resolve('./')
   // const __dirname = path.dirname(new URL(import.meta.url).pathname)
@@ -16,7 +15,7 @@ export async function main(start: Function) {
   const yarg = yargs(hideBin(process.argv))
   yarg.version(pkg.version)
   console.info(`📅 ${pkg.name} - v${pkg.version} - A shared agenda for local communities (nodejs: ${process.version})`)
-  //yarg.exitProcess(false) // ← prevent yargs from exiting
+  // yarg.exitProcess(false) // ← prevent yargs from exiting
 
   const argv = await yarg
     .usage('Usage $0 <command> [options]')
@@ -24,7 +23,7 @@ export async function main(start: Function) {
       alias: 'c',
       describe: 'Configuration file (deprecated!)',
       // default: path.resolve(process.env.cwd, 'config.json'),
-      coerce: config_path => {
+      coerce: (config_path) => {
         const absolute_config_path = path.resolve(process.env.cwd, config_path)
         process.env.config_path = absolute_config_path
         return absolute_config_path
@@ -47,5 +46,4 @@ export async function main(start: Function) {
   } else {
     process.exit(-1)
   }
-
 }

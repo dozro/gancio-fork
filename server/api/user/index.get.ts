@@ -1,4 +1,3 @@
-
 /**
  * Get current authenticated user
  * @auth
@@ -17,8 +16,7 @@
 }
 ```
 */
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   const { user } = await requireUser(event)
   return user
 })
-

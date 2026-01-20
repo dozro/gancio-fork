@@ -3,7 +3,7 @@
  * @return {EventAPI[]}
 */
 const log = useLogger('events/place')
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   const nameOrId = getRouterParam(evt, 'place')
   const id = Number(nameOrId)
   const place = !isNaN(id) && Number.isInteger(id)

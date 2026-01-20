@@ -1,18 +1,19 @@
-const log = useLogger('webfinger')
-
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
+  const log = useLogger('webfinger')
   if (!publicSettings.enable_federation) {
     throw createError({ statusCode: 404, statusMessage: 'Federation disabled' })
   }
-  
-  const { resource } = getQuery(event)
-  if (!resource || !resource?.includes('acct:')) {
-    log.info('Bad webfinger request => ', resource)
+
+  const { resource } = getQuery<{ resource?: string }>(event)
+
+  const match = resource?.match(/^acct:([^@]+)@([^@]+)$/)
+  if (!match) {
+    log.info({ resource }, 'Bad webfinger request')
     throw createError({ statusCode: 400, statusMessage: 'Bad request. Please make sure "acct:USER@DOMAIN" is what you are sending as the "resource" query parameter.' })
   }
-  
-  const domain = (new URL(publicSettings.baseurl)).host
-  const [, name, req_domain] = resource?.match(/acct:(.*)@(.*)/)
+
+  const [, name, req_domain] = match
+  const domain = new URL(publicSettings.baseurl).host
   if (domain !== req_domain) {
     log.warn(`Bad webfinger request, requested domain "${req_domain}" instead of "${domain}"`)
     throw createError({ statusCode: 400, statusMessage: 'Bad request. Please make sure "acct:USER@DOMAIN" is what you are sending as the "resource" query parameter.' })
@@ -33,10 +34,10 @@ export default defineEventHandler(async event => {
         href: `${publicSettings.baseurl}/federation/u/${name}`
       },
       {
-        "href" : publicSettings.baseurl + '/logo.png',
-        "rel" : "http://webfinger.net/rel/avatar",
-        "type" : "image/png"
-     }
+        href: publicSettings.baseurl + '/logo.png',
+        rel: 'http://webfinger.net/rel/avatar',
+        type: 'image/png'
+      }
     ]
   }
 })

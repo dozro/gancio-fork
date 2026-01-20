@@ -1,8 +1,7 @@
 <script setup lang='ts'>
 
-
 const settings = useState('settings')
-const { $notify, $confirm }  = useNuxtApp()
+const { $notify, $confirm } = useNuxtApp()
 
 const headers = [
   { value: 'logo', title: 'Logo', width: 60, sortable: false },
@@ -13,7 +12,6 @@ const headers = [
   { value: 'follower', title: 'Follower' },
   { value: 'actions', title: 'Actions', align: 'right', sortable: false }
 ]
-
 
 const { data: stats } = useFetch('/api/ap_actors/stats')
 const { data: trusted_sources, refresh } = await useFetch('/api/ap_actors/trusted', { deep: true })
@@ -28,22 +26,11 @@ const loading = ref(false)
 const trusted_sources_ref = ref([])
 const valid = ref(false)
 
-function manageSetting(key) {
-  return computed({
-    get: () =>  settings.value[key],
-    set: (value) => {
-      $fetch('/api/settings', { method: 'PUT', body: { key, value } })
-      settings.value[key] = value
-    }
-  })
-}
-
 const enable_resources = manageSetting('enable_resources')
 const enable_federation = manageSetting('enable_federation')
 const federated_events_in_home = manageSetting('federated_events_in_home')
 const default_fedi_hashtags = manageSetting('default_fedi_hashtags')
 const hide_boosts = manageSetting('hide_boosts')
-
 
 async function toggleFollowing (trusted_source) {
   try {
@@ -75,12 +62,14 @@ async function createTrustedInstance () {
 
 async function deleteTrustedSource (trusted_source) {
   const ret = await $confirm('admin.delete_trusted_source_confirm')
-  if (!ret) { return }
+  if (!ret) {
+    return
+  }
   try {
     await $fetch('/api/ap_actors/trust', { method: 'DELETE', body: { ap_id: trusted_source.ap_id } })
     refresh()
     // this.$root.$emit('update_trusted_sources')
-    $notify('admin.trusted_source_removed', Statuses.SUCCESS )
+    $notify('admin.trusted_source_removed', Statuses.SUCCESS)
   } catch (e) {
     $notify(e, Statuses.ERROR)
   }
@@ -91,8 +80,8 @@ async function deleteTrustedSource (trusted_source) {
 <div class="d-flex flex-column ga-12 mt-4">
   <div>
     <v-switch
-      class="mt-0"
       v-model="enable_federation"
+      class="mt-0"
       :label="$t('admin.enable_federation')"
       persistent-hint
       :hint="$t('admin.enable_federation_help')"
@@ -100,24 +89,24 @@ async function deleteTrustedSource (trusted_source) {
 
     <template v-if="enable_federation">
       <v-switch
-        class="mt-4"
         v-model="federated_events_in_home"
+        class="mt-4"
         :label="$t('admin.federated_events_in_home')"
         :hint="$t('admin.federated_events_in_home_help')"
         persistent-hint
       />
 
       <v-switch
-        class="mt-4"
         v-model="enable_resources"
+        class="mt-4"
         :label="$t('admin.enable_resources')"
         :hint="$t('admin.enable_resources_help')"
         persistent-hint
       />
 
       <v-switch
-        class="mt-4"
         v-model="hide_boosts"
+        class="mt-4"
         :label="$t('admin.hide_boost_bookmark')"
         :hint="$t('admin.hide_boost_bookmark_help')"
         persistent-hint
@@ -137,27 +126,25 @@ async function deleteTrustedSource (trusted_source) {
     </template>
 
     <v-combobox
-      class="mt-4"
       v-model="default_fedi_hashtags"
+      class="mt-4"
       prepend-icon="mdi-tag-multiple"
       :label="$t('admin.default_fedi_hashtags')"
       persistent-hint
       multiple
       :delimiters="[';', ',']"
       chips
-      small-chips
-      deletable-chips
+      closable-chips
       :hint="$t('admin.default_fedi_hashtags_help')"
-      @blur="save('default_fedi_hashtags', default_fedi_hashtags)"
     >
-      <template v-slot:selection="{ item, on, attrs, selected, parent }">
+      <template v-slot:chip="{ item, attrs, selected, parent }">
         <v-chip
           v-bind="attrs"
           closable
-          @click:close="parent.selectItem(item)"
-          :input-value="selected"
+          :model-value="selected"
           label
-          small
+          size="small"
+          @click:close="parent.selectItem(item)"
         >
           {{ item }}
         </v-chip>
@@ -165,34 +152,33 @@ async function deleteTrustedSource (trusted_source) {
     </v-combobox>
 
     <v-text-field
-      class="mt-4"
       v-model="trusted_sources_label"
+      class="mt-4"
       :label="$t('admin.trusted_sources_label')"
       persistent-hint
       :placeholder="$t('admin.trusted_sources_label_default')"
       :hint="$t('admin.trusted_sources_label_help')"
-      @blur="save('trusted_sources_label', trusted_sources_label)"
-    ></v-text-field>
+    />
 
     <v-dialog v-model="dialogAddTrustedSource" width="500px" :fullscreen="$vuetify.display?.mobile">
       <v-card>
         <v-card-title>{{ $t('admin.add_trusted_source') }}</v-card-title>
-        <v-card-subtitle class="mt-2 text-wrap" v-html="$t('admin.add_trusted_source_help')"></v-card-subtitle>
+        <v-card-subtitle class="mt-2 text-wrap" v-html="$t('admin.add_trusted_source_help')"/>
         <v-card-text>
-          <v-form v-model="valid" @submit.prevent="createTrustedInstance" ref="form" lazy-validation>
+          <v-form ref="form" v-model="valid" @submit.prevent="createTrustedInstance">
             <v-text-field
-              class="mt-4"
               v-model="source_url"
+              class="mt-4"
               persistent-hint
               :rules="[$valid.required('common.url')]"
               :loading="loading"
               :hint="$t('admin.add_trusted_source')"
               :label="$t('common.url')"
-            ></v-text-field>
+            />
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer/>
           <v-btn variant='outlined' color="error" @click="dialogAddTrustedSource=false">{{ $t('common.cancel') }}</v-btn>
           <v-btn
             variant='outlined'
@@ -205,22 +191,22 @@ async function deleteTrustedSource (trusted_source) {
       </v-card>
     </v-dialog>
 
-    <v-btn class="mt-4" @click="dialogAddTrustedSource = true" color="primary" text prepend-icon='mdi-plus'>
+    <v-btn class="mt-4" color="primary" variant="text" prepend-icon='mdi-plus' @click="dialogAddTrustedSource = true">
       {{ $t('admin.add_source') }}
     </v-btn>
 
     <v-data-table
       v-if="trusted_sources?.length"
-      dense
+      density="compact"
       :hide-default-footer="trusted_sources?.length<10"
       :headers="headers"
       :items="trusted_sources"
     >
       <template v-slot:item.logo="{ item }">
-        <v-img height="20" width="20" :src="item?.object?.icon?.url"></v-img>
+        <v-img height="20" width="20" :src="item?.object?.icon?.url"/>
       </template>
       <template v-slot:item.name="{ item }">
-        <span>{{ item.object.name }}</span><br/>
+        <span>{{ item.object.name }}</span><br>
         <span>
           @{{ item?.object?.preferredUsername ?? item?.instance?.data?.metadata?.nodeName }}@{{ item?.instance?.domain }}
         </span>
@@ -233,11 +219,11 @@ async function deleteTrustedSource (trusted_source) {
       </template>
       <template v-slot:item.following="{ item }">
         <v-switch
-          :input-value="item.following"
+          :model-value="item.following"
           :disabled="item.loading"
           :loading="item.loading"
-          @change="() => toggleFollowing(item)"
           hide-details
+          @update:model-value="() => toggleFollowing(item)"
         />
       </template>
       <template v-slot:item.follower="{ item }">
@@ -245,7 +231,7 @@ async function deleteTrustedSource (trusted_source) {
         <v-icon v-if="item.follower" icon="mdi-upload" />
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn icon='mdi-delete-forever' @click="deleteTrustedSource(item)" color="error" />
+        <v-btn icon='mdi-delete-forever' color="error" @click="deleteTrustedSource(item)" />
       </template>
     </v-data-table>
   </div>

@@ -3,7 +3,6 @@ import type { SitemapUrlInput } from '#sitemap/types'
 
 // TODO: unit test
 export default defineSitemapEventHandler(async () => {
-
   const events = await Event.findAll({
     where: { is_visible: true },
     attributes: ['slug', 'updatedAt'],

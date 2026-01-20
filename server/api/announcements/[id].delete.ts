@@ -1,4 +1,4 @@
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const log = useLogger('announcement delete')
   const id = getRouterParam(event, 'id')

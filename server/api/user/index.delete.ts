@@ -1,10 +1,10 @@
-import { Event } from "#imports"
+import { Event } from '#imports'
 
 /**
  * Delete the current authenticated user and disassociate all events created by this user
  * @auth
  */
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   const log = useLogger('user self delete')
   const user = await requireUser(event)
   const userInstance = await User.findByPk(user.id)
@@ -13,7 +13,7 @@ export default defineEventHandler(async event => {
   }
 
   log.info(`User ${user.id} (${user.email}) is deleting their own account`)
-  
+
   try {
     // disassociate all events created by this user
     await Event.update({ userId: undefined }, { where: { userId: user.id } })

@@ -15,9 +15,7 @@ export default defineEventHandler(async (event) => {
   try {
     await user.update({ recover_code: '', password })
     setResponseStatus(event, 201)
-  } catch (e) {
+  } catch {
     setResponseStatus(event, 400)
   }
-
-
 })

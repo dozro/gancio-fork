@@ -1,12 +1,13 @@
-import { Event, Message } from "./sequelize"
+import { Event, Message } from './sequelize'
 import { DateTime } from 'luxon'
-import { Op, literal, col, where, fn, InferAttributes, WhereOptions, SQL_NULL, JSON_NULL, sql } from '@sequelize/core'
+import type { WhereOptions } from '@sequelize/core'
+import { Op, literal, col, where, fn, JSON_NULL, sql } from '@sequelize/core'
 
 import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
-import { EventAPI } from "~~/shared/types/generic"
-import { H3Event } from "h3"
-import { createHash } from "crypto"
+import type { EventAPI } from '~~/shared/types/generic'
+import type { H3Event } from 'h3'
+import { createHash } from 'crypto'
 
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
@@ -65,7 +66,6 @@ export async function getEvents(opts?: EventQueryType | undefined) {
 
   // ...(args.user_id && { userId: args.user_id }),
 
-
   // if (args.user_id) {
   //   condition.userId = args.user_id
   // }
@@ -87,9 +87,9 @@ export async function getEvents(opts?: EventQueryType | undefined) {
       sql`event.id IN (SELECT eventId FROM event_tags WHERE tagTag IN  ${sql.list(args.tags)})`
     ]
   } else if (args.places) {
-      condition.placeId = args.places
+    condition.placeId = args.places
   } else if (args.tags) {
-      condition[Op.and] = sql`event.id IN (SELECT eventId FROM event_tags WHERE tagTag IN  ${sql.list(args.tags)})`
+    condition[Op.and] = sql`event.id IN (SELECT eventId FROM event_tags WHERE tagTag IN  ${sql.list(args.tags)})`
   }
 
   if (args.query) {
@@ -133,7 +133,6 @@ export async function getEvents(opts?: EventQueryType | undefined) {
 
   // return mapEvents(events as Event[])
 }
-
 
 /**
  * get the last modified date of items.
@@ -186,7 +185,6 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
   }
 
   return response
-
 }
 
 export function mapEvents(events: Event[]): EventAPI[] {

@@ -9,7 +9,6 @@ module.exports = {
 
   // create a resource from AP Note
   async create (req, res) {
-
     if (!res.locals.settings.enable_resources) {
       log.info('[FEDI] Ignore resource as it is disabled in settings')
       return
@@ -36,7 +35,7 @@ module.exports = {
 
         if (!event) {
           // in reply to a remote event
-          event = await Event.findOne({ where: { ap_id: inReplyTo }})
+          event = await Event.findOne({ where: { ap_id: inReplyTo } })
         }
       }
     }
@@ -49,7 +48,7 @@ module.exports = {
 
     log.debug(`[FEDI] Reply from ${req.body.actor} to "${res.locals.settings.baseurl}/event/${event.slug}"`)
 
-    body.object.content = helpers.sanitizeHTML(linkifyHtml(body.object.content || '', { target: '_blank', render: { email: ctx => ctx.content }}))
+    body.object.content = helpers.sanitizeHTML(linkifyHtml(body.object.content || '', { target: '_blank', render: { email: ctx => ctx.content } }))
 
     await Resource.create({
       activitypub_id: body.object.id,
@@ -63,14 +62,13 @@ module.exports = {
 
   // update a resource from AP Note
   async update (req, res) {
-
     if (!res.locals.settings.enable_resources) {
       log.info('[FEDI] Ignore resource as it is disabled in settings')
       return
     }
 
     const body = req.body
-    
+
     // TODO: check if it is the same author
     const resource = await Resource.findOne({ where: { activitypub_id: body.object?.id }, include: [Event] })
     if (!resource) {
@@ -78,7 +76,7 @@ module.exports = {
       return res.sendStatus(404)
     }
 
-    body.object.content = helpers.sanitizeHTML(linkifyHtml(body.object.content || '', { target: '_blank', render: { email: ctx => ctx.content }}))
+    body.object.content = helpers.sanitizeHTML(linkifyHtml(body.object.content || '', { target: '_blank', render: { email: ctx => ctx.content } }))
 
     await resource.update({
       data: body.object
@@ -87,7 +85,6 @@ module.exports = {
     log.debug('[FEDI] Resource updated!')
     res.sendStatus(201)
   },
-
 
   async remove (req, res) {
     const resource = await Resource.findOne({

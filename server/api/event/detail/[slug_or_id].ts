@@ -1,8 +1,6 @@
-import { Event, Place, Tag, User, Resource, APUser } from "~~/server/utils/sequelize"
+import { Event, Place, Tag, User, Resource, APUser } from '~~/server/utils/sequelize'
 import { Op } from '@sequelize/core'
-import { htmlToText } from 'html-to-text'
-import { EventAPI } from "~~/shared/types/generic"
-import { formatSchema } from "~~/server/types/validator"
+import { formatSchema } from '~~/server/types/validator'
 
 /**
  * Get event details.
@@ -13,7 +11,7 @@ import { formatSchema } from "~~/server/types/validator"
  * @example
  * https://demo.gancio.org/api/event/detail/manifestazione
  */
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   const log = useLogger('event details!')
   const user = await getUser(evt)
   const isAdminOrEditor = user?.is_editor || user?.is_admin
@@ -59,7 +57,7 @@ export default defineEventHandler(async evt => {
     n_messages = await Message.count({ where: { eventId: event.id, ...(!isAdminOrEditor && { is_author_visible: true }) } }).catch(() => 0)
   }
 
-  if (!event || !event.is_visible && !isAdminOrEditor) {
+  if (!event?.is_visible && !isAdminOrEditor) {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 

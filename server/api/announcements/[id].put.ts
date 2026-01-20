@@ -1,4 +1,4 @@
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const log = useLogger('announcement put')
   const id = Number(getRouterParam(event, 'id'))
@@ -11,5 +11,4 @@ export default defineEventHandler(async event => {
   }
 
   return announcement.update(body)
-
 })

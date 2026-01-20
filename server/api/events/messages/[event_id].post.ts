@@ -1,6 +1,6 @@
-import { Message, Event } from "~~/server/utils/sequelize"
+import { Message, Event } from '~~/server/utils/sequelize'
 
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   if (!publicSettings.enable_moderation) {
     throw createError({ status: 403 })
   }
@@ -13,14 +13,14 @@ export default defineEventHandler(async evt => {
     log.warn(`[REPORT] Event does not exists: ${eventId}`)
     throw createError({ statusCode: 404 })
   }
-  
+
   console.error(event)
 
   const body = await readBody(evt)
   const user = await getUser(evt)
   const isMine = user?.id === event.userId
   const isAdminOrEditor = user?.is_editor || user?.is_admin
-  
+
   if (!isAdminOrEditor && !isMine && !publicSettings.enable_report) {
     log.warn(`[REPORT] Someone not allowed is trying to report an event -> "${event.title}" isMine: ${isMine} `)
     throw createError({ statusCode: 403 })
@@ -41,7 +41,7 @@ export default defineEventHandler(async evt => {
 
     // notify author
     if (event?.user?.email && body.is_author_visible && !isMine) {
-      enqueueMail(event.user.email, 'report', { event, message: body.message, author }) //, TODO publicSettings.locals.locale)
+      enqueueMail(event.user.email, 'report', { event, message: body.message, author }) // , TODO publicSettings.locals.locale)
     }
 
     return message
@@ -49,5 +49,4 @@ export default defineEventHandler(async evt => {
     log.warn(`[EVENT] ${e}`)
     throw createError({ statusCode: 500 })
   }
-  
 })

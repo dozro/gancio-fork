@@ -1,1 +1,1 @@
-export type FooterLinks = { label: string; href?: string, to?: string }[]
+export type FooterLinks = { label: string, href?: string, to?: string }[]

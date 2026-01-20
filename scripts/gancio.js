@@ -1,12 +1,12 @@
-// this script is used to run migrations on the database 
+// this script is used to run migrations on the database
 // as we cannot run them directly from nuxt
 import { Umzug, SequelizeStorage } from 'umzug'
 import { Sequelize } from '@sequelize/core'
-import { SqliteDialect} from '@sequelize/sqlite3'
-import { MariaDbDialect} from '@sequelize/mariadb'
+import { SqliteDialect } from '@sequelize/sqlite3'
+import { MariaDbDialect } from '@sequelize/mariadb'
 import dotenv from 'dotenv'
 
-dotenv.config({ quiet: true})
+dotenv.config({ quiet: true })
 
 async function main() {
   const dialectMap = {
@@ -14,10 +14,10 @@ async function main() {
     sqlite3: SqliteDialect,
     mariadb: MariaDbDialect,
   }
-  
+
   const dialectName = process.env.DB_DIALECT ?? 'sqlite3'
   let dbOptions = {}
-  
+
   if (dialectName === 'mariadb') {
     dbOptions = {
       dialect: dialectMap[dialectName],
@@ -43,7 +43,7 @@ async function main() {
       console.error('Unable to connect to the database:', dbOptions, error)
       process.exit(1)
     }
-    await runMigrations(sequelize).catch(e => { console.error(e) })
+    await runMigrations(sequelize).catch(e => console.error(e))
     sequelize.close()
     import('../.output/server/index.mjs')
   } catch (e) {
@@ -54,10 +54,10 @@ async function main() {
 async function runMigrations(sequelize) {
   console.error('Running migrations! ', process.cwd())
   const umzug = new Umzug({
-      storage: new SequelizeStorage({ sequelize }),
-      migrations: { glob: '**/migrations/*.js'},
-      context: sequelize.queryInterface,
-      logger: console
+    storage: new SequelizeStorage({ sequelize }),
+    migrations: { glob: '**/migrations/*.js' },
+    context: sequelize.queryInterface,
+    logger: console
   })
   await umzug.up()
 }

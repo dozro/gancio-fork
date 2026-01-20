@@ -21,10 +21,10 @@ export async function follow (event, ap_message) {
   const guid = crypto.randomUUID()
   const message = {
     '@context': 'https://www.w3.org/ns/activitystreams',
-    id: `${publicSettings.baseurl}/federation/${guid}`,
-    type: 'Accept',
-    actor: `${publicSettings.baseurl}/federation/u/${username}`,
-    object: ap_message
+    'id': `${publicSettings.baseurl}/federation/${guid}`,
+    'type': 'Accept',
+    'actor': `${publicSettings.baseurl}/federation/u/${username}`,
+    'object': ap_message
   }
   await signAndSend(JSON.stringify(message), event.context.fedi_user.object.inbox)
 }

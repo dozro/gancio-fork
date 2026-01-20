@@ -16,4 +16,3 @@ export const useAppTheme = () => {
 
   return { theme, toggleTheme }
 }
-
