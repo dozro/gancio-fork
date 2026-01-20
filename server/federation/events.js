@@ -1,11 +1,11 @@
-// const log = require('../log')
-// const helpers = require('../helpers')
-// const linkifyHtml = require('linkify-html')
-// const dayjs = require('dayjs')
-// const { Event, User, Tag, Place, APUser, Resource, EventNotification } = require('../api/models/models')
-// const tagController = require('../api/controller/tag')
-// const Helpers = require('./helpers')
-// const { parseAPLocation } = require('./places')
+const log = require('../log')
+const helpers = require('../helpers')
+const linkifyHtml = require('linkify-html')
+const dayjs = require('dayjs')
+const { Event, User, Tag, Place, APUser, Resource, EventNotification } = require('../api/models/models')
+const tagController = require('../api/controller/tag')
+const Helpers = require('./helpers')
+const { parseAPLocation } = require('./places')
 
 // module.exports = {
 
@@ -132,8 +132,16 @@
 //       await event.setTags(tags)
 //     }
 
-//     return res.status(201).send()
-//   },
+    if (event.media && event.media.length && !event.recurrent) {
+      try {
+        const old_path = path.join(config.upload_path, event.media[0].url)
+        const old_thumb_path = path.join(getThumbnailsPath(config), event.media[0].url)
+        await fs.unlink(old_thumb_path)
+        await fs.unlink(old_path)
+      } catch (e) {
+        log.info(e.toString())
+      }
+    }
 
 //   // remove an event from AP
 //   async remove (req, res) {

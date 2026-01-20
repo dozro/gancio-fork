@@ -2,6 +2,7 @@ import type { H3Event, MultiPartData } from 'h3'
 import { get as getConfig } from '../config'
 import path from 'path'
 import sharp from 'sharp'
+
 const log = useLogger('parseMultipartForm')
 
 export async function parseMultipartFormData(event: H3Event) {

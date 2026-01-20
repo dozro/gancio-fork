@@ -124,7 +124,6 @@
     "linkifyjs": "^4.3.2",
     "material-design-icons-iconfont": "^6.7.0",
     "mitt": "^3.0.1",
-    "mkdirp": "^3.0.1",
     "negotiator": "^1.0.0",
     "nitro-test-utils": "^0.10.1",
     "nitropack": "^2.13.0",

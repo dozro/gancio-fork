@@ -1,5 +1,4 @@
 import { Event } from '#imports'
-import { mkdirp } from 'mkdirp'
 import { parseMultipartFormData, saveUploadedEventImage } from '~~/server/utils/parseMultipartForm'
 import type { MultiPartData } from 'h3'
 import { DateTime } from 'luxon'
@@ -10,10 +9,6 @@ import { findOrCreateTags } from '~~/server/lib/tags'
 import { mapEvent } from '~~/server/utils/events'
 import type { CreationAttributes } from '@sequelize/core'
 
-/* try {
-  mkdirp.sync(config.upload_path + '/thumb')
-} catch (e) {}
-*/
 /**
  * Add a new event
  * Allow anyone to add an event (anon event has to be confirmed)

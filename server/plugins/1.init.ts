@@ -18,6 +18,9 @@ export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
         log.info('Loading settings')
         await loadSettings()
 
+        log.info('Checking directory structure')
+        useCreateDirectoryStructure()
+
         log.info('Loading task manager')
         useTaskManager().start()
 
