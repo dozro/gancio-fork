@@ -28,7 +28,6 @@ import crypto from 'crypto'
 import { Readable } from 'node:stream'
 import { JSDOM } from 'jsdom'
 import DOMPurify from 'dompurify'
-import { getThumbnailsPath } from './utils/directories'
 
 const window = new JSDOM('').window
 const domPurify = DOMPurify(window)
@@ -234,7 +233,7 @@ export async function getImageFromURL(url: string, name: string, focalpoint: [nu
   const sharpStream = sharp({ failOnError: true })
   const promises = [
     sharpStream.clone().rotate().resize(500, null, { withoutEnlargement: true }).jpeg({ effort: 6, mozjpeg: true })
-      .toFile(path.resolve(getThumbnailsPath(config), filename + '.jpg')),
+      .toFile(path.resolve(config.upload_path, 'thumb', filename + '.jpg')),
     sharpStream.clone().rotate().resize(1200, null, { withoutEnlargement: true })
       .jpeg({ quality: 95, effort: 6, mozjpeg: true }).toFile(path.resolve(config.upload_path, filename + '.jpg')),
   ]

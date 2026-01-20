@@ -5,7 +5,6 @@ import type { NitroApp } from 'nitropack'
 import pluginController from '../utils/plugins'
 import fsDriver from 'unstorage/drivers/fs'
 import { get as getConfig } from '../config'
-import { useCreateDirectoryStructure } from "../utils/directories"
 
 export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
   const log = useLogger('init')

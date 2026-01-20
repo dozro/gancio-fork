@@ -50,7 +50,6 @@ import type { SecretSettings, Settings } from './settings'
 
 import { DateTime } from 'luxon'
 import { get as getConfig } from '../config'
-import { getThumbnailsPath } from './directories'
 const config = getConfig()
 const log = useLogger('sequelize')
 
@@ -308,7 +307,7 @@ export class Event extends Model<
     }
     for (const media of instance.media) {
       if (!media?.url) continue
-      const thumbPath = path.resolve(getThumbnailsPath(config), path.basename(media.url))
+      const thumbPath = path.resolve(config.upload_path, 'thumb', path.basename(media.url))
       const normalPath = path.resolve(config.upload_path, path.basename(media.url))
       log.info(`Removing event images for event ${instance.id}: `, normalPath, thumbPath)
       await Promise.allSettled([

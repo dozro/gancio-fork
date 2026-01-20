@@ -6,7 +6,6 @@ const { Event, User, Tag, Place, APUser, Resource, EventNotification } = require
 const tagController = require('../api/controller/tag')
 const Helpers = require('./helpers')
 const { parseAPLocation } = require('./places')
-const { getThumbnailsPath } = require('../utils/directories')
 
 // module.exports = {
 
