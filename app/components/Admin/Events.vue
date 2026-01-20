@@ -13,18 +13,12 @@ const { t } = useI18n()
 const openModeration = ref($route?.query?.moderation ? true : false)
 const selectedEvent = ref()
 
-const data = reactive({
-  valid: false,
-  dialog: false,
-  editing: false,
-})
-
 const headers = [
-    { value: 'title', title: t('common.title') },
-    { value: 'place.name', title: t('common.place'), width: 300 },
-    { value: 'start_datetime', title: t('common.when'), width: 300 },
-    { value: 'actions', title: t('common.actions'), align: 'end', sortable: false, width: 280 }
-  ]
+  { value: 'title', title: t('common.title') },
+  { value: 'place.name', title: t('common.place'), width: 300 },
+  { value: 'start_datetime', title: t('common.when'), width: 300 },
+  { value: 'actions', title: t('common.actions'), align: 'end', sortable: false, width: 280 }
+]
 
 async function confirm (event) {
   try {
@@ -38,12 +32,16 @@ async function confirm (event) {
 
 async function remove (event) {
   const ret = await $confirm('event.remove_confirmation', { event: event.title })
-  if (!ret) { return }
+  if (!ret) {
+    return
+  }
   try {
-    await $fetch(`/api/events/${event.id}`, { method: 'DELETE'})
+    await $fetch(`/api/events/${event.id}`, { method: 'DELETE' })
     $notify('admin.event_remove_ok')
     emit('removed', event.id)
-  } catch (e) {}
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
 }
 </script>
 
@@ -59,12 +57,12 @@ async function remove (event) {
     <template v-slot:item.start_datetime='{ item }'>{{time.when(item)}}</template>
 
     <template v-slot:item.actions='{ item }'>
-      <t-btn @click='confirm(item)' color='success' :tooltip="$t('common.confirm')" icon='mdi-check-bold' />
+      <t-btn color='success' :tooltip="$t('common.confirm')" icon='mdi-check-bold' @click='confirm(item)' />
 
       <t-btn
-        @click='() => { selectedEvent = item; openModeration=true }'
-        color='warning' :tooltip="$t('common.moderation')" icon='mdi-message-text' />
-         <!-- v-badge(v-if='item?.n_messages' :content="item?.n_messages" overlap bordered)
+        color='warning'
+        :tooltip="$t('common.moderation')" icon='mdi-message-text' @click='() => { selectedEvent = item; openModeration=true }' />
+      <!-- v-badge(v-if='item?.n_messages' :content="item?.n_messages" overlap bordered)
           v-icon(v-text='mdiMessageText')
         v-icon(v-else v-text='mdiMessageText')  -->
 
@@ -72,7 +70,7 @@ async function remove (event) {
 
       <t-btn :to='`/add/${item.id}`' color='warning' :tooltip="$t('common.edit')" icon='mdi-pencil' />
 
-      <t-btn @click='remove(item)' color='error' :tooltip="$t('common.delete')" icon='mdi-delete-forever' />
+      <t-btn color='error' :tooltip="$t('common.delete')" icon='mdi-delete-forever' @click='remove(item)' />
     </template>
   </v-data-table>
 
@@ -87,7 +85,7 @@ async function remove (event) {
     <template v-slot:item.actions='{ item }'>
       <t-btn :to='`/event/${item.slug || item.id}`' color='info' :tooltip="$t('common.preview')" icon='mdi-arrow-right' />
       <t-btn :to='`/add/${item.id}`' color='warning' :tooltip="$t('common.edit')" icon='mdi-pencil' />
-      <t-btn @click='remove(item)' color='error' :tooltip="$t('common.delete')" icon='mdi-delete-forever' />
+      <t-btn color='error' :tooltip="$t('common.delete')" icon='mdi-delete-forever' @click='remove(item)' />
     </template>
   </v-data-table>
   <v-navigation-drawer
@@ -98,12 +96,11 @@ async function remove (event) {
     temporary
   >
     <EventModeration
-      :event="selectedEvent"
       v-if="openModeration"
+      :event="selectedEvent"
       @close="openModeration=false"
     />
   </v-navigation-drawer>
 </div>
-
 
 </template>

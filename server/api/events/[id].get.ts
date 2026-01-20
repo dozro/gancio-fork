@@ -1,18 +1,19 @@
-import { Event, Place, Tag } from "~~/server/utils/sequelize"
-import { Op } from '@sequelize/core'
+import { Event, Place, Tag } from '~~/server/utils/sequelize'
+import { Op, type WhereOptions } from '@sequelize/core'
 
-export default defineEventHandler(async evt => {
-  const log = useLogger('event details!')
+export default defineEventHandler(async (evt) => {
   const slug = getRouterParam(evt, 'id')
-  let where: any = { [Op.or]: [{ slug }] }
   const id = Number(slug)
-  if (!isNaN(id) && Number.isInteger(id)) {
-    where[Op.or].push({ id })
+  const where: WhereOptions<Event> = {
+    [Op.or]: [
+      { slug },
+      ...(Number.isInteger(id) ? [{ id }] : [])
+    ]
   }
   const event = await Event.findOne({ where, include: [Tag, Place] })
-    if (event) {
-      return event
-    } else {
-        throw createError({ status: 404, message: 'Not found' })
-    }
+  if (event) {
+    return event
+  } else {
+    throw createError({ status: 404, message: 'Not found' })
+  }
 })

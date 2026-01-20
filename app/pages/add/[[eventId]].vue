@@ -22,7 +22,7 @@ const event = ref<EventAPI>({
 
 let eventId = route.params.eventId
 if (eventId) {
-  const { data , error } = await useFetch<EventAPI>(() => `/api/event/detail/${route.params.eventId}`)
+  const { data, error } = await useFetch<EventAPI>(() => `/api/event/detail/${route.params.eventId}`)
   if (error.value) {
     throw createError(error.value)
   }
@@ -112,11 +112,11 @@ async function done() {
     formData.append('tags[]', '')
   }
 
-  // 
+  //
   try {
     const ret: EventAPI = eventId ?
-      await $fetch(`/api/events/${eventId}`, { method: 'PUT', body: formData }) :
-      await $fetch('/api/events', { method: 'POST', body: formData })
+        await $fetch(`/api/events/${eventId}`, { method: 'PUT', body: formData }) :
+        await $fetch('/api/events', { method: 'POST', body: formData })
 
     // navigate to created event in case its already visible and not a recurrent event!
     if (!evt?.recurrent && (ret.is_visible || loggedIn.value)) {
@@ -155,68 +155,69 @@ const normalizedTags = computed({
 
 </script>
 <template>
-  <v-container class="pa-0 pa-md-3">
-    <v-card>
-      <v-card-title>
-        <!-- <v-btn variant='outlined' class='float-right' color='primary' @click='openImportDialog = true' prepend-icon="mdi-file-import">{{$t('common.import') }}</v-btn> -->
-        <h4>{{ eventId ? $t('common.edit_event') : $t('common.add_event') }}</h4>
-      </v-card-title>
-      <!-- <v-dialog v-model='openImportDialog' :fullscreen='$vuetify.display.mobile'>
+<v-container class="pa-0 pa-md-3">
+  <v-card>
+    <v-card-title>
+      <!-- <v-btn variant='outlined' class='float-right' color='primary' @click='openImportDialog = true' prepend-icon="mdi-file-import">{{$t('common.import') }}</v-btn> -->
+      <h4>{{ eventId ? $t('common.edit_event') : $t('common.add_event') }}</h4>
+    </v-card-title>
+    <!-- <v-dialog v-model='openImportDialog' :fullscreen='$vuetify.display.mobile'>
         <ImportDialog @close='openImportDialog = false' />
       </v-dialog> -->
-      <v-card-text class='px-0 px-xs-2'>
-        <v-form v-model='valid' ref='form'>
-          <v-container>
-            <v-row>
-              <!-- Not logged event -->
-              <v-col v-if='!loggedIn' cols=12>
-                <p v-html="$t('event.anon_description')" />
-              </v-col>
+    <v-card-text class='px-0 px-xs-2'>
+      <v-form ref='form' v-model='valid'>
+        <v-container>
+          <v-row>
+            <!-- Not logged event -->
+            <v-col v-if='!loggedIn' cols=12>
+              <p v-html="$t('event.anon_description')" />
+            </v-col>
 
-              <!-- Title -->
-              <v-col cols=12>
-                <v-text-field v-model="event.title" prepend-icon='mdi-format-title' :label="$t('common.title')"
-                  :rules="[$valid.required('common.title')]" autofocus ref='title' />
-              </v-col>
+            <!-- Title -->
+            <v-col cols=12>
+              <v-text-field
+                ref='title' v-model="event.title" prepend-icon='mdi-format-title'
+                :label="$t('common.title')" :rules="[$valid.required('common.title')]" autofocus />
+            </v-col>
 
-              <!-- Where -->
-              <v-col cols=12>
-                <WhereInput ref='where' v-model='event.place' :event='event' />
-              </v-col>
+            <!-- Where -->
+            <v-col cols=12>
+              <WhereInput ref='where' v-model='event.place' :event='event' />
+            </v-col>
 
-              <!-- When -->
-              <DateInput ref="when" v-model:event="event" />
+            <!-- When -->
+            <DateInput ref="when" v-model:event="event" />
 
-              <!-- Description -->
-              <v-col class='px-0' cols='12'>
-                <CoreEditor class='px-3 ma-0' :label="$t('event.description_description')" v-model='event.description'
-                  :placeholder="$t('event.description_description')" max-height='400px' />
-              </v-col>
+            <!-- Description -->
+            <v-col class='px-0' cols='12'>
+              <CoreEditor
+                v-model='event.description' class='px-3 ma-0' :label="$t('event.description_description')"
+                :placeholder="$t('event.description_description')" max-height='400px' />
+            </v-col>
 
-              <!-- MEDIA / FLYER / POSTER -->
-              <v-col cols=12 md=6>
-                <MediaInput v-model:media='event.media' :event='event' />
-              </v-col>
+            <!-- MEDIA / FLYER / POSTER -->
+            <v-col cols=12 md=6>
+              <MediaInput v-model:media='event.media' :event='event' />
+            </v-col>
 
-              <!-- TAGS -->
-              <v-col cols=12 md=6>
-                <v-combobox v-model:search="searchTag" v-model="normalizedTags" prepend-icon="mdi-tag-multiple" chips
-                  multiple closable-chips hide-no-data hide-selected persistent-hint :loading="statusTags === 'pending'"
-                  :delimiters="[',', ';']" :items="tags || []"
-                  :label="$t('common.tags')">
-                </v-combobox>
-              </v-col>
+            <!-- TAGS -->
+            <v-col cols=12 md=6>
+              <v-combobox
+                v-model:search="searchTag" v-model="normalizedTags" prepend-icon="mdi-tag-multiple" chips
+                multiple closable-chips hide-no-data hide-selected persistent-hint :loading="statusTags === 'pending'"
+                :delimiters="[',', ';']" :items="tags || []"
+                :label="$t('common.tags')"/>
+            </v-col>
 
-
-            </v-row>
-          </v-container>
-        </v-form>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='done'>{{
-          eventId ?
-            $t('common.save') : $t('common.send') }}</v-btn>
-      </v-card-actions> </v-card>
-  </v-container>
+          </v-row>
+        </v-container>
+      </v-form>
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer />
+      <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='done'>{{
+        eventId ?
+          $t('common.save') : $t('common.send') }}</v-btn>
+    </v-card-actions> </v-card>
+</v-container>
 </template>

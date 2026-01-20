@@ -1,6 +1,5 @@
 <script setup lang='ts'>
 
-import type { Event } from '#build/types/nitro-imports'
 import { DateTime } from 'luxon'
 import { useTheme } from 'vuetify'
 
@@ -9,7 +8,7 @@ const { isAdmin } = useAuth()
 const theme = useTheme()
 const settings = useState<Settings>('settings')
 const { t } = useI18n()
-const event = defineModel<Event>('event', { type: Object, required: true } )
+const event = defineModel<EventAPI>('event', { type: Object, required: true })
 
 const type = ref('normal')
 const frequencies = [
@@ -42,8 +41,9 @@ const selectedDate = computed({
   get() {
     if (type.value === 'multidate') {
       return event.value.start_datetime ?
-      { start: DateTime.fromSeconds(event.value.start_datetime).toJSDate(),
-        end: DateTime.fromSeconds(event.value.end_datetime).toJSDate() } : null
+          { start: DateTime.fromSeconds(event.value.start_datetime).toJSDate(),
+            end: DateTime.fromSeconds(event.value?.end_datetime).toJSDate() }
+        : null
     } else {
       return event.value.start_datetime ? DateTime.fromSeconds(event.value.start_datetime).toJSDate() : null
     }
@@ -53,11 +53,11 @@ const selectedDate = computed({
     const eTime = endTime.value || '00:00'
     console.error(val)
     if (type.value === 'multidate') {
-      event.value.start_datetime = fromDateAndTimeToDateTime(val.start, sTime) //DateTime.fromJSDate(val).toUnixInteger() 
-      event.value.end_datetime = fromDateAndTimeToDateTime(val.end, eTime) //DateTime.fromJSDate(val).toUnixInteger()       
+      event.value.start_datetime = fromDateAndTimeToDateTime(val.start, sTime) // DateTime.fromJSDate(val).toUnixInteger()
+      event.value.end_datetime = fromDateAndTimeToDateTime(val.end, eTime) // DateTime.fromJSDate(val).toUnixInteger()
     } else {
-      event.value.start_datetime = fromDateAndTimeToDateTime(val as Date, sTime) //DateTime.fromJSDate(val).toUnixInteger() 
-      event.value.end_datetime = fromDateAndTimeToDateTime(val as Date, eTime) //DateTime.fromJSDate(val).toUnixInteger() 
+      event.value.start_datetime = fromDateAndTimeToDateTime(val as Date, sTime) // DateTime.fromJSDate(val).toUnixInteger()
+      event.value.end_datetime = fromDateAndTimeToDateTime(val as Date, eTime) // DateTime.fromJSDate(val).toUnixInteger()
     }
   },
 })
@@ -68,8 +68,7 @@ const startTime = computed({
     return event.value.start_datetime ? formatTime(event.value.start_datetime) : ''
   },
   set(val) {
-    const date = selectedDate.value
-    event.value.start_datetime = fromDateAndTimeToDateTime(selectedDate.value, val) //DateTime.fromJSDate(val).toUnixInteger() 
+    event.value.start_datetime = fromDateAndTimeToDateTime(selectedDate.value, val) // DateTime.fromJSDate(val).toUnixInteger()
   },
 })
 
@@ -79,22 +78,20 @@ const endTime = computed({
     return event.value.end_datetime ? formatTime(event.value.end_datetime) : ''
   },
   set(val) {
-    const date = selectedDate.value
     event.value.end_datetime = fromDateAndTimeToDateTime(selectedDate.value, val)
   },
 })
-
 
 </script>
 <template>
 <v-col cols="12">
   <div class="text-center">
-    
+
     <v-btn-toggle
-      class="flex-wrap flex-row"
-      variant='outlined'
       v-if="!event.parentId && !event.recurrent"
       v-model="type"
+      class="flex-wrap flex-row"
+      variant='outlined'
       color="primary"
       mandatory
     >
@@ -106,55 +103,55 @@ const endTime = computed({
     <p>{{ $t(`event.${type}_description`) }}</p>
 
     <v-btn-toggle
-      class="v-col-6 flex-column flex-sm-row"
       v-if="type === 'recurrent'"
+      class="v-col-6 flex-column flex-sm-row"
       color="primary"
       :model-value="event.recurrent.frequency"
     >
       <!-- @change="fq => change('frequency', fq)" -->
       <v-btn v-for="f in frequencies" :key="f.value" :value="f.value">{{ f.text }}</v-btn>
     </v-btn-toggle>
-  
+
     <div class="mx-auto d-block mt-3">
       <v-input v-model="selectedDate">
         <template #default>
           <DatePicker
+            v-model='selectedDate'
             :rules="[$valid.required('common.when')]"
             class='mx-auto'
-            v-model='selectedDate'
             :is-dark="theme.global.current.value.dark"
             :is-range="type === 'multidate'"
             :locale="$i18n.locale"
             is-inline
-             :min-date="!isAdmin ? new Date() : undefined" 
+            :min-date="!isAdmin ? new Date() : undefined"
             is-expanded
           />
-            <!-- :attributes="attributes" -->
-            <!-- :is-dark="is_dark" -->
+          <!-- :attributes="attributes" -->
+          <!-- :is-dark="is_dark" -->
         </template>
       </v-input>
     </div>
-    
+
   </div>
 
-  <div class="text-center mb-2" v-if="type === 'recurrent'">
+  <div v-if="type === 'recurrent'" class="text-center mb-2">
     <span v-if="event.recurrent.frequency !== '1m' && event.recurrent.frequency !== '2m'">{{ whenPatterns }}</span>
     <v-btn-toggle
-      class="mt-1 flex-column flex-sm-row"
       v-else
+      class="mt-1 flex-column flex-sm-row"
       :model-value="event.recurrent.type"
     >
       <v-btn
         v-for="whenPattern in whenPatterns"
-        :value="whenPattern.key"
         :key="whenPattern.key"
+        :value="whenPattern.key"
         size='small'
       >{{ whenPattern.label }}</v-btn>
     </v-btn-toggle>
   </div>
 
   <v-row class="mt-3 col-md-6 mx-auto datePicker">
-    
+
     <v-col class="col-12 col-sm-6">
       <v-text-field
         v-model='startTime'
@@ -164,16 +161,16 @@ const endTime = computed({
         type='time'
         step='300' />
     </v-col>
-    
+
     <v-col class="col-12 col-sm-6">
-        <!-- :disabled="!value.fromHour" -->
+      <!-- :disabled="!value.fromHour" -->
       <v-text-field
         v-model='endTime'
         :rules="[settings.allow_event_without_end_time ? true : $valid.required('event.due')]"
         :label="$t('event.due')"
         prepend-icon='mdi-clock-time-eight-outline' type='time' />
-    </v-col>    
-    
+    </v-col>
+
   </v-row>
   <!--
       <v-menu
@@ -251,12 +248,9 @@ const endTime = computed({
   </v-row> -->
 </v-col>
 
-  <!-- //List(v-if='type === "normal" && todayEvents.length' :events='todayEvents' :title='$t("event.same_day")') -->
+<!-- //List(v-if='type === "normal" && todayEvents.length' :events='todayEvents' :title='$t("event.same_day")') -->
 
-</template>
-
-// <!-- <script> -->
-// import { DateTime } from 'luxon'
+<!-- // import { DateTime } from 'luxon'
 // import { mapState, mapActions, mapGetters } from 'vuex'
 // import List from '@/components/List'
 // import { mdiClockTimeFourOutline, mdiClockTimeEightOutline, mdiClose } from '@mdi/js'
@@ -357,7 +351,7 @@ const endTime = computed({
 //       this.getEvents()
 //     }
 //   },
-//   methods: {
+ //   methods: {
 //     ...mapActions(['getEvents']),
 //     updateRecurrent(value) {
 //       this.$emit('input', { ...this.value, recurrent: value || null })
@@ -441,8 +435,8 @@ const endTime = computed({
 //       }
 //     },
 //   }
-// }
-// <!-- </script> -->
+// } -->
+</template>
 
 <style>
 .datePicker {

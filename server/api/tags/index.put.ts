@@ -11,7 +11,7 @@ const schema = z.object({
  * @param {string} newTag - New tag
  * @info rename the tag with `newTag` or merge it with an existing one, in this case all associated events will also be updated
  */
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   await requireAdminSession(evt)
   const log = useLogger('tag update')
   const { tag, newTag } = await readValidatedBody(evt, schema.parse)
@@ -21,7 +21,7 @@ export default defineEventHandler(async evt => {
     log.error('This tag does not exist: ', tag)
     throw createError({ status: 404, message: 'This tag does not exists' })
   }
-  
+
   const newtag = await Tag.findByPk(newTag)
   // if the new tag does not exists, just rename the old one
   if (!newtag) {

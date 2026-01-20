@@ -4,15 +4,15 @@ import fs from 'fs'
 import { z } from 'zod'
 
 export const ProxyAuthSchema = z.object({
-  username: z.string().optional().default(""),
-  password: z.string().optional().default(""),
+  username: z.string().optional().default(''),
+  password: z.string().optional().default(''),
 })
 
 export const ProxySchema = z.object({
-  protocol: z.string().optional().default(""),
-  hostname: z.string().optional().default(""),
-  host: z.string().optional().default(""),
-  port: z.string().optional().default(""),
+  protocol: z.string().optional().default(''),
+  hostname: z.string().optional().default(''),
+  host: z.string().optional().default(''),
+  port: z.string().optional().default(''),
   auth: ProxyAuthSchema,
   headers: z.record(z.string(), z.string()).optional().default({}),
 })
@@ -40,7 +40,7 @@ export const ConfigSchema = z.object({
   user_locale: z.string(),
   upload_path: z.string(),
   plugins_path: z.string(),
-  hidden_service: z.string().optional().default(""),
+  hidden_service: z.string().optional().default(''),
   proxy: ProxySchema,
 })
 
@@ -50,7 +50,7 @@ let config: Config | null = null
 
 /**
  * this loads the configuration using the legacy `config.json`
- * and merge it with the ENV vars incoming from `.env` or from 
+ * and merge it with the ENV vars incoming from `.env` or from
  * docker configuration
  */
 export function get(): Config {
@@ -84,7 +84,9 @@ export function get(): Config {
     user_locale: path.resolve(process.env.USER_LOCALE || 'user_locale'),
     upload_path: path.resolve(process.env.UPLOAD_PATH || 'uploads'),
     plugins_path: path.resolve(process.env.PLUGINS_PATH || 'plugins'),
+    // TODO
     hidden_service: process.env.ALLOW_ACCESS_TO_HIDDEN_SERVICE || '',
+    // TODO
     proxy: {
       protocol: process.env.PROXY_PROTOCOL || '',
       hostname: process.env.PROXY_HOSTNAME || '',

@@ -1,12 +1,12 @@
 /**
 */
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   const log = useLogger('ics')
-  const  { icsText, includePastEvents = false } = await readBody(event)
+  const { icsText, includePastEvents = false } = await readBody(event)
 
   if (!icsText) {
     log.warn('No ICS text received')
-    throw createError({ status: 400, message: 'No ICS text received'})
+    throw createError({ status: 400, message: 'No ICS text received' })
   }
 
   try {

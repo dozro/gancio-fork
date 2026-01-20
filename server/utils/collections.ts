@@ -1,7 +1,8 @@
-import { InferAttributes, JSON_NULL, Op, WhereOptions, fn, literal, col, sql } from "@sequelize/core"
-import { APUser, Event, Place } from "./sequelize"
-import { DateTime } from "luxon"
-import z from "zod"
+import type { WhereOptions } from '@sequelize/core'
+import { Op, literal, sql } from '@sequelize/core'
+import { APUser, Event, Place } from './sequelize'
+import { DateTime } from 'luxon'
+import z from 'zod'
 
 export const collectionQuerySchema = z.object({
   name: z.string(),
@@ -20,15 +21,14 @@ export type CollectionQueryType = z.infer<typeof collectionQuerySchema>
 
 /**
  * Transform a Filter into a sequelize conditions + replacements
- * @param {Filter} filter 
- * @returns 
+ * @param {Filter} filter
+ * @returns
  * @link https://sequelize.org/docs/v7/querying/raw-queries/#replacements
  * @link https://sequelize.org/docs/v7/querying/select-in-depth/
  */
-function filterToConditions(filter: InferAttributes<Filter>) {
-
-  const conditions: WhereOptions<InferAttributes<Event>> = []
-  const replacements: Record<string, any> = {}
+function filterToConditions(filter: Filter) {
+  const conditions: WhereOptions<Event> = []
+  const replacements: Record<string, unknown> = {}
 
   // mtch tags
   // if (filter?.tags?.length) {
@@ -56,7 +56,7 @@ function filterToConditions(filter: InferAttributes<Filter>) {
 
   if (filter.actors?.length) {
     // search for local instance
-    if (filter.actors.find((a: APUser) => a.ap_id === null)) {
+    if (filter.actors.find(a => a.ap_id === null)) {
       conditions.push({ [Op.or]: [{ apUserApId: filter.actors.map(a => a.ap_id).filter(a => a) }, { apUserApId: null }] })
     } else {
       conditions.push({ apUserApId: filter.actors.map(a => a.ap_id) })
@@ -64,7 +64,6 @@ function filterToConditions(filter: InferAttributes<Filter>) {
   }
 
   return { conditions, replacements }
-
 }
 
 export async function getCollectionEvents(opts?: CollectionQueryType) {
@@ -88,7 +87,7 @@ export async function getCollectionEvents(opts?: CollectionQueryType) {
   }
 
   // init stardard filter
-  const where: WhereOptions<InferAttributes<Event>> = {
+  const where: WhereOptions<Event> = {
     // do not include parent recurrent event
     // recurrent: JSON_NULL,
 
@@ -101,17 +100,16 @@ export async function getCollectionEvents(opts?: CollectionQueryType) {
     },
     ...(args.end && { start_datetime: { [args.older ? Op.gte : Op.lte]: args.end } }),
 
-
     // include recurrent events?
     ...(!args.show_recurrent && { parentId: null }),
   }
 
-  let replacements: Record<string, any> = {}
-  const conditions: WhereOptions<InferAttributes<Event>> = []
-  const negatedConditions: WhereOptions<InferAttributes<Event>> = []
+  let replacements: Record<string, unknown> = {}
+  const conditions: WhereOptions<Event> = []
+  const negatedConditions: WhereOptions<Event> = []
 
   // collections are a set of filters to match
-  filters.forEach(f => {
+  filters.forEach((f) => {
     const { conditions: tmpConditions, replacements: tmpReplacements } = filterToConditions(f)
     replacements = { ...replacements, ...tmpReplacements }
     if (!tmpConditions.length) return
@@ -151,9 +149,8 @@ export async function getCollectionEvents(opts?: CollectionQueryType) {
     ...(opts?.page && args.limit && { offset: opts.page * args.limit }),
     logging: console.log,
     replacements
-  }).catch(e => {
+  }).catch((e) => {
     log.error('[EVENT]', e)
     return []
   })
-
 }

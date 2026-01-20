@@ -3,7 +3,7 @@
 import time from '~/utils/time'
 import { useTheme } from 'vuetify'
 
-let selectedDate = useState('selectedDate')
+const selectedDate = useState('selectedDate')
 const { attributes, params } = useEvents()
 
 const theme = useTheme()
@@ -18,20 +18,20 @@ function updatePages (pages) {
 }
 </script>
 <template>
-  <!-- :first-day-of-week='settings.calendar_first_day_of_week ?? undefined' -->
-  <!-- :columns="$vuetify.display?.smAndUp ? 2 : 1" -->
-  <DatePicker
-    class='mt-2'
-    v-model='selectedDate'
-    :locale='$i18n.locale'  
-    title-position='left'
-    transition='fade'
-    :is-dark="theme?.global?.current?.value?.dark"
-    aria-label='Calendar'
-    expanded
-    :attributes='attributes'
-    @update:pages="updatePages"
-  />
+<!-- :first-day-of-week='settings.calendar_first_day_of_week ?? undefined' -->
+<!-- :columns="$vuetify.display?.smAndUp ? 2 : 1" -->
+<DatePicker
+  v-model='selectedDate'
+  class='mt-2'
+  :locale='$i18n.locale'
+  title-position='left'
+  transition='fade'
+  :is-dark="theme?.global?.current?.value?.dark"
+  aria-label='Calendar'
+  expanded
+  :attributes='attributes'
+  @update:pages="updatePages"
+/>
 </template>
 
 <style>
@@ -42,14 +42,12 @@ function updatePages (pages) {
   /* --vc-color: var(vc--gray-900) !important; */
 }
 
-
 .v-theme--dark .vc-container {
   --vc-border: #333 !important;
   --vc-rounded-lg: 4px !important;
   --vc-bg: rgba(10,10,10,0.5);
   /* --vc-color: #999 !important; */
 }
-
 
 .vc-opacity-0 {
   opacity: 0.3 !important;

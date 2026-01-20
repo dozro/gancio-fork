@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // const event = defineModel<EventAPI>('event', { type: Object, required: true } )
 const emit = defineEmits(['close', 'update:event'])
-const place = defineModel('place', { type: Object, required: true } )
+const place = defineModel('place', { type: Object, required: true })
 
 </script>
 <template>
@@ -14,7 +14,7 @@ const place = defineModel('place', { type: Object, required: true } )
   </v-card-text>
   <v-card-actions>
     <v-spacer />
-    <v-btn @click='emit("close")' variant='outlined' :text="$t('common.close')" />
+    <v-btn variant='outlined' :text="$t('common.close')" @click='emit("close")' />
   </v-card-actions>
 </v-card>
 </template>

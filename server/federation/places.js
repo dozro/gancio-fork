@@ -1,7 +1,7 @@
 // const { Place } = require('../api/models/models')
 // const log = require('../log')
 
-import { findOrCreatePlace } from "../lib/places"
+import { findOrCreatePlace } from '../lib/places'
 
 // module exports = {
 //   async get (req, res) {
@@ -25,7 +25,7 @@ import { findOrCreatePlace } from "../lib/places"
 //     res.json(ret)
 //   },
 
-  // * @returns {Array} An array containing the Place and a list of online locations
+// * @returns {Array} An array containing the Place and a list of online locations
 /**
   * Parses the location of an ActivityPub Event to extract physical and online locations.
   * @link https://www.w3.org/TR/activitystreams-vocabulary/#places
@@ -33,6 +33,7 @@ import { findOrCreatePlace } from "../lib/places"
   * @param {Object} APEvent - The ActivityPub Event object
   */
 export async function parseAPLocation(APEvent) {
+  const log = useLogger('federation:places')
   // const eventController = require('../api/controller/event')
   let place = null
 
@@ -75,8 +76,8 @@ export async function parseAPLocation(APEvent) {
   if (addr) {
     if (typeof addr === 'string') {
       place.place_address = addr
-    } else if ( addr?.streetAddress || addr?.addressLocality || addr?.addressCountry || addr?.addressRegion ) {
-      place.place_address = [ addr?.streetAddress, addr?.addressLocality, addr?.addressRegion, addr?.addressCountry].filter(part => part).join(', ')
+    } else if (addr?.streetAddress || addr?.addressLocality || addr?.addressCountry || addr?.addressRegion) {
+      place.place_address = [addr?.streetAddress, addr?.addressLocality, addr?.addressRegion, addr?.addressCountry].filter(part => part).join(', ')
     } else if (addr?.url) {
       place.place_name = 'online'
     } else {

@@ -1,4 +1,4 @@
-import { eventQuerySchema, sendEvents } from "~~/server/utils/events"
+import { eventQuerySchema, sendEvents } from '~~/server/utils/events'
 
 /**
 * Get events
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   const log = useLogger('get events')
   const opt = await getValidatedQuery(event, eventQuerySchema.parse)
   let events
-  
+
   if (publicSettings.collection_in_home && !(opt.tags || opt.places || opt.query)) {
     log.debug('get collection events', publicSettings.collection_in_home)
     events = await getCollectionEvents({ name: publicSettings.collection_in_home, ...opt })

@@ -2,7 +2,7 @@
 <script setup>
 const { t } = useI18n()
 
-onMounted( () => {
+onMounted(() => {
   const { $on } = useNuxtApp()
   $on('notify', showNotification)
 })
@@ -19,8 +19,8 @@ function showNotification(ev) {
 <template>
 <div style="z-index: 10000; position: fixed; right: 1em; bottom: 1rem; opacity: 0.9;" class="mb-2">
   <v-alert
-    variant="flat" border='start' elevation="2"
-    class='mb-2'  min-width="350px" max-width="800px"
-    :type="notification?.status ?? 'warning'"  v-for="notification in notifications" :key="notification" :text="notification.msg"/>
+    v-for="notification in notifications" :key="notification" variant="flat"
+    border='start'  elevation="2" class='mb-2'
+    min-width="350px"  max-width="800px" :type="notification?.status ?? 'warning'" :text="notification.msg"/>
 </div>
 </template>

@@ -5,24 +5,23 @@ const route = useRoute()
 const show_calendar = computed(() => !settings.value?.hide_calendar && route?.name === 'index')
 const show_collections_bar = computed(() => ['index', 'collection-name'].includes(route.name as string))
 
-
 </script>
 <template>
-  <nav id='AppBar'>
-    <NavHeader />
+<nav id='AppBar'>
+  <NavHeader />
 
-    <!-- title -->
-    <component :is='$route.name === "index" ? "h1" : "div"' class="text-center">
-      <nuxt-link color='primary' id="title" v-text="settings?.title ?? 'Gancio'" to="/" />
-      <div
-        class="text-body-1 font-weight-light pb-3"
-        v-html="settings?.description ?? 'a shared agenda for local communities'"
-      />
-    </component>
+  <!-- title -->
+  <component :is='$route.name === "index" ? "h1" : "div"' class="text-center">
+    <nuxt-link id="title" color='primary' to="/" v-text="settings?.title ?? 'Gancio'" />
+    <div
+      class="text-body-1 font-weight-light pb-3"
+      v-html="settings?.description ?? 'a shared agenda for local communities'"
+    />
+  </component>
 
-    <NavSearch v-show='show_collections_bar || show_calendar' />
-    <NavBar v-if="!['event-slug','e-slug'].includes(route.name as string)"/> 
-  </nav>
+  <NavSearch v-show='show_collections_bar || show_calendar' />
+  <NavBar v-if="!['event-slug','e-slug'].includes(route.name as string)"/>
+</nav>
 </template>
 <style>
   nav#AppBar {
@@ -41,7 +40,7 @@ const show_collections_bar = computed(() => ['index', 'collection-name'].include
       ),
       url('/headerimage.png');
   }
-  
+
   #title {
     word-break: break-all;
     font-size: 2rem;
@@ -50,4 +49,3 @@ const show_collections_bar = computed(() => ['index', 'collection-name'].include
     color: rgb(var(--v-theme-primary));
   }
 </style>
-  

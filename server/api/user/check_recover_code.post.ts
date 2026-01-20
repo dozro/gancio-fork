@@ -12,5 +12,4 @@ export default defineEventHandler(async (event) => {
   }
 
   return { email: user.email }
-
 })

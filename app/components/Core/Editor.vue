@@ -1,9 +1,8 @@
 <script setup>
 
-const { $prompt } = useNuxtApp()
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-// import Underline from '@tiptap/extension-underline'
+const { $prompt } = useNuxtApp()
 
 const props = defineProps({
   modelValue: { type: String, default: '' },
@@ -14,15 +13,14 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
-const link = ref()
 
 const editor = useEditor({
-    content: props.modelValue || '',
-    extensions: [StarterKit],
-    onUpdate: ({ editor }) => {
-      emit('update:modelValue', editor.getHTML())
-    },
-  })
+  content: props.modelValue || '',
+  extensions: [StarterKit],
+  onUpdate: ({ editor }) => {
+    emit('update:modelValue', editor.getHTML())
+  },
+})
 
 const focused = ref(false)
 
@@ -55,7 +53,7 @@ async function askLink () {
   <label :class="{ float: isLabelFloating }">{{ label }}</label>
   <div class='editor-menu-bar menubar'>
     <v-btn-toggle density='compact'>
-      
+
       <v-btn
         tabindex='-1'
         icon='mdi-format-bold' variant='text'
@@ -67,19 +65,19 @@ async function askLink () {
         icon='mdi-format-underline' variant='text'
         :active="editor?.isActive('underline')"
         @click="editor.chain().focus().toggleUnderline().run()" />
-  
+
       <v-btn
         tabindex='-1'
         icon='mdi-format-strikethrough' variant='text'
         :active="editor?.isActive('strike')"
         @click="editor.chain().focus().toggleStrike().run()" />
-      
+
       <v-btn
         tabindex='-1'
         icon='mdi-format-italic' variant='text'
         :active="editor?.isActive('italic')"
         @click="editor.chain().focus().toggleItalic().run()" />
-      
+
       <v-btn
         tabindex='-1'
         icon='mdi-format-header-1'
@@ -100,7 +98,7 @@ async function askLink () {
         :active="editor?.isActive('heading', { level: 3 })"
         @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
       />
-      
+
       <v-btn
         tabindex='-1'
         icon='mdi-code-tags'
@@ -121,15 +119,15 @@ async function askLink () {
         :active="editor?.isActive('bullet_list')"
         @click="editor.chain().focus().toggleBulletList().run()"
       />
-      
+
       <v-btn
         tabindex='-1'
         icon="mdi-link"
         :active="editor?.isActive('link')"
         @click='askLink'
       />
-      
-        <!-- v-if="editor?.isActive('link')" -->
+
+      <!-- v-if="editor?.isActive('link')" -->
       <!-- <v-text-field
         ref="link"
         v-model="linkUrl"
@@ -143,7 +141,7 @@ async function askLink () {
       <!-- TODO -->
 
     </v-btn-toggle>
-<!-- 
+    <!--
 
       v-btn(icon text tabindex='-1'
         :class="{ primary: isActive.bullet_list() }"
@@ -157,9 +155,9 @@ async function askLink () {
           :value='isActive.link() && getMarkAttrs("link") && getMarkAttrs("link").href || ""'
           @keypress.enter='commands.link({ href: $event.target.value}); editor.focus()') -->
   </div>
-  
+
   <EditorContent :editor="editor" class="v-editor__content" :style="{ height }" :label='label' :aria-label='label'  />
-  
+
 </div>
 </template>
 <style lang='css'>
@@ -169,7 +167,6 @@ async function askLink () {
   transition: border-color 0.2s;
   min-height: 100px;
 }
-
 
 .v-editor .tiptap {
   background-color: #eee;
@@ -226,10 +223,6 @@ async function askLink () {
   }
 
 </style>
-
-
-
-
 
 <!-- <template>
   <div

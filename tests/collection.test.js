@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it } from 'vitest'
 import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
 
 import { fetchWithAuth } from './setup.js'
@@ -6,7 +6,6 @@ import { fetchWithAuth } from './setup.js'
 const base_url = 'http://localhost:13120'
 await setup({ host: base_url })
 // let places = []
-
 
 let collections = []
 let filters = []
@@ -45,7 +44,6 @@ describe('Collection', () => {
 
     expect(response.data.id).toBeDefined()
     filters.push(response.data.id)
-
   })
 
   it('shoud get collection\'s filters using withFilters parameter', async () => {
@@ -65,7 +63,6 @@ describe('Collection', () => {
     response = await fetchWithAuth('/api/collections?withFilters=false')
     expect(response.status).toBe(200)
     expect(response.data[0]?.filters).toBeUndefined()
-
   })
 
   it('should get collection events', async () => {
@@ -109,7 +106,6 @@ describe('Collection', () => {
     expect(response.data?.length).toBe(2)
     expect(response.data[0].id).toBe(collections[0].id)
     expect(response.data[1].id).toBe(collections[1].id)
-
   })
 
   it('should change collections order', async () => {
@@ -123,5 +119,3 @@ describe('Collection', () => {
     expect(response.data[1].id).toBe(collections[0].id)
   })
 })
-
-

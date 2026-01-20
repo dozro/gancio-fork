@@ -60,12 +60,12 @@ function resetFooterLinks () {
       { href: '/', label: 'common.home' },
       { href: '/about', label: 'common.about' }
     ]
-}})
+  } })
 }
 
-async function updateColor (theme: "light" | "dark", color: string, value: string) {
+async function updateColor (theme: 'light' | 'dark', color: string, value: string) {
   const settingsKey = theme === 'light' ? 'light_colors' : 'dark_colors'
-  
+
   // Update settings
   settings.value[settingsKey][color] = value
 
@@ -126,22 +126,24 @@ function addFooterLink () {
 
 async function removeFooterLink (item: FooterLink) {
   const ret = await $confirm('admin.delete_footer_link_confirm')
-  if (!ret) { return }
+  if (!ret) {
+    return
+  }
   const footerLinks = settings.value.footerLinks.filter(l => l.label !== item.label)
   return $fetch('/api/settings', { method: 'PUT', body: {
     key: 'footerLinks',
     value: footerLinks
-  }})
+  } })
 }
 
 async function moveUpFooterLink (item: FooterLink, idx: number) {
   const footerLinks = [...settings.value.footerLinks]
-  footerLinks[idx] = footerLinks[idx-1]
-  footerLinks[idx-1] = settings.value.footerLinks[idx]
+  footerLinks[idx] = footerLinks[idx - 1]
+  footerLinks[idx - 1] = settings.value.footerLinks[idx]
   return $fetch('/api/settings', { method: 'PUT', body: {
     key: 'footerLinks',
     value: footerLinks
-  }})
+  } })
 }
 
 async function editFooterLink (item: FooterLink) {
@@ -225,14 +227,14 @@ const custom_js = manageSetting('custom_js')
         <v-col cols="4">
           <!-- LOGO -->
           <v-file-input
-            class="mt-5"
             ref="upload"
+            class="mt-5"
             :label="$t('admin.favicon')"
-            @update:modelValue="uploadLogo"
             accept="image/*"
+            @update:model-value="uploadLogo"
           >
             <template #append>
-              <v-btn color="warning" variant='text' @click="resetLogo" prepend-icon='mdi-restore'>
+              <v-btn color="warning" variant='text' prepend-icon='mdi-restore' @click="resetLogo">
                 {{ $t('common.reset') }}
               </v-btn>
             </template>
@@ -241,22 +243,22 @@ const custom_js = manageSetting('custom_js')
             class="mt-2"
             :src="`/logo.png?${imageKeys.logo}`"
             max-height="60px"
-            contain
+            cover
           />
         </v-col>
 
         <v-col cols="4">
           <!-- FALLBACK IMAGE -->
           <v-file-input
-            class="mt-5"
             ref="upload"
+            class="mt-5"
             :label="$t('admin.fallback_image')"
             persistent-hint
-            @update:modelValue="uploadFallbackImage"
             accept="image/*"
+            @update:model-value="uploadFallbackImage"
           >
             <template #append>
-              <v-btn color="warning" variant='text' @click="resetFallbackImage" prepend-icon='mdi-restore'>
+              <v-btn color="warning" variant='text' prepend-icon='mdi-restore' @click="resetFallbackImage">
                 {{$t('common.reset')}}
               </v-btn>
             </template>
@@ -265,22 +267,22 @@ const custom_js = manageSetting('custom_js')
             class="mt-2"
             :src="`/fallbackimage.png?${imageKeys.fallback}`"
             max-height="150px"
-            contain
+            cover
           />
         </v-col>
 
         <v-col cols="4">
           <!-- HEADER IMAGE -->
           <v-file-input
-            class="mt-5"
             ref="upload"
+            class="mt-5"
             :label="$t('admin.header_image')"
             persistent-hint
-            @update:model-value="uploadHeaderImage"
             accept="image/*"
+            @update:model-value="uploadHeaderImage"
           >
             <template #append>
-              <v-btn color="warning" variant='text' @click="resetHeaderImage" prepend-icon='mdi-restore'>
+              <v-btn color="warning" variant='text' prepend-icon='mdi-restore' @click="resetHeaderImage">
                 {{$t('common.reset')}}
               </v-btn>
             </template>
@@ -289,7 +291,7 @@ const custom_js = manageSetting('custom_js')
             class="mt-2"
             :src="`/headerimage.png?${imageKeys.header}`"
             max-height="150px"
-            contain
+            cover
           />
         </v-col>
       </v-row>
@@ -312,19 +314,21 @@ const custom_js = manageSetting('custom_js')
     <v-card>
       <v-card-title class="bg-primary">{{$t('admin.footer_links')}}</v-card-title>
       <v-card-text>
-        <v-form v-model='valid' ref='linkModalForm'>
-          <v-text-field v-model='link.label'
+        <v-form ref='linkModalForm' v-model='valid'>
+          <v-text-field
+            v-model='link.label'
             :rules="[$valid.required('common.label')]"
             label='Label' />
-          <v-text-field v-model='link.href'
+          <v-text-field
+            v-model='link.href'
             :rules="[$valid.required('common.url')]"
             :label="$t('common.url')" />
         </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn variant='outlined' @click='linkModal=false' color='error'> {{$t('common.cancel')}}</v-btn>
-        <v-btn variant='outlined' @click='addFooterLink' color='primary' :disabled='!valid'> {{$t('common.add')}}</v-btn>
+        <v-btn variant='outlined' color='error' @click='linkModal=false'> {{$t('common.cancel')}}</v-btn>
+        <v-btn variant='outlined' color='primary' :disabled='!valid' @click='addFooterLink'> {{$t('common.add')}}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -332,18 +336,18 @@ const custom_js = manageSetting('custom_js')
   <div>
     <div class="text-h5 mb-4">{{ $t('admin.footer_links') }}</div>
     <div>
-      <v-btn color='primary' variant='text' @click='openLinkModal' prepend-icon='mdi-plus'> {{$t('admin.add_link')}}</v-btn>
-      <v-btn color='warning' variant='text' @click='resetFooterLinks' prepend-icon='mdi-restore'>{{$t('common.reset')}}</v-btn>
+      <v-btn color='primary' variant='text' prepend-icon='mdi-plus' @click='openLinkModal'> {{$t('admin.add_link')}}</v-btn>
+      <v-btn color='warning' variant='text' prepend-icon='mdi-restore' @click='resetFooterLinks'>{{$t('common.reset')}}</v-btn>
       <v-card>
         <v-list class='mt-1'>
           <v-list-item
             v-for='(link, idx) in settings.footerLinks'
             :key='`${link.label}`' @click='editFooterLink(link)'>
 
-              <v-list-item-title>{{$t(link.label)}}</v-list-item-title>
-              <v-list-item-subtitle>{{link.href}}</v-list-item-subtitle>
+            <v-list-item-title>{{$t(link.label)}}</v-list-item-title>
+            <v-list-item-subtitle>{{link.href}}</v-list-item-subtitle>
             <template v-slot:append>
-              <v-btn variant='text' size='small' class='left' v-if='idx !== 0' icon='mdi-chevron-up' color='warn' @click.stop='moveUpFooterLink(link, idx)' />
+              <v-btn v-if='idx !== 0' variant='text' size='small' class='float-left' icon='mdi-chevron-up' color='warn' @click.stop='moveUpFooterLink(link, idx)' />
               <v-btn variant='text' size='small' class='float-right' icon='mdi-delete-forever' color='error' @click.stop='removeFooterLink(link)' />
             </template>
           </v-list-item>

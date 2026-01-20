@@ -6,12 +6,12 @@
 // await loadSettings()
 <!-- </script> -->
 <template>
-  <v-app>
-    <v-main>
-      <CoreDialog />
-      <NuxtPage />
-    </v-main>
-    <CoreNotification />
-    <CoreFooter />
-  </v-app>
+<v-app>
+  <v-main>
+    <CoreDialog />
+    <NuxtPage />
+  </v-main>
+  <CoreNotification />
+  <CoreFooter />
+</v-app>
 </template>

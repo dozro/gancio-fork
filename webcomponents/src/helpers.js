@@ -1,18 +1,17 @@
-function formatDatetime(timestamp, type = 'long', addTimezone = false ) {
+function formatDatetime(timestamp, type = 'long', addTimezone = false) {
   const options =
     type === 'long'
       ? {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        ...(addTimezone && { timeZoneName: 'short' })
-      }
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          ...(addTimezone && { timeZoneName: 'short' })
+        }
       : { hour: '2-digit', minute: '2-digit' }
   return new Date(timestamp * 1000).toLocaleString(undefined, options)
 }
-
 
 export function when(event) {
   const addTimezone = event.ap_id || event.place.name === 'online'

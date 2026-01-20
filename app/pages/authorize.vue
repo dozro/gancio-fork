@@ -8,7 +8,7 @@ const { user } = useUserSession()
 const settings = useState<Settings>('settings')
 const route = useRoute()
 const { transactionID, client, scope, redirect_uri } = route.query
-useHead( () => {
+useHead(() => {
   return { title: `${settings.value.title} - Authorize` }
 })
 </script>

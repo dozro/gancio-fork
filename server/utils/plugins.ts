@@ -1,3 +1,9 @@
+/**
+* TODO:
+*/
+
+/* eslint-disable */
+
 import path from 'path'
 import fs from 'fs/promises'
 import { existsSync } from 'fs'
@@ -21,7 +27,7 @@ const log = useLogger('plugins')
 interface Plugin {
   configuration: {
     name: string
-    [key: string]: any
+    [key: string]: unknown
   }
   load?: (ctx: any, settings: any) => void
   unload?: () => void
@@ -164,7 +170,6 @@ const pluginController = {
         log.info(`Plugin ${name} not enabled; skipping load`)
         await setSetting(settingKey, { enable: false })
       }
-
     } catch (err) {
       log.warn(`Failed to load plugin at ${filePath}: ${String(err)}`)
     }

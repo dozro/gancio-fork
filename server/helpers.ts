@@ -57,7 +57,6 @@ const config = getConfig()
 //   return node
 // })
 
-
 // class HttpError extends Error {
 //   constructor(status, message) {
 //     super(message);
@@ -218,7 +217,6 @@ export function sanitizeHTML(html: string) {
 //   next()
 // },
 
-
 async function readableWebToNodeStream(webStream) {
   const reader = webStream.getReader()
   return new Readable({
@@ -248,7 +246,7 @@ export async function getImageFromURL(url: string, name: string, focalpoint: [nu
   const srcStream = await readableWebToNodeStream(response.body)
   srcStream.pipe(sharpStream)
   return Promise.all(promises)
-    .then(res => {
+    .then((res) => {
       const info = res[1]
       return {
         name,
@@ -259,18 +257,16 @@ export async function getImageFromURL(url: string, name: string, focalpoint: [nu
         focalpoint
       }
     })
-    .catch(err => {
+    .catch((err) => {
       log.error(err)
       throw err
     })
 }
 
 export function isHiddenService(domain) {
-  const pattern = /^(http:\/\/)?[a-zA-Z0-9]+\.(onion|i2p)\/?$/;
+  const pattern = /^(http:\/\/)?[a-zA-Z0-9]+\.(onion|i2p)\/?$/
   return pattern.test(domain.hostname)
 }
-
-
 
 /**
  * Import events from url

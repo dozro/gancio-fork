@@ -98,6 +98,7 @@
     "@nuxt/eslint": "^1.12.1",
     "@nuxt/test-utils": "^3.23.0",
     "@sequelize/mariadb": "^7.0.0-alpha.47",
+    "@stylistic/eslint-plugin": "^5.7.0",
     "@types/bcrypt": "^6.0.0",
     "@types/email-templates": "^10.0.4",
     "@types/luxon": "^3.7.1",
@@ -113,6 +114,8 @@
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "email-templates": "^13.0.1",
+    "eslint": "^9.39.2",
+    "eslint-plugin-vuetify": "^2.5.3",
     "h3": "^1.15.4",
     "happy-dom": "^20.3.0",
     "ics": "^3.8.1",
@@ -126,7 +129,6 @@
     "nitropack": "^2.13.0",
     "npm-packlist": "^10.0.3",
     "playwright-core": "^1.57.0",
-    "prettier": "^3.8.0",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
@@ -149,8 +151,14 @@
       "sharp"
     ],
     "supportedArchitectures": {
-      "os": ["current", "linux"],
-      "cpu": ["x64", "arm64"]
+      "os": [
+        "current",
+        "linux"
+      ],
+      "cpu": [
+        "x64",
+        "arm64"
+      ]
     }
   },
   "trustedDependencies": [

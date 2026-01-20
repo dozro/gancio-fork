@@ -7,7 +7,7 @@ if (!data.value) {
   throw createError({ status: 404, statusMessage: `Place ${route.params?.id} not found` })
 }
 
-useHead( () => {
+useHead(() => {
   const title = `${settings.value.title} - ${data.value?.place?.name}`
   return {
     title,
@@ -29,7 +29,7 @@ useHead( () => {
   <!-- Map -->
   <div v-if='settings?.allow_geolocation && data.place?.latitude && data.place?.longitude' >
     <div class="mt-4 mx-auto px-4" >
-      <Map :place='data.place' /> 
+      <Map :place='data.place' />
       <!-- :height='mapHeight' /> -->
     </div>
     <div class="mt-4">
@@ -39,25 +39,27 @@ useHead( () => {
 
   <!-- Events -->
   <section class='events mt-sm-4 mt-2'>
-    <v-lazy class='event' :modelValue='idx<9'
+    <v-lazy
       v-for='(event, idx) in data.events' :key='event.id'
+      class='event' :model-value='idx<9'
       :min-height='settings.hide_thumbs ? 105 : undefined'
       :options="{ threshold: .5, rootMargin: '500px' }"
-      >
+    >
       <!-- :class="{ 'theme--dark': is_dark }"> -->
-        <EventCard :event='event' :lazy='idx>9' />    
+      <EventCard :event='event' :lazy='idx>9' />
     </v-lazy>
   </section>
 
   <!-- Past Events -->
-  <h2 class='mt-14 mb-3' v-if="data?.pastEvents.length">{{$t('common.past_events')}}</h2>
-  <section class="events" v-if="data?.pastEvents.length">
-    <v-lazy class='event' :modelValue='idx<9'
+  <h2 v-if="data?.pastEvents.length" class='mt-14 mb-3'>{{$t('common.past_events')}}</h2>
+  <section v-if="data?.pastEvents.length" class="events">
+    <v-lazy
       v-for='(event, idx) in data.pastEvents' :key='event.id'
+      class='event' :model-value='idx<9'
       :min-height='settings.hide_thumbs ? 105 : undefined'
       :options="{ threshold: .5, rootMargin: '500px' }">
-        <!-- :class="{ 'theme--dark': is_dark }"> -->
-      <EventCard :event='event' :lazy='idx>9' />    
+      <!-- :class="{ 'theme--dark': is_dark }"> -->
+      <EventCard :event='event' :lazy='idx>9' />
     </v-lazy>
   </section>
 

@@ -9,7 +9,6 @@ import * as linkify from 'linkifyjs'
  * @param {string} password - password
  * @param {string} description - description
  */
- 
 
 // TODO
 // const userSchema = z.object({
@@ -18,17 +17,18 @@ import * as linkify from 'linkifyjs'
 //   description: z.string().min(5).max(255).optional()
 // })
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   const log = useLogger('register')
-  
+
   // const user = await readValidatedBody(event, userSchema.parse)
   const user = await readBody(event)
-  
-  if (!publicSettings.allow_registration) { throw createError({ status: 404, message: 'Not found' }) }
+
+  if (!publicSettings.allow_registration) {
+    throw createError({ status: 404, message: 'Not found' })
+  }
 
   const n_users = await User.count()
   try {
-
     // the first registered user will be an active admin
     if (n_users === 0) {
       log.info('First registered user will be an admin')
@@ -51,11 +51,10 @@ export default defineEventHandler(async event => {
     const userInstance = await User.create(user)
     log.info(`Sending registration email to ${user.email} and registration confirmation to admins`)
     const config = useRuntimeConfig()
-    enqueueMail(user.email, 'register', { user, config }) //, TODO publicSettings.locals.locale)
+    enqueueMail(user.email, 'register', { user, config }) // , TODO publicSettings.locals.locale)
 
     notifyAdmins('admin_register', { user, config })
     return userInstance
-
   } catch (e) {
     log.error(String(e))
     throw createError({ status: 400, statusMessage: String(e) })

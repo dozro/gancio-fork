@@ -1,17 +1,37 @@
-// @ts-check
 import withNuxt from './.nuxt/eslint.config.mjs'
 import vuetify from 'eslint-plugin-vuetify'
+import { globalIgnores } from 'eslint/config'
+import stylistic from '@stylistic/eslint-plugin'
 
 export default withNuxt([
+  globalIgnores([
+    'wp-plugin/js/*',
+    'server/migrations/*',
+    'docs/assets/*',
+    'tests/*'
+  ]),
+  stylistic.configs.recommended,
   ...vuetify.configs['flat/base'],
   {
+    plugins: {
+      '@stylistic': stylistic
+    },
     rules: {
+      '@stylistic/semi': ['error', 'never'],
+      '@stylistic/brace-style': 'off',
+      '@stylistic/space-before-function-paren': 'off',
+      '@stylistic/comma-dangle': 'off',
+      '@stylistic/operator-linebreak': 'off',
+      // do not enforce v-slot style
       'vue/v-slot-style': 'off',
-      "vue/valid-v-slot": ["error", {
-        "allowModifiers": true
+      'vue/html-indent': ['error', 2, {
+        attribute: 1,
+        baseIndent: 0,
+        closeBracket: 0,
+        alignAttributesVertically: false,
+        ignores: []
       }],
-      'vue/attributes-order': 'off',
-      'vue/no-v-text-v-html-on-component': 'off'
     }
   }
+
 ])

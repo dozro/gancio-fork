@@ -1,13 +1,13 @@
-import { Event } from "#imports"
-import { parseMultipartFormData, saveUploadedEventImage } from "~~/server/utils/parseMultipartForm"
-import type { MultiPartData } from "h3"
-import { DateTime } from "luxon"
-import { findOrCreatePlace } from "~~/server/lib/places"
-import { getImageFromURL, sanitizeHTML } from "~~/server/helpers"
-import linkifyHtml from "linkify-html"
-import { findOrCreateTags } from "~~/server/lib/tags"
-import { mapEvent } from "~~/server/utils/events"
-import { CreationAttributes } from "@sequelize/core"
+import { Event } from '#imports'
+import { parseMultipartFormData, saveUploadedEventImage } from '~~/server/utils/parseMultipartForm'
+import type { MultiPartData } from 'h3'
+import { DateTime } from 'luxon'
+import { findOrCreatePlace } from '~~/server/lib/places'
+import { getImageFromURL, sanitizeHTML } from '~~/server/helpers'
+import linkifyHtml from 'linkify-html'
+import { findOrCreateTags } from '~~/server/lib/tags'
+import { mapEvent } from '~~/server/utils/events'
+import type { CreationAttributes } from '@sequelize/core'
 
 /**
  * Add a new event
@@ -31,7 +31,7 @@ import { CreationAttributes } from "@sequelize/core"
  * @param {string} [image_url] - Image URL
  * @todo Multiple images upload
  */
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   const log = useLogger('New event')
   const user = await getUser(evt)
   log.info(user, publicSettings.allow_anon_event)
@@ -119,7 +119,6 @@ export default defineEventHandler(async evt => {
 
   // do we have an image?
   if (body.image || body.image_url) {
-
     let focalpoint = body.image_focalpoint ? body.image_focalpoint?.split(',') : ['0', '0']
     focalpoint = [parseFloat(parseFloat(focalpoint[0]).toFixed(2)), parseFloat(parseFloat(focalpoint[1]).toFixed(2))]
 

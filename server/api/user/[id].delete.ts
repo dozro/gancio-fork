@@ -1,10 +1,10 @@
-import { Event } from "#imports"
+import { Event } from '#imports'
 
 /**
  * Delete a user by id and disassociate all events created by this user
  * @auth admin
  */
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const log = useLogger('user delete')
   const id = getRouterParam(event, 'id')

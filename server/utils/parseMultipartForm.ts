@@ -1,15 +1,16 @@
-import type { H3Event, MultiPartData } from "h3"
-import { get as getConfig } from "../config"
-import path from "path"
-import sharp from "sharp"
+import type { H3Event, MultiPartData } from 'h3'
+import { get as getConfig } from '../config'
+import path from 'path'
+import sharp from 'sharp'
 import { getThumbnailsPath } from "./directories"
+
 const log = useLogger('parseMultipartForm')
 
 export async function parseMultipartFormData(event: H3Event) {
   const form = await readMultipartFormData(event)
   if (!form) return
 
-  const fields: Record<string, any> = {}
+  const fields: Record<string, unknown> = {}
 
   for (const item of form) {
     if (!item.name) continue

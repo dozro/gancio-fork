@@ -1,8 +1,7 @@
-import { Event } from "#imports"
-import { Cast, fn, col, sql } from "@sequelize/core"
-import { DateTime } from "luxon"
+import { Event } from '#imports'
+import { DateTime } from 'luxon'
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   await requireUserSession(event)
   const log = useLogger('event/unconfirmed')
   try {
@@ -23,9 +22,9 @@ export default defineEventHandler(async event => {
       ],
       // group: [col('event', 'id'), col('place.id')],
     })
-    
+
     const now = DateTime.local().toUnixInteger()
-    return ({ events: events.filter(e => e.start_datetime >= now) , oldEvents: events.filter(e => e.start_datetime < now) })
+    return ({ events: events.filter(e => e.start_datetime >= now), oldEvents: events.filter(e => e.start_datetime < now) })
   } catch (e) {
     log.info(String(e))
     throw createError({ statusCode: 400, statusMessage: String(e) })

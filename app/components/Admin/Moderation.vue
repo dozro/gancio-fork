@@ -20,7 +20,7 @@ const resourcesHeader = [
   { value: 'content', text: t('common.content') },
   { value: 'actions', text: t('common.actions') }
 ]
- 
+
 const { data: instances } = await useFetch('/api/instances')
 const { data: users } = await useFetch(`/api/instances/${instances?.[0]?.domain}`)
 const { data: resources } = await useFetch('/api/resources')
@@ -35,7 +35,7 @@ const { data: resources } = await useFetch('/api/resources')
 //   this.users = await this.$axios.$get(`/instances/${instance.domain}`)
 //   this.resources = await this.$axios.$get('/resources', { filters: { instance: instance.domain } })
 // }
-// 
+//
 async function hideResource (resource, hidden) {
   await $fetch(`/resources/${resource.id}`, { method: 'POST', body: hidden })
   resource.hidden = hidden
@@ -44,15 +44,19 @@ async function hideResource (resource, hidden) {
 async function toggleUserBlock (ap_user) {
   if (!ap_user.blocked) {
     const ret = await $confirm('admin.user_block_confirm', { user: ap_user?.object?.preferredUsername })
-    if (!ret) { return }
+    if (!ret) {
+      return
+    }
   }
-  await $fetch('/ap_actors/toggle_block', { method: 'POST', body: { ap_id: ap_user.ap_id }})
+  await $fetch('/ap_actors/toggle_block', { method: 'POST', body: { ap_id: ap_user.ap_id } })
   ap_user.blocked = !ap_user.blocked
 }
 
 async function deleteResource (resource) {
   const ret = await $confirm('admin.delete_resource_confirm')
-  if (!ret) { return }
+  if (!ret) {
+    return
+  }
 
   await $fetch(`/resources/${resource.id}`, { method: 'DELETE' })
   resources = resources.filter(r => r.id !== resource.id)
@@ -61,7 +65,9 @@ async function deleteResource (resource) {
 async function toggleBlock (instance) {
   if (!instance.blocked) {
     const ret = await $confirm('admin.instance_block_confirm', { instance: instance.domain })
-    if (!ret) { return }
+    if (!ret) {
+      return
+    }
   }
   await $fetch('/instances/toggle_block', { method: 'POST', body: { instance: instance.domain, blocked: !instance.blocked } })
   instance.blocked = !instance.blocked
@@ -81,12 +87,12 @@ async function toggleBlock (instance) {
           :items-per-page="5"
           :search="instancesFilter"
           :hide-default-footer="instances.length<5"
-          dense
+          density="compact"
           :headers="instancesHeader"
           @click:row="instanceSelected"
         >
           <template v-slot:item.blocked="{ item }">
-            <v-icon @click="toggleBlock(item)" icon="item.blocked ? 'mdi-checkbox-intermediate' : 'mdi-checkbox-blank-outline'" />
+            <v-icon icon="item.blocked ? 'mdi-checkbox-intermediate' : 'mdi-checkbox-blank-outline'" @click="toggleBlock(item)" />
           </template>
         </v-data-table>
       </v-col>
@@ -99,7 +105,7 @@ async function toggleBlock (instance) {
           :items-per-page="5"
           :search="usersFilter"
           :hide-default-footer="users.length<5"
-          dense
+          density="compact"
           :headers="usersHeader"
         >
           <template v-slot:item.blocked="{ item }">
@@ -113,7 +119,7 @@ async function toggleBlock (instance) {
       <v-card-title>{{ $t('common.resources') }}</v-card-title>
       <v-data-table
         :items="resources"
-        dense
+        density="compact"
         :headers="resourcesHeader"
         :hide-default-footer="resources.length<10"
         :items-per-page="10"
@@ -131,26 +137,26 @@ async function toggleBlock (instance) {
           <nuxt-link :to="`/event/${item.event.slug || item.event.id}`">{{ item.event.title }}</nuxt-link>
         </template>
         <template v-slot:item.actions="{ item }">
-          <v-menu offset-y>
-            <template v-slot:activator="{ on }">
-              <v-btn class="mr-2" v-on="on" color="primary" small icon='mdi-dots-vertical' />
+          <v-menu>
+            <template v-slot:activator="{ props }">
+              <v-btn class="mr-2" v-bind="props" color="primary" size="small" icon='mdi-dots-vertical' />
             </template>
             <v-list>
               <v-list-item v-if="!item.hidden" @click="hideResource(item, true)">
                 <v-list-item-title>
-                  <v-icon left v-text="mdiEyeOff"></v-icon>
+                  <v-icon start icon='mdi-eye-off' />
                   {{ $t('admin.hide_resource') }}
                 </v-list-item-title>
               </v-list-item>
               <v-list-item v-else @click="hideResource(item, false)">
                 <v-list-item-title>
-                  <v-icon left v-text="mdiEye"></v-icon>
+                  <v-icon start icon='mdi-eye' />
                   {{ $t('admin.show_resource') }}
                 </v-list-item-title>
               </v-list-item>
               <v-list-item @click="deleteResource(item)">
                 <v-list-item-title>
-                  <v-icon left v-text="mdiDelete"></v-icon>
+                  <v-icon start icon='mdi-delete' />
                   {{ $t('admin.delete_resource') }}
                 </v-list-item-title>
               </v-list-item>

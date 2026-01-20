@@ -15,7 +15,6 @@ const headers = [
   { value: 'actions', title: t('common.actions'), align: 'end' }
 ]
 
-
 const { data: tags, refresh } = await useFetch('/api/tags/list')
 
 function editTag(item) {
@@ -40,12 +39,14 @@ async function saveTag () {
 
 async function removeTag (tag) {
   const ret = await $confirm('admin.delete_tag_confirm', { tag: tag.tag, n: tag.count })
-  if (!ret) { return }
+  if (!ret) {
+    return
+  }
   try {
     $fetch(`/api/tags`, { method: 'DELETE', body: { tag: tag.tag } })
     refresh()
   } catch (e) {
-    $notify(err, Statuses.ERROR)
+    $notify(e, Statuses.ERROR)
   }
 }
 </script>
@@ -56,14 +57,14 @@ async function removeTag (tag) {
     <CoreSearchInput v-model="search" class="w-100 w-sm-25"/>
   </div>
 
-  <v-dialog v-model='dialog' width='600' :fullscreen='$vuetify.display?.mobile' v-if='dialog'>
+  <v-dialog v-if='dialog' v-model='dialog' width='600' :fullscreen='$vuetify.display?.mobile'>
     <v-card>
       <v-card-title> {{$t('admin.edit_tag')}} -
         <strong class='ml-2'> {{tag.tag}}</strong>
       </v-card-title>
       <v-card-subtitle> {{$t('admin.edit_tag_help', tag.count)}}</v-card-subtitle>
       <v-card-text>
-        <v-form v-model='valid' ref='form'>
+        <v-form ref='form' v-model='valid'>
           <v-combobox
             v-model='newTag'
             v-model:search="newTag"
@@ -76,22 +77,22 @@ async function removeTag (tag) {
             item-title='tag'
             :label="$t('common.tag')"
             @keyup.enter='saveTag'>
-              <template #item="{ item, props }">
-                <v-list-item v-bind="props">
-                  <template #title>
-                    "{{item.raw.tag}}" <small>({{item.raw.count}})</small>
-                  </template>
-                </v-list-item>
-              </template>
-            </v-combobox>
+            <template #item="{ item, props }">
+              <v-list-item v-bind="props">
+                <template #title>
+                  "{{item.raw.tag}}" <small>({{item.raw.count}})</small>
+                </template>
+              </v-list-item>
+            </template>
+          </v-combobox>
         </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn @click='dialog = false' variant='outlined' color='warning'> {{ $t('common.cancel') }}</v-btn>
+        <v-btn variant='outlined' color='warning' @click='dialog = false'> {{ $t('common.cancel') }}</v-btn>
         <v-btn
-          @click='saveTag' color='primary' variant='outlined' :loading='loading'
-          :disabled='!newTag || loading'> {{ $t('common.save') }}</v-btn>
+          color='primary' variant='outlined' :loading='loading' :disabled='!newTag || loading'
+          @click='saveTag'> {{ $t('common.save') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -103,9 +104,9 @@ async function removeTag (tag) {
       :hide-default-footer='tags?.length < 5'
       :search='search'>
       <template v-slot:item.actions='{ item }'>
-        <t-btn @click='editTag(item)' color='primary' :tooltip="$t('common.edit')" icon='mdi-pencil' />
+        <t-btn color='primary' :tooltip="$t('common.edit')" icon='mdi-pencil' @click='editTag(item)' />
         <t-btn :to='`/tag/${item.tag}`' color='success'  :tooltip="$t('common.preview')" icon='mdi-eye' />
-        <t-btn @click='removeTag(item)' color='error' :tooltip="$t('common.delete')" icon='mdi-delete-forever' />
+        <t-btn color='error' :tooltip="$t('common.delete')" icon='mdi-delete-forever' @click='removeTag(item)' />
       </template>
     </v-data-table>
   </div>

@@ -1,6 +1,8 @@
 /**
  * This is a beta ics feed importer
  */
+
+/* eslint-disable */
 const plugin = {
   configuration: {
     name: 'Feed',
@@ -46,13 +48,13 @@ const plugin = {
     plugin.db = gancio.db
     plugin.settings = settings // this plugin settings
 
-    plugin.log.info("Feed plugin loaded!")
+    plugin.log.info('Feed plugin loaded!')
     plugin.apiBaseUrl = gancio.settings.baseurl + '/api'
     plugin.log.debug(`[FEED Plugin] Using API base: ${plugin.apiBaseUrl}`)
 
     // TODO: could use the TaskManager?
     if (settings.refresh_minutes > 0) {
-      plugin.interval = setInterval(this._tick, settings.refresh_minutes*1000*60)
+      plugin.interval = setInterval(this._tick, settings.refresh_minutes * 1000 * 60)
     } else {
       this._tick()
     }
@@ -126,8 +128,8 @@ const plugin = {
           })
 
           if (exists) {
-            plugin.log.debug(`[FEED Plugin] Event ${evt.title} already exists, do not add it`);
-            continue;
+            plugin.log.debug(`[FEED Plugin] Event ${evt.title} already exists, do not add it`)
+            continue
           }
 
           plugin.log.debug(`[FEED Plugin] Adding event: ${evt.title} `)
@@ -150,7 +152,7 @@ const plugin = {
               plugin.log.debug(`[FEED Plugin] Place ${place.name} already exists, do not add it`)
             } else {
               plugin.log.debug(`[FEED Plugin] Create a new place: ${placeName}`)
-              place = await plugin.db.models.place.create({ name: placeName, address: address });
+              place = await plugin.db.models.place.create({ name: placeName, address: address })
             }
             const dbEvent = await plugin.db.models.event.create(evt)
             await dbEvent.setPlace(place)
@@ -164,7 +166,6 @@ const plugin = {
         console.error(e)
         plugin.log.error(`[FEED Plugin] Error fetching ics "${plugin.settings?.feed_URL}": ${String(e)}`)
       }
-
     } catch (e) {
       console.error(e)
       plugin.log.error(e)

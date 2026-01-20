@@ -1,7 +1,6 @@
-import { Event } from "#imports"
+import { Event } from '#imports'
 
-export default defineEventHandler(async event => {
-
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
 
   const nodeinfo_version = event.context.params?.nodeinfo_version ?? '2.0'
@@ -23,7 +22,7 @@ export default defineEventHandler(async event => {
     software: {
       name: 'gancio',
       config: config.public.version,
-      ...(nodeinfo_version === '2.1' && { repository : 'https://framagit.org/les/gancio' })
+      ...(nodeinfo_version === '2.1' && { repository: 'https://framagit.org/les/gancio' })
     },
     version: event.context?.params?.nodeinfo_version ?? '2.1',
     usage: {
@@ -34,5 +33,4 @@ export default defineEventHandler(async event => {
       }
     }
   }
-
 })

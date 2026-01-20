@@ -5,17 +5,17 @@ import { refDebounced } from '@vueuse/core'
 const settings = useState<Settings>('settings')
 
 interface Place {
-  name?: string,
-  address?: string,
-  online?: boolean,
+  name?: string
+  address?: string
+  online?: boolean
   create?: boolean
 }
 
-const event = defineModel<EventAPI>('event', { type: Object, required: true } )
+const event = defineModel<EventAPI>('event', { type: Object, required: true })
 // const modelValue = defineModel('modelValue', { type: Object, default: () => ({ name: '', address: '' }) })
 
 const whereInputAdvancedDialog = ref(false)
-const onlineLocations = ref([])
+// const onlineLocations = ref([])
 
 const disableAddress = computed(() => !!event.value?.place?.id)
 const isOnLine = computed(() => settings.value.allow_online_event && 'online' === event?.value?.place?.name)
@@ -40,15 +40,15 @@ const { data: places } = await useFetch<Place[]>('/api/places', { params: { quer
     if (settings.value.allow_online_event) {
       places.push({ online: true, name: 'online', props: { prependIcon: 'mdi-laptop-account', color: 'primary' } })
     }
-    if (!search.value && places.length) { 
-      return places 
+    if (!search.value && places.length) {
+      return places
     }
     const matches = places.find(p => search.value === p.name?.toLocaleLowerCase())
     if (!matches && search.value) {
       places.unshift({ create: true, name: search.value.trim(), props: { prependIcon: 'mdi-plus', color: 'primary' } })
     }
     return places
-  }})
+  } })
 
 function selectPlace (place) {
   if (typeof place === 'string') {
@@ -60,30 +60,30 @@ function selectPlace (place) {
 
 </script>
 <template>
-<v-row class="mb-4" v-if="event.place">
+<v-row v-if="event.place" class="mb-4">
   <v-col cols="12" md="4">
     <v-combobox
       ref="place"
+      v-model:search.trim.toLowerCase='search'
       :rules="[$valid.required('common.where')]"
       :label="$t('common.where')"
       :model-value="event.place.name"
-      @update:model-value="selectPlace"
       no-filter
       prepend-icon="mdi-map-marker"
       hide-no-data
-      v-model:search.trim.toLowerCase='search'
       density='default'
       :hint="$t('event.where_description')"
       persistent-hint
       :items="places"
       item-title='name'
+      @update:model-value="selectPlace"
     >
-        
+
       <template #item="{ item, props }">
         <v-list-item v-bind='props'>
-          <template #title v-if='item.raw.create'>{{ $t('common.add')}} {{ item.raw.name }}</template>
-          <template #title v-else>{{ item.raw.name }}</template>
-          <template #subtitle v-if='item.raw.address'>{{ item.raw.address }}</template>
+          <template v-if='item.raw.create' #title>{{ $t('common.add')}} {{ item.raw.name }}</template>
+          <template v-else #title>{{ item.raw.name }}</template>
+          <template v-if='item.raw.address' #subtitle>{{ item.raw.address }}</template>
           <!-- <v-list-item-title v-if="item?.create" prepend-icon='mdi-plus' color='primary':aria-label='$t("common.add")'> {{$t('common.add')}} <strong>{{item?.name}}</strong></v-list-item-title>
           <v-list-item-title v-else-if="item?.online" prepend-icon='mdi-laptop-account'
             color='primary' :aria-label='$t("common.online")'> {{$t('common.online')}}</v-list-item-title>
@@ -92,11 +92,11 @@ function selectPlace (place) {
       </template>
     </v-combobox>
   </v-col>
-  
+
   <!-- address -->
-  <v-col cols="12" :md="settings.allow_online_event?5:8" v-if="!isOnLine">
+  <v-col v-if="!isOnLine" cols="12" :md="settings.allow_online_event?5:8">
     <v-text-field
-      class="mr-4" ref="address" v-model="event.place.address" prepend-icon="mdi-map" :disabled="disableAddress" 
+      ref="address" v-model="event.place.address" class="mr-4" prepend-icon="mdi-map" :disabled="disableAddress"
       :rules="[ v => disableAddress ? true : $valid.required('common.address')(v)]" :label="$t('common.address')"
       :hint="$t('event.address_description')" persistent-hint>
       <template v-if="showAdvancedDialogButton" #append>
@@ -104,10 +104,10 @@ function selectPlace (place) {
       </template>
     </v-text-field>
   </v-col>
-  
-  <v-col cols="12" :md="isOnLine?8:3" v-if="settings.allow_online_event">
+
+  <v-col v-if="settings.allow_online_event" cols="12" :md="isOnLine?8:3">
     <v-combobox
-      class="mr-4" v-model="event.online_locations"
+      v-model="event.online_locations" class="mr-4"
       prepend-icon="mdi-link" :hint="$t('event.online_locations_help')"
       :label="$t('event.online_locations')"
       :rules="isOnLine ? [$valid.required('event.online_locations')] : []"
@@ -119,7 +119,7 @@ function selectPlace (place) {
       hide-selected
       persistent-hint
       :delimiters="[',', ';', '; ']" />
-      <!-- <template #chip="{ item, index, props }">
+    <!-- <template #chip="{ item, index, props }">
         <v-chip v-bind="props" :outlined="index !== 0" closable close-icon="mdi-close-circle" @click:close="label="label" small="small">{{ item }}</v-chip>
       </template> -->
     <!-- </v-combobox> -->
@@ -131,9 +131,9 @@ function selectPlace (place) {
     <WhereInputAdvanced
       v-model:place="event.place" @close="whereInputAdvancedDialog = false" />
   </v-dialog>
-  
+
 </v-row>
-    
+
 </template>
 <!-- // import { mdiMap, mdiMapMarker, mdiPlus, mdiCog, mdiLink, mdiCloseCircle, mdiLaptopAccount, mdiMapSearch } from '@mdi/js'
 // import { mapState } from 'vuex'
@@ -193,8 +193,8 @@ function selectPlace (place) {
 //         this.places.push({ online: true, name: 'online' })
 //       }
 
-//       if (!search && this.places.length) { 
-//         return this.places 
+//       if (!search && this.places.length) {
+//         return this.places
 //       }
 //       const matches = this.places.find(p => search === p.name.toLocaleLowerCase())
 //       if (!matches && search) {
@@ -218,7 +218,7 @@ function selectPlace (place) {
 //         }
 //         this.place.id = p.id
 //         // if (this.settings.allow_event_only_online && this.place.name === 'online') {
-//         //   this.event_only_online = true 
+//         //   this.event_only_online = true
 //         // }
 //         this.disableAddress = true
 //       } else { // this is a new place
@@ -256,7 +256,7 @@ function selectPlace (place) {
 //         }
 //         // Remove duplicates
 //         this.$nextTick(() => this.onlineLocations = [...new Set(this.onlineLocations)])
-        
+
 //         this.onlineLocations.forEach((item, i) => {
 //           if (!item.startsWith('http')) { this.onlineLocations[i] = `https://${item}` }
 //           this.event.online_locations[i] = this.onlineLocations[i]

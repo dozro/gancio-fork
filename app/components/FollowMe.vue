@@ -1,12 +1,13 @@
 <script setup lang='ts'>
 import debounce from 'lodash/debounce'
 defineProps({ isDialog: { type: Boolean, default: false } })
+defineEmits(['close'])
 
 const instance_hostname = ref('')
 const proceed = ref(false)
-const instance = ref({})
+const instance = ref({ title: '', thumbnail: '' })
 const loading = ref(false)
-      
+
 const { data: stats } = useFetch('/api/ap_actors/stats')
 const settings = useState<Settings>('settings')
 
@@ -18,12 +19,12 @@ const getInstanceInfo = debounce(() => {
   loading.value = true
   const instance_url = `https://${instance_hostname.value}/api/v1/instance`
   $fetch(instance_url)
-    .then(ret => {
+    .then((ret) => {
       instance.value = ret
       proceed.value = true
       loading.value = false
     })
-    .catch(e => {
+    .catch((_e) => {
       instance.value = {}
       proceed.value = false
       loading.value = false
@@ -32,7 +33,9 @@ const getInstanceInfo = debounce(() => {
 </script>
 <template>
 <v-card>
-  <v-card-title class="bg-primary" v-text="$t('common.follow_me_title')" />
+  <v-card-title class="bg-primary" >
+    {{ $t('common.follow_me_title')}}
+  </v-card-title>
   <v-card-text>
     <v-alert class='mb-4' type="info" border="start" icon="mdi-information">
       {{$t('admin.stats', stats)}}
@@ -40,10 +43,10 @@ const getInstanceInfo = debounce(() => {
 
     <p v-html="$t('event.follow_me_description', { title: settings.title, account: `@${settings.instance_name}@${settings.hostname}`})" />
     <v-text-field
+      v-model="instance_hostname"
       :rules="[$valid.required('common.url')]"
       :loading="loading"
       :label="$t('common.url')"
-      v-model="instance_hostname"
       @update:model-value="getInstanceInfo"
     >
       <template v-if="!isDialog" #prepend>

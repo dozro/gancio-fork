@@ -2,7 +2,6 @@ import { Op, col, where, fn } from '@sequelize/core'
 import { useLogger } from '../utils/useLogger'
 const log = useLogger('tags')
 
-
 export async function findOrCreateTags (tags) {
   if (!Array.isArray(tags) || tags.length === 0) {
     return []
@@ -37,16 +36,18 @@ export async function findOrCreateTags (tags) {
 }
 
 export async function cleanOrphanTags () {
-    const tags = await Tag.findAll({
-      include: [{ model: Event, as: 'events', required: false, attributes: [], through: { attributes: [] } }],
-      group: ['tag'],
-      having: where(fn('COUNT', col('events.id')), Op.eq, 0)
-    })
+  const tags = await Tag.findAll({
+    include: [{ model: Event, as: 'events', required: false, attributes: [], through: { attributes: [] } }],
+    group: ['tag'],
+    having: where(fn('COUNT', col('events.id')), Op.eq, 0)
+  })
 
-    if (!tags.length) { return }
-    log.info(`Remove ${tags.length} orphan tags (${tags.map(p => p.tag).join(', ')})`)
-
-    await Tag.destroy({
-      where: { tag: { [Op.in]: tags.map(p => p.tag) } }
-    })
+  if (!tags.length) {
+    return
   }
+  log.info(`Remove ${tags.length} orphan tags (${tags.map(p => p.tag).join(', ')})`)
+
+  await Tag.destroy({
+    where: { tag: { [Op.in]: tags.map(p => p.tag) } }
+  })
+}
