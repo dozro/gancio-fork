@@ -1,4 +1,4 @@
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   const allowed_settings: Array<keyof Settings> = ['title', 'description', 'logo', 'baseurl', 'instance_name', 'hostname', 'about',
     'allow_registration', 'allow_anon_event', 'allow_multidate_event', 'allow_recurrent_event', 'allow_event_without_end_time',
     'allow_online_event', 'show_download_media', 'enable_moderation', 'enable_report', 'enable_federation',

@@ -1,6 +1,6 @@
-import { sendMail } from "~~/server/utils/sendMail"
+import { sendMail } from '~~/server/utils/sendMail'
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const setting = await readBody(event)
   await setSetting('smtp', setting)

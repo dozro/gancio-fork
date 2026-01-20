@@ -1,6 +1,6 @@
 /**
  * Task manager
- * 
+ *
  */
 
 import { Duration } from 'luxon'
@@ -14,7 +14,6 @@ const loopInterval = 60 // process.env.NODE_ENV === 'production' ? 1 : 1
 const minute = 1 * loopInterval
 const hour = minute * 60
 const day = hour * 24
-
 
 // Singleton instance
 let instance
@@ -30,8 +29,8 @@ export class Task {
     this.name = name
     this.method = method
     this.args = args
-    
-  this.repeat = repeat
+
+    this.repeat = repeat
     this.repeatDelay = repeatDelay
     this.processInNTick = callAtStart ? 1 : repeatDelay
     // retries on non-repeatable task only
@@ -43,13 +42,13 @@ export class Task {
     if (!this.repeat) {
       this.processInNTick = this.retries?.shift() ?? false
       if (this.processInNTick) {
-        log.info(`Error in ${this.name}: retring in `, Duration.fromMillis(this.processInNTick * 1000).rescale().toHuman({ listStyle: "long" }))
+        log.info(`Error in ${this.name}: retring in `, Duration.fromMillis(this.processInNTick * 1000).rescale().toHuman({ listStyle: 'long' }))
       } else {
         log.info('This was the last try processing this task')
       }
     }
   }
-  
+
   process () {
     this.processInNTick--
     if (this.processInNTick > 0) {
@@ -81,7 +80,7 @@ export class Task {
  * - Remove past federated events and related resources
  * - Remove unused ap actors
  */
- 
+
 export class TaskManager {
   constructor () {
     this.tasks = []
@@ -90,7 +89,6 @@ export class TaskManager {
   }
 
   start (interval = loopInterval) {
-  
     // create and clean recurrent events
     // this.add({
     //   name: 'CREATE_RECURRENT_EVENT',
@@ -98,7 +96,7 @@ export class TaskManager {
     //   repeatDelay: hour / 2, // check each half an hour
     //   repeat: true
     // })
-    
+
     this.add({
       name: 'CLEAN_UNUSED_PLACES',
       method: cleanOrphanPlaces,
@@ -106,11 +104,11 @@ export class TaskManager {
       repeat: true,
       callAtStart: true
     })
-    
+
     this.add({
       name: 'CLEAN_UNUSED_TAGS',
       method: cleanOrphanTags,
-      repeatDelay: day+10*minute,
+      repeatDelay: day + 10 * minute,
       repeat: true,
       callAtStart: true
     })
@@ -118,7 +116,7 @@ export class TaskManager {
     this.add({
       name: 'CLEAN_FEDIVERSE_PAST_EVENT',
       method: cleanPastEvents,
-      repeatDelay: 12*hour+5*minute,
+      repeatDelay: 12 * hour + 5 * minute,
       repeat: true,
       callAtStart: true,
     })
@@ -126,7 +124,7 @@ export class TaskManager {
     this.add({
       name: 'CLEAN_FEDIVERSE_AP_USERS',
       method: cleanUnusedAPActor,
-      repeatDelay: day+10*minute,
+      repeatDelay: day + 10 * minute,
       repeat: true,
       callAtStart: true
     })
@@ -143,10 +141,10 @@ export class TaskManager {
       this.timeout = false
     }
   }
-  
+
   add ({ name, repeat = false, repeatDelay = 0, callAtStart = false, retries = [20, 50], method, args = [] }) {
     if (repeat) {
-      log.info(`[TASK] Add ${name} (each ${Duration.fromMillis(repeatDelay * this.interval * 1000).rescale().toHuman({ listStyle: "long" })})`)
+      log.info(`[TASK] Add ${name} (each ${Duration.fromMillis(repeatDelay * this.interval * 1000).rescale().toHuman({ listStyle: 'long' })})`)
     } else {
       log.info(`[TASK] Add ${name}`)
     }

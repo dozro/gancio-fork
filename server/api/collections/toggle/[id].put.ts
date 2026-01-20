@@ -1,6 +1,5 @@
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
-  const log = useLogger('collection moveup')
   const id = Number(getRouterParam(event, 'id'))
 
   const collection = await Collection.findByPk(id)
@@ -10,5 +9,4 @@ export default defineEventHandler(async event => {
 
   await collection.update({ isTop: !collection.isTop })
   return !collection.isTop
-
 })

@@ -1,16 +1,7 @@
 <script setup>
-      // file: null,
-      // errorMessage: '',
-      // error: false,
-      // loading: false,
-      // valid: false,
-      // URL: '',
-      // event: {}
-  // methods: {
-
 const valid = ref(false)
 const loading = ref(false)
-const error = ref(false )
+const error = ref(false)
 const errorMessage = ref('')
 const file = ref()
 const URL = ref('')
@@ -79,14 +70,16 @@ async function importURL () {
 
   // this.loading = false
 }
+
+defineEmits(['imported', 'close'])
 </script>
 
 <template>
 <v-card>
   <v-card-title>{{ $t('common.import') }}</v-card-title>
   <v-card-text>
-    <p v-html="$t('event.import_description')"></p>
-    <v-form v-model="valid" ref="form" lazy-validation @submit.prevent="importGeneric">
+    <p v-html="$t('event.import_description')"/>
+    <v-form ref="form" v-model="valid" @submit.prevent="importGeneric">
       <v-row>
         <v-col class="col-xl-5 col-lg-5 col-md-7 col-sm-12 col-xs-12">
           <v-text-field
@@ -101,8 +94,8 @@ async function importURL () {
         </v-col>
         <v-col>
           <v-file-input
-            prepend-icon="mdi-attachment"
             v-model="file"
+            prepend-icon="mdi-attachment"
             accept=".ics"
             :label="$t('event.ics')"
             :hint="$t('event.import_ICS')"
@@ -113,9 +106,9 @@ async function importURL () {
     </v-form>
   </v-card-text>
   <v-card-actions>
-    <v-spacer></v-spacer>
-    <v-btn outlined @click="$emit('close')" color="warning">{{ $t('common.cancel') }}</v-btn>
-    <v-btn outlined @click="importGeneric" :loading="loading" :disabled="loading" color="primary">{{ $t('common.import') }}</v-btn>
+    <v-spacer/>
+    <v-btn variant="outlined" color="warning" @click="$emit('close')">{{ $t('common.cancel') }}</v-btn>
+    <v-btn variant="outlined" :loading="loading" :disabled="loading" color="primary" @click="importGeneric">{{ $t('common.import') }}</v-btn>
   </v-card-actions>
 </v-card>
 

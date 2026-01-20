@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it } from 'vitest'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 
-import { parseIcsData } from "../server/utils/icsparser.js"
+import { parseIcsData } from '../server/utils/icsparser.js'
 const base_url = 'http://localhost:13120'
 
 await setup({ host: base_url })
@@ -105,7 +105,7 @@ describe('ICS API (/api/ics-parser)', () => {
   })
 
   it('should return 400 if no icsText is provided', async () => {
-    const ret = await fetch('/api/ics-import', { method: 'POST', body: "{}" })
+    const ret = await fetch('/api/ics-import', { method: 'POST', body: '{}' })
     expect(ret.status).toBe(400)
   })
 

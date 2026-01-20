@@ -1,10 +1,10 @@
-import { Event } from "#imports"
-import { H3Event } from "h3"
-import { DateTime } from "luxon"
-import path from "path"
+import type { Event } from '#imports'
+import type { H3Event } from 'h3'
+import { DateTime } from 'luxon'
+import path from 'path'
 import fs from 'fs'
 import pug from 'pug'
-import { InferAttributes } from "@sequelize/core"
+import type { InferAttributes } from '@sequelize/core'
 
 const isBuild = process.env.NODE_ENV === 'production'
 const rssTemplateStr = fs.readFileSync(
@@ -14,7 +14,6 @@ const rssTemplateStr = fs.readFileSync(
 export const rssTemplate = pug.compile(rssTemplateStr)
 
 export function exportFeed(evt: H3Event, events: InferAttributes<Event, { omit: never }>[], title = publicSettings.title, link = `${publicSettings.baseurl}/feed/rss`) {
-
   const opt = {
     zone: publicSettings.instance_timezone,
     locale: publicSettings.instance_locale

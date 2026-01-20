@@ -2,7 +2,7 @@
  */
 import merge from 'lodash.merge'
 import { getMaxLastModifieds } from '~~/server/utils/events'
-export default defineCachedEventHandler(async event => {
+export default defineCachedEventHandler(async (event) => {
   const log = useLogger('locale')
   const localeStorage = useStorage('locale_storage')
   const customUserLocaleStorage = useStorage('custom_user_locale')
@@ -15,19 +15,18 @@ export default defineCachedEventHandler(async event => {
   }
 
   try {
-
     const fallbackMessages = await localeStorage.getItem('en.json')
-    
+
     const localStorageMeta = await localeStorage.getMeta(locale + '.json')
     const fallbackMessagesMeta = await localeStorage.getMeta('en.json')
-    let lastModifieds = [localStorageMeta?.mtime, fallbackMessagesMeta?.mtime]
-    
+    const lastModifieds = [localStorageMeta?.mtime, fallbackMessagesMeta?.mtime]
+
     let defaultLocaleMessages
 
     // check if we have a user custom messages
     if (await customUserLocaleStorage.hasItem(locale + '.json')) {
       const customUserLocaleMeta = await customUserLocaleStorage.getMeta(locale + '.json')
-      lastModifieds.push( customUserLocaleMeta?.mtime )
+      lastModifieds.push(customUserLocaleMeta?.mtime)
       defaultLocaleMessages = merge(
         fallbackMessages,
         await localeStorage.getItem(locale + '.json'),
@@ -52,7 +51,6 @@ export default defineCachedEventHandler(async event => {
     if (!handleCacheHeaders(event, { modifiedTime })) {
       return Object.assign(defaultLocaleMessages, { $vuetify })
     }
-
   } catch (e) {
     throw createError({ status: 400, message: String(e) })
   }

@@ -3,7 +3,7 @@
  * the first user being created will automatically become an active admin.
  * For subsequent users, a recovery code is generated and sent via email to allow
  * the user to set their password and confirm their account creation
- * 
+ *
  * @auth
  * @param {string} email - User email address
  * @param {string} description - User description
@@ -11,7 +11,7 @@
  * @returns Created user object
  * @returns status `400` if user creation fails (e.g. email already exists)
  */
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const log = useLogger('user')
 
@@ -20,7 +20,6 @@ export default defineEventHandler(async event => {
 
   const n_users = await User.count()
   try {
-
     // the first registered user will be an active admin
     if (n_users === 0) {
       log.info('First user!')

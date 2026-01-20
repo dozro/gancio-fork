@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import debounce from 'lodash/debounce'
-import { useDisplay, useTheme } from 'vuetify';
+import { useDisplay, useTheme } from 'vuetify'
 import type { ThemeColorPalette } from '~~/server/utils/settings'
 
 const vTheme = useTheme()
@@ -11,11 +11,11 @@ const { mobile: isMobile } = useDisplay()
 const settings = useState<Settings>('settings')
 const pageTitle = computed(() => settings.value.title)
 
-type Theme = "light" | "dark"
+type Theme = 'light' | 'dark'
 const props = defineProps<{
-	theme: Theme
-	colors: ThemeColorPalette
-}>();
+  theme: Theme
+  colors: ThemeColorPalette
+}>()
 
 const emit = defineEmits<{
   (e: 'change', theme: Theme, colorName: string, value: string): void
@@ -23,10 +23,10 @@ const emit = defineEmits<{
 
 const onColorChange = debounce((colorName: string, colorValue: string) => {
   const hexColor = colorValue.substring(0, 7)
-	emit("change", props.theme, colorName, hexColor);
+  emit('change', props.theme, colorName, hexColor)
 }, 250, { maxWait: 1000 })
 
-const menusOpen = reactive<{ [key: string ]: boolean}>({})
+const menusOpen = reactive<{ [key: string ]: boolean }>({})
 
 </script>
 <template>
@@ -52,8 +52,8 @@ const menusOpen = reactive<{ [key: string ]: boolean}>({})
             mode="hex"
             :theme="currentTheme"
             :model-value="colorValue"
-            @update:model-value="newValue => onColorChange(colorName, newValue)"
             class="mx-auto"
+            @update:model-value="newValue => onColorChange(colorName, newValue)"
           />
         </component>
       </template>

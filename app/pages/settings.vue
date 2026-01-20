@@ -26,17 +26,17 @@ async function removeAccount () {
 </script>
 
 <template>
-  <v-container class="pa-0 pa-md-3">
-    <v-card>
-      <v-card-title>{{user.email}}</v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-btn variant="outlined" color="warning" @click='forgot'>{{$t('login.forgot_password')}}</v-btn>
-          <v-divider class='my-4' />
-          <p class="font-light">{{$t('settings.remove_account')}}</p>
-          <v-btn variant='outlined' color='error' @click='removeAccount'>{{$t('common.remove')}}</v-btn>
-        </v-container>
-      </v-card-text>
-    </v-card>
-  </v-container>
+<v-container class="pa-0 pa-md-3">
+  <v-card>
+    <v-card-title>{{user.email}}</v-card-title>
+    <v-card-text>
+      <v-container>
+        <v-btn variant="outlined" color="warning" @click='forgot'>{{$t('login.forgot_password')}}</v-btn>
+        <v-divider class='my-4' />
+        <p class="font-light">{{$t('settings.remove_account')}}</p>
+        <v-btn variant='outlined' color='error' @click='removeAccount'>{{$t('common.remove')}}</v-btn>
+      </v-container>
+    </v-card-text>
+  </v-card>
+</v-container>
 </template>

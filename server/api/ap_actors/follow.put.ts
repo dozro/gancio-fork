@@ -1,12 +1,11 @@
-import { z } from "zod"
+import { z } from 'zod'
 // import { APUser } from "~/server/utils/sequelize"
 import { followActor, unfollowActor } from '~~/server/federation/helpers'
 const schema = z.object({
   ap_id: z.string()
 })
 
-export default defineEventHandler(async event => {
-  
+export default defineEventHandler(async (event) => {
   // authenticate
   await requireAdminSession(event)
 
@@ -15,6 +14,7 @@ export default defineEventHandler(async event => {
 
   const ap_actor = await APUser.findByPk(body.ap_id, { include: Instance })
   if (!ap_actor) {
+    log.warn('This ap user does not exists: ', body.ap_id)
     throw createError({ status: 404, message: 'This ap user does not exists' })
   }
 
@@ -23,5 +23,4 @@ export default defineEventHandler(async event => {
   } else {
     return followActor(ap_actor)
   }
-  
 })

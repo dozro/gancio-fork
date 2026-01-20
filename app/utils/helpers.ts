@@ -1,9 +1,8 @@
 /**
  * FrontEnd helpers utilities
  */
- 
- 
-import type { APUser, Event } from "#build/types/nitro-imports"
+
+import type { APUser, Event } from '#build/types/nitro-imports'
 import { DateTime } from 'luxon'
 
 export function mediaURL(event: EventAPI, type?: string, format = '.jpg') {
@@ -21,26 +20,26 @@ export function mediaURL(event: EventAPI, type?: string, format = '.jpg') {
   return ''
 }
 
-
-export function manageSetting<K extends keyof Settings>(key: K, setCb?: Function) {
+export function manageSetting<K extends keyof Settings>(key: K, setCb?: (value: unknown) => void) {
   const settings = useState<Settings>('settings')
   return computed<Settings[K]>({
     get: () => settings.value[key],
     set: (value) => {
       $fetch('/api/settings', { method: 'PUT', body: { key, value } })
-      if (typeof setCb === 'function') { setCb(value) }
+      if (typeof setCb === 'function') {
+        setCb(value)
+      }
       settings.value[key] = value
     }
   })
 }
-
 
 /**
  * This is a generic formatter to use especially in templates
  */
 export const format = {
   /** Actor formatter, used in Admin > Collections > Filter > Instance autocomplete */
-  actor (actor: APUser, context='label') {
+  actor (actor: APUser, context = 'label') {
     const settings = useState<Settings>('settings')
     if (context === 'title') {
       if (actor?.ap_id) {
@@ -56,14 +55,13 @@ export const format = {
       }
     } else if (context === 'icon') {
       if (actor?.ap_id) {
-        return actor?.object?.icon?.url ?? `${actor?.instanceDomain ?? actor?.domain ?? ''  }/favicon.ico`
+        return actor?.object?.icon?.url ?? `${actor?.instanceDomain ?? actor?.domain ?? ''}/favicon.ico`
       } else {
         return settings.value.baseurl + '/logo.png'
       }
     }
   }
 }
-
 
 /**
   * @description build v-calendar attributes
@@ -120,10 +118,9 @@ export function useAttributesFromEvents(events: Event[]) {
     } else {
       i.dot = { color: 'teal', class: c }
     }
-
   }
   // add a bar to highlight today
-  attributes.push({ key: 'today', dates: new Date(), highlight: { color: 'green', fillMode: 'outline' }})
+  attributes.push({ key: 'today', dates: new Date(), highlight: { color: 'green', fillMode: 'outline' } })
 
   return attributes
 }

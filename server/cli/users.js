@@ -1,4 +1,3 @@
-
 // let db
 // async function _initializeDB () {
 //   const config = require('../config')
@@ -44,7 +43,6 @@
 //   await db.close()
 // }
 
-
 // async function remove (args) {
 //   await _initializeDB()
 //   const { User } = require('../api/models/models')
@@ -68,7 +66,6 @@ async function list() {
   const users = await User.findAll()
   users.forEach(u => console.log(`${u.id}\trole: ${u.role}\tenabled: ${u.is_active}\temail: ${u.email}`))
 }
-
 
 async function resetPassword(args) {
   await connect()

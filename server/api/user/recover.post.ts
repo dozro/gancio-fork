@@ -3,7 +3,7 @@
  */
 export default defineEventHandler(async (event) => {
   const log = useLogger('user/recover')
-  
+
   const { email } = await readBody(event)
   const user = await User.findOne({ where: { email, is_active: true } })
 
@@ -14,5 +14,4 @@ export default defineEventHandler(async (event) => {
 
   await user.generateRecoverCode()
   enqueueMail(user.email, 'recover', { user, config: publicSettings }, event.context.locale)
-
 })

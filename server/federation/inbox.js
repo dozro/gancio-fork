@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
     log.warn('[FEDI] message without `object` or `type` property: %s', message)
     return res.status(404).send('Wrong AP message: no object or type property')
   }
-  
+
   res.set('Content-Type', 'application/activity+json')
   log.debug('[FEDI] Type %s', message.type)
   switch (message.type) {
@@ -52,17 +52,17 @@ module.exports = async (req, res) => {
       if (message.object?.type === 'Tombstone') {
         message.object.type = message.object?.formerType ?? 'Tombstone'
       }
-      if (message.object?.type==='Note') {
+      if (message.object?.type === 'Note') {
         await Resources.remove(req, res)
       } else if (message.object?.type === 'Event') {
         await Events.remove(req, res)
       } else {
         const ap_id = get(req.body, 'object.id', req.body.object)
-        const ap_actor = await APUser.findOne({ where: { ap_id }})
+        const ap_actor = await APUser.findOne({ where: { ap_id } })
         if (ap_actor) {
           await Users.remove(req, res)
         } else {
-          const resource = await Resource.findOne({ where: { activitypub_id: ap_id }})
+          const resource = await Resource.findOne({ where: { activitypub_id: ap_id } })
           if (resource) {
             await Resources.remove(req, res)
           }

@@ -5,13 +5,15 @@ const props = defineProps({
 })
 
 const code = computed(() => `<script src='${settings.value.baseurl}\/gancio-events.es.js'><\/script>\n<gancio-event baseurl='${settings.value.baseurl}' id=${props.event.id}></gancio-event>\n\n`)
+
+defineEmits(['close'])
 </script>
 <template>
 <v-card>
   <v-card-title class="bg-primary">{{$t('common.embed_title')}}</v-card-title>
   <v-card-text>
     <!-- <v-alert class="mb-3 mt-1" type="info" show-icon icon="mdi-information"> -->
-      {{$t('common.embed_help')}}
+    {{$t('common.embed_help')}}
     <!-- </v-alert> -->
     <v-alert class="pa-5 my-4 bg-blue-grey-darken-4 text-body-1 text-lime-lighten-3">
       <pre>{{code}}</pre>
@@ -31,7 +33,7 @@ const code = computed(() => `<script src='${settings.value.baseurl}\/gancio-even
     <v-btn variant='outlined' color="warning" @click="$emit('close')">
       {{$t("common.close")}}
     </v-btn>
-    <v-btn variant='outlined' @click="$copyToClipboard(code)" color="primary">
+    <v-btn variant='outlined' color="primary" @click="$copyToClipboard(code)">
       {{$t("common.copy")}}
     </v-btn>
   </v-card-actions>

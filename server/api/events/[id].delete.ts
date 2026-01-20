@@ -1,6 +1,6 @@
-import { Event } from "#imports"
+import { Event } from '#imports'
 
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   await requireAdminSession(evt)
   const log = useLogger('event delete')
   const id = getRouterParam(evt, 'id')

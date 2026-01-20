@@ -11,17 +11,17 @@ import {
   DataTypes,
   Op,
   Model,
+  type BelongsToManySetAssociationsMixin,
+  type BelongsToSetAssociationMixin,
+  type AggregateOptions,
   type InferAttributes,
   type InferCreationAttributes,
   type CreationOptional,
   type NonAttribute,
   type InferAttributesOptions,
   type AbstractDialect,
-  type Options,
-  BelongsToManySetAssociationsMixin,
-  BelongsToSetAssociationMixin,
-  AggregateOptions,
-} from "@sequelize/core"
+  type Options
+} from '@sequelize/core'
 
 import {
   Attribute,
@@ -44,7 +44,7 @@ import {
   BeforeCreate,
   BelongsTo,
   BeforeDestroy
-} from "@sequelize/core/decorators-legacy"
+} from '@sequelize/core/decorators-legacy'
 
 import type { SecretSettings, Settings } from './settings'
 
@@ -56,7 +56,9 @@ const log = useLogger('sequelize')
 export let sequelize: Sequelize | undefined
 
 export async function connect() {
-  if (sequelize) { return sequelize }
+  if (sequelize) {
+    return sequelize
+  }
   if ('sqlite3' === config.db.dialect) {
     log.info(`Connecting to sqlite db ${config.db.storage}`)
   } else {
@@ -91,7 +93,7 @@ export async function runMigrations() {
   try {
     await umzug.up()
   } catch (e) {
-    log.error("Error running migrations ", e)
+    log.error('Error running migrations ', e)
     throw e
   }
 }
@@ -149,9 +151,9 @@ export class Message extends Model<
 
   @Attribute({
     type: DataTypes.INTEGER.UNSIGNED,
-    references: { table: "events", key: "id" },
-    onUpdate: "CASCADE",
-    onDelete: "CASCADE",
+    references: { table: 'events', key: 'id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   declare eventId: number
 
@@ -161,17 +163,16 @@ export class Message extends Model<
 
 export interface Media {
   /** use as alt attribute */
-  name?: string,
-  url?: string,
-  height?: number,
-  width?: number,
-  size?: number,
-  image?: string | Blob | File,
+  name?: string
+  url?: string
+  height?: number
+  width?: number
+  size?: number
+  image?: string | Blob | File
 
   /** https://docs-p.joinmastodon.org/spec/activitypub/#focalPoint */
   focalpoint?: [number, number]
 }
-
 
 @Table({
   tableName: 'events'
@@ -207,7 +208,7 @@ export class Event extends Model<
 
   @Attribute(DataTypes.INTEGER.UNSIGNED)
   @Index
-  declare end_datetime?: number
+  declare end_datetime: CreationOptional<number>
 
   @Attribute(DataTypes.JSON)
   @Default([])
@@ -220,78 +221,78 @@ export class Event extends Model<
   declare is_visible: boolean
 
   @Attribute(DataTypes.JSON)
-  declare online_locations?: Array<string>
+  declare online_locations: string[] | null
 
   @Attribute(DataTypes.JSON)
-  declare recurrent?: object | null
+  declare recurrent: object | null
 
   @Attribute(DataTypes.JSON)
-  declare ap_object?: { url?: string, attributedTo?: string }
+  declare ap_object: CreationOptional<{ url?: string, attributedTo?: string, id: string, to: string, cc?: string }>
 
   @Attribute(DataTypes.JSON)
-  declare likes?: Array<object>
+  declare likes: CreationOptional<Array<object>>
 
   @Attribute(DataTypes.JSON)
-  boost?: Array<object>
+  declare boost: CreationOptional<Array<object>>
 
   /** represent the AP URI */
   @Attribute(DataTypes.STRING)
   @Index
-  declare ap_id?: string
+  declare ap_id: string | null
 
   @Attribute({
     type: DataTypes.INTEGER.UNSIGNED,
-    references: { table: "users", key: "id" },
-    onUpdate: "CASCADE",
-    onDelete: "SET NULL",
+    references: { table: 'users', key: 'id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
   })
-  declare userId?: number;
+  declare userId: CreationOptional<number>
 
   @BelongsTo(() => User, { foreignKey: 'userId', targetKey: 'id' })
-  declare user?: NonAttribute<User>
+  declare user: NonAttribute<User>
 
   @Attribute({
     type: DataTypes.INTEGER.UNSIGNED,
     allowNull: true,
-    references: { table: "events", key: "id" },
-    onUpdate: "CASCADE",
-    onDelete: "SET NULL",
+    references: { table: 'events', key: 'id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   declare parentId: number | null
 
   @BelongsTo(() => Event, { foreignKey: 'parentId', targetKey: 'id' })
-  declare parent?: NonAttribute<Event>
+  declare parent: NonAttribute<Event>
 
   @Attribute({
     type: DataTypes.INTEGER.UNSIGNED,
-    references: { table: "places", key: "id" },
-    onUpdate: "CASCADE",
-    onDelete: "CASCADE",
+    references: { table: 'places', key: 'id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   declare placeId: number
 
   @BelongsTo(() => Place, { foreignKey: 'placeId' })
-  declare place?: NonAttribute<Place>
+  declare place: NonAttribute<Place>
 
   @BelongsToMany(() => Tag, { through: 'event_tags', inverse: { as: 'events' } })
-  declare tags?: NonAttribute<Tag[]>
+  declare tags: NonAttribute<Tag[]>
 
   @Attribute({
     type: DataTypes.STRING,
-    references: { table: "ap_users", key: "ap_id" },
-    onUpdate: "CASCADE",
-    onDelete: "CASCADE",
+    references: { table: 'ap_users', key: 'ap_id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   })
-  declare apUserApId?: string
+  declare apUserApId: CreationOptional<string>
 
   @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
-  declare APUser?: NonAttribute<APUser>
+  declare APUser: NonAttribute<APUser>
 
   @HasMany(() => Message, { foreignKey: 'eventId', sourceKey: 'id' })
-  declare messages?: NonAttribute<Message[]>
+  declare messages: NonAttribute<Message[]>
 
   @HasMany(() => Resource, { foreignKey: 'eventId', sourceKey: 'id' })
-  declare resources?: NonAttribute<Resource[]>
+  declare resources: NonAttribute<Resource[]>
 
   // the mixins Sequelize automatically provides
   declare setTags: BelongsToManySetAssociationsMixin<Tag, string>
@@ -301,8 +302,10 @@ export class Event extends Model<
   static async removeImg (instance: Event) {
     // remove the image files (normal and thumb) associated with this event
     // if no image is associated, do nothing
-    if (!instance.media || instance.media.length === 0 || !instance.media[0]?.url) { return }
-    for (let media of instance.media) {
+    if (!instance.media || instance.media.length === 0 || !instance.media[0]?.url) {
+      return
+    }
+    for (const media of instance.media) {
       if (!media?.url) continue
       const thumbPath = path.resolve(config.upload_path, 'thumb', path.basename(media.url))
       const normalPath = path.resolve(config.upload_path, path.basename(media.url))
@@ -313,7 +316,7 @@ export class Event extends Model<
       ])
     }
   }
-  
+
   @BeforeCreate
   static async generateSlug(event: Event) {
     if (event.title && !event.slug) {
@@ -335,7 +338,6 @@ export class Event extends Model<
   }
 
   toAP() {
-
     const username = publicSettings.instance_name
     const opt = {
       zone: publicSettings.instance_timezone,
@@ -351,7 +353,7 @@ export class Event extends Model<
     let attachment: object[] = []
     let location: object[] = []
 
-    if (this?.online_locations?.length) {
+    if (this.online_locations?.length) {
       location = this.online_locations.map(url => ({
         type: 'VirtualLocation',
         url
@@ -369,9 +371,9 @@ export class Event extends Model<
     }
 
     // in case we only have a single location (the common case) do not use an array to simplify federation parser
-    if (location.length === 1) {
-      location = location[0]
-    }
+    // if (location?.length === 1) {
+    //   location = location[0]
+    // }
 
     if (this?.media?.length) {
       attachment.push({
@@ -403,7 +405,7 @@ export class Event extends Model<
       type: 'Event',
       startTime: DateTime.fromSeconds(this.start_datetime, opt).toISO(),
       ...(this.end_datetime ? { endTime: DateTime.fromSeconds(this.end_datetime, opt).toISO() } : {}),
-      location,
+      location: location.length === 1 ? location[0] : location,
       attachment,
       tag,
       published: this.updatedAt,
@@ -428,7 +430,7 @@ export class Tag extends Model<
   @PrimaryKey
   @Index
   @Unique
-  declare tag: string;
+  declare tag: string
 
   // @BelongsToMany(() => Event, { through: 'event_tags' })
   declare events?: NonAttribute<Event[]>
@@ -444,7 +446,7 @@ export class Place extends Model<
   @Attribute(DataTypes.INTEGER.UNSIGNED)
   @PrimaryKey
   @AutoIncrement
-  declare readonly id: CreationOptional<number>;
+  declare readonly id: CreationOptional<number>
 
   @Attribute(DataTypes.STRING)
   @Index
@@ -484,14 +486,12 @@ export class Place extends Model<
       ...(this.latitude && this.longitude && ({ latitude: this.latitude, longitude: this.longitude }))
     }
   }
-
-
 }
 
-export type UserRole = "admin" | "editor" | "user"
+export type UserRole = 'admin' | 'editor' | 'user'
 
 @Table({
-  tableName: "users"
+  tableName: 'users'
 })
 export class User extends Model<
   InferAttributes<User>,
@@ -500,10 +500,10 @@ export class User extends Model<
   @Attribute(DataTypes.INTEGER.UNSIGNED)
   @PrimaryKey
   @AutoIncrement
-  declare readonly id: CreationOptional<number>;
+  declare readonly id: CreationOptional<number>
 
   @Attribute(DataTypes.STRING)
-  declare display_name: string;
+  declare display_name: string
 
   @Attribute(DataTypes.STRING)
   @NotNull
@@ -512,7 +512,7 @@ export class User extends Model<
     name: 'unique_mail',
     msg: 'error.email_taken'
   })
-  declare email: string;
+  declare email: string
 
   @Attribute(DataTypes.STRING)
   declare password: string
@@ -548,7 +548,9 @@ export class User extends Model<
   }
 
   async comparePassword(pwd: string) {
-    if (!this.password) { return false }
+    if (!this.password) {
+      return false
+    }
     return bcrypt.compare(pwd, this.password)
   }
 
@@ -559,7 +561,7 @@ export class User extends Model<
       if (password) {
         log.info('inside hashPassword', password)
         const hashedPassword = bcrypt.hashSync(password, 10)
-        instance.setDataValue("password", hashedPassword)
+        instance.setDataValue('password', hashedPassword)
       }
     }
   }
@@ -583,7 +585,7 @@ export class Instance extends Model<
   declare blocked: boolean
 
   @Attribute(DataTypes.JSON)
-  declare data: string;
+  declare data: string
 
   @Attribute(DataTypes.STRING)
   declare applicationActor?: string
@@ -593,26 +595,24 @@ export class Instance extends Model<
 
   // @HasMany(() => Event, /* foreign key */ 'placeId')
   // declare events?: NonAttribute<Event[]>;
-
 }
 
-
 type APUserObject = {
-  name: string,
-  icon: { url: string },
-  summary?: string,
-  preferredUsername: string,
-  discoverable?: boolean,
-  indexable?: boolean,
+  name: string
+  icon: { url: string }
+  summary?: string
+  preferredUsername: string
+  discoverable?: boolean
+  indexable?: boolean
   attachments?: Array<{
-    type: string,
-    name: string,
+    type: string
+    name: string
     url: string
-  }>,
-  url?: string,
+  }>
+  url?: string
   publicKey?: {
-    id: string,
-    owner: string,
+    id: string
+    owner: string
     publicKeyPem: string
   }
 }
@@ -647,13 +647,13 @@ export class APUser extends Model<
   declare blocked: boolean
 
   @Attribute(DataTypes.JSON)
-  declare object: APUserObject;
+  declare object: APUserObject
 
   @Attribute({
     type: DataTypes.STRING,
-    references: { table: "instances", key: "domain" },
-    onUpdate: "CASCADE",
-    onDelete: "CASCADE",
+    references: { table: 'instances', key: 'domain' },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   declare instanceDomain: string
 
@@ -665,7 +665,6 @@ export class APUser extends Model<
 
   @HasMany(() => Resource, { foreignKey: 'activitypub_id', sourceKey: 'ap_id' })
   declare resources?: NonAttribute<Resource[]>
-
 }
 
 @Table({
@@ -701,7 +700,6 @@ export class Collection extends Model<
   InferAttributes<Collection>,
   InferCreationAttributes<Collection>
 > {
-
   @Attribute(DataTypes.INTEGER.UNSIGNED)
   @PrimaryKey
   @AutoIncrement
@@ -737,7 +735,6 @@ export class Collection extends Model<
 
   @HasMany(() => Filter, { foreignKey: 'collectionId', sourceKey: 'id' })
   declare filters?: NonAttribute<Filter[]>
-
 }
 
 @Table({
@@ -760,13 +757,13 @@ export class Filter extends Model<
   declare negate: boolean
 
   @Attribute(DataTypes.JSON)
-  declare tags: any
+  declare tags: string[] | null
 
   @Attribute(DataTypes.JSON)
-  declare places: any
+  declare places: { id: number, name: string }[] | null
 
   @Attribute(DataTypes.JSON)
-  declare actors: any
+  declare actors: { ap_id?: string | null }[] | null
 
   // If collectionId is a foreign key, you may want to add:
   @Attribute(DataTypes.INTEGER)
@@ -774,9 +771,7 @@ export class Filter extends Model<
 
   @BelongsTo(() => Collection, { foreignKey: 'collectionId', targetKey: 'id' })
   declare collection?: NonAttribute<Collection>
-
 }
-
 
 @Table({
   tableName: 'resources',
@@ -786,7 +781,6 @@ export class Resource extends Model<
   InferAttributes<Resource>,
   InferCreationAttributes<Resource>
 > {
-
   @Attribute(DataTypes.STRING)
   @PrimaryKey
   declare activitypub_id: string
@@ -810,9 +804,9 @@ export class Resource extends Model<
 
   @Attribute({
     type: DataTypes.INTEGER.UNSIGNED,
-    references: { table: "events", key: "id" },
-    onUpdate: "CASCADE",
-    onDelete: "CASCADE",
+    references: { table: 'events', key: 'id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   declare eventId: number
 
@@ -850,7 +844,7 @@ export class Page extends Model<
   @BeforeCreate
   static async generateSlug(page: Page) {
     if (page.title && !page.slug) {
-      let baseSlug = slugify(page.title, { lower: true, strict: true })
+      const baseSlug = slugify(page.title, { lower: true, strict: true })
       let slug = baseSlug
       let count = 1
 
@@ -895,7 +889,7 @@ export class Notification extends Model<
   InferCreationAttributes<Notification>
 > {
   @Attribute(DataTypes.JSON)
-  declare filters: any
+  declare filters: { is_visible: boolean, tags?: string[], places: unknown }
 
   @Attribute(DataTypes.STRING)
   declare email: string

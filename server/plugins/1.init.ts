@@ -1,13 +1,12 @@
 /**
 ** This is the first and only server plugin and this is where everything start
 */
-import type { NitroApp } from "nitropack"
-import pluginController from "../utils/plugins"
+import type { NitroApp } from 'nitropack'
+import pluginController from '../utils/plugins'
 import fsDriver from 'unstorage/drivers/fs'
 import { get as getConfig } from '../config'
 
-export default defineNitroPlugin(async (nitroApp: NitroApp) => {
-
+export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
   const log = useLogger('init')
   try {
     const config = getConfig()
@@ -57,5 +56,4 @@ export default defineNitroPlugin(async (nitroApp: NitroApp) => {
     console.error(e)
     process.exit(1)
   }
-
 })

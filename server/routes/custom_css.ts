@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
-import path from "path"
-import { publicSettingsLastModified } from "../utils/settings"
+import path from 'path'
+import { publicSettingsLastModified } from '../utils/settings'
 
 /**
  * return a custom css
@@ -9,7 +9,6 @@ import { publicSettingsLastModified } from "../utils/settings"
  * @cached
  */
 export default defineEventHandler(async (event) => {
-
   // custom css from admin panel settings
   let custom_css = publicSettings.custom_css
   let stat = null
@@ -23,8 +22,8 @@ export default defineEventHandler(async (event) => {
     if (stat.mtime > lastModified) {
       lastModified = stat.mtime
     }
-  } catch (e) {
-    custom_css += "\n/** no custom.css file **/"
+  } catch {
+    custom_css += '\n/** no custom.css file **/'
   }
 
   setHeader(event, 'Content-Type', 'text/css')

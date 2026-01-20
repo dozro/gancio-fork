@@ -91,15 +91,15 @@ const link = computed(() => {
         </v-card-text>
       </v-card>
     </v-card-text>
-    
+
     <v-tabs v-model='type'>
       <v-tab href='#feed' value='feed'> {{$t('common.feed')}}</v-tab>
       <v-tab href='#ical' value='ical'> {{$t('export.ical_title')}}</v-tab>
       <v-tab href='#list' value='list'> {{$t('export.list_title')}}</v-tab>
-      <v-tab href='#federation' value='federation' v-if='settings.enable_federation'> {{$t('common.fediverse')}}</v-tab>
+      <v-tab v-if='settings.enable_federation' href='#federation' value='federation'> {{$t('common.fediverse')}}</v-tab>
     </v-tabs>
 
-      <!-- //- TOFIX
+    <!-- //- TOFIX
       //- v-tab {{$t('common.email')}}
       //- v-tab-item
         v-card
@@ -110,16 +110,16 @@ const link = computed(() => {
             v-text-field(v-model='notification.email' :placeholder="$t('export.insert_your_address')" ref='email')
               v-btn(slot='prepend' text color='primary' @click='add_notification') {{$t('common.send')}} <v-icon>mdi-email</v-icon> -->
 
-      <v-card-text>
+    <v-card-text>
       <v-tabs-window v-model='type'>
 
-        <v-tabs-window-item value="feed" id='feed'>
+        <v-tabs-window-item id='feed' value="feed">
           <v-card>
             <v-card-text>
               <section v-html='$t(`export.feed_description`)' />
               <v-text-field v-model="link" readonly>
                 <template #prepend>
-                  <v-btn variant='text' color="primary" @click="$copyToClipboard(link)" append-icon='mdi-content-copy'>
+                  <v-btn variant='text' color="primary" append-icon='mdi-content-copy' @click="$copyToClipboard(link)">
                     {{$t("common.copy")}}
                   </v-btn>
                 </template>
@@ -128,14 +128,13 @@ const link = computed(() => {
           </v-card>
         </v-tabs-window-item>
 
-        
-        <v-tabs-window-item value='ical' id='ical'>
+        <v-tabs-window-item id='ical' value='ical'>
           <v-card>
             <v-card-text>
               <section v-html='$t(`export.ical_description`)' />
               <v-text-field v-model="link">
                 <template #prepend>
-                  <v-btn variant='text' color="primary" @click="$copyToClipboard(link)" append-icon='mdi-content-copy'>
+                  <v-btn variant='text' color="primary" append-icon='mdi-content-copy' @click="$copyToClipboard(link)">
                     {{$t("common.copy")}}
                   </v-btn>
                 </template>
@@ -145,17 +144,17 @@ const link = computed(() => {
         </v-tabs-window-item>
 
         <!-- <v-tab> {{$t('export.list_title')}}</v-tab> -->
-        <v-tabs-window-item value='list' id='list'>
+        <v-tabs-window-item id='list' value='list'>
           <v-card>
             <v-card-text>
               <p v-html='$t(`export.list_description`)' />
 
               <v-row>
                 <v-col class="col-12 col-lg-4">
-                  <v-text-field v-model="list.title" :label="$t('common.title')"></v-text-field>
-                  <v-text-field v-model="list.maxEvents" type="number" min="1" :label="$t('common.max_events')"></v-text-field>
-                  <v-switch v-model="list.theme" hide-details :true-value="'dark'" :false-value="'light'" :label="$t('admin.is_dark')"></v-switch>
-                  <v-switch v-model="list.sidebar" :true-value="'true'" :false-value="'false'" :label="$t('admin.widget')"></v-switch>
+                  <v-text-field v-model="list.title" :label="$t('common.title')"/>
+                  <v-text-field v-model="list.maxEvents" type="number" min="1" :label="$t('common.max_events')"/>
+                  <v-switch v-model="list.theme" hide-details :true-value="'dark'" :false-value="'light'" :label="$t('admin.is_dark')"/>
+                  <v-switch v-model="list.sidebar" :true-value="'true'" :false-value="'false'" :label="$t('admin.widget')"/>
                 </v-col>
                 <v-col class='col-12.col-lg-8'>
                   <gancio-events
@@ -180,10 +179,10 @@ const link = computed(() => {
           </v-card>
         </v-tabs-window-item>
 
-        <v-tabs-window-item v-if='settings.enable_federation' value='federation' id='federation'>
+        <v-tabs-window-item v-if='settings.enable_federation' id='federation' value='federation'>
           <FollowMe />
         </v-tabs-window-item>
-          <!-- //- TOFIX
+        <!-- //- TOFIX
         //- v-tab.pt-1(label='calendar' name='calendar')
         //- v-tab-item
         //-   p(v-html='$t(`export.calendar_description`)')
@@ -192,7 +191,7 @@ const link = computed(() => {
         //-   v-text-field.mb-1(type='textarea' v-model='script')
         //-   el-button.float-right(plain type="primary" icon='el-icon-document') Copy -->
       </v-tabs-window>
-      </v-card-text>
+    </v-card-text>
   </v-card>
 </v-container>
 </template>

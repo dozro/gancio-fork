@@ -35,7 +35,6 @@ const settings = useState('settings')
 const in_home = ref(!!settings.value?.collection_in_home)
 const { data: collections, refresh } = await useFetch('/api/collections?withFilters=true')
 
-
 function newCollection() {
   collection.value = { name: '', id: null }
   filters.value = []
@@ -57,7 +56,9 @@ async function saveCollection() {
 
 async function removeCollection(collection) {
   const ret = await $confirm('admin.delete_collection_confirm', { collection: collection.name })
-  if (!ret) { return }
+  if (!ret) {
+    return
+  }
   try {
     await $fetch(`/api/collections/${collection.id}`, { method: 'DELETE' })
     $notify('common.ok')
@@ -79,7 +80,7 @@ async function addFilter() {
   loading.value = true
   const tags = filterTags.value
   const places = filterPlaces.value.map(p => ({ id: p.id, name: p.name }))
-  const actors = filterActors.value.map(a => ({ ap_id: a.ap_id, name: a.object?.preferredUsername ?? a.object?.username ?? a?.name, domain: a?.instanceDomain ?? a.domain  }))
+  const actors = filterActors.value.map(a => ({ ap_id: a.ap_id, name: a.object?.preferredUsername ?? a.object?.username ?? a?.name, domain: a?.instanceDomain ?? a.domain }))
   const filter = { collectionId: collection.value.id, tags, places, actors, negate: negateFilter.value }
 
   // tags and places are JSON field and there's no way to use them inside a unique constrain
@@ -115,23 +116,18 @@ async function addFilter() {
   loading.value = false
 }
 
-
-
-
-
-  // watch: {
-  //   in_home (val) {
-  //     this.collection_in_home = null
-  //   }
-  // },
-  // methods: {
-    // searchTags: debounce(async function (ev) {
-    //   this.tags = await this.$axios.$get(`/tag?search=${encodeURIComponent(ev.target.value)}`)
-    // }, 100),
-    // searchPlaces: debounce(async function (ev) {
-    //   this.places = await this.$axios.$get(`/place?search=${ev.target.value}`)
-    // }, 100),
-
+// watch: {
+//   in_home (val) {
+//     this.collection_in_home = null
+//   }
+// },
+// methods: {
+// searchTags: debounce(async function (ev) {
+//   this.tags = await this.$axios.$get(`/tag?search=${encodeURIComponent(ev.target.value)}`)
+// }, 100),
+// searchPlaces: debounce(async function (ev) {
+//   this.places = await this.$axios.$get(`/place?search=${ev.target.value}`)
+// }, 100),
 
 //     newCollection() {
 //       this.collection = { name: '', id: null }
@@ -139,14 +135,12 @@ async function addFilter() {
 //       this.dialog = true
 //     },
 
-
-
 async function togglePinCollection (collection) {
   try {
     await $fetch(`/api/collections/toggle/${collection.id}`, { method: 'PUT' })
     refresh()
   } catch (e) {
-    $notify(e, Statuses.ERROR )
+    $notify(e, Statuses.ERROR)
   }
 }
 
@@ -199,10 +193,10 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
 
     <div v-if="collections.length" class="d-flex flex-wrap ga-4 justify-space-between align-center">
       <v-switch
-        :label="$t('common.collection_in_home')"
-        @update:model-value="collection_in_home = null"
         v-model="in_home"
+        :label="$t('common.collection_in_home')"
         hide-details
+        @update:model-value="collection_in_home = null"
       />
       <div class="w-100 w-sm-50">
         <v-autocomplete
@@ -223,7 +217,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
     </div>
 
     <div class="d-flex justify-end">
-      <v-btn color="primary" variant='text' @click="newCollection" prepend-icon='mdi-plus'>
+      <v-btn color="primary" variant='text' prepend-icon='mdi-plus' @click="newCollection">
         {{ $t('admin.new_collection') }}
       </v-btn>
     </div>
@@ -240,21 +234,21 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
           {{ $t(!collection.id ? 'admin.new_collection' : 'admin.edit_collection') }}
         </v-card-title>
         <v-card-text>
-          <v-form v-model="valid" ref="form" @submit.prevent="saveCollection">
+          <v-form ref="form" v-model="valid" @submit.prevent="saveCollection">
             <v-text-field
               v-if="!collection.id"
+              v-model="collection.name"
               :rules="[$valid.required('common.name')]"
               :label="$t('common.name')"
-              v-model="collection.name"
               :placeholder="$t('common.name')"
             >
-              <template #append v-if="!collection.id">
+              <template v-if="!collection.id" #append>
                 <v-btn
                   variant='outlined'
-                  @click="saveCollection"
                   color="primary"
                   :loading="loading"
                   :disabled="!valid || loading || !!collection.id"
+                  @click="saveCollection"
                 >
                   {{ $t('common.save') }}
                 </v-btn>
@@ -285,7 +279,8 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
                 :label="$t('common.trusted_sources')"
               >
                 <template #item="{ item, props }">
-                  <v-list-item v-bind="props"
+                  <v-list-item
+                    v-bind="props"
                     :prepend-avatar="format.actor(item.raw, 'icon')"
                     :title="format.actor(item.raw, 'title')"
                     :subtitle="format.actor(item.raw, 'label')"/>
@@ -319,13 +314,13 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
                 hide-details
                 item-title="name"
                 :disabled="!collection.id"
-                @update:model-value="searchPlaces"
-                @focus="searchPlaces"
                 :delimiters="[';', ',']"
                 :items="places"
                 :label="$t('common.places')"
+                @update:model-value="searchPlaces"
+                @focus="searchPlaces"
               />
-                <!-- <template
+              <!-- <template
                   #chip="{ item, attrs, selected, parent }">
                   <v-chip
                     v-bind="attrs"
@@ -344,6 +339,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
             <v-col cols="6">
               <v-combobox
                 v-model="filterTags"
+                v-model:search="searchTags"
                 prepend-inner-icon="mdi-tag-multiple"
                 chips
                 multiple
@@ -354,7 +350,6 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
                 :disabled="!collection.id"
                 hide-details
                 placeholder="All"
-                v-model:search="searchTags"
                 :delimiters="[';', ',']"
                 :items="tags"
                 :label="$t('common.tags')"
@@ -376,8 +371,8 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
 
             <v-col cols="3">
               <v-switch
-                :disabled="!collection.id"
                 v-model="negateFilter"
+                :disabled="!collection.id"
                 label="Not"
               />
             </v-col>
@@ -389,8 +384,8 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
             :hide-default-footer="filters.length < 5"
           >
             <template v-slot:item.actions="{ item }">
-              <v-btn @click="editFilter(item)" color="primary" icon='mdi-pencil' />
-              <v-btn @click="removeFilter(item)" color="error" icon='mdi-delete-forever' />
+              <v-btn color="primary" icon='mdi-pencil' @click="editFilter(item)" />
+              <v-btn color="error" icon='mdi-delete-forever' @click="removeFilter(item)" />
             </template>
             <template v-slot:item.negate="{ item }">
               <v-icon
@@ -400,27 +395,27 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
             </template>
             <template v-slot:item.tags="{ item }">
               <v-chip
-                class="ma-1"
-                size='small'
                 v-for="tag in item.tags"
                 :key="tag"
+                class="ma-1"
+                size='small'
               >{{ tag }}</v-chip>
             </template>
             <template v-slot:item.places="{ item }">
               <v-chip
-                class="ma-1"
-                size='small'
                 v-for="place in item.places"
                 :key="place.id"
+                class="ma-1"
+                size='small'
               >{{ place.name }}</v-chip>
             </template>
             <template v-slot:item.actors="{ item }">
               <v-chip
+                v-for="actor in item.actors"
+                :key="actor.ap_id"
                 class="ma-1"
                 size='small'
                 label
-                v-for="actor in item.actors"
-                :key="actor.ap_id"
               >
                 {{ format.actor(actor, 'filter') }}
               </v-chip>
@@ -431,33 +426,33 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
         <v-card-actions>
           <v-spacer />
           <v-btn
-            color="primary"
             v-if="editFilterId === false"
+            color="primary"
             variant='outlined'
             :loading="loading"
-            @click="addFilter"
             :disabled="loading || filterActors.length<1 && filterPlaces.length<1 && filterTags.length<1"
             append-icon='mdi-plus'
+            @click="addFilter"
           >
             {{ $t('common.add') }}
           </v-btn>
 
           <v-btn
+            v-else
             color="primary"
             variant='outlined'
-            v-else
             :loading="loading"
-            @click="addFilter"
             :disabled="loading || filterActors.length<1 && filterPlaces.length<1 && filterTags.length<1"
+            @click="addFilter"
           >
             {{ $t('common.save') }}
           </v-btn>
 
           <v-btn
-            @click="dialog = false"
             variant='outlined'
             color="warning"
             :disabled="loading || filterActors.length>0 || filterPlaces.length>0 || filterTags.length>0"
+            @click="dialog = false"
           >
             {{ $t('common.close') }}
           </v-btn>
@@ -474,15 +469,15 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
         <template v-slot:item.pin="{ item }">
           <v-switch
             class="float-right"
-            :modelValue="item.isTop"
-            @update:modelValue="togglePinCollection(item)"
+            :model-value="item.isTop"
             hide-details
+            @update:model-value="togglePinCollection(item)"
           />
         </template>
         <template v-slot:item.actions="{ item, index }">
-          <v-btn v-if="index>0" color="warn" @click.stop="moveUp(item)" icon='mdi-chevron-up' />
-          <v-btn @click="editCollection(item)" color="primary" icon='mdi-pencil' />
-          <v-btn @click="removeCollection(item)" color="error" icon='mdi-delete-forever' />
+          <v-btn v-if="index>0" color="warn" icon='mdi-chevron-up' @click.stop="moveUp(item)" />
+          <v-btn color="primary" icon='mdi-pencil' @click="editCollection(item)" />
+          <v-btn color="error" icon='mdi-delete-forever' @click="removeCollection(item)" />
         </template>
       </v-data-table>
     </div>

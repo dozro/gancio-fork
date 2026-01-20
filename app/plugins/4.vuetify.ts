@@ -9,7 +9,6 @@ import type { Settings } from '~~/server/utils/settings'
 // import '@mdi/font/css/materialdesignicons.css'
 
 export default defineNuxtPlugin((nuxtApp) => {
-
   const i18n = nuxtApp.$i18n
   const current = i18n.locale
   const fallback = i18n.fallbackLocale
@@ -17,10 +16,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   const currentLocale = ref(current.value)
 
   const settings = useState<Settings | null>('settings', () => null)
-  
+
   const cookie = useCookie<'light' | 'dark' | 'system' | undefined>('theme')
   const defaultTheme = cookie.value ?? (settings?.value?.['theme.is_dark'] ? 'dark' : 'light')
-  // const { locale, locales } = useI18n()
   watch(currentLocale, (val, oldVal) => {
     if (oldVal)
       i18n.setLocale(val)
@@ -46,7 +44,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       const i18n = useI18n({
         locale: currentLocale.value,
         fallbackLocale: data.fallback.value,
-        messages: data.messages.value as any,
+        messages: data.messages.value,
         useScope: 'local',
         legacy: false,
         inheritLocale: false,
@@ -72,11 +70,8 @@ export default defineNuxtPlugin((nuxtApp) => {
       }
     }
   }
-
-  function wrapI18n<T extends (...args: any[]) => any>(t: T): T {
-    return <T>((...args: any[]) => {
-      return t(...args)
-    })
+  function wrapI18n<T extends (...args: any[]) => any>(fn: T): T {
+    return ((...args: Parameters<T>) => fn(...args)) as T
   }
 
   const vuetify = createVuetify({
@@ -169,7 +164,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       VAutocomplete: {
         VChip: {
           closable: true,
-          closeIcon: "mdi-close-circle",
+          closeIcon: 'mdi-close-circle',
         },
         autocomplete: 'off',
         clearable: true,

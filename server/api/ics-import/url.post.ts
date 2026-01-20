@@ -1,12 +1,12 @@
 /**
 */
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   const log = useLogger('ics')
-  const  { url, includePastEvents = false } = await readBody(event)
+  const { url, includePastEvents = false } = await readBody(event)
 
   if (!url) {
     log.warn('No URL provided')
-    throw createError({ status: 400, message: 'No URL provided'})
+    throw createError({ status: 400, message: 'No URL provided' })
   }
 
   try {

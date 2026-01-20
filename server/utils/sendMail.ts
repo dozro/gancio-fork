@@ -1,12 +1,12 @@
 import Email from 'email-templates'
 import path from 'path'
 import { DateTime } from 'luxon'
-const log = useLogger('mail')
 import locales from '~~/i18n/locales/index'
+const log = useLogger('mail')
 
 /**
  * Enqueues an email to be sent using the task manager.
- * 
+ *
  * @param addresses - The recipient email address or an array of addresses.
  * @param template - The name of the email template to use.
  * @param locals - Optional. Local variables to pass to the email template.
@@ -40,7 +40,7 @@ export async function sendMail(addresses: string | string[], template: emailTemp
   locale = locale ?? settings.instance_locale
   locale = localeMapOverride?.[locale] ?? locale
   log.info(`Send ${template} email to ${addresses} with locale ${locale}`)
-  
+
   const from = `"${settings?.smtp?.from || '📅 ' + settings.title}" <${settings.admin_email}>`
   const email = new Email({
     views: {
@@ -92,7 +92,7 @@ export async function sendMail(addresses: string | string[], template: emailTemp
     }
   }
   return email.send(msg)
-    .catch(e => {
+    .catch((e) => {
       log.error('[MAIL]', e)
       throw e
     })

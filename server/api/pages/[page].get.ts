@@ -1,4 +1,4 @@
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   const page = getRouterParam(event, 'page')
   console.error(page)
   return Page.findOne({

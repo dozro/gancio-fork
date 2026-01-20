@@ -60,18 +60,18 @@ async function savePlace() {
         {{ $t('admin.edit_place') }}
       </v-card-title>
       <v-card-text class="mb-4">
-        <v-form v-model="valid" ref="form" lazy-validation>
+        <v-form ref="form" v-model="valid">
           <v-text-field
+            v-model="place.name"
             :rules="[$valid.required('common.name')]"
             :label="$t('common.name')"
-            v-model="place.name"
             :placeholder="$t('common.name')"
           />
           <v-text-field
             ref="address"
+            v-model="place.address"
             :rules="[ v => $valid.required('common.address')(v)]"
             :label="$t('common.address')"
-            v-model="place.address"
             persistent-hint
           />
           <SearchAddress v-if="settings.allow_geolocation" v-model:place="place" />
@@ -79,15 +79,15 @@ async function savePlace() {
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn @click="dialog = false" outlined color="warning">
+        <v-btn variant="outlined" color="warning" @click="dialog = false">
           {{ $t('common.cancel') }}
         </v-btn>
         <v-btn
-          @click="savePlace"
           color="primary"
-          outlined
+          variant="outlined"
           :loading="loading"
           :disable="!valid || loading"
+          @click="savePlace"
         >
           {{ $t('common.save') }}
         </v-btn>
@@ -103,10 +103,10 @@ async function savePlace() {
       :search="search"
     >
       <template v-slot:item.map="{ item }">
-        <v-icon v-if="item.latitude && item.longitude" icon='mdi-map-marker'></v-icon>
+        <v-icon v-if="item.latitude && item.longitude" icon='mdi-map-marker'/>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn @click="editPlace(item)" color="primary" icon='mdi-pencil' />
+        <v-btn color="primary" icon='mdi-pencil' @click="editPlace(item)" />
         <v-btn :to="`/place/${item.id}/${encodeURIComponent(item.name)}`" icon='mdi-eye' />
       </template>
     </v-data-table>

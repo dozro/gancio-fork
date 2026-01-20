@@ -20,5 +20,4 @@ export default defineEventHandler(async (event) => {
     setHeader(event, 'Content-Length', s.size)
     return sendStream(event, createReadStream(filePath))
   }
-
 })

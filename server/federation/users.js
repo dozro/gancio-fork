@@ -11,14 +11,16 @@ const settingsController = require('../api/controller/settings')
 module.exports = {
   get (req, res) {
     const { preferHTML } = require('../helpers')
-    if (preferHTML(req)){
+    if (preferHTML(req)) {
       log.debug('[FEDI] Get actor but prefer text/html, redirect to homepage')
       return res.redirect(302, '/')
     }
     const settings = settingsController.settings
     const name = req.params.name
-    if (!name) { return res.status(400).send('Bad request.') }
-    
+    if (!name) {
+      return res.status(400).send('Bad request.')
+    }
+
     if (name !== settings.instance_name) {
       log.debug(`[FEDI] Get unknown actor ${name}`)
       return res.status(404).send(`No record found for ${escape(name)}`)
@@ -43,36 +45,35 @@ module.exports = {
           indexable: 'toot:indexable'
         }
       ],
-      id: `${config.baseurl}/federation/u/${name}`,
-      type: 'Application',
-      summary: config.description,
-      name: settings.title,
-      preferredUsername: name,
-      inbox: `${config.baseurl}/federation/u/${name}/inbox`,
-      outbox: `${config.baseurl}/federation/u/${name}/outbox`,
-      manuallyApprovesFollowers: false,
-      endpoints: { sharedInbox: `${config.baseurl}/federation/u/${name}/inbox` },
-      discoverable: true,
-      indexable: true,
-      attachment: [
+      'id': `${config.baseurl}/federation/u/${name}`,
+      'type': 'Application',
+      'summary': config.description,
+      'name': settings.title,
+      'preferredUsername': name,
+      'inbox': `${config.baseurl}/federation/u/${name}/inbox`,
+      'outbox': `${config.baseurl}/federation/u/${name}/outbox`,
+      'manuallyApprovesFollowers': false,
+      'endpoints': { sharedInbox: `${config.baseurl}/federation/u/${name}/inbox` },
+      'discoverable': true,
+      'indexable': true,
+      'attachment': [
         {
           type: 'PropertyValue',
           name: 'Website',
           value: `<a href='${config.baseurl}'>${config.baseurl}</a>`
         }
       ],
-      icon: {
+      'icon': {
         type: 'Image',
         mediaType: 'image/png',
         url: config.baseurl + '/logo.png'
       },
-      summary: settings.description,
-      publicKey: {
+      'publicKey': {
         id: `${config.baseurl}/federation/u/${name}#main-key`,
         owner: `${config.baseurl}/federation/u/${name}`,
         publicKeyPem: settings.publicKey
       },
-      url: `${config.baseurl}/federation/u/${name}`
+      'url': `${config.baseurl}/federation/u/${name}`
     }
     res.type('application/activity+json; charset=utf-8')
     res.json(ret)
@@ -114,10 +115,9 @@ module.exports = {
   //   })
   // },
 
-
   async remove (req, res) {
     const ap_id = get(req.body, 'object.id', req.body.object)
-    const ap_actor = await APUser.findOne({ where: { ap_id }})
+    const ap_actor = await APUser.findOne({ where: { ap_id } })
     if (!ap_actor) {
       log.info(`[FEDI] Delete of unknown object ${ap_id}`)
       return res.status(404).send('Not found')
@@ -150,47 +150,47 @@ module.exports = {
       return res.status(404).send(`No record found for ${escape(name)}`)
     }
 
-    const n_events = await Event.count({ where: { is_visible: true, ap_id: null }})
+    const n_events = await Event.count({ where: { is_visible: true, ap_id: null } })
     let events = []
     log.debug(`[FEDI] GET /outbox, should return all events from this instance: ${n_events}`)
     // https://www.w3.org/TR/activitypub/#outbox
     res.type('application/activity+json; charset=utf-8')
 
-    const last_page = Math.ceil(n_events/10)
+    const last_page = Math.ceil(n_events / 10)
 
     if (page) {
       events = await Event.findAll({
         where: { is_visible: true, ap_id: null },
         include: [{ model: Tag, required: false }, Place],
         limit: events_per_page,
-        offset: (page-1)*events_per_page,
+        offset: (page - 1) * events_per_page,
         order: [['start_datetime', 'DESC']],
       })
       return res.json({
         '@context': Helpers['@context'],
-        id: `${config.baseurl}/federation/u/${name}/outbox?page=${page}`,
-        type: 'OrderedCollectionPage',
-        totalItems: n_events,
-        partOf: `${config.baseurl}/federation/u/${name}/outbox`,
-        ...( page > 1 && { prev: `${config.baseurl}/federation/u/${name}/outbox?page=${page-1}`}),
-        ...( page !== last_page && { next: `${config.baseurl}/federation/u/${name}/outbox?page=${page+1}`}),
-        orderedItems: events.map(e => ({
-            id: `${config.baseurl}/federation/m/${e.id}#create`,
-            type: 'Create',
-            to: 'https://www.w3.org/ns/activitystreams#Public',
-            published: new DateTime(e.createdAt).toISO(),
-            actor: `${config.baseurl}/federation/u/${name}`,
-            object: e.toAP()
-          }))
-      })      
+        'id': `${config.baseurl}/federation/u/${name}/outbox?page=${page}`,
+        'type': 'OrderedCollectionPage',
+        'totalItems': n_events,
+        'partOf': `${config.baseurl}/federation/u/${name}/outbox`,
+        ...(page > 1 && { prev: `${config.baseurl}/federation/u/${name}/outbox?page=${page - 1}` }),
+        ...(page !== last_page && { next: `${config.baseurl}/federation/u/${name}/outbox?page=${page + 1}` }),
+        'orderedItems': events.map(e => ({
+          id: `${config.baseurl}/federation/m/${e.id}#create`,
+          type: 'Create',
+          to: 'https://www.w3.org/ns/activitystreams#Public',
+          published: new DateTime(e.createdAt).toISO(),
+          actor: `${config.baseurl}/federation/u/${name}`,
+          object: e.toAP()
+        }))
+      })
     } else {
       return res.json({
         '@context': 'https://www.w3.org/ns/activitystreams',
-        id: `${settings.baseurl}/federation/u/${name}/outbox`,
-        type: 'OrderedCollection',
-        totalItems: n_events,
-        first: `${settings.baseurl}/federation/u/${name}/outbox?page=1`,
-        last: `${settings.baseurl}/federation/u/${name}/outbox?page=${last_page}`
+        'id': `${settings.baseurl}/federation/u/${name}/outbox`,
+        'type': 'OrderedCollection',
+        'totalItems': n_events,
+        'first': `${settings.baseurl}/federation/u/${name}/outbox?page=1`,
+        'last': `${settings.baseurl}/federation/u/${name}/outbox?page=${last_page}`
       })
     }
   }

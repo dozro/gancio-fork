@@ -1,6 +1,6 @@
-import { Op } from "@sequelize/core"
+import { Op } from '@sequelize/core'
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const log = useLogger('collection moveup')
   const sortIndex = Number(getRouterParam(event, 'index'))
@@ -20,5 +20,4 @@ export default defineEventHandler(async event => {
     log.error(e)
     throw createError({ status: 404 })
   }
-
 })

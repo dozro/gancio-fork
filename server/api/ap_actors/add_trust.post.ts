@@ -1,6 +1,6 @@
-import { z } from "zod"
+import { z } from 'zod'
 // import { APUser } from "~/server/utils/sequelize"
-import { followActor, unfollowActor, getInstance, getActor } from '~~/server/federation/helpers.js'
+import { followActor, getInstance, getActor } from '~~/server/federation/helpers.js'
 import { get as getConfig } from '../../config'
 import { isHiddenService } from '../../helpers'
 
@@ -8,8 +8,7 @@ const schema = z.object({
   url: z.string()
 })
 
-export default defineEventHandler(async event => {
-
+export default defineEventHandler(async (event) => {
   const config = getConfig()
 
   // authenticate
@@ -20,25 +19,24 @@ export default defineEventHandler(async event => {
 
   /**
     * url
-    * in case we have a @ we should use webfinger 
+    * in case we have a @ we should use webfinger
     * in case we have a full url could be an actor
-    * or a nodeinfo url to search for 
+    * or a nodeinfo url to search for
     */
   let url = body.url
   let instance
-
 
   // @actor@instance.tld syntax, let's use webfinger
   if (!url.startsWith('http') && url.includes('@')) {
     const [user, instance_url] = url.replace(/^@/, '').split('@')
     log.debug('[FEDI] Adds user: %s and instance: %s because url was: %s', user, instance_url, url)
     try {
-      let protocol = "https://"
-      if (config.hidden_service === "true" && isHiddenService(url)) {
-        protocol = "http://"
+      let protocol = 'https://'
+      if (config.hidden_service === 'true' && isHiddenService(url)) {
+        protocol = 'http://'
       }
 
-      if (config.hidden_service !== "true" && isHiddenService(url)) {
+      if (config.hidden_service !== 'true' && isHiddenService(url)) {
         log.warn('[FEDI] Trying to trust instance %s but hidden services are not enabled', instance_url)
         throw createError({ status: 403, message: 'Hidden service not allowed' })
       }
@@ -118,7 +116,6 @@ export default defineEventHandler(async event => {
 
     // if we have an actor, let's make a new friend
     if (instance.actor) {
-
       // send a well-known request
       const instance_hostname = new URL(url).host
       const webfinger = await $fetch(`${url}/.well-known/webfinger?resource=acct:${instance.actor}@${instance_hostname}`)

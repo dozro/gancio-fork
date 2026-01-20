@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Settings from '~/components/Core/Settings/Settings.vue'
 import SettingsView from '~/components/Core/Settings/SettingsView.vue'
-import { type SettingsMenuItem } from '~/components/Core/Settings/types'
+import type { SettingsMenuItem } from '~/components/Core/Settings/types'
 
 const settings = useState<Settings>('settings')
 
@@ -16,30 +16,30 @@ const { data: unconfirmedEvents, refresh } = await useFetch('/api/events/unconfi
 
 const menuItems = computed<SettingsMenuItem[]>(() => [
   {
-    value: "events",
+    value: 'events',
     title: $t('common.events'),
-    icon: "mdi-calendar",
-    badge: unconfirmedEvents.value?.events?.length  || null,
+    icon: 'mdi-calendar',
+    badge: unconfirmedEvents.value?.events?.length || null,
   },
-  { value: "users", title: $t('common.users'), icon: "mdi-account-group" },
+  { value: 'users', title: $t('common.users'), icon: 'mdi-account-group' },
 
-  { type: "divider" },
+  { type: 'divider' },
 
-  { value: "collections", title: $t('common.collections'), icon: "mdi-group" },
-  { value: "places", title: $t('common.places'), icon: "mdi-map-marker" },
-  { value: "tags", title: $t('common.tags'), icon: "mdi-tag-text" },
+  { value: 'collections', title: $t('common.collections'), icon: 'mdi-group' },
+  { value: 'places', title: $t('common.places'), icon: 'mdi-map-marker' },
+  { value: 'tags', title: $t('common.tags'), icon: 'mdi-tag-text' },
   // { value: "moderation", title: $t('common.moderation') },
-  { value: "announcements", title: $t('common.announcements'), icon: "mdi-bullhorn" },
-  { value: "pages", title: $t('common.pages'), icon: "mdi-post-outline" },
+  { value: 'announcements', title: $t('common.announcements'), icon: 'mdi-bullhorn' },
+  { value: 'pages', title: $t('common.pages'), icon: 'mdi-post-outline' },
 
-  { type: "divider" },
+  { type: 'divider' },
 
-  ...(isAdmin.value ? [{ value: "settings", title: $t('common.settings'), icon: "mdi-cog" }] : []),
-  { value: "theme", title: $t('common.theme'), icon: "mdi-shape" },
-  { value: "federation", title: $t('common.federation'), icon: "mdi-web" },
-  { value: "geolocation", title: $t('admin.geolocation'), icon: "mdi-map" },
-  { value: "plugins", title: $t('common.plugins'), icon: "mdi-toy-brick" },
-]);
+  ...(isAdmin.value ? [{ value: 'settings', title: $t('common.settings'), icon: 'mdi-cog' }] : []),
+  { value: 'theme', title: $t('common.theme'), icon: 'mdi-shape' },
+  { value: 'federation', title: $t('common.federation'), icon: 'mdi-web' },
+  { value: 'geolocation', title: $t('admin.geolocation'), icon: 'mdi-map' },
+  { value: 'plugins', title: $t('common.plugins'), icon: 'mdi-toy-brick' },
+])
 
 </script>
 <template>
@@ -48,7 +48,7 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
   <AdminSetupAlert v-if="isAdmin" />
 
   <div class="mt-md-4 mb-8">
-    <Settings :menuItems="menuItems" :title="$t('common.admin')" query-param="view">
+    <Settings :menu-items="menuItems" :title="$t('common.admin')" query-param="view">
       <SettingsView value="settings">
         <AdminSettings />
       </SettingsView>

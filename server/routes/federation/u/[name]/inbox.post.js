@@ -1,5 +1,5 @@
 import { parseAPMessage, verifySignature } from '~~/server/federation/helpers'
-import { follow, unfollow } from "~~/server/federation/follows"
+import { follow, unfollow } from '~~/server/federation/follows'
 
 /**
  * Federation route handler for ActivityPub (AP) POST requests to /inbox.
@@ -8,13 +8,13 @@ import { follow, unfollow } from "~~/server/federation/follows"
  * and dispatches handling logic based on the message type.
  *
  */
- 
-export default defineEventHandler(async event => {
+
+export default defineEventHandler(async (event) => {
   const log = useLogger('AP inbox')
   await verifySignature(event)
   const message = await readBody(event)
   console.error('message:', message)
-  
+
   // has to have an object and a type property..
   if (!message?.object || !message?.type) {
     log.warn('[FEDI] message without `object` or `type` property: %s', message)
@@ -40,7 +40,7 @@ export default defineEventHandler(async event => {
         // Ego.unboost(req, res)
       } else {
         log.warn('[FEDI] Undo Activity for unsupported Object: %s', JSON.stringify(message.object))
-        throw createError({ status: 400, message: 'Undo Activity for unsupported Object'})
+        throw createError({ status: 400, message: 'Undo Activity for unsupported Object' })
       }
       break
     case 'Announce':
@@ -106,7 +106,7 @@ export default defineEventHandler(async event => {
       break
     default:
       log.error('[FEDI] Unknown message type: %s', message?.type)
-      throw createError({ status: 404, message: 'Unknown message type'})
+      throw createError({ status: 404, message: 'Unknown message type' })
       // res.sendStatus(404)
   }
 })

@@ -1,7 +1,7 @@
 import max from 'lodash/max'
 
 import { calculateEtag } from '~~/server/utils/events'
-export default defineEventHandler(async evt => {
+export default defineEventHandler(async (evt) => {
   const log = useLogger('events/tag')
   const tagName = getRouterParam(evt, 'tag', { decode: true })
 
@@ -26,5 +26,4 @@ export default defineEventHandler(async evt => {
   if (!handleCacheHeaders(evt, { modifiedTime, etag, maxAge: 5 })) {
     return { events: mapEvents(events), pastEvents: mapEvents(pastEvents) }
   }
-
 })

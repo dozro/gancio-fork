@@ -46,7 +46,7 @@ export default defineNuxtConfig({
   i18n: {
     defaultLocale: 'en',
     lazy: true,
-    langDir: 'locales/',   // must be set, but won’t be used for actual loading
+    langDir: 'locales/', // must be set, but won’t be used for actual loading
     types: 'composition',
     pages: undefined,
     locales: Object.keys(locales).map(key => ({
@@ -55,7 +55,7 @@ export default defineNuxtConfig({
       dir: ['ar', 'fa', 'ta'].includes(key) ? 'rtl' : 'ltr',
       file: 'en.js'
     })),
-    // skipSettingLocaleOnNavigate: true,// 
+    // skipSettingLocaleOnNavigate: true,//
     // dynamicRouteParams: false,
     compilation: {
       strictMessage: false
