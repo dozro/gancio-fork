@@ -119,7 +119,9 @@
         "report": "Report event",
         "role": "Role",
         "past_events": "Past Events",
-        "pages": "Pages"
+        "pages": "Pages",
+        "no_events_found": "No events found",
+        "no_events_found_hint": "Select different dates or criteria"
     },
     "login": {
         "description": "By logging in you can publish new events.",

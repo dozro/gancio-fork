@@ -121,7 +121,9 @@
         "enabled": "Habilitado",
         "pages": "Páginas",
         "trusted_sources": "Fuentes federadas de confianza",
-        "past_events": "Eventos pasados"
+        "past_events": "Eventos pasados",
+        "no_events_found": "No hay eventos",
+        "no_events_found_hint": "Selecciona fechas o filtros diferentes"
     },
     "login": {
         "description": "Entrando podrás publicar nuevos eventos.",
