@@ -26,7 +26,7 @@ export const eventQuerySchema = z.object({
   }, z.array(z.coerce.number())).optional(),
   show_recurrent: z.coerce.boolean().default(publicSettings.recurrent_event_visible).optional(),
   show_multidate: z.coerce.boolean().default(true).optional(),
-  show_federated: z.coerce.boolean().default(false).optional(),
+  show_federated: z.coerce.boolean().default(publicSettings.federated_events_in_home).optional(),
   max: z.coerce.number().optional(),
   page: z.coerce.number().optional(),
   older: z.coerce.boolean().optional(),
