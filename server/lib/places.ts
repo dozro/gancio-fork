@@ -1,6 +1,8 @@
 import { Op, col, where, fn } from '@sequelize/core'
+import { Event, Place, Tag, User, Resource, APUser } from '../utils/sequelize'
 import { useLogger } from '../utils/useLogger'
-const log = useLogger('place')
+import { createError } from 'h3'
+const log = useLogger('federation:places')
 
 export async function findOrCreatePlace (body) {
   if (body?.place_id) {

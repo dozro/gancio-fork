@@ -1,6 +1,6 @@
 // const { Place } = require('../api/models/models')
 // const log = require('../log')
-
+import { useLogger } from '../utils/useLogger'
 import { findOrCreatePlace } from '../lib/places'
 
 // module exports = {
@@ -32,7 +32,7 @@ import { findOrCreatePlace } from '../lib/places'
   * @link https://codeberg.org/fediverse/fep/src/commit/4a75a1bc50bc6d19fc1e6112f02c52621bc178fe/fep/8a8e/fep-8a8e.md#location
   * @param {Object} APEvent - The ActivityPub Event object
   */
-export async function parseAPLocation(APEvent) {
+export async function parseAPLocation(APEvent: unknown) {
   const log = useLogger('federation:places')
   // const eventController = require('../api/controller/event')
   let place = null
