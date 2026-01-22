@@ -42,7 +42,10 @@ function newCollection() {
 }
 
 async function saveCollection() {
-  if (!form.value.validate()) return
+  const { valid } = await form.value.validate()
+  if (!valid) {
+    return
+  }
   loading.value = true
   collection.value.name = collection.value.name.trim()
   try {

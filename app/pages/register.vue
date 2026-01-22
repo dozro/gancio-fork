@@ -14,7 +14,7 @@ const valid = ref(false)
 const { $notify } = useNuxtApp()
 
 const register = async () => {
-  const valid = form.value.validate()
+  const valid = await form.value.validate()
   if (!valid) {
     return
   }

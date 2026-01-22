@@ -2,6 +2,7 @@
 const { t } = useI18n()
 const settings = useState('settings')
 
+const form = ref()
 const loading = ref(false)
 const dialog = ref(false)
 const valid = ref(false)
@@ -34,8 +35,10 @@ function editPlace(item) {
 }
 
 async function savePlace() {
-  const form = refs.form || (typeof $refs !== 'undefined' && $refs.form)
-  if (!form || !form.validate()) return
+  const { valid } = await form.value.validate()
+  if (!valid) {
+    return
+  }
   loading.value = true
   await $fetch('/place', {
     method: 'PUT',

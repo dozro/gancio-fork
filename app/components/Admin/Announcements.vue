@@ -55,7 +55,8 @@ async function remove(announcement: Announcement) {
 }
 
 async function save() {
-  if (!form.value.validate()) {
+  const { valid } = await form.value.validate()
+  if (!valid) {
     return
   }
   loading.value = true

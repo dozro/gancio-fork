@@ -2,15 +2,17 @@ import * as linkify from 'linkifyjs'
 export default defineNuxtPlugin((nuxtApp) => {
   const t = nuxtApp.vueApp.$nuxt.$i18n.t
 
-  const validators = {
+  const validators: ValidationService = {
     required: (fieldName: string) => (value: unknown) => !!value || t('validators.required', { fieldName: t(fieldName) }),
+
+    requiredMulti: fieldName => values => (Array.isArray(values) && values.length > 0 && values.every(v => !!v)) || t('validators.required', { fieldName: t(fieldName) }),
 
     password: (value: string) => {
       if (value.length < 8) return 'The password must have at least 8 characters'
       return true
     },
 
-    confirm: (password: string) => (value: string) => password === value || `Password does not match`,
+    // confirm: (password: string) => (value: string) => password === value || `Password does not match`,
 
     email: [
       (v: string) => !!v || t('validators.required', { fieldName: t('common.email') }),

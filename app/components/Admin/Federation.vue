@@ -16,6 +16,7 @@ const headers = [
 const { data: stats } = useFetch('/api/ap_actors/stats')
 const { data: trusted_sources, refresh } = await useFetch('/api/ap_actors/trusted', { deep: true })
 
+const form = ref()
 const source_url = ref('')
 const instance_name = ref(settings.value.instance_name)
 const trusted_sources_label = ref(settings.value.trusted_sources_label)
@@ -45,8 +46,11 @@ async function toggleFollowing (trusted_source) {
 }
 
 async function createTrustedInstance () {
-  // if (!this.$refs.form.validate()) { return }
   loading.value = true
+  const { valid } = await form.value.validate()
+  if (!valid) {
+    return
+  }
   try {
     source_url.value = source_url.value.replace(/\/$/, '')
     await $fetch('/api/ap_actors/add_trust', { method: 'POST', body: { url: source_url.value } })

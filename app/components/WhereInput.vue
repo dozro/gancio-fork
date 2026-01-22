@@ -110,7 +110,7 @@ function selectPlace (place) {
       v-model="event.online_locations" class="mr-4"
       prepend-icon="mdi-link" :hint="$t('event.online_locations_help')"
       :label="$t('event.online_locations')"
-      :rules="isOnLine ? [$valid.required('event.online_locations')] : []"
+      :rules="isOnLine ? [$valid.requiredMulti('event.online_locations')] : []"
       clearable chips
       multiple
       density='default'

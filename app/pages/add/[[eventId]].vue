@@ -51,7 +51,8 @@ async function done() {
     return
   }
 
-  if (!form.value.validate()) {
+  const formValidation = await form.value.validate()
+  if (!formValidation.valid) {
     console.error('validation error!')
     return
   }
