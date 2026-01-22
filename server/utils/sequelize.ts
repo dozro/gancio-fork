@@ -850,7 +850,7 @@ export class Page extends Model<
 
       // Ensure slug is unique
       while (
-        await Event.findOne({
+        await Page.findOne({
           where: { slug, id: { [Op.ne]: page.id } }
         }) // skip self in case of update
       ) {
