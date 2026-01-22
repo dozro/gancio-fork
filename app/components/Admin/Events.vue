@@ -15,8 +15,8 @@ const selectedEvent = ref()
 
 const headers = [
   { value: 'title', title: t('common.title') },
-  { value: 'place.name', title: t('common.place'), width: 300 },
-  { value: 'start_datetime', title: t('common.when'), width: 300 },
+  { value: 'place.name', title: t('common.place') },
+  { value: 'start_datetime', title: t('common.when') },
   { value: 'actions', title: t('common.actions'), align: 'end', sortable: false, width: 280 }
 ]
 
