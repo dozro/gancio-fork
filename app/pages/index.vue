@@ -69,6 +69,12 @@ const { data: announcements } = await useFetch<Announcement[]>('/api/announcemen
       :options="{ threshold: .5, rootMargin: '500px' }">
       <EventCard :event='event' :lazy='idx>9' />
     </v-lazy>
+
+    <div v-if="!visibleEvents?.length" class="d-flex flex-column align-center ga-2 my-8 my-sm-12">
+      <span class="text-h4 text-medium-emphasis">{{ $t('common.no_events_found') }}</span>
+      <span>{{ $t('common.no_events_found_hint') }}</span>
+      <v-icon icon="mdi-cactus" :size="200" class="opacity-20 mt-2" />
+    </div>
   </section>
 
 </v-container>
