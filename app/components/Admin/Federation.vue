@@ -1,6 +1,5 @@
 <script setup lang='ts'>
 
-const settings = useState('settings')
 const { $notify, $confirm } = useNuxtApp()
 
 const headers = [
@@ -18,13 +17,9 @@ const { data: trusted_sources, refresh } = await useFetch('/api/ap_actors/truste
 
 const form = ref()
 const source_url = ref('')
-const instance_name = ref(settings.value.instance_name)
-const trusted_sources_label = ref(settings.value.trusted_sources_label)
-// const url2host = ref($options.filters.url2host)
+// const instance_name = ref(settings.value.instance_name)
 const dialogAddTrustedSource = ref(false)
-const statsRef = ref({})
 const loading = ref(false)
-const trusted_sources_ref = ref([])
 const valid = ref(false)
 
 const enable_resources = manageSetting('enable_resources')
@@ -32,12 +27,14 @@ const enable_federation = manageSetting('enable_federation')
 const federated_events_in_home = manageSetting('federated_events_in_home')
 const default_fedi_hashtags = manageSetting('default_fedi_hashtags')
 const hide_boosts = manageSetting('hide_boosts')
+const trusted_sources_label = manageSetting('trusted_sources_label')
 
 async function toggleFollowing (trusted_source) {
   try {
     trusted_source.loading = true
     await $fetch('/api/ap_actors/follow', { method: 'PUT', body: { ap_id: trusted_source.ap_id } })
     $notify('common.ok', Statuses.SUCCESS)
+    refresh()
   } catch (e) {
     $notify(String(e), Statuses.ERROR)
   }
@@ -140,20 +137,7 @@ async function deleteTrustedSource (trusted_source) {
       chips
       closable-chips
       :hint="$t('admin.default_fedi_hashtags_help')"
-    >
-      <template v-slot:chip="{ item, attrs, selected, parent }">
-        <v-chip
-          v-bind="attrs"
-          closable
-          :model-value="selected"
-          label
-          size="small"
-          @click:close="parent.selectItem(item)"
-        >
-          {{ item }}
-        </v-chip>
-      </template>
-    </v-combobox>
+    />
 
     <v-text-field
       v-model="trusted_sources_label"
