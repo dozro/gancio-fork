@@ -25,7 +25,8 @@ function editTag(item) {
 
 async function saveTag () {
   loading.value = true
-  if (!form.value.validate()) {
+  const { valid } = await form.value.validate()
+  if (!valid) {
     return
   }
 

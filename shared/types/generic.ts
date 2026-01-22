@@ -1,9 +1,13 @@
 import type { Event, Place } from '#build/types/nitro-imports'
 import type { CreationAttributes } from '@sequelize/core'
 
+type ValidatorFn<T = unknown> = (value: T) => boolean | string
+
 export interface ValidationService {
-  required: (fieldName: string) => (value: unknown) => boolean | string
-  password: (value: string) => boolean | string
+  required: (fieldName: string) => ValidatorFn
+  requiredMulti: (fieldName: string) => ValidatorFn
+  password: ValidatorFn<string>
+  email: ValidatorFn<string>[]
 }
 
 declare module 'vue' {

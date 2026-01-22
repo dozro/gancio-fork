@@ -8,7 +8,10 @@ const new_password = ref('')
 const form = ref()
 
 async function change_password () {
-  if (!form.value.validate()) return
+  const valid = await form.value.validate()
+  if (!valid) {
+    return
+  }
   try {
     await $fetch('/api/user/recover_password', { method: 'POST', body: { recover_code, password: new_password.value } })
     $notify('common.password_updated', Statuses.SUCCESS)

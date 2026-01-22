@@ -82,8 +82,9 @@ async function changeRole (user, role) {
   return false
 }
 
-async function createUser () {
-  if (!userForm.value.validate()) {
+async function createUser() {
+  const { valid } = await userForm.value.validate()
+  if (!valid) {
     return
   }
   try {
