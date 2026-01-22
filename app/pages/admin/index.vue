@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import Settings from '~/components/Core/Settings/Settings.vue'
-import SettingsView from '~/components/Core/Settings/SettingsView.vue'
 import type { SettingsMenuItem } from '~/components/Core/Settings/types'
-
 const settings = useState<Settings>('settings')
 
 definePageMeta({ middleware: ['authenticated'] })
@@ -48,64 +45,64 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
   <AdminSetupAlert v-if="isAdmin" />
 
   <div class="mt-md-4 mb-8">
-    <Settings :menu-items="menuItems" :title="$t('common.admin')" query-param="view">
-      <SettingsView value="settings">
+    <CoreSettings :menu-items="menuItems" :title="$t('common.admin')" query-param="view">
+      <CoreSettingsView value="settings">
         <AdminSettings />
-      </SettingsView>
+      </CoreSettingsView>
 
-      <SettingsView value="users">
+      <CoreSettingsView value="users">
         <AdminUsers />
-      </SettingsView>
+      </CoreSettingsView>
 
-      <SettingsView value="events">
+      <CoreSettingsView value="events">
         <AdminEvents
           :unconfirmed-events='unconfirmedEvents?.events'
           :unconfirmed-old-events='unconfirmedEvents?.oldEvents'
           @confirmed='refresh'
           @removed='refresh'
         />
-      </SettingsView>
+      </CoreSettingsView>
 
-      <SettingsView value='collections'>
+      <CoreSettingsView value='collections'>
         <AdminCollections />
-      </SettingsView>
+      </CoreSettingsView>
 
-      <SettingsView value='federation'>
+      <CoreSettingsView value='federation'>
         <AdminFederation />
-      </SettingsView>
+      </CoreSettingsView>
 
-      <!-- <SettingsView value='moderation'>
+      <!-- <CoreSettingsView value='moderation'>
         <AdminModeration />
-      </SettingsView> -->
+      </CoreSettingsView> -->
 
-      <SettingsView value='places'>
+      <CoreSettingsView value='places'>
         <AdminPlaces />
-      </SettingsView>
+      </CoreSettingsView>
 
-      <SettingsView value='tags'>
+      <CoreSettingsView value='tags'>
         <AdminTags />
-      </SettingsView>
+      </CoreSettingsView>
 
-      <SettingsView value='theme'>
+      <CoreSettingsView value='theme'>
         <AdminTheme />
-      </SettingsView>
+      </CoreSettingsView>
 
-      <SettingsView value='geolocation'>
+      <CoreSettingsView value='geolocation'>
         <AdminGeolocation />
-      </SettingsView>
+      </CoreSettingsView>
 
-      <SettingsView value='announcements'>
+      <CoreSettingsView value='announcements'>
         <AdminAnnouncements />
-      </SettingsView>
+      </CoreSettingsView>
 
-      <SettingsView value='pages'>
+      <CoreSettingsView value='pages'>
         <AdminPages />
-      </SettingsView>
+      </CoreSettingsView>
 
-      <SettingsView value='plugins'>
+      <CoreSettingsView value='plugins'>
         <AdminPlugin />
-      </SettingsView>
-    </Settings>
+      </CoreSettingsView>
+    </CoreSettings>
   </div>
 </v-container>
 </template>
