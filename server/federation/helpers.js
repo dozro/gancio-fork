@@ -5,6 +5,7 @@ import { DateTime } from 'luxon'
 import { parseAPLocation } from './places'
 import { getImageFromURL, sanitizeHTML } from '../helpers'
 import { findOrCreateTags } from '../lib/tags'
+import { _signAndSend } from './sign_and_send'
 
 const log = useLogger('federation')
 
@@ -33,7 +34,7 @@ export async function signAndSend (message, inbox, method = 'post') {
   useTaskManager().add({
     name: 'SIGN_AND_SEND',
     method: _signAndSend,
-    args: [message, inbox, method]
+    args: [message, inbox, method, secretSettings.privateKey]
   })
 }
 
@@ -122,70 +123,6 @@ export async function updateActor() {
     body['@context'] = body['object']['@context']
 
     signAndSend(JSON.stringify(body), sharedInbox)
-  }
-}
-
-async function _signAndSend (message, inbox, method = 'post') {
-  // log.debug('[FEDI] Sign and %s %s %s', method, message, inbox)
-  log.debug('[FEDI] Sign and %s %s', method, inbox)
-  const inboxUrl = new URL(inbox)
-  const privkey = secretSettings.privateKey
-  const signer = crypto.createSign('sha256')
-  const d = new Date()
-
-  let header
-  let digest
-  if (method === 'post') {
-    digest = crypto.createHash('sha256')
-      .update(message)
-      .digest('base64')
-    const stringToSign = `(request-target): post ${inboxUrl.pathname}\nhost: ${inboxUrl.hostname}\ndate: ${d.toUTCString()}\ndigest: SHA-256=${digest}`
-    signer.update(stringToSign)
-    signer.end()
-    const signature = signer.sign(privkey)
-    const signature_b64 = signature.toString('base64')
-    header = `keyId="${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key",algorithm="rsa-sha256",headers="(request-target) host date digest",signature="${signature_b64}"`
-  } else {
-    const stringToSign = `(request-target): get ${inboxUrl.pathname}\nhost: ${inboxUrl.hostname}\ndate: ${d.toUTCString()}`
-    signer.update(stringToSign)
-    signer.end()
-    const signature = signer.sign(privkey)
-    const signature_b64 = signature.toString('base64')
-    header = `keyId="${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key",algorithm="rsa-sha256",headers="(request-target) host date",signature="${signature_b64}"`
-  }
-  try {
-    const ret = await fetch(inbox, {
-      headers: {
-        'Host': inboxUrl.hostname,
-        'Date': d.toUTCString(),
-        'Signature': header,
-        ...(method === 'post' && ({ Digest: `SHA-256=${digest}` })),
-        'Content-Type': 'application/activity+json',
-        'Accept': 'application/activity+json'
-      },
-      method,
-      ...(method === 'post' && ({ body: message }))
-    })
-
-    const contentType = ret.headers.get('content-type')
-    // check if content-type is json
-    if (!contentType.includes('json')) {
-      log.error(`[FEDI] Error in sign and send, wrong content-type returned: ${contentType} - status: ${ret.status}`)
-      console.error(await ret.text())
-      return
-    }
-
-    if (ret.ok) {
-      log.debug(`[FEDI] Signed and verified! ${ret.status} => ${contentType}`)
-      return ret.json().catch(() => '')
-    } else {
-      const body = await ret.json()
-      log.error('[FEDI] Error in sign and send [%s]: %s', inbox, body)
-      throw body
-    }
-  } catch (e) {
-    log.error('[FEDI] Error in sign and send [%s]: %s', inbox, e?.response?.data?.error ?? e?.response?.statusMessage ?? '' + ' ' + String(e))
-    throw e
   }
 }
 
@@ -302,7 +239,8 @@ export async function parseAPMessage (APMessage, actor) {
     let tmp_actor
     if (!event) {
       // this is an announce of a remote event, let's get the event
-      event = await _signAndSend('', APMessage, 'get')
+      log.debug(`[FEDI] Fetch remote Event from ${APMessage}`)
+      event = await _signAndSend('', APMessage, 'get', secretSettings.privateKey)
     }
     if (event?.type === 'Event') {
       if (event?.attributedTo !== actor?.ap_id) {
@@ -405,7 +343,7 @@ export async function followActor (actor) {
   await signAndSend(JSON.stringify(body), actor.object.endpoints?.sharedInbox ?? actor.object.inbox)
   await actor.update({ following: true })
 
-  log.info('After actor update follogin, get the outbox')
+  log.info('After actor update following, get the outbox')
   // let's try to get remote outbox
   const events = await getOutbox(actor, 10)
   if (!events?.length) {
@@ -424,12 +362,12 @@ export async function getOutbox(actor) {
 
   if (!actor?.object?.outbox) return
   try {
-    let collection = await _signAndSend('', actor?.object?.outbox, 'get')
+    let collection = await _signAndSend('', actor?.object?.outbox, 'get', secretSettings.privateKey)
     // embedded collection
     if (typeof collection?.first !== 'string') {
       return collection?.first?.orderedItems ?? []
     } else if (/^https?:\/\//.test(collection?.first)) {
-      collection = await _signAndSend('', collection.first, 'get')
+      collection = await _signAndSend('', collection.first, 'get', secretSettings.privateKey)
       if (Array.isArray(collection?.orderedItems)) {
         return collection?.orderedItems ?? []
       }
@@ -476,18 +414,22 @@ export async function getActor (URL, instance, force = false, fail_on_not_cached
     }
   }
 
-  fedi_user = await _signAndSend('', URL, 'get')
-  if (!fedi_user?.id) {
-    log.debug('[FEDI] getActor failed for %s', URL)
-    return false
-  }
-  if (fedi_user) {
-    log.info('[FEDI] Create/Update a new AP User "%s" and associate it to instance "%s"', fedi_user?.id, instance.domain)
-    try {
-      ([fedi_user] = await APUser.upsert({ ap_id: fedi_user?.id, object: fedi_user, instanceDomain: instance.domain, blocked: false }))
-    } catch (e) {
-      log.debug('[FEDI] Error in update/create ', e)
+  try {
+    fedi_user = await _signAndSend('', URL, 'get', secretSettings.privateKey)
+    if (!fedi_user?.id) {
+      log.debug('[FEDI] getActor failed for %s', URL)
+      return false
     }
+    if (fedi_user) {
+      log.info('[FEDI] Create/Update a new AP User "%s" and associate it to instance "%s"', fedi_user?.id, instance.domain)
+      try {
+        ([fedi_user] = await APUser.upsert({ ap_id: fedi_user?.id, object: fedi_user, instanceDomain: instance.domain, blocked: false }))
+      } catch (e) {
+        log.debug('[FEDI] Error in update/create ', e)
+      }
+    }
+  } catch (e) {
+    log.debug('[FEDI] nope ', e)
   }
   return fedi_user
 }
@@ -557,7 +499,7 @@ export async function getInstance (actor_url, force = false, fail_on_not_cached 
    * https://www.w3.org/wiki/SocialCG/ActivityPub/Authentication_Authorization#Signing_requests_using_HTTP_Signatures
    * Each POST to /inbox coming from fediverse has to be verified.
    * Signature checking needs Actor's public key
-   * @return {Boolean} true in case of successfull validation
+   * @return true in case of successfull validation
    * @throws {H3Error} throw in case of validation failure
    */
 export async function verifySignature (event) {
