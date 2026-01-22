@@ -374,6 +374,7 @@
         "new_page": "Añade una nueva página customizada",
         "federated_events_in_home_help": "Los eventos entrantes de fuentes federadas confiables serán mostrados por defecto en la página home. Para mostrar solo algunos de ellos puedes utilizar las colecciones.",
         "page_description": "En esta sección puedes administrar páginas customizadas (p.ej. políticas, tutoriales). Estas páginas no aparecerán automáticamente en ningún lugar, pero puedes referenciarlas en el pie de página, desde la página «acerca de» o desde cualquier lugar a través del enlace de vista previa.",
+        "page_is_disabled": "Esta página no está visible al público",
         "trusted_sources_label": "Etiqueta de navegación para las fuentes federadas confiables",
         "trusted_source_removed": "Fuente confiable borrada",
         "federated_events_in_home": "Muestra eventos federados en la página home",
