@@ -360,16 +360,8 @@ export async function parseAPEvent (APEvent, actor) {
   const image_url = APEvent?.attachment?.find(a => a?.mediaType.includes('image') && a.url)?.url
   if (image_url) {
     log.debug('[FEDI] Download attachment for event %s', image_url)
-    const file = await getImageFromURL(image_url)
-
-    media = [{
-      url: file.filename,
-      height: file.height,
-      width: file.width,
-      name: APEvent.attachment[0]?.name || APEvent.name.trim() || '',
-      size: file.size || 0,
-      focalpoint: APEvent.attachment[0]?.focalPoint
-    }]
+    const image = await getImageFromURL(image_url, APEvent.attachment[0]?.name || APEvent.name.trim() || '', APEvent.attachment[0]?.focalPoint)
+    media = [image]
   }
 
   // create it
