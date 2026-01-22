@@ -221,6 +221,8 @@ export async function parseAPMessage (APMessage, actor) {
     const is_local = APMessage?.match(`${publicSettings.baseurl}/federation/m/(.*)`)
     // Announce of local event
     if (is_local) {
+      log.debug(`[FEDI] Announce of local event ${APMessage}, skip parsing`)
+      return false
       // return Ego.boost(APMessage, actor)
     }
   } else if (APMessage.type === 'Event') {
@@ -313,7 +315,7 @@ export async function parseAPEvent (APEvent, actor) {
     is_visible: true,
     ap_id,
     ap_object: APEvent,
-    apUserApId: actor?.ap_id ?? actor,
+    apUserApId: actor?.ap_id ?? actor
   })
 
   if (place) {

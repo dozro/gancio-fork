@@ -53,6 +53,7 @@ export type Settings = {
   'custom_css': string
   'publicKey'?: string
   'about'?: string
+  'trusted_sources_label'?: string
 }
 
 // { primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00' },
@@ -117,8 +118,8 @@ export const publicSettings: Settings = {
   'smtp': {}
 }
 
-export const secretSettings: Record<keyof SecretSettings, unknown> = {
-  privateKey: null
+export const secretSettings: SecretSettings = {
+  privateKey: ''
 }
 
 export function getSetting(key: keyof Settings) {

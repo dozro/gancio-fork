@@ -10,11 +10,11 @@ export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
 
   const log = useLogger('follow')
-  const body = await readValidatedBody(event, schema.parse)
+  const { ap_id } = await readValidatedBody(event, schema.parse)
 
-  const ap_actor = await APUser.findByPk(body.ap_id, { include: Instance })
+  const ap_actor = await APUser.findByPk(ap_id, { include: Instance })
   if (!ap_actor) {
-    log.warn('This ap user does not exists: ', body.ap_id)
+    log.warn('This ap user does not exists: ', ap_id)
     throw createError({ status: 404, message: 'This ap user does not exists' })
   }
 

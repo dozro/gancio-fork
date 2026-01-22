@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     log.debug(`[FEDI] Get unknown actor ${name} (should be ${publicSettings.instance_name}`)
     throw createError({
       statusCode: 404,
-      statusMessage: `No record found for ${name} (are you searching for ${publicSettings.instance_name} ?`
+      statusMessage: `No record found for ${name} (are you searching for ${publicSettings.instance_name} ?)`
     })
   }
 
