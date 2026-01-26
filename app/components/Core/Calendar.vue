@@ -40,6 +40,7 @@ function updatePages (pages) {
   --vc-rounded-lg: 4px !important;
   --vc-bg: rgba(250,250,250,0.5);
   /* --vc-color: var(vc--gray-900) !important; */
+  backdrop-filter: blur(4px);
 }
 
 .v-theme--dark .vc-container {
@@ -47,6 +48,7 @@ function updatePages (pages) {
   --vc-rounded-lg: 4px !important;
   --vc-bg: rgba(10,10,10,0.5);
   /* --vc-color: #999 !important; */
+  backdrop-filter: blur(4px);
 }
 
 .vc-opacity-0 {

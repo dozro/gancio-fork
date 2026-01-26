@@ -35,6 +35,9 @@ const { events, params } = useEvents()
 const isCurrentMonth = computed(() => params.value.start === time.startMonth())
 
 const visibleEvents = computed(() => {
+  if (params.value.query) {
+    return events.value
+  }
   if (selectedDate.value) {
     const min = DateTime.fromJSDate(selectedDate?.value)?.startOf('day')?.toUnixInteger()
     const max = DateTime.fromJSDate(selectedDate?.value)?.endOf('day')?.toUnixInteger()

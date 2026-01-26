@@ -79,7 +79,7 @@ export async function getEvents(opts?: EventQueryType | undefined) {
   //   args.tags = args.tags.map(t => t.trim())
   // }
 
-  const replacements = []
+  const replacements: { [key: string]: unknown } = {}
 
   if (args.tags && args.places) {
     condition[Op.and] = [
@@ -93,12 +93,12 @@ export async function getEvents(opts?: EventQueryType | undefined) {
   }
 
   if (args.query) {
-    replacements.push(args.query)
+    replacements.query = args.query
     condition[Op.or] =
       [
-        { title: where(fn('LOWER', col('title')), 'LIKE', '%' + args.query + '%') },
-        where(fn('LOWER', col('name')), 'LIKE', '%' + args.query + '%'),
-        fn('EXISTS', literal(`SELECT 1 FROM event_tags WHERE event_tags.eventId=event.id AND LOWER(${col('tagTag')}) = LOWER(?)`))
+        where(fn('LOWER', col('title')), Op.like, '%' + args.query + '%'),
+        where(fn('LOWER', col('name')), Op.like, '%' + args.query + '%'),
+        fn('EXISTS', literal(`SELECT 1 FROM event_tags WHERE event_tags.eventId=event.id AND LOWER(${col('tagTag').identifiers}) = LOWER(:query)`))
       ]
   }
 
@@ -128,7 +128,7 @@ export async function getEvents(opts?: EventQueryType | undefined) {
       { model: Place, required: true, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] }
     ],
     ...pagination,
-    // replacements,
+    replacements,
   })
 
   // return mapEvents(events as Event[])
