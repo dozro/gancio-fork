@@ -7,20 +7,17 @@ const { t } = useI18n()
 const showFollowMe = ref<boolean>(false)
 
 const { data: trusted_sources } = await useFetch<APUser[]>('/api/ap_actors/trusted', { lazy: true })
-const { data: footerLinks } = await useFetch<FooterLink[]>('/api/settings/footerLinks', {
-  transform(links) {
-    return links.map((link) => {
-      if (/^https?:\/\//.test(link.href)) {
-        return { href: link.href, label: link.label.startsWith('common.') ? t(link.label) : link.label }
-      } else {
-        return { to: link.href, label: link.label.startsWith('common.') ? t(link.label) : link.label }
-      }
-    }) as FooterLink[] }
-})
+const footerLinks = computed(() => settings.value.footerLinks?.map((link) => {
+  if (/^https?:\/\//.test(link.href)) {
+    return { href: link.href, label: link.label.startsWith('common.') ? t(link.label) : link.label }
+  } else {
+    return { to: link.href, label: link.label.startsWith('common.') ? t(link.label) : link.label }
+  }
+}))
 
 </script>
 <template>
-<v-footer id='footer' color='surface' border aria-label='Footer' class="flex-grow-0 py-3 flex-wrap" >
+<v-footer id='footer' color='surface' border aria-label='Footer' class="flex-grow-0 py-3 flex-wrap flex-column flex-sm-row" >
 
   <!-- follow me dialog -->
   <v-dialog v-model='showFollowMe' destroy-on-close max-width='700px' :fullscreen='$vuetify.display?.mobile'>
@@ -40,10 +37,14 @@ const { data: footerLinks } = await useFetch<FooterLink[]>('/api/settings/footer
       <v-btn class="ml-1" v-bind="props" color="primary">{{ settings.trusted_sources_label || $t('admin.trusted_sources_label_default') }}</v-btn>
     </template>
     <v-list lines="two" max-height="300" max-width="550">
-      <v-list-item v-for='instance in trusted_sources' :key="instance.ap_id" lines="two" target="_blank" :href="instance?.object.url ?? instance?.ap_id">
-        <v-avatar>
-          <v-img :src="instance.object?.icon.url" />
-        </v-avatar>
+      <v-list-item
+        v-for='instance in trusted_sources'
+        :key="instance.ap_id"
+        lines="two"
+        target="_blank"
+        :href="instance?.object.url ?? instance?.ap_id"
+        :prepend-avatar="instance.object?.icon.url"
+      >
         <v-list-item-title>{{ instance?.object?.name ?? instance?.object?.preferredUsername }}</v-list-item-title>
         <v-list-item-subtitle>{{ instance?.object?.summary }}</v-list-item-subtitle>
       </v-list-item>
