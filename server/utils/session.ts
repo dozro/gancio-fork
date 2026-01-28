@@ -1,5 +1,5 @@
 import type { User } from '#auth-utils'
-import { verifyJwtToken } from './jwt'
+import { verifyJwtToken } from '../lib/jwt'
 
 type UseSessionEvent = Parameters<typeof useSession>[0]
 

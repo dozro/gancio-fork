@@ -1,8 +1,9 @@
 import { z } from 'zod'
 // import { APUser } from "~/server/utils/sequelize"
 import { followActor, getInstance, getActor } from '~~/server/federation/helpers.js'
-import { get as getConfig } from '../../config'
+import { get as getConfig } from '../../services/config'
 import { isHiddenService } from '../../helpers'
+import { useLogger } from '~~/server/lib/logger'
 
 const schema = z.object({
   url: z.string()

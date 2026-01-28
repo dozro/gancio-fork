@@ -1,5 +1,7 @@
 import { parseAPMessage, verifySignature } from '~~/server/federation/helpers'
 import { follow, unfollow } from '~~/server/federation/follows'
+import { useLogger } from '~~/server/lib/logger'
+import { APUser, Resource } from '~~/server/services'
 
 /**
  * Federation route handler for ActivityPub (AP) POST requests to /inbox.
@@ -107,6 +109,6 @@ export default defineEventHandler(async (event) => {
     default:
       log.error('[FEDI] Unknown message type: %s', message?.type)
       throw createError({ status: 404, message: 'Unknown message type' })
-      // res.sendStatus(404)
+    // res.sendStatus(404)
   }
 })

@@ -1,10 +1,11 @@
-<script setup>
+<script setup lang="ts">
 defineProps({
   unconfirmedEvents: { type: Array, default: () => [] },
   unconfirmedOldEvents: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits(['confirmed', 'removed'])
+const settings = useState<Settings>('settings')
 
 const { $confirm, $notify } = useNuxtApp()
 const $route = useRoute()
@@ -60,6 +61,7 @@ async function remove (event) {
       <t-btn color='success' :tooltip="$t('common.confirm')" icon='mdi-check-bold' @click='confirm(item)' />
 
       <t-btn
+        v-if='settings.enable_moderation'
         color='warning'
         :tooltip="$t('common.moderation')" icon='mdi-message-text' @click='() => { selectedEvent = item; openModeration=true }' />
       <!-- v-badge(v-if='item?.n_messages' :content="item?.n_messages" overlap bordered)

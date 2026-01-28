@@ -1,5 +1,7 @@
 import path from 'path'
-import { get as getConfig } from '../config'
+import { get as getConfig } from '../services/config'
+import { serveFile } from '../helpers'
+import { publicSettings } from '../services'
 
 export default defineEventHandler(async (event) => {
   const config = getConfig()

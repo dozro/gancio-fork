@@ -4,13 +4,17 @@ import { DateTime } from 'luxon'
 
 import { parseAPLocation } from './places'
 import { getImageFromURL, sanitizeHTML } from '../helpers'
-import { findOrCreateTags } from '../lib/tags'
+import { findOrCreateTags } from '../services/tags'
 import { _signAndSend } from './sign_and_send'
+import { useLogger } from '../lib/logger'
+import { useTaskManager } from '../services/taskManager'
+import { APUser, publicSettings, secretSettings } from '../services'
+import { Instance } from '../services/db'
 
 const log = useLogger('federation')
 
 // ignore unimplemented ping url from fediverse
-export function spamFilter (req, res, next) {
+export function spamFilter(req, res, next) {
   const urlToIgnore = [
     '/api/v1/instance',
     '/api/meta',
@@ -30,7 +34,7 @@ export function spamFilter (req, res, next) {
   next()
 }
 
-export async function signAndSend (message, inbox, method = 'post') {
+export async function signAndSend(message, inbox, method = 'post') {
   useTaskManager().add({
     name: 'SIGN_AND_SEND',
     method: _signAndSend,
@@ -38,7 +42,7 @@ export async function signAndSend (message, inbox, method = 'post') {
   })
 }
 
-function _getUser () {
+function _getUser() {
   const name = publicSettings?.instance_name ?? publicSettings.title
   const baseurl = publicSettings.baseurl
   return {
@@ -126,7 +130,7 @@ export async function updateActor() {
   }
 }
 
-export async function getFollowersInbox () {
+export async function getFollowersInbox() {
   const followers = await APUser.findAll({ where: { follower: true } })
 
   const recipients = {}
@@ -159,7 +163,7 @@ const APContext = [
   }
 ]
 
-export async function announceEvent (event) {
+export async function announceEvent(event) {
   if (!publicSettings.enable_federation) {
     log.info('[FEDI] Event not sent, federation is disabled')
     return
@@ -181,7 +185,7 @@ export async function announceEvent (event) {
   }
 }
 
-export async function sendEvent (event, type = 'Create') {
+export async function sendEvent(event, type = 'Create') {
   if (!publicSettings.enable_federation) {
     log.info('[FEDI] Event not sent, federation is disabled')
     return
@@ -205,7 +209,7 @@ export async function sendEvent (event, type = 'Create') {
   }
 }
 
-export async function parseAPMessage (APMessage, actor) {
+export async function parseAPMessage(APMessage, actor) {
   log.info('Parsing message from %s', actor?.ap_id ?? actor)
   if (APMessage.type === 'Announce' || APMessage.type === 'Create') {
     if (!APMessage?.object || !APMessage?.type) {
@@ -264,7 +268,7 @@ export async function parseAPMessage (APMessage, actor) {
 /**
    *  Event object.type
    */
-export async function parseAPEvent (APEvent, actor) {
+export async function parseAPEvent(APEvent, actor) {
   // const tagController = require('../api/controller/tag')
 
   if (APEvent?.type !== 'Event') {
@@ -332,7 +336,7 @@ export async function parseAPEvent (APEvent, actor) {
   return event
 }
 
-export async function followActor (actor) {
+export async function followActor(actor) {
   log.debug(`[FEDI] Following actor ${actor.ap_id}`)
   const body = {
     '@context': 'https://www.w3.org/ns/activitystreams',
@@ -380,7 +384,7 @@ export async function getOutbox(actor) {
   }
 }
 
-export async function unfollowActor (actor) {
+export async function unfollowActor(actor) {
   log.debug(`[FEDI] Unfollowing actor ${actor.ap_id}`)
 
   const object = {
@@ -401,7 +405,7 @@ export async function unfollowActor (actor) {
 }
 
 // get Actor from URL using GET HTTP Signature
-export async function getActor (URL, instance, force = false, fail_on_not_cached = false) {
+export async function getActor(URL, instance, force = false, fail_on_not_cached = false) {
   log.debug(`[FEDI] getActor for ${URL}`)
 
   let fedi_user
@@ -436,7 +440,7 @@ export async function getActor (URL, instance, force = false, fail_on_not_cached
   return fedi_user
 }
 
-export async function getNodeInfo (instance_url) {
+export async function getNodeInfo(instance_url) {
   let nodeInfo = await $fetch(`${instance_url}/.well-known/nodeinfo`, { headers: { Accept: 'application/json' } })
     .catch(() => {
       log.debug('[FEDI] Node %s does not support nodeInfo', instance_url)
@@ -461,7 +465,7 @@ export async function getNodeInfo (instance_url) {
   throw new Error(nodeInfo)
 }
 
-export async function getInstance (actor_url, force = false, fail_on_not_cached = false) {
+export async function getInstance(actor_url, force = false, fail_on_not_cached = false) {
   log.debug(`[FEDI] getInstance for ${actor_url}`)
   actor_url = new URL(actor_url)
   const domain = actor_url.host
@@ -490,7 +494,7 @@ export async function getInstance (actor_url, force = false, fail_on_not_cached 
     })
     log.debug('[FEDI] Create a new instance from %s: %s %s', instance_url, instance.name, nodeInfo)
     return instance
-  } catch(e) {
+  } catch (e) {
     log.error('[FEDI] Wrong nodeInfo returned for "%s": %s', instance_url, e?.response?.data ?? String(e))
     return false
   }
@@ -504,7 +508,7 @@ export async function getInstance (actor_url, force = false, fail_on_not_cached 
    * @return true in case of successfull validation
    * @throws {H3Error} throw in case of validation failure
    */
-export async function verifySignature (event) {
+export async function verifySignature(event) {
   const name = event.context.params.name
   const body = await readBody(event)
   const actor_url = body?.actor

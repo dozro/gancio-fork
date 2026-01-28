@@ -3,42 +3,42 @@
 set -eu
 
 usage() {
-  echo "$0 [options]"
-  echo "Options:"
-  echo "      -d      Set release type to dev"
-  echo "      -s      Set release type to stable (default)"
-  echo "      -o  dir    Output a directory"
-  echo "      -o  tgz    Output a tarball"
-  echo "      -o  7z    Output a 7z archive (default)"
-  echo "      -h      Show this help"
+	echo "$0 [options]"
+	echo "Options:"
+	echo "      -d      Set release type to dev"
+	echo "      -s      Set release type to stable (default)"
+	echo "      -o  dir    Output a directory"
+	echo "      -o  tgz    Output a tarball"
+	echo "      -o  7z    Output a 7z archive (default)"
+	echo "      -h      Show this help"
 }
 
 releaseType=stable
 output=7z
 while getopts 'dsho:' opt; do
-  case "$opt" in
-  h)
-    usage
-    exit 0
-    ;;
-  d)
-    releaseType=dev
-    ;;
-  s)
-    releaseType=stable
-    ;;
-  o)
-    output=$OPTARG
-    if [ "$output" != dir ] && [ "$output" != tgz ] && [ "$output" != 7z ]; then
-      echo "Invalid output type ($output): it must literally be either 'dir' or 'tgz' or '7z'" >&2
-      exit 2
-    fi
-    ;;
-  \?)
-    usage >&2
-    exit 2
-    ;;
-  esac
+	case "$opt" in
+	h)
+		usage
+		exit 0
+		;;
+	d)
+		releaseType=dev
+		;;
+	s)
+		releaseType=stable
+		;;
+	o)
+		output=$OPTARG
+		if [ "$output" != dir ] && [ "$output" != tgz ] && [ "$output" != 7z ]; then
+			echo "Invalid output type ($output): it must literally be either 'dir' or 'tgz' or '7z'" >&2
+			exit 2
+		fi
+		;;
+	\?)
+		usage >&2
+		exit 2
+		;;
+	esac
 done
 
 cd "$(dirname "$0")"
@@ -48,11 +48,11 @@ gitRepo=$(realpath .)
 # npx standard-version
 # git push --follow-tags
 if [ "$releaseType" = dev ]; then
-  version="dev-$(date +%F)-$(git describe --always)"
-  destDir="$gitRepo"
+	version="dev-$(date +%F)-$(git describe --always)"
+	destDir="$gitRepo"
 else
-  version=$(npm pkg get version | xargs echo)
-  destDir=$(realpath ./docs/public/releases)
+	version=$(npm pkg get version | xargs echo)
+	destDir=$(realpath ./docs/public/releases)
 fi
 destArchive="${destDir}/gancio-${version}.${output}"
 echo $destArchive
@@ -60,9 +60,9 @@ echo $destArchive
 PKG_BASE=$(mktemp --tmpdir -d gancio_build.XXXXXX)
 PKG_MAIN="${PKG_BASE}/${version}"
 if [ "$output" = dir ]; then
-  trap 'echo Your output dir is at ${PKG_BASE}' EXIT
+	trap 'echo Your output dir is at ${PKG_BASE}' EXIT
 else
-  trap 'rm -rf ${PKG_BASE}' EXIT
+	trap 'rm -rf ${PKG_BASE}' EXIT
 fi
 mkdir "${PKG_MAIN}"
 
@@ -96,7 +96,7 @@ cp -ra i18n "${PKG_MAIN}/nuxt/server/i18n/"
 # pug rss template / mail template
 cp -ra ./server/emails "${PKG_MAIN}/nuxt/server/emails/"
 
-cp -ra ./server/utils/rss.pug "${PKG_MAIN}/nuxt/server/rss.pug"
+cp -ra ./server/services/rss.pug "${PKG_MAIN}/nuxt/server/rss.pug"
 
 # default db
 # cp gancio.sqlite.rel "${PKG_MAIN}/gancio.sqlite"
@@ -116,21 +116,21 @@ cp -ra ./gancio_plugins "${PKG_MAIN}/plugins/"
 # cp gancio.service "${PKG_MAIN}/"
 
 if [ "$output" = tgz ]; then
-  mkdir -p "$destDir"
-  tar -cvzf "${destArchive}" -C "${PKG_BASE}" .
+	mkdir -p "$destDir"
+	tar -cvzf "${destArchive}" -C "${PKG_BASE}" .
 elif [ "$output" = 7z ]; then
-  mkdir -p "$destDir"
-  pushd "${PKG_BASE}"
-  7z a "${destArchive}" .
-  popd
+	mkdir -p "$destDir"
+	pushd "${PKG_BASE}"
+	7z a "${destArchive}" .
+	popd
 fi
 
 if [ "$releaseType" = stable ]; then
-  if [ "$output" = tgz ]; then
-    rm -f "${destDir}/gancio-latest.tgz"
-    cp "${destArchive}" "${destDir}/gancio-latest.tgz"
-  fi
+	if [ "$output" = tgz ]; then
+		rm -f "${destDir}/gancio-latest.tgz"
+		cp "${destArchive}" "${destDir}/gancio-latest.tgz"
+	fi
 
-  pnpm run docs:build
-  # rsync -vr docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2
+	pnpm run docs:build
+	# rsync -vr docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2
 fi

@@ -1,13 +1,12 @@
-import { defineSitemapEventHandler, Place } from '#imports'
-import type { SitemapUrlInput } from '#sitemap/types'
+import { Place } from '~~/server/services'
 
-export default defineSitemapEventHandler(async () => {
+export default defineEventHandler(async () => {
   const places = await Place.findAll({
     attributes: ['name', 'id'],
     raw: true
   })
 
-  const urls: SitemapUrlInput[] = places.map(e => ({
+  const urls = places.map(e => ({
     loc: `/place/${e.id}/${e.name}`,
   }))
 

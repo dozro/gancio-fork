@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import debounce from 'lodash/debounce'
 import { useDisplay, useTheme } from 'vuetify'
-import type { ThemeColorPalette } from '~~/server/utils/settings'
 
 const vTheme = useTheme()
 const currentTheme = vTheme.name

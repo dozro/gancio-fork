@@ -1,7 +1,10 @@
-import { exportICS } from '~~/server/utils/ics'
-import { exportFeed } from '~~/server/utils/rss'
-import { getLastModified } from '~~/server/utils/events'
+import { exportICS } from '~~/server/services/ics'
+import { exportFeed } from '~~/server/services/rss'
+import { getLastModified, publicSettings } from '~~/server/services'
 import { formatSchema } from '~~/server/types/validator'
+import { useLogger } from '~~/server/lib/logger'
+import { calculateEtag, eventQuerySchema, getEvents, mapEvents } from '~~/server/services/events'
+import { getCollectionEvents } from '~~/server/services/collections'
 
 /**
  * Return events in different formats: rss, ics, json

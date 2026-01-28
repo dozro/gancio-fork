@@ -2,12 +2,12 @@ import pkg from '../../package.json' with { type: 'json' }
 import path from 'path'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import usersCLI from '../cli/users.js'
+import usersCLI from './users.js'
 
 /**
  * parse cli command
  */
-export async function main(start: () => void) {
+export async function parseCLI(start: () => void) {
   // teleport myself to the correct position
   // process.env.cwd = process.env.GANCIO_DATA || path.resolve('./')
   // const __dirname = path.dirname(new URL(import.meta.url).pathname)

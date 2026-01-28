@@ -1,3 +1,4 @@
+import { Page } from '~~/server/services'
 export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const page_id = Number(getRouterParam(event, 'page'))

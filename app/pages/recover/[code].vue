@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang='ts'>
 
 const route = useRoute()
-const settings = useState('settings')
+const settings = useState<Settings>('settings')
 useHead({ title: `${settings.value.title} - Recover` })
 
 const recoverCode = route.params.code

@@ -1,5 +1,6 @@
-import { parseMultipartFormData, saveUploadedImage } from '~~/server/utils/parseMultipartForm'
 import type { MultiPartData } from 'h3'
+import { parseMultipartFormData, saveUploadedImage } from '~~/server/lib/parseMultipartForm'
+import { setSetting } from '~~/server/services'
 
 export default defineEventHandler(async (evt) => {
   await requireAdminSession(evt)

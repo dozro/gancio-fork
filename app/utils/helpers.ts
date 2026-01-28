@@ -2,7 +2,6 @@
  * FrontEnd helpers utilities
  */
 
-import type { APUser, Event } from '#build/types/nitro-imports'
 import { DateTime } from 'luxon'
 
 export function mediaURL(event: EventAPI, type?: string, format = '.jpg') {
@@ -39,7 +38,7 @@ export function manageSetting<K extends keyof Settings>(key: K, setCb?: (value: 
  */
 export const format = {
   /** Actor formatter, used in Admin > Collections > Filter > Instance autocomplete */
-  actor (actor: APUser, context = 'label') {
+  actor(actor: APUser, context = 'label') {
     const settings = useState<Settings>('settings')
     if (context === 'title') {
       if (actor?.ap_id) {
@@ -67,7 +66,7 @@ export const format = {
   * @description build v-calendar attributes
   * @link https://vcalendar.io/calendar/attributes.html#attributes
   */
-export function useAttributesFromEvents(events: Event[]) {
+export function useAttributesFromEvents(events: EventAPI[]) {
   if (!events) return []
   const attributes = []
   // const opt = {

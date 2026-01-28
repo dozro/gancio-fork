@@ -1,6 +1,7 @@
 import max from 'lodash/max'
+import { useLogger } from '~~/server/lib/logger'
+import { Tag, calculateEtag, getEvents, getLastModified, mapEvents } from '~~/server/services'
 
-import { calculateEtag } from '~~/server/utils/events'
 export default defineEventHandler(async (evt) => {
   const log = useLogger('events/tag')
   const tagName = getRouterParam(evt, 'tag', { decode: true })

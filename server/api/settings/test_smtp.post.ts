@@ -1,4 +1,4 @@
-import { sendMail } from '~~/server/utils/sendMail'
+import { sendMail, publicSettings, setSetting } from '~~/server/services'
 
 export default defineEventHandler(async (event) => {
   await requireAdminSession(event)

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 
-import { parseIcsData } from '../server/utils/icsparser.js'
+import { parseIcsData } from '../server/services/icsparser'
 const base_url = 'http://localhost:13120'
 
 await setup({ host: base_url })

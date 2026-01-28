@@ -1,4 +1,3 @@
-import { Event, Message } from './sequelize'
 import { DateTime } from 'luxon'
 import type { WhereOptions } from '@sequelize/core'
 import { Op, literal, col, where, fn, JSON_NULL, sql } from '@sequelize/core'
@@ -8,6 +7,9 @@ import { z } from 'zod'
 import type { EventAPI } from '~~/shared/types/generic'
 import type { H3Event } from 'h3'
 import { createHash } from 'crypto'
+import type { User } from './db'
+import { Place, Tag, Event, Message } from './db'
+import { publicSettings } from './settings'
 
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
@@ -147,7 +149,7 @@ export function getLastModified(items: readonly { updatedAt: Date }[]) {
   return lastModified
 }
 
-export function getMaxLastModifieds (lastModifieds: Array<Date | undefined>) {
+export function getMaxLastModifieds(lastModifieds: Array<Date | undefined>) {
   return lastModifieds.reduce((max, current) => {
     if (!max) return current
     if (!current) return max

@@ -1,15 +1,16 @@
 import { DateTime } from 'luxon'
 import ics from 'ics'
 import type { H3Event } from 'h3'
-import type { Event } from './sequelize'
+import type { Event } from './db'
 import { htmlToText } from 'html-to-text'
+import { publicSettings } from './settings'
 
 /**
  * Send an ics of specified events (optionally with reminders)
  * @param {Event[]} events array of events from sequelize
  * @param {*} alarms https://github.com/adamgibbons/ics#attributes (alarms)
  */
-export function exportICS (evt: H3Event, events: Event[], alarms: ics.Alarm[] | undefined) {
+export function exportICS(evt: H3Event, events: Event[], alarms?: ics.Alarm[]) {
   const eventsMap = events.map((e) => {
     const tmpStart = DateTime.fromSeconds(e.start_datetime, { zone: 'UTC' })
     const start: [number, number, number, number, number] = [tmpStart.year, tmpStart.month, tmpStart.day, tmpStart.hour, tmpStart.minute]

@@ -1,5 +1,8 @@
 // import { APUser } from "~/server/utils/sequelize"
 
+import { useLogger } from '~~/server/lib/logger'
+import { publicSettings } from '~~/server/services'
+
 export default defineEventHandler(async (event) => {
   const log = useLogger('federation actor')
   // const { preferHTML } = require('../helpers')

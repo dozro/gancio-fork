@@ -1,3 +1,4 @@
+import { setSetting } from '~~/server/services'
 export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const setting = await readBody(event) // , body => settingSchema.parse(body))

@@ -1,4 +1,4 @@
-import { Event } from '#imports'
+import { Event, Tag } from '~~/server/services'
 import { Op, fn, col } from '@sequelize/core'
 
 import { z } from 'zod'
@@ -12,9 +12,11 @@ export default defineEventHandler(async (event) => {
   const tags = await Tag.findAll({
     order: [[fn('COUNT', col('tag')), 'DESC']],
     attributes: ['tag'],
-    ...(query && { where: {
-      tag: { [Op.like]: `%${query}%` }
-    } }),
+    ...(query && {
+      where: {
+        tag: { [Op.like]: `%${query}%` }
+      }
+    }),
     include: [{ model: Event, where: { is_visible: true }, attributes: [], through: { attributes: [] }, required: true }],
     group: ['tag'],
     limit: 10,

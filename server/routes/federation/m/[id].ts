@@ -1,4 +1,5 @@
-import { Event } from '#imports'
+import { useLogger } from '~~/server/lib/logger'
+import { Event } from '~~/server/services'
 
 export default defineEventHandler(async (evt) => {
   // const { preferHTML } = await import('./helpers')

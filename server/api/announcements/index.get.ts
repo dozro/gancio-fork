@@ -1,3 +1,4 @@
+import { Announcement, getLastModified } from '~~/server/services'
 /**
  * return visible announcements to show preview in homepage
  * or full announcements for admin panel when `full_attributes` is specified and the request is coming from 'editor' or 'admin'

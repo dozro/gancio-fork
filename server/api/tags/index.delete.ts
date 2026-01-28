@@ -1,3 +1,5 @@
+import { useLogger } from '~~/server/lib/logger'
+import { Tag } from '~~/server/services'
 import { z } from 'zod'
 const schema = z.object({
   tag: z.string()

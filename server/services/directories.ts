@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { get as getConfig } from '../config'
+import { get as getConfig } from '../services/config'
+import { useLogger } from '../lib/logger'
 
 export async function useCreateDirectoryStructure() {
   const log = useLogger('init')

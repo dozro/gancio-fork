@@ -1,7 +1,7 @@
 import ical from 'ical.js'
-import { useLogger } from './useLogger'
+import { useLogger } from '../lib/logger'
 
-export function parseIcsData (icsText: string, includePastEvents = true) {
+export function parseIcsData(icsText: string, includePastEvents = true) {
   const log = useLogger('ICS Parser')
   const ret = ical.parse(icsText)
   const component = new ical.Component(ret)

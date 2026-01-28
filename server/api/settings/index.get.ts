@@ -1,3 +1,5 @@
+import { useLogger } from '~~/server/lib/logger'
+import { publicSettings, publicSettingsLastModified } from '~~/server/services'
 export default defineEventHandler(async (event) => {
   const log = useLogger('settings')
   log.info('get settings')

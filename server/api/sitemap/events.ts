@@ -1,14 +1,12 @@
-import { defineSitemapEventHandler, Event } from '#imports'
-import type { SitemapUrlInput } from '#sitemap/types'
+import { Event } from '~~/server/services'
 
-// TODO: unit test
-export default defineSitemapEventHandler(async () => {
+export default defineEventHandler(async () => {
   const events = await Event.findAll({
     where: { is_visible: true },
     attributes: ['slug', 'updatedAt'],
     raw: true
   })
-  const urls: SitemapUrlInput[] = events.map(e => ({
+  const urls = events.map(e => ({
 
     loc: `/event/${e.slug}`,
     lastmod: e.updatedAt instanceof Date

@@ -1,3 +1,5 @@
+import { Page } from '~~/server/services'
+
 export default defineEventHandler(async (evt) => {
   // const log = useLogger('page')
   await requireAdminSession(evt)

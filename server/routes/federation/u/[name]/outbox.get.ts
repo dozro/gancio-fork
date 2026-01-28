@@ -1,4 +1,5 @@
-import { Event } from '#imports'
+import { useLogger } from '~~/server/lib/logger'
+import { Event, Place, publicSettings, Tag } from '~~/server/services'
 
 // https://www.w3.org/TR/activitypub/#outbox
 export default defineEventHandler(async (event) => {

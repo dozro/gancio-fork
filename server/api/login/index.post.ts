@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
+import { useLogger } from '~~/server/lib/logger'
+import { User } from '~~/server/services'
 
 const bodySchema = z.object({
   email: z.string(), // TODO: .email(), // or admin

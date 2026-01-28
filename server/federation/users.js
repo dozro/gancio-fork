@@ -3,13 +3,13 @@ const escape = require('lodash/escape')
 const get = require('lodash/get')
 
 const { Event, Place, APUser, Tag } = require('../api/models/models')
-const config = require('../config')
+const config = require('../services/config')
 const log = require('../log')
 const Helpers = require('./helpers')
 const settingsController = require('../api/controller/settings')
 
 module.exports = {
-  get (req, res) {
+  get(req, res) {
     const { preferHTML } = require('../helpers')
     if (preferHTML(req)) {
       log.debug('[FEDI] Get actor but prefer text/html, redirect to homepage')
@@ -115,7 +115,7 @@ module.exports = {
   //   })
   // },
 
-  async remove (req, res) {
+  async remove(req, res) {
     const ap_id = get(req.body, 'object.id', req.body.object)
     const ap_actor = await APUser.findOne({ where: { ap_id } })
     if (!ap_actor) {
@@ -135,7 +135,7 @@ module.exports = {
     }
   },
 
-  async outbox (req, res) {
+  async outbox(req, res) {
     const name = req.params.name
     const page = parseInt(req.query?.page)
     const events_per_page = 10

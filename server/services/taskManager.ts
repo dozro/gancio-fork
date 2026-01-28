@@ -4,10 +4,10 @@
  */
 
 import { Duration } from 'luxon'
-import { useLogger } from './useLogger'
-import { cleanOrphanPlaces } from '../lib/places'
-import { cleanOrphanTags } from '../lib/tags'
-import { cleanPastEvents, cleanUnusedAPActor } from '../lib/ap'
+import { useLogger } from '../lib/logger'
+import { cleanOrphanPlaces } from '../services/places'
+import { cleanOrphanTags } from './tags'
+import { cleanPastEvents, cleanUnusedAPActor } from './ap'
 const log = useLogger('Task Manager')
 
 const loopInterval = 60 // process.env.NODE_ENV === 'production' ? 1 : 1
@@ -16,7 +16,7 @@ const hour = minute * 60
 const day = hour * 24
 
 // Singleton instance
-let instance
+let instance: TaskManager
 export function useTaskManager() {
   if (!instance) {
     instance = new TaskManager()
@@ -25,7 +25,15 @@ export function useTaskManager() {
 }
 
 export class Task {
-  constructor ({ name, repeat = false, repeatDelay = 0, callAtStart = false, retries = [10, 50], method, args = [] }) {
+  name: string
+  method: () => Promise<undefined> | null
+  args: unknown[]
+  repeat: boolean
+  retries?: number[]
+  repeatDelay: number
+  processInNTick: number
+
+  constructor({ name = '', repeat = false, repeatDelay = 0, callAtStart = false, retries = [10, 50], method, args = [] }) {
     this.name = name
     this.method = method
     this.args = args
@@ -34,13 +42,13 @@ export class Task {
     this.repeatDelay = repeatDelay
     this.processInNTick = callAtStart ? 1 : repeatDelay
     // retries on non-repeatable task only
-    this.retries = !repeat && retries
+    this.retries = repeat ? retries : []
   }
 
-  handleError (e) {
+  handleError(e) {
     log.error(`TASK ERROR [${this?.name}]: ${e} ${e.stack}`)
     if (!this.repeat) {
-      this.processInNTick = this.retries?.shift() ?? false
+      this.processInNTick = this.retries?.shift() ?? 0
       if (this.processInNTick) {
         log.info(`Error in ${this.name}: retring in `, Duration.fromMillis(this.processInNTick * 1000).rescale().toHuman({ listStyle: 'long' }))
       } else {
@@ -49,7 +57,7 @@ export class Task {
     }
   }
 
-  process () {
+  process() {
     this.processInNTick--
     if (this.processInNTick > 0) {
       return
@@ -82,13 +90,16 @@ export class Task {
  */
 
 export class TaskManager {
-  constructor () {
+  tasks: Task[]
+  interval: number
+  timeout?: ReturnType<typeof setTimeout>
+
+  constructor() {
     this.tasks = []
     this.interval = 1
-    this.timeout = null
   }
 
-  start (interval = loopInterval) {
+  start(interval = loopInterval) {
     // create and clean recurrent events
     // this.add({
     //   name: 'CREATE_RECURRENT_EVENT',
@@ -134,15 +145,15 @@ export class TaskManager {
     this.timeout = setTimeout(this.tick.bind(this), interval * 1000)
   }
 
-  stop () {
+  stop() {
     if (this.timeout) {
       log.info('STOP TASKMANAGER')
       clearTimeout(this.timeout)
-      this.timeout = false
+      this.timeout = undefined
     }
   }
 
-  add ({ name, repeat = false, repeatDelay = 0, callAtStart = false, retries = [20, 50], method, args = [] }) {
+  add({ name = '', repeat = false, repeatDelay = 0, callAtStart = false, retries = [20, 50], method, args = [] }) {
     if (repeat) {
       log.info(`[TASK] Add ${name} (each ${Duration.fromMillis(repeatDelay * this.interval * 1000).rescale().toHuman({ listStyle: 'long' })})`)
     } else {
@@ -152,7 +163,7 @@ export class TaskManager {
     this.tasks.push(task)
   }
 
-  process () {
+  process() {
     if (!this.tasks.length) {
       return
     }
@@ -167,7 +178,7 @@ export class TaskManager {
     return Promise.allSettled(tasks)
   }
 
-  async tick () {
+  async tick() {
     await this.process()
     this.timeout = setTimeout(this.tick.bind(this), this.interval * 1000)
   }

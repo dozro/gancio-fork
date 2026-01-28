@@ -2,7 +2,6 @@ import { createVuetify, type LocaleMessages, type LocaleOptions } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
-import type { Settings } from '~~/server/utils/settings'
 // import { ca, cs, de, en, es, fr, it, nl, pl, pt, tr, sk, sv, ro, ru, zhHans } from 'vuetify/lib/locale/index.mjs'
 
 // import 'vuetify/styles'
@@ -15,7 +14,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const messages = i18n.messages
   const currentLocale = ref(current.value)
 
-  const settings = useState<Settings | null>('settings', () => null)
+  const settings = useState<Settings>('settings')
 
   const cookie = useCookie<'light' | 'dark' | 'system' | undefined>('theme')
   const defaultTheme = cookie.value ?? (settings?.value?.['theme.is_dark'] ? 'dark' : 'light')

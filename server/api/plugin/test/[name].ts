@@ -1,4 +1,4 @@
-import pluginController from '../../../utils/plugins'
+import { pluginController } from '~~/server/services'
 
 export default defineEventHandler(async (evt) => {
   await requireAdminSession(evt)

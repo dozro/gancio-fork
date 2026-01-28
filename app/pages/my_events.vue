@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 definePageMeta({ middleware: ['authenticated'] })
 const { t } = useI18n()
 const { data: events, refresh } = await useFetch('/api/events/mine')
@@ -23,8 +23,8 @@ async function toggle (event) {
   }
 }
 
-async function remove (event, parent) {
-  const ret = await $confirm(`event.remove_${parent ? 'recurrent_' : ''}confirmation`)
+async function remove (event: EventAPI, parent) {
+  const ret = await $confirm(`event.remove_${parent ? 'recurrent_' : ''}confirmation`, { event: event.title })
   if (!ret) {
     return
   }

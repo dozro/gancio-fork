@@ -1,5 +1,11 @@
 import { Op } from '@sequelize/core'
+import { useLogger } from '~~/server/lib/logger'
+import { Collection } from '~~/server/services'
 
+/**
+ * move up a collection by swapping its sortIndex with the one above it.
+ * @auth
+ */
 export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const log = useLogger('collection moveup')

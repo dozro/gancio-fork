@@ -1,4 +1,5 @@
-import { parseMultipartFormData, saveUploadedImage } from '~~/server/utils/parseMultipartForm'
+import { parseMultipartFormData, saveUploadedImage } from '~~/server/lib/parseMultipartForm'
+import { setSetting } from '~~/server/services'
 import type { MultiPartData } from 'h3'
 
 export default defineEventHandler(async (evt) => {

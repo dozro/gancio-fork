@@ -1,6 +1,9 @@
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
-import { signJwt } from '~~/server/utils/jwt'
+import { signJwt } from '~~/server/lib/jwt'
+
+import { useLogger } from '~~/server/lib/logger'
+import { User } from '~~/server/services'
 
 const bodySchema = z.object({
   email: z.string(), // TODO: .email(), // or admin

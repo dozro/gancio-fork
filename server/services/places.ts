@@ -1,10 +1,10 @@
 import { Op, col, where, fn } from '@sequelize/core'
-import { Event, Place, Tag, User, Resource, APUser } from '../utils/sequelize'
-import { useLogger } from '../utils/useLogger'
 import { createError } from 'h3'
+import { useLogger } from '../lib/logger'
+import { Place, Event } from './db'
 const log = useLogger('federation:places')
 
-export async function findOrCreatePlace (body) {
+export async function findOrCreatePlace(body) {
   if (body?.place_id) {
     const place = await Place.findByPk(body.place_id)
     if (!place) {
@@ -41,7 +41,7 @@ export async function findOrCreatePlace (body) {
   return place
 }
 
-export async function cleanOrphanPlaces () {
+export async function cleanOrphanPlaces() {
   const places = await Place.findAll({
     include: [{ model: Event, as: 'events', required: false, attributes: [] }],
     group: ['Place.id'],

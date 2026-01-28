@@ -1,3 +1,5 @@
+import { useLogger } from '~~/server/lib/logger'
+import { enqueueMail, User, publicSettings } from '~~/server/services'
 /**
  * Update user activation or role
  * @auth

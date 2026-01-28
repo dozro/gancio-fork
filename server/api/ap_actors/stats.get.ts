@@ -1,7 +1,5 @@
-// import { APUser } from "~/server/utils/sequelize"
-
-import { Event } from '#imports'
 import { Op } from '@sequelize/core'
+import { APUser, Event, Resource, Instance } from '~~/server/services'
 
 export default defineEventHandler(async () => {
   const n_followers = await APUser.count({ where: { follower: true }, include: [Instance] })

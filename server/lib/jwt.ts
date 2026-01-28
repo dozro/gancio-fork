@@ -1,5 +1,3 @@
-// server/utils/jwt.ts
-
 import type { JWTPayload } from 'jose'
 import { jwtVerify, SignJWT } from 'jose'
 

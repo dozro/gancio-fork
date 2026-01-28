@@ -2,15 +2,21 @@
 ** This is the first and only server plugin and this is where everything start
 */
 import type { NitroApp } from 'nitropack'
-import pluginController from '../utils/plugins'
+import pluginController from '../services/plugins'
 import fsDriver from 'unstorage/drivers/fs'
-import { get as getConfig } from '../config'
+import { get as getConfig } from '../services/config'
+import { useLogger } from '../lib/logger'
+import { parseCLI } from '../cli'
+import { loadSettings } from '../services/settings'
+import { useTaskManager } from '../services/taskManager'
+import { connect, runMigrations } from '../services/db'
+import { useCreateDirectoryStructure } from '../services/directories'
 
 export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
   const log = useLogger('init')
   try {
     const config = getConfig()
-    async function start() {
+    async function startGancio() {
       try {
         log.info('Connecting to database')
         await connect()
@@ -48,9 +54,9 @@ export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
 
     if (!isBuild && !process.env.ARGV) {
       log.info('Dev startup')
-      await start()
+      await startGancio()
     } else {
-      const ret = main(start)
+      const ret = parseCLI(startGancio)
       if (!ret) {
         process.exit(1)
       }

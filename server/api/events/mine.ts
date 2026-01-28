@@ -1,3 +1,5 @@
+import { getEvents, mapEvent } from '~~/server/services'
+
 /**
  * Get events created by the current user.
  * @auth

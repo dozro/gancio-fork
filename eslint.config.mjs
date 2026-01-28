@@ -21,6 +21,7 @@ export default withNuxt([
       '@stylistic/brace-style': 'off',
       '@stylistic/space-before-function-paren': 'off',
       '@stylistic/comma-dangle': 'off',
+      '@stylistic/eol-last': 'off',
       '@stylistic/operator-linebreak': 'off',
       // do not enforce v-slot style
       'vue/v-slot-style': 'off',

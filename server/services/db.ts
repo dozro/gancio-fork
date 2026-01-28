@@ -4,7 +4,7 @@ import slugify from 'slugify'
 import { Umzug, SequelizeStorage } from 'umzug'
 import fs from 'fs/promises'
 import path from 'path'
-import { useLogger } from './useLogger'
+import { useLogger } from '../lib/logger'
 
 import {
   Sequelize,
@@ -46,10 +46,10 @@ import {
   BeforeDestroy
 } from '@sequelize/core/decorators-legacy'
 
-import type { SecretSettings, Settings } from './settings'
+import { publicSettings, type SecretSettings, type Settings } from '../services/settings'
 
 import { DateTime } from 'luxon'
-import { get as getConfig } from '../config'
+import { get as getConfig } from '../services/config'
 const config = getConfig()
 const log = useLogger('sequelize')
 
@@ -246,7 +246,7 @@ export class Event extends Model<
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
   })
-  declare userId: CreationOptional<number>
+  declare userId: CreationOptional<number | null>
 
   @BelongsTo(() => User, { foreignKey: 'userId', targetKey: 'id' })
   declare user: NonAttribute<User>
@@ -299,7 +299,7 @@ export class Event extends Model<
   declare setPlace: BelongsToSetAssociationMixin<Place, number>
 
   @BeforeDestroy
-  static async removeImg (instance: Event) {
+  static async removeImg(instance: Event) {
     // remove the image files (normal and thumb) associated with this event
     // if no image is associated, do nothing
     if (!instance.media || instance.media.length === 0 || !instance.media[0]?.url) {
@@ -432,8 +432,13 @@ export class Tag extends Model<
   @Unique
   declare tag: string
 
-  // @BelongsToMany(() => Event, { through: 'event_tags' })
-  declare events?: NonAttribute<Event[]>
+  @BelongsToMany(() => Event, { through: 'event_tags' })
+  declare events: NonAttribute<Event[]>
+
+  // the mixins Sequelize automatically provides
+  // declare getEvents: BelongsToManySetAssociationsMixin<Tag, Event[]>
+  // declare removeEvents: BelongsToManySetAssociationsMixin<Tag, Event[]>
+  // declare setPlace: BelongsToSetAssociationMixin<Place, number>
 }
 
 @Table({
@@ -456,7 +461,7 @@ export class Place extends Model<
 
   @Attribute(DataTypes.STRING)
   @Index
-  declare ap_id?: string
+  declare ap_id: CreationOptional<string>
 
   @Attribute(DataTypes.STRING)
   declare address: string

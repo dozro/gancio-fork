@@ -2,7 +2,7 @@ import { defineEventHandler, getRouterParam, setHeader, sendRedirect, sendStream
 import { join } from 'path'
 import { createReadStream } from 'fs'
 import { stat } from 'fs/promises'
-import { get as getConfig } from '../../config'
+import { get as getConfig } from '../../services/config'
 
 export default defineEventHandler(async (event) => {
   const config = getConfig()

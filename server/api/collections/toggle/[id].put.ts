@@ -1,3 +1,5 @@
+import { Collection } from '~~/server/services'
+
 export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const id = Number(getRouterParam(event, 'id'))

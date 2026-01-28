@@ -1,14 +1,14 @@
-import type { Event } from '#imports'
 import type { H3Event } from 'h3'
 import { DateTime } from 'luxon'
 import path from 'path'
 import fs from 'fs'
 import pug from 'pug'
 import type { InferAttributes } from '@sequelize/core'
+import { publicSettings, type Event } from '../services'
 
 const isBuild = process.env.NODE_ENV === 'production'
 const rssTemplateStr = fs.readFileSync(
-  path.resolve(isBuild ? './nuxt/server/rss.pug' : './server/utils/rss.pug'),
+  path.resolve(isBuild ? './nuxt/server/rss.pug' : './server/services/rss.pug'),
   'utf-8'
 )
 export const rssTemplate = pug.compile(rssTemplateStr)
