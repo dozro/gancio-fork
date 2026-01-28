@@ -14,7 +14,7 @@
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": {
 		"Install extra system packages": "sudo apt-get -y update && sudo apt-get -y install sqlite3",
-		"Uninstall global eslint": "sudo npm uninstall -g eslint",
+		"Setup global node environment": "sudo npm uninstall -g eslint && sudo corepack enable",
 	 	"Symlink project utilities to ~/.local/bin": "mkdir -p /home/node/.local/bin && ln -s ${containerWorkspaceFolder}/node_modules/eslint/bin/eslint.js /home/node/.local/bin/eslint && ln -s ${containerWorkspaceFolder}/node_modules/prettier/bin-prettier.js /home/node/.local/bin/prettier"
 	},
 
