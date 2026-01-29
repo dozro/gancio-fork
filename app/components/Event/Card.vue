@@ -29,36 +29,51 @@ function isPast() {
     <h3 class='event-title' itemprop="name">{{ event.title }}</h3>
   </nuxt-link>
 
-  <v-img v-if='event?.ap_user?.image' cover :src='event?.ap_user?.image' max-height=30  max-width=30 style="position: absolute; top: 5px; right: 5px;" />
+  <v-avatar v-if='event?.ap_user?.image' size="small" class="position-absolute top-0 right-0 ma-2 pointer-ev-none">
+    <v-img :src='event.ap_user.image' :alt="event.ap_user.name" />
+  </v-avatar>
 
-  <v-card-text class='pt-0 pb-0 m-0 mb-2'>
+  <v-card-text class='pt-0 pb-3'>
     <!-- <span>{{event.start_datetime}} - {{time.when(event)}}</span> -->
 
-    <!-- <time class="dt-start text-subtitle-1" :datetime="time.time(event.start_datetime)" itemprop="startDate" :content="time.timeToISO(event.start_datetime)">{{time.time(event.start_datetime)}}</time> -->
-    <time
-      class='dt-start text-subtitle-1' :datetime='time.unixFormat(event.start_datetime, "yyyy-MM-dd HH:mm")'
-      itemprop="startDate" :content="time.unixFormat(event.start_datetime, 'yyyy-MM-dd\'T\'HH:mm')"> <v-icon icon='mdi-calendar' /> {{ time.when(event) }}
-    </time>
-    <time
-      v-if='event.end_datetime' class='d-none dt-end' itemprop="endDate"
-      :content="time.unixFormat(event.end_datetime,'yyyy-MM-dd\'T\'HH:mm')"> {{ time.unixFormat(event.end_datetime)}}</time>
+    <div class="d-flex ga-2 align-center mb-1">
+      <v-icon icon='mdi-calendar' />
+      <!-- <time class="dt-start text-subtitle-1" :datetime="time.time(event.start_datetime)" itemprop="startDate" :content="time.timeToISO(event.start_datetime)">{{time.time(event.start_datetime)}}</time> -->
+      <time
+        class='dt-start text-body-2 text-md-body-1'
+        :datetime='time.unixFormat(event.start_datetime, "yyyy-MM-dd HH:mm")'
+        itemprop="startDate"
+        :content="time.unixFormat(event.start_datetime, 'yyyy-MM-dd\'T\'HH:mm')"
+      >
+        {{ time.when(event) }}
+      </time>
+      <time
+        v-if='event.end_datetime'
+        class='d-none dt-end'
+        itemprop="endDate"
+        :content="time.unixFormat(event.end_datetime,'yyyy-MM-dd\'T\'HH:mm')"
+      >
+        {{ time.unixFormat(event.end_datetime)}}
+      </time>
+    </div>
 
-    <nuxt-link
-      class='place d-block p-location pl-0' variant='text'
-      :to='`/place/${event?.place?.id}/${encodeURIComponent(event.place.name)}`'
-      itemprop="location" itemscope itemtype="https://schema.org/Place" icon='mdi-close'>
-      <v-icon icon="mdi-map-marker"/>
-      <span itemprop='name'>{{ event.place.name }}</span>
-    </nuxt-link>
-    <div class='d-none' itemprop='address'>{{ event.place.address }}</div>
+    <div class="d-flex ga-2 align-center">
+      <v-icon icon="mdi-map-marker" />
+      <nuxt-link
+        class='place p-location text-body-2 text-md-body-1'
+        :to='`/place/${event?.place?.id}/${encodeURIComponent(event.place.name)}`'
+        itemprop="location" itemscope itemtype="https://schema.org/Place">
+        <span itemprop='name'>{{ event.place.name }}</span>
+      </nuxt-link>
+      <div class='d-none' itemprop='address'>{{ event.place.address }}</div>
+    </div>
 
+    <div v-if='event?.tags?.length' class='d-flex flex-wrap ga-1 mt-3'>
+      <v-chip
+        v-for='tag in event?.tags?.slice(0, 6)' :key='tag' size='small' label
+        :to='`/tag/${encodeURIComponent(tag)}`' variant='outlined' color='primary'>{{ tag }}</v-chip>
+    </div>
   </v-card-text>
-
-  <v-card-actions v-if='event?.tags?.length' class='flex-wrap ga-1'>
-    <v-chip
-      v-for='tag in event?.tags?.slice(0, 6)' :key='tag' size='small' label
-      :to='`/tag/${encodeURIComponent(tag)}`' variant='outlined' color='primary'>{{ tag }}</v-chip>
-  </v-card-actions>
 
 </article>
 </template>

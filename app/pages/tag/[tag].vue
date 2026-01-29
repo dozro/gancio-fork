@@ -40,13 +40,13 @@ useHead(() => {
       :key='event.id'
       class='event'
       :model-value='idx<9'
-      :min-height='settings.hide_thumbs ? 105 : undefined'
       :options="{ threshold: .5, rootMargin: '500px' }"
     >
       <!-- :class="{ 'theme--dark': is_dark }"> -->
       <EventCard
         :event='event'
         :lazy='idx>9'
+        :hide-thumbs="settings.hide_thumbs"
       />
     </v-lazy>
   </section>
@@ -62,13 +62,13 @@ useHead(() => {
       :key='event.id'
       class='event'
       :model-value='idx<9'
-      :min-height='settings.hide_thumbs ? 105 : undefined'
       :options="{ threshold: .5, rootMargin: '500px' }"
     >
       <!-- :class="{ 'theme--dark': is_dark }"> -->
       <EventCard
         :event='event'
         :lazy='idx>9'
+        :hide-thumbs="settings.hide_thumbs"
       />
     </v-lazy>
   </section>

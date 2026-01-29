@@ -68,9 +68,8 @@ const { data: announcements } = await useFetch<Announcement[]>('/api/announcemen
     <v-lazy
       v-for='(event, idx) in visibleEvents' :key='event.id'
       class='event' :model-value='idx<9'
-      :min-height='settings.hide_thumbs ? 105 : undefined'
       :options="{ threshold: .5, rootMargin: '500px' }">
-      <EventCard :event='event' :lazy='idx>9' />
+      <EventCard :event='event' :lazy='idx>9' :hide-thumbs="settings.hide_thumbs" />
     </v-lazy>
 
     <div v-if="!visibleEvents?.length" class="d-flex flex-column align-center ga-2 my-8 my-sm-12">
@@ -99,7 +98,6 @@ const { data: announcements } = await useFetch<Announcement[]>('/api/announcemen
   flex-grow: 1;
   max-width: 500px !important;
   width: 330px;
-  min-height: 288px;
   position: relative;
   /* margin-top: 16px;
   margin-right: 16px; */

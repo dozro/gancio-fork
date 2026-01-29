@@ -47,5 +47,8 @@ export type EventAPI = Omit<CreationAttributes<Event>, 'placeId' | 'is_visible'>
   /** plain text description */
   plain_description?: string
 
-  ap_user?: { image: string }
+  ap_user?: {
+    image: string
+    name?: string
+  }
 }
