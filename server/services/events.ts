@@ -38,7 +38,7 @@ export const eventQuerySchema = z.object({
   include_unconfirmed: z.coerce.boolean().default(false).optional(),
   include_parent: z.coerce.boolean().default(false).optional(),
   include_description: z.coerce.boolean().default(false).optional(),
-  inlude_ap_events: z.coerce.boolean().default(false).optional(),
+  inlude_ap_events: z.coerce.boolean().default(false).optional()
 }).transform(o => ({
   ...o,
   ...(o.max && { limit: o.max })
@@ -59,10 +59,10 @@ export async function getEvents(opts?: EventQueryType | undefined) {
     ...(!args.include_unconfirmed && { is_visible: true }),
 
     // include recurrent events?
-    ...(!args.show_recurrent && { parentId: null }),
+    ...(!args.show_recurrent && { parentId: null })
 
     // include parent event
-    ...(!args.include_parent && { recurrent: { [Op.is]: null } })
+    // ...(!args.include_parent && { recurrent: { [Op.is]: null } })
 
   }
 
@@ -108,7 +108,7 @@ export async function getEvents(opts?: EventQueryType | undefined) {
   if (args.limit) {
     pagination = {
       limit: args.limit,
-      offset: args.limit * (args?.page ?? 0),
+      offset: args.limit * (args?.page ?? 0)
     }
   }
 
@@ -116,7 +116,7 @@ export async function getEvents(opts?: EventQueryType | undefined) {
     where: condition,
     attributes: {
       exclude: [
-        'likes', 'boost', 'userId', 'createdAt', 'placeId', 'ap_object', 'ap_id',
+        'likes', 'boost', 'userId', 'createdAt', 'placeId', 'ap_object', 'ap_id'
       ]
     },
     order: [['start_datetime', args.reverse ? 'DESC' : 'ASC']],
@@ -130,7 +130,7 @@ export async function getEvents(opts?: EventQueryType | undefined) {
       { model: Place, required: true, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] }
     ],
     ...pagination,
-    replacements,
+    replacements
   })
 
   // return mapEvents(events as Event[])
@@ -176,7 +176,7 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
     is_mine: event.userId ? event.userId === user?.id : false,
     is_anon: event.userId === null || !event?.user?.is_active,
     is_visible: event.is_visible,
-    original_url: event?.ap_object?.url ?? event?.ap_id,
+    original_url: event?.ap_object?.url ?? event?.ap_id
 
     // TODO
     // n_msgs: event?.,
@@ -185,7 +185,7 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
   if (event?.APUser?.object) {
     response.ap_user = {
       image: event.APUser.object.icon?.url ?? `${event.APUser.object.url}/favicon.ico`,
-      name: event.APUser.object.name,
+      name: event.APUser.object.name
     }
   }
 
@@ -219,8 +219,8 @@ export function sendEvents(event: H3Event, events: Event[]) {
       cacheControls: [
         'must-revalidate',
         'stale-while-revalidate=30',
-        'stale-if-error=300',
-      ],
+        'stale-if-error=300'
+      ]
     })
   ) {
     return events.map(e => mapEvent(e))

@@ -45,7 +45,7 @@ export async function parseAPLocation(APEvent: unknown) {
   const locations = Array.isArray(APEvent.location) ? APEvent.location : [APEvent.location]
 
   // find the first physical place from locations
-  let APPlace = locations.find(location => location?.type !== 'VirtualLocation')
+  const APPlace = locations.find(location => location?.type !== 'VirtualLocation')
 
   // get the list of online locations
   let onlineLocations = locations.filter(location => location.type === 'VirtualLocation' && location?.url).map(location => location.url)
@@ -55,10 +55,17 @@ export async function parseAPLocation(APEvent: unknown) {
 
   // we have a physical place
   if (APPlace) {
+    if (!APPlace?.name) {
+      log.warn(`[FEDI] Event has a location without a name: ${JSON.stringify(APPlace)}`)
+      throw createError({ status: 400, message: 'Location must have at least a name' })
+    }
+
+    const place_latitude = APPlace?.latitude ? Number(APPlace.latitude) : null
+    const place_longitude = APPlace?.longitude ? Number(APPlace.longitude) : null
     place = {
       place_name: APPlace?.name,
       ...(APPlace?.id && { place_ap_id: APPlace.id }),
-      ...(APPlace?.latitude && APPlace?.longitude && { place_latitude: APPlace.latitude, place_longitude: APPlace.longitude }),
+      ...(place_latitude !== null && place_longitude !== null && { place_latitude, place_longitude }),
     }
     // no physical but at least virtual location
   } else if (onlineLocations.length) {

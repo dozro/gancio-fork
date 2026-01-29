@@ -8,7 +8,8 @@ import { findOrCreateTags } from '~~/server/services/tags'
 import { mapEvent } from '~~/server/services/events'
 import type { CreationAttributes } from '@sequelize/core'
 import type { Tag, Media } from '~~/server/services'
-import { Event, publicSettings } from '~~/server/services'
+import { publicSettings } from '~~/server/services'
+import { Event } from '~~/server/services/db'
 import { useLogger } from '~~/server/lib/logger'
 import { notifyEvent } from '~~/server/services/notifier'
 
@@ -102,7 +103,7 @@ export default defineEventHandler(async (evt) => {
     throw createError({ statusCode: 400, statusMessage: 'Place not found' })
   }
 
-  const recurrent = body.recurrent ? JSON.parse(body.recurrent as string) : null
+  const recurrent = body.recurrent ? JSON.parse(body.recurrent as string) : undefined
 
   const eventDetails: CreationAttributes<Event> = {
     title: body.title?.trim(),

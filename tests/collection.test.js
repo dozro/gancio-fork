@@ -27,7 +27,7 @@ describe('Collection', () => {
     collections.push(response.data)
   })
 
-  it('should do not have any event when no filters', async () => {
+  it('should not have any event when no filters', async () => {
     const response = await fetch('/api/collections/test')
 
     expect(response.status).toBe(200)
@@ -117,5 +117,12 @@ describe('Collection', () => {
     expect(response.data?.length).toBe(2)
     expect(response.data[0].id).toBe(collections[1].id)
     expect(response.data[1].id).toBe(collections[0].id)
+  })
+
+  it('should remove collection', async () => {
+    let response = await fetchWithAuth(`/api/collections/${collections[0].id}`, 'DELETE')
+    expect(response.status).toBe(200)
+    response = await fetchWithAuth(`/api/collections/${collections[1].id}`, 'DELETE')
+    expect(response.status).toBe(200)
   })
 })

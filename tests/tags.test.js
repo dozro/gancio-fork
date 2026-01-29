@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import dayjs from 'dayjs'
-import { fetchWithAuth, login, registerAdmin } from './setup.js'
-import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
+import { fetchWithAuth, setup, now } from './setup'
 
-const base_url = 'http://localhost:13120'
-await setup({ host: base_url })
+await setup()
 
 let event = {}
 describe('Tags', async () => {
@@ -14,7 +11,7 @@ describe('Tags', async () => {
         title: 'test tags',
         place_name: 'test',
         place_address: 'test',
-        start_datetime: dayjs().unix() + 1000,
+        start_datetime: now() + 1000,
         tags: ['tag1', 'Tag2', 'tAg3']
       })
 
@@ -25,7 +22,7 @@ describe('Tags', async () => {
 
   it('should dedup tags', async () => {
     const response = await fetchWithAuth('/api/events', 'POST',
-      { title: 'test tags diocane', place_name: 'test 2', place_address: 'test', start_datetime: dayjs().unix() + 1000, tags: ['ciao', ' Ciao '] })
+      { title: 'test tags diocane', place_name: 'test 2', place_address: 'test', start_datetime: now() + 1000, tags: ['ciao', ' Ciao '] })
 
     expect(response.status).toBe(200)
     expect(response.data.is_visible).toBe(true)
@@ -35,7 +32,10 @@ describe('Tags', async () => {
 
   it('should not allow non-array tags field', async () => {
     const response = await fetchWithAuth('/api/events', 'POST',
-      { title: 'test non-array tags', place_id: 1, start_datetime: dayjs().unix() + 1000, tags: 'Tag1' })
+      {
+        title: 'test non-array tags', place_name: 'place name',
+        place_address: 'place name address', start_datetime: now() + 1000, tags: 'Tag1'
+      })
 
     expect(response.status).toBe(400)
     expect(response.data.message).toBe('tags field must be an array')
@@ -43,7 +43,10 @@ describe('Tags', async () => {
 
   it('should create event trimming tags / ignore sensitiviness', async () => {
     event = await fetchWithAuth('/api/events', 'POST',
-      { title: 'test trimming tags', place_id: 1, start_datetime: dayjs().unix() + 1000, tags: ['Tag1', 'taG2 '] })
+      {
+        title: 'test trimming tags', place_name: 'place name',
+        place_address: 'place address', start_datetime: now() + 1000, tags: ['Tag1', 'taG2 ']
+      })
 
     expect(event.status).toBe(200)
 
@@ -54,7 +57,10 @@ describe('Tags', async () => {
 
   it('should modify event tags', async () => {
     const { data } = await fetchWithAuth(`/api/events/${event.data.id}`, 'PUT',
-      { title: 'test trimming tags', place_id: 1, start_datetime: dayjs().unix() + 1000, tags: ['tag1', 'tag3', 'tag4'] })
+      {
+        title: 'test trimming tags', place_name: 'place name', place_address: 'address',
+        start_datetime: now() + 1000, tags: ['tag1', 'tag3', 'tag4']
+      })
 
     expect(data.tags).toStrictEqual(['tag1', 'tAg3', 'tag4'])
   })
@@ -63,8 +69,8 @@ describe('Tags', async () => {
     const { data } = await fetchWithAuth('/api/events', 'POST',
       {
         title: 'test trimming tags',
-        place_id: 1,
-        start_datetime: dayjs().unix() + 1000,
+        place_name: 'place name', place_address: 'place address',
+        start_datetime: now() + 1000,
         tags: ['/\'"%^&*~`!@#$*()_+=-\\}{', 'üniversite etkinliği', 'ÜNIVERSITE ETKINLIĞI', 'antani', '$$antan$i']
       })
 
@@ -74,7 +80,7 @@ describe('Tags', async () => {
   it('should autocomplete tags', async () => {
     let response = await fetchWithAuth('/api/tags', 'GET', undefined, 'none')
     expect(response.data).toEqual(
-      expect.arrayContaining(['tag1', 'Tag2', 'üniversite etkinliği', 'tAg3', 'ciao', 'antani', '/\'"%^&*~`!@#$*()_+=-\\}{', '$$antan$i', 'test', 'tag4'])
+      expect.arrayContaining(['tag1', 'Tag2', 'üniversite etkinliği', 'tAg3', 'ciao', 'antani', '/\'"%^&*~`!@#$*()_+=-\\}{', '$$antan$i', 'tag4'])
     )
 
     response = await fetchWithAuth('/api/tags?query=ANT', 'GET', 'none')
@@ -82,26 +88,19 @@ describe('Tags', async () => {
     expect(response.data).toStrictEqual(expect.arrayContaining(['antani', '$$antan$i']))
   })
 
-  // it('should return events searching for tags', async () => {
+  it('should return events searching for tags', async () => {
+    const response = await fetchWithAuth('/api/events?tags=tAg3', 'GET', undefined, 'none')
+    expect(response.status).toBe(200)
 
-  //   const response = await request(app).get('/api/events?tags=tAg3')
-  //     .expect(200)
+    expect(response.data.length).toBe(2)
+    expect(response.data[0].tags.length).toBe(3)
+  })
 
-  //   expect(response.body.length).toBe(2)
-  //   // expect(response.body[0].title).toBe('test tags')
-  //   expect(response.body[0].tags.length).toBe(3)
-  // })
+  it('should return limited events', async () => {
+    let response = await fetchWithAuth('/api/events?max=1', 'GET', undefined, 'none')
+    expect(response.data.length).toBe(1)
 
-  //   it('should return limited events', async () => {
-
-  //     let response = await request(app).get('/api/events?max=1')
-  //     .expect(200)
-  //     expect(response.body.length).toBe(1)
-
-  //     response = await request(app).get('/api/events?max=2')
-  //       .expect(200)
-
-  //     expect(response.body.length).toBe(2)
-
-  //   })
+    response = await fetchWithAuth('/api/events?max=2', 'GET', undefined, 'none')
+    expect(response.data.length).toBe(2)
+  })
 })

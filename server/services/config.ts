@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 export const ProxyAuthSchema = z.object({
   username: z.string().optional().default(''),
-  password: z.string().optional().default(''),
+  password: z.string().optional().default('')
 })
 
 export const ProxySchema = z.object({
@@ -14,7 +14,7 @@ export const ProxySchema = z.object({
   host: z.string().optional().default(''),
   port: z.string().optional().default(''),
   auth: ProxyAuthSchema,
-  headers: z.record(z.string(), z.string()).optional().default({}),
+  headers: z.record(z.string(), z.string()).optional().default({})
 })
 
 export type DialectName = 'sqlite3' | 'mariadb' | 'postgresql'
@@ -27,7 +27,7 @@ export const DbSchema = z.object({
   port: z.coerce.number().optional(),
   username: z.string().optional(),
   password: z.string().optional(),
-  database: z.string().optional(),
+  database: z.string().optional()
 })
 
 export const ConfigSchema = z.object({
@@ -41,19 +41,19 @@ export const ConfigSchema = z.object({
   upload_path: z.string(),
   plugins_path: z.string(),
   hidden_service: z.string().optional().default(''),
-  proxy: ProxySchema,
+  proxy: ProxySchema
 })
 
 export type Config = z.infer<typeof ConfigSchema>
 
-let config: Config | null = null
+let config: Config
 
 /**
  * this loads the configuration using the legacy `config.json`
  * and merge it with the ENV vars incoming from `.env` or from
  * docker configuration
  */
-export function get(): Config {
+export function get(): Config | undefined {
   if (config) return config
 
   // read the legacy v1 configuration file
@@ -73,8 +73,8 @@ export function get(): Config {
     process.exit(-1)
   }
 
-  const defaultConfig = {
-    baseurl: process.env.BASE_URL || 'http://localhost:13120',
+  const defaultConfig: Config = {
+    baseurl: process.env.BASEURL || 'http://localhost:13120',
     log_level: process.env.LOG_LEVEL || 'debug',
     log_path: path.resolve(process.env.LOG_PATH || '', 'logs'),
     db: {
@@ -96,12 +96,17 @@ export function get(): Config {
         username: process.env.PROXY_USERNAME || '',
         password: process.env.PROXY_PASSWORD || ''
       },
-      headers: process.env.PROXY_HEADERS && JSON.parse(process.env.PROXY_HEADERS) || {}
+      headers: process.env.PROXY_HEADERS ? JSON.parse(process.env.PROXY_HEADERS) : {}
     }
   }
 
   // TODO: check is this is working as expected
   config = Object.assign(legacyConfiguration, defaultConfig)
-  config = ConfigSchema.parse(config)
-  return config
+  try {
+    config = ConfigSchema.parse(config)
+    return config
+  } catch (e) {
+    console.error('Configuration error:', e)
+    process.exit(-1)
+  }
 }

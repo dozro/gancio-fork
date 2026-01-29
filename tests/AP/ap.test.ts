@@ -2,14 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { $fetch, fetch } from '@nuxt/test-utils/e2e'
 import { setup } from '../setup'
 
-
 // const { _signAndSend } = await import('../../server/federation/sign_and_send')
 
 await setup()
 
 describe('AP', () => {
   it('should redirect to / on html as accepted content type', async () => {
-    const res = await fetch('/federation/u/relay', { headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' } })
+    const res = await fetch('/federation/u/relay', { redirect: 'manual', headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' } })
     expect(res.status).toBe(302)
     expect(res.headers.get('Location')).toBe('/')
   })
@@ -90,16 +89,16 @@ describe('Inbox', () => {
     expect(res.status).toBe(401)
   })
 
-//   it('should follow myself', async () => {
-//     const body = {
-//       '@context': 'https://www.w3.org/ns/activitystreams',
-//       'id': `${publicSettings.baseurl}/federation/m/relay#follow`,
-//       'type': 'Follow',
-//       'actor': `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
-//       'object': 'http://localhost:13120/federation/u/relay'
-//     }
+  //   it('should follow myself', async () => {
+  //     const body = {
+  //       '@context': 'https://www.w3.org/ns/activitystreams',
+  //       'id': `${publicSettings.baseurl}/federation/m/relay#follow`,
+  //       'type': 'Follow',
+  //       'actor': `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
+  //       'object': 'http://localhost:13120/federation/u/relay'
+  //     }
 
-//     const ret = await signAndSend(JSON.stringify(body), 'http://localhost:13120/federation/u/relay/inbox')
-//     console.error(ret)
-//   })
-// })
+  //     const ret = await signAndSend(JSON.stringify(body), 'http://localhost:13120/federation/u/relay/inbox')
+  //     console.error(ret)
+  //   })
+})

@@ -47,13 +47,14 @@ END:VCALENDAR
 describe('ICSParser', () => {
   it('should parse a single event correctly', () => {
     const events = parseIcsData(singleEventIcs)
-
     expect(events.length).toBe(1)
-    expect(events[0].title).toBe('Single Event Test')
-    expect(events[0].description).toBe('This is a single test event')
-    expect(events[0].location).toBe('Test Location')
-    expect(events[0].start_datetime).toBeGreaterThan(0)
-    expect(events[0].end_datetime).toBeGreaterThan(events[0].start_datetime)
+    const [event] = events!
+
+    expect(event?.title).toBe('Single Event Test')
+    expect(event?.description).toBe('This is a single test event')
+    expect(event?.location).toBe('Test Location')
+    expect(event?.start_datetime).toBeGreaterThan(0)
+    expect(event?.end_datetime).toBeGreaterThan(event!.start_datetime)
   })
 
   it('should parse multiple events correctly', () => {
