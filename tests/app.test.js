@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
-import { DateTime } from 'luxon'
-import { fetchWithAuth, admin, setCookie, setToken, cookie } from './setup.js'
+import { $fetch, fetch } from '@nuxt/test-utils/e2e'
+import { fetchWithAuth, admin, setCookie, cookie, setup, now } from './setup.js'
 
-const base_url = 'http://localhost:13120'
-await setup({ host: base_url })
+await setup(false)
 let event_id
 let places = []
 
@@ -147,7 +145,7 @@ describe('Events', () => {
     const required_fields = {
       'title': {},
       'start_datetime': { title: 'test title' },
-      'place_id or place_name and place_address are': { title: 'test title', start_datetime: DateTime.now().toUnixInteger(), place_name: 'test place name' },
+      'place_id or place_name and place_address are': { title: 'test title', start_datetime: now(), place_name: 'test place name' }
     }
 
     const promises = Object.keys(required_fields).map(async (field) => {
@@ -166,7 +164,10 @@ describe('Events', () => {
     response = await fetchWithAuth('/api/events', 'POST', undefined, 'none')
     expect(response.ok).toBe(false)
 
-    response = await fetchWithAuth('/api/events', 'POST', { title: 'test title 2', place_name: 'place name', place_address: 'address', tags: ['test'], start_datetime: DateTime.now().toUnixInteger() + 1000 })
+    response = await fetchWithAuth('/api/events', 'POST', {
+      title: 'test title 2', place_name: 'place name',
+      place_address: 'address', tags: ['test'], start_datetime: now() + 1000
+    })
     expect(response.ok).toBe(true)
 
     expect(response.data.place.id).toBeDefined()
@@ -175,7 +176,10 @@ describe('Events', () => {
     response = await fetchWithAuth('/api/settings', 'PUT', { key: 'allow_anon_event', value: true })
     expect(response.status).toBe(200)
 
-    response = await fetchWithAuth('/api/events', 'POST', { title: 'test title 3', place_name: 'place name 2', place_address: 'address 2', tags: ['test'], start_datetime: DateTime.now().toUnixInteger() + 1000 }, 'none')
+    response = await fetchWithAuth('/api/events', 'POST', {
+      title: 'test title 3', place_name: 'place name 2',
+      place_address: 'address 2', tags: ['test'], start_datetime: now() + 1000
+    }, 'none')
     expect(response.ok).toBe(true)
 
     expect(response.data.place.id).toBeDefined()
@@ -183,48 +187,46 @@ describe('Events', () => {
   })
 
   it('should not confirm anon events', async () => {
-    const response = await fetchWithAuth('/api/events', 'POST', { title: 'test title 6', place_id: 1, start_datetime: DateTime.now().toUnixInteger() + 1000 },
-      'none')
+    const response = await fetchWithAuth('/api/events', 'POST', {
+      title: 'test title 6', place_name: 'place name 2',
+      place_address: 'address 2',
+      start_datetime: now() + 1000
+    },
+    'none')
 
     expect(response.data.is_visible).toBe(false)
     event_id = response.data.id
   })
 
-  //   it('should not get unconfirmed events', async () => {
-  //     let response = await request(app).get(`/api/event/detail/${event_id}`)
-  //       .expect(404)
+  it('should not get unconfirmed events', async () => {
+    let response = await fetch(`/api/event/detail/${event_id}`)
+    expect(response.status).toBe(404)
 
-  //       response = await request(app).get(`/api/event/detail/${event_id}`)
-  //       .auth(token.access_token, { type: 'bearer' })
-  //       .expect(200)
-  //   })
+    response = await fetchWithAuth(`/api/event/detail/${event_id}`)
+    expect(response.status).toBe(200)
+  })
 
-  //   it('should confirm event if allowed', async () => {
-  //     let response = await request(app).put(`/api/event/confirm/${event_id}`)
-  //       .send()
-  //       .expect(403)
+  it('should confirm event if allowed', async () => {
+    let response = await fetch(`/api/events/${event_id}/toggle`, { method: 'PUT' })
+    expect(response.status).toBe(401)
 
-  //     response = await request(app).put(`/api/event/confirm/${event_id}`)
-  //       .auth(token.access_token, { type: 'bearer' })
-  //       .send()
-  //       .expect(200)
-  //   })
+    response = await fetchWithAuth(`/api/events/${event_id}/toggle`, 'PUT')
+    expect(response.status).toBe(200)
+  })
 
-  //   it('should not allow start_datetime greater than end_datetime', async () => {
+  it('should not allow start_datetime greater than end_datetime', async () => {
+    const event = {
+      title: ' test title 5',
+      place_id: places[0],
+      start_datetime: now() + 1000,
+      end_datetime: now()
+    }
 
-  //     const event = {
-  //       title: ' test title 5',
-  //       place_id: places[0],
-  //       start_datetime: dayjs().unix() + 1000,
-  //       end_datetime: dayjs().unix(),
-  //     }
+    const response = await fetchWithAuth('/api/events', 'POST', event)
 
-  //     const response = await request(app).post('/api/event')
-  //       .send(event)
-  //       .expect(400)
-
-  //     expect(response.text).toBe('start datetime is greater than end datetime')
-  //   })
+    expect(response.status).toBe(400)
+    expect(response.data.message).toBe('start datetime is greater than end datetime')
+  })
 
   //   it('should not allow start_datetime greater than 3000', async () => {
 

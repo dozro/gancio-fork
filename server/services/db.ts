@@ -383,10 +383,10 @@ export class Place extends Model<
   declare address: string
 
   @Attribute(DataTypes.DOUBLE)
-  declare latitude?: number
+  declare latitude: CreationOptional<number>
 
   @Attribute(DataTypes.DOUBLE)
-  declare longitude?: number
+  declare longitude: CreationOptional<number>
 
   @HasMany(() => Event, /* foreign key */ 'placeId')
   declare events?: NonAttribute<Event[]>

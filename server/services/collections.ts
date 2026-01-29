@@ -1,6 +1,6 @@
 import type { WhereOptions } from '@sequelize/core'
 import { Op, literal, sql } from '@sequelize/core'
-import { APUser, Event, Place, Filter, Collection } from './db'
+import { APUser, Event, Place, Filter, Collection, Tag } from './db'
 import { DateTime } from 'luxon'
 import z from 'zod'
 import { publicSettings } from './settings'
@@ -17,7 +17,7 @@ export const collectionQuerySchema = z.object({
   include_description: z.coerce.boolean().optional(),
   page: z.number().optional(),
   older: z.coerce.boolean().optional(),
-  reverse: z.coerce.boolean().optional(),
+  reverse: z.coerce.boolean().optional()
 })
 export type CollectionQueryType = z.infer<typeof collectionQuerySchema>
 
@@ -103,7 +103,7 @@ export async function getCollectionEvents(opts?: CollectionQueryType) {
     ...(args.end && { start_datetime: { [args.older ? Op.gte : Op.lte]: args.end } }),
 
     // include recurrent events?
-    ...(!args.show_recurrent && { parentId: null }),
+    ...(!args.show_recurrent && { parentId: null })
   }
 
   let replacements: Record<string, unknown> = {}

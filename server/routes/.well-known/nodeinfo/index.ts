@@ -1,4 +1,5 @@
 import max from 'lodash/max'
+import { publicSettings, publicSettingsLastModified } from '~~/server/services'
 
 export default defineEventHandler((event) => {
   const nodeinfo = {

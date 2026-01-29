@@ -7,8 +7,7 @@ export default withNuxt([
   globalIgnores([
     'wp-plugin/js/*',
     'server/migrations/*',
-    'docs/assets/*',
-    'tests/*'
+    'docs/assets/*'
   ]),
   stylistic.configs.recommended,
   ...vuetify.configs['flat/base'],
@@ -20,8 +19,8 @@ export default withNuxt([
       '@stylistic/semi': ['error', 'never'],
       '@stylistic/brace-style': 'off',
       '@stylistic/space-before-function-paren': 'off',
-      '@stylistic/comma-dangle': 'off',
       '@stylistic/eol-last': 'off',
+      '@stylistic/comma-dangle': ['error', 'never'],
       '@stylistic/operator-linebreak': 'off',
       // do not enforce v-slot style
       'vue/v-slot-style': 'off',
@@ -31,7 +30,7 @@ export default withNuxt([
         closeBracket: 0,
         alignAttributesVertically: false,
         ignores: []
-      }],
+      }]
     }
   }
 

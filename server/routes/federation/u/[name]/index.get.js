@@ -1,15 +1,15 @@
 // import { APUser } from "~/server/utils/sequelize"
 
 import { useLogger } from '~~/server/lib/logger'
+import { preferHTML } from '~~/server/lib/negotiator'
 import { publicSettings } from '~~/server/services'
 
 export default defineEventHandler(async (event) => {
   const log = useLogger('federation actor')
-  // const { preferHTML } = require('../helpers')
-  // if (preferHTML(req)){
-  //   log.debug('[FEDI] Get actor but prefer text/html, redirect to homepage')
-  //   return res.redirect(302, '/')
-  // }
+  if (preferHTML(event)) {
+    log.debug('[FEDI] Get actor but prefer text/html, redirect to homepage')
+    sendRedirect(event, '/', 302)
+  }
 
   const name = getRouterParam(event, 'name')
   if (!name) {

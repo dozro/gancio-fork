@@ -24,7 +24,7 @@ export function parseIcsData(icsText: string, includePastEvents = true) {
       // That means: both start_datetime AND end_datetime must be less than 'now'.
       // -> Events that are currently ongoing (start < now && end > now) should still be imported.
       if (!includePastEvents && start_datetime < now && end_datetime < now) {
-        return null
+        return
       }
 
       // Check if optional organizer is present (RFC 5545:
@@ -34,9 +34,9 @@ export function parseIcsData(icsText: string, includePastEvents = true) {
       const organizer = organizerProp
         ? {
             name: organizerProp.getParameter('cn') || '',
-            email: (organizerProp.getFirstValue() || '')?.replace(/^mailto:/i, '')
+            email: (organizerProp.getFirstValue() as string || '')?.replace(/^mailto:/i, '')
           }
-        : null
+        : undefined
 
       return {
         title: event.summary || '',
