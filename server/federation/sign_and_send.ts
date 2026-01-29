@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import { useLogger } from '../lib/logger'
+import { publicSettings } from '../services'
 export async function _signAndSend(message: string, inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
   const log = useLogger('sign_and_send')
   log.debug('[FEDI] Sign and %s %s', method, inbox)
@@ -55,7 +56,7 @@ export async function _signAndSend(message: string, inbox: string, method: 'post
     } else {
       const body = await ret.json()
       log.error('[FEDI] Error in sign and send status [%s]: %s', inbox, body)
-      throw 'diocane'
+      throw body
     }
   } catch (e) {
     log.error('[FEDI] Error in sign and send [%s]: %s', inbox, e?.response?.data?.error ?? e?.response?.statusMessage ?? '' + ' ' + String(e))
