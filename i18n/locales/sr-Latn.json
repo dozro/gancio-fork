@@ -227,7 +227,7 @@
         "allow_anon_event": "Dozvoli anonimne događaje (moraju biti potvrđeni)?",
         "collections_description": "Kolekcije su grupirani događaji prema tagovima i mestima. Biće prikazane na početnoj stranici",
         "add_trusted_source": "Dodaj pouzdan federisani izvor",
-        "add_trusted_source_help": "Koristi jednu od sledećih sintaksi: <br/><ul><li>web adresu drugog Gancio-a ili softvera koji podržava Application Actor / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (npr. <u>https://demo.gancio.org</u>)</li><li>ActivityPub nalog kao <u>@gancio@mastodon.cisti.org</u></li><li>URL naloga kao <u>https://instance.tld/actor</u>.</li></ul><br/>Događaji objavljeni ili boost-ani sa ovih izvora biće uvezeni.",
+        "add_trusted_source_help": "Koristi jednu od sledećih sintaksi: <br/><ul><li>web adresu drugog Gancio-a ili softvera koji podržava Application Actor / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (npr. <u>https://demo.gancio.org</u>)</li><li>ActivityPub nalog kao <u>{'@gancio@mastodon.cisti.org'}</u></li><li>URL naloga kao <u>https://instance.tld/actor</u>.</li></ul><br/>Događaji objavljeni ili boost-ani sa ovih izvora biće uvezeni.",
         "hide_calendar": "Sakrij kalendar",
         "instance_name": "Naziv instance",
         "place_description": "Ako ste pogrešno uneli mesto ili adresu, možete ih promeniti.<br/>Svi trenutni i prethodni događaji povezani sa ovim mestom promeniće adresu.",

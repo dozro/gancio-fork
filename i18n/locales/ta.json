@@ -342,7 +342,7 @@
         "trusted_sources_label_default": "பிற இடங்கள்",
         "trusted_sources_label_help": "இயல்புநிலை சிட்டை 'பிற இடங்கள்'",
         "add_trusted_source": "நம்பகமான கூட்டாட்சி மூலத்தைச் சேர்",
-        "add_trusted_source_help": "பின்வரும் தொடரியல் ஒன்றைப் பயன்படுத்தவும்: <br/><ul><li>மற்றொரு கொக்கி அல்லது பயன்பாட்டு நடிகரை ஆதரிக்கும் மென்பொருளின் வலை முகவரி / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (எ.கா. <u>https://demo.gancio.org</u>)</li><li>ஒரு செயல்பாட்டு பப் கையாளுதல் <u>@gancio@mastodon.cisti.org</u></li><li><u>https://instance.tld/actor</u> போன்ற கணக்கின் முகவரி.</li></ul><br/>இந்த மூலங்களிலிருந்து வெளியிடப்பட்ட அல்லது உயர்த்தப்பட்ட நிகழ்வுகள் இறக்குமதி செய்யப்படும்.",
+        "add_trusted_source_help": "பின்வரும் தொடரியல் ஒன்றைப் பயன்படுத்தவும்: <br/><ul><li>மற்றொரு கொக்கி அல்லது பயன்பாட்டு நடிகரை ஆதரிக்கும் மென்பொருளின் வலை முகவரி / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (எ.கா. <u>https://demo.gancio.org</u>)</li><li>ஒரு செயல்பாட்டு பப் கையாளுதல் <u>{'@gancio@mastodon.cisti.org'}</u></li><li><u>https://instance.tld/actor</u> போன்ற கணக்கின் முகவரி.</li></ul><br/>இந்த மூலங்களிலிருந்து வெளியிடப்பட்ட அல்லது உயர்த்தப்பட்ட நிகழ்வுகள் இறக்குமதி செய்யப்படும்.",
         "delete_trusted_source_confirm": "இந்த நம்பகமான மூலத்தை நீக்க விரும்புகிறீர்களா?",
         "trusted_source_removed": "நம்பகமான சான்று அகற்றப்பட்டது",
         "smtp_password_description": "நீங்கள் கடவுச்சொல்லை மாற்ற விரும்பவில்லை என்றால் காலியாக விடவும்",

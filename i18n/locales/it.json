@@ -118,7 +118,8 @@
         "enabled": "Abilitato",
         "pages": "Pagine",
         "pin": "Fissa",
-        "contact_user": "Contatta utente"
+        "contact_user": "Contatta utente",
+        "trusted_sources": "Fonti federate attendibili"
     },
     "login": {
         "description": "Entrando puoi pubblicare nuovi eventi.",
@@ -141,7 +142,8 @@
         "list_description": "Se hai un sito web e vuoi mostrare una lista di eventi, puoi usare il seguente codice",
         "filter_description": "Puoi filtrare gli eventi per tag, luoghi o per una collezione predefinita",
         "filter_title": "Filtra",
-        "ical_title": "ics/ical"
+        "ical_title": "ics/ical",
+        "list_title": "Elenco"
     },
     "register": {
         "description": "I movimenti hanno bisogno di organizzarsi e autofinanziarsi. <br/>\nUsatelo solo per eventi non commerciali, antifascisti, antisessisti, antirazzisti. <br/>Prima di poter pubblicare <strong>dobbiamo approvare l'account</strong>, considera che <strong>dietro questo sito ci sono delle persone</strong> di carne e sangue, scrivici quindi due righe per farci capire che eventi vorresti pubblicare.",
@@ -288,7 +290,7 @@
         "delete_footer_link_confirm": "Vuoi eliminare questo collegamento?",
         "edit_place": "Modifica luogo",
         "edit_tag": "Modifica tag",
-        "edit_tag_help": "Puoi cambiare il tag sostituendolo con uno nuovo o unendolo ad uno gia' esistente. Verranno modificati anche i {n} eventi associati",
+        "edit_tag_help": "Si può cambiare il tag sostituendolo con uno nuovo o unendolo a uno già esistente. Verranno modificati anche {n} eventi associati.",
         "new_announcement": "Nuovo annuncio",
         "show_smtp_setup": "Impostazioni email",
         "widget": "Widget",
@@ -371,7 +373,7 @@
         "past_unconfirmed_events": "Eventi passati non confermati",
         "page_description": "In questa sezione si possono gestire pagine personalizzate (ad esempio politica, guide, ecc.). Queste pagine non appariranno automaticamente da nessuna parte, ma si può farvi riferimento nel piè di pagina, dalla pagina \"Chi siamo\" o da qualsiasi punto tramite il link di anteprima.",
         "new_page": "Aggiungi pagina personalizzata",
-        "add_trusted_source_help": "Utilizzare una delle seguenti sintassi: <br/><ul><li>l'indirizzo web di un altro Gancio o di un software che supporta un Application Actor / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (ad esempio <u>https://demo.gancio.org</u>)</li><li>un handle ActivityPub come <u>@gancio@mastodon.cisti.org</u></li><li>l'URL di un account come <u>https://instance.tld/actor</u>.</li></ul><br/>Gli eventi pubblicati o potenziati da queste fonti verranno importati.",
+        "add_trusted_source_help": "Utilizzare una delle seguenti sintassi: <br/><ul><li>l'indirizzo web di un altro Gancio o di un software che supporta un Application Actor / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (ad esempio <u>https://demo.gancio.org</u>)</li><li>un handle ActivityPub come <u>{'@gancio@mastodon.cisti.org'}</u></li><li>l'URL di un account come <u>https://instance.tld/actor</u>.</li></ul><br/>Gli eventi pubblicati o potenziati da queste fonti verranno importati.",
         "plugins_description": "I plugin sono piccole porzioni di codice che forniscono funzionalità aggiuntive all'applicazione principale. Di solito sono scritti da sviluppatori esterni al progetto che sfruttano il <a href=\"https://gancio.org/dev/plugins\">sistema di plugin</a>, principalmente per inviare eventi ad altre piattaforme e canali.",
         "custom_js_help": "Si può integrare del codice JavaScript che verrà caricato per ogni utente scrivendolo nell'area di testo qui sotto. Probabilmente è meglio prima leggere la <a href='https://gancio.org/usage/custom_js'>documentazione</a>.",
         "delete_page_confirm": "Vuoi davvero rimuovere la pagina \"<strong>{title}</strong>\"?",

@@ -312,7 +312,7 @@
         "allow_multidate_event": "Dopustiti višednevne događaje",
         "allow_recurrent_event": "Dopustiti ponavljajuće događaje",
         "allow_online_event": "Dopustiti online događaje",
-        "add_trusted_source_help": "Koristite jednu od sljedećih sintaksi: <br/><ul><li>web-adresu drugog Gancio-a ili softvera koji podržava Application Actor / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (npr. <u>https://demo.gancio.org</u>)</li><li>ActivityPub račun kao <u>@gancio@mastodon.cisti.org</u></li><li>URL računa kao <u>https://instance.tld/actor</u>.</li></ul><br/>Događaji objavljeni ili boostani s ovih izvora bit će uvezeni.",
+        "add_trusted_source_help": "Koristite jednu od sljedećih sintaksi: <br/><ul><li>web-adresu drugog Gancio-a ili softvera koji podržava Application Actor / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (npr. <u>https://demo.gancio.org</u>)</li><li>ActivityPub račun kao <u>{'@gancio@mastodon.cisti.org'}</u></li><li>URL računa kao <u>https://instance.tld/actor</u>.</li></ul><br/>Događaji objavljeni ili boostani s ovih izvora bit će uvezeni.",
         "delete_trusted_source_confirm": "Jeste li sigurni da želite obrisati ovaj pouzdani izvor?",
         "trusted_source_removed": "Pouzdani izvor uklonjen",
         "is_dark": "Tamna tema",

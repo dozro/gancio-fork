@@ -367,7 +367,7 @@
         "default_fedi_hashtags_help": "Les tags spécifiées seront ajoutées aux événements envoyés au fediverse",
         "federated_events_in_home": "Afficher les événements fédérés sur la page d'accueil",
         "federated_events_in_home_help": "Les événements provenant de sources fédérées de confiance seront affichés par défaut sur la page d'accueil. Pour n'afficher que certains événements, vous pouvez utiliser les collections",
-        "add_trusted_source_help": "Utilisez l'une des syntaxes suivantes : <br/><ul><li>l'adresse web d'un autre Gancio ou d'un logiciel qui supporte un Application Actor / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (e.g. <u>https://demo.gancio.org</u>)</li><li>ou un compte ActivityPub, tel <u>@gancio@mastodon.cisti.org</u></li><li>l'url d'un compte, tel <u>https://instance.tld/actor</u>.</li></ul><br/>Les Events publiés or boostés par ces sources seront importés.",
+        "add_trusted_source_help": "Utilisez l'une des syntaxes suivantes : <br/><ul><li>l'adresse web d'un autre Gancio ou d'un logiciel qui supporte un Application Actor / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (e.g. <u>https://demo.gancio.org</u>)</li><li>ou un compte ActivityPub, tel <u>{'@gancio@mastodon.cisti.org'}</u></li><li>l'url d'un compte, tel <u>https://instance.tld/actor</u>.</li></ul><br/>Les Events publiés or boostés par ces sources seront importés.",
         "unconfirmed_events": "Événements non confirmés",
         "past_unconfirmed_events": "Événements non confirmés passés",
         "delete_page_confirm": "Êtes-vous sûr de vouloir supprimer la page « <strong>{title}</strong> » ?",

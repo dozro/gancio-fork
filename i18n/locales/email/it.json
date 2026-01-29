@@ -5,7 +5,7 @@
     },
     "confirm": {
         "subject": "Puoi iniziare a pubblicare eventi",
-        "content": "Ciao, il tuo account su <a href='{{{config.baseurl}}}'>{{config.title}}</a> è stato confermato.<br/> Scrivici a {{config.admin_email}} per qualsiasi informazione e fai a modino."
+        "content": "Ciao, il tuo account su <a href='{{{config.baseurl}}}'>{{config.title}}</a> è stato confermato.<br/> Scrivici a {{config.admin_email}} per qualsiasi informazione."
     },
     "user_confirm": {
         "subject": "Puoi iniziare a pubblicare eventi",
@@ -29,7 +29,7 @@
     "report": {
         "subject": "Segnalazione evento [{{event.title}}]",
         "content_ADMIN": "Una persona con permessi di amministrazione ha commentato l'evento <strong>{{event.title}}</strong>:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Apri moderazione</a>",
-        "content_ANON": "Una persona ha commentato l'evento <strong>{{event.title}}</strong>:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Apri evento<a>",
+        "content_ANON": "Una persona ha commentato l'evento <strong>{{event.title}}</strong>:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Apri la moderazione<a>",
         "content_AUTHOR": "Chi ha inserito l'evento <strong>{{event.title}}</strong> ha scritto:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Apri evento</a>"
     }
 }

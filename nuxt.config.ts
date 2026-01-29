@@ -53,10 +53,8 @@ export default defineNuxtConfig({
       code: key,
       name: locales[key],
       dir: ['ar', 'fa', 'ta'].includes(key) ? 'rtl' : 'ltr',
-      file: 'en.js'
+      file: 'loader.ts'
     })),
-    // skipSettingLocaleOnNavigate: true,//
-    // dynamicRouteParams: false,
     compilation: {
       strictMessage: false
     },
@@ -129,10 +127,10 @@ export default defineNuxtConfig({
           // See https://github.com/nuxt/nuxt/issues/14126
           //     https://github.com/unjs/nitro/issues/273
           compilerOptions: {
-            experimentalDecorators: true,
-          },
-        },
-      },
-    },
-  },
+            experimentalDecorators: true
+          }
+        }
+      }
+    }
+  }
 })

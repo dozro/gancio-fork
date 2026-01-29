@@ -259,7 +259,7 @@
         "custom_css_help": "Você pode customizar alguns estilos também, veja alguns exemplos <a href='https://gancio.org/usage/custom_css'>aqui</a>.",
         "default_fedi_hashtags": "Hashtags padrão do Fediverso",
         "default_fedi_hashtags_help": "As tags especificadas será adicionadas aos eventos enviados ao Fediverso",
-        "add_trusted_source_help": "Utilize uma das seguintes sintaxes: <br/><ul><li>o endereço de outra insância do Gancio ou outro aplicativo que suporte um Ator / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (e.g. <u>https://demo.gancio.org</u>)</li><li>um identificador ActivityPub como <u>@gancio@mastodon.cisti.org</u></li><li>a URL de uma conta como <u>https://instance.tld/actor</u>.</li></ul><br/>Eventos publicados ou impulsionados por estas fontes serão importados.",
+        "add_trusted_source_help": "Utilize uma das seguintes sintaxes: <br/><ul><li>o endereço de outra insância do Gancio ou outro aplicativo que suporte um Ator / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (e.g. <u>https://demo.gancio.org</u>)</li><li>um identificador ActivityPub como <u>{'@gancio@mastodon.cisti.org'}</u></li><li>a URL de uma conta como <u>https://instance.tld/actor</u>.</li></ul><br/>Eventos publicados ou impulsionados por estas fontes serão importados.",
         "trusted_sources_label_help": "O marcador padrão é ‘Outros locais’",
         "add_trusted_source": "Adicionar uma fonte federada confiável",
         "delete_trusted_source_confirm": "Você quer realmente excluir esta fonte confiável?",
