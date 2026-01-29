@@ -1,7 +1,7 @@
 {
     "admin": {
         "announcement_remove_ok": "Oznámení odebráno",
-        "description_description": "Zobrazuje se v záhlaví stránky vedle názvu (je podporováno HTML)",
+        "description_description": "Text popisu, který se zobrazuje v záhlaví stránky pod názvem (je podporováno HTML)",
         "config_plugin": "Nastavení doplňků",
         "delete_announcement_confirm": "Opravdu chcete odebrat toto oznámení?",
         "header_image": "Úvodní obrázek",
@@ -334,7 +334,7 @@
         "each_week": "Každý týden",
         "what_description": "Název",
         "only_future": "pouze budoucí události",
-        "multidate": "Více dní",
+        "multidate": "Několik dní",
         "description_description": "Popis",
         "recurrent": "Pravidelné",
         "remove_recurrent_confirmation": "Přejete si odstranit tuto pravidelnou událost?\nMinulé události budou zachovány, nebudou ale vytvořeny žádné budoucí.",
@@ -349,7 +349,7 @@
         "tag_description": "Štítek",
         "saved": "Událost uložena",
         "assign_to_user": "Přiřadit k uživateli",
-        "assign_to_user_description": "Anonymní událost můžete přiřadit k uživateli. Tím umožníte zvolenému uživateli událost upravovat.",
+        "assign_to_user_description": "Anonymní událost můžete přiřadit k jakémukoli uživateli. Tím umožníte zvolenému uživateli událost upravovat.",
         "message": "Zpráva",
         "message_hint": "Můžete poslat zprávu ostatním administrátorům a případně osobě, která je autorem události.",
         "message_author_hint": "Napsat zprávu administrátorům",
