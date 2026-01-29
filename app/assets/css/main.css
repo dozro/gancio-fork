@@ -6,7 +6,8 @@
 }
 
 
-.v-card .v-icon {
+.v-card .v-icon,
+.event-card .v-icon {
   --v-icon-opacity: 0.6;
 }
 
@@ -51,4 +52,9 @@ blockquote {
   margin-right: 0;
   padding-left: 16px;
   opacity: 0.6;
+}
+
+.pointer-ev-none {
+  pointer-events: none;
+  user-select: none;
 }

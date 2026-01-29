@@ -182,8 +182,11 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
     // n_msgs: event?.,
   }
 
-  if (event.APUser) {
-    response.ap_user = { image: event?.APUser?.object?.icon?.url ?? `${event?.APUser?.object?.url}/favicon.ico` }
+  if (event?.APUser?.object) {
+    response.ap_user = {
+      image: event.APUser.object.icon?.url ?? `${event.APUser.object.url}/favicon.ico`,
+      name: event.APUser.object.name,
+    }
   }
 
   return response
