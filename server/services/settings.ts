@@ -1,11 +1,10 @@
 import { z } from 'zod'
-import { updateActor } from '../federation/helpers'
 import { promisify } from 'util'
 import crypto from 'crypto'
 import { get as getConfig } from './config'
-import { Setting } from './db'
 import type { SecretSettings, Settings } from '~~/shared/types/settings'
 import { useLogger } from '../lib/logger'
+import { Setting } from './db'
 
 const generateKeyPair = promisify(crypto.generateKeyPair)
 
@@ -89,6 +88,7 @@ export async function setSetting<K extends keyof AllSettings>(
   } else {
     // when changing this we have to update the actor
     if (['description', 'logo'].includes(key)) {
+      const { updateActor } = await import('../federation/helpers')
       updateActor()
     }
     publicSettings[key] = value
