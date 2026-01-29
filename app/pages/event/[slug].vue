@@ -16,13 +16,15 @@ if (!event.value || error.value) {
   })
 }
 
+const canonicalUrl = computed(() => `${settings.value.baseurl}/event/${event.value?.slug || event.value?.id}`)
+
 useHead({
   title: `${settings.value.title} - ${event.value.title}`,
   meta: [
     { property: 'og:title', content: event.value.title },
     { property: 'og:description', content: event.value?.plain_description ?? '' },
     { property: 'og:title', content: event.value.title },
-    { property: 'og:url', content: `${settings.value.baseurl}/event/${event.value.slug || event.value.id}` },
+    { property: 'og:url', content: canonicalUrl },
     { property: 'og:type', content: 'event' },
     { property: 'og:image', content: mediaURL(event.value) },
     { property: 'og:image:alt', content: mediaURL(event.value, 'alt') },
@@ -34,6 +36,7 @@ useHead({
     // { property: 'og:updated_time' },
   ],
   link: [
+    { rel: 'canonical', href: canonicalUrl },
     { rel: 'alternate', type: 'application/rss+xml', title: settings.value.title, href: `${settings.value.baseurl}/feed/rss` }
   ]
 })
@@ -46,6 +49,9 @@ const openAssignAuthor = ref(false)
 const showModeration = computed(() => settings.value.enable_moderation && (event?.value?.is_mine || user?.value?.role === 'admin' || user?.value?.role === 'editor'))
 const canEdit = computed(() => event?.value?.is_mine || user?.value?.role === 'admin' || user?.value?.role === 'editor')
 const hasOnlineLocations = computed(() => event?.value?.online_locations?.length)
+
+const share = useShare()
+const shareEvent = () => share.value?.({ url: canonicalUrl.value, title: document.title })
 
 // head () {
 //   if (!this.event) {
@@ -174,10 +180,20 @@ async function report() {
         <!-- info & actions -->
         <v-list>
 
-          <!-- copy link -->
+          <!-- share/copy link -->
           <v-list-item
+            v-if="share"
+            prepend-icon="mdi-share-variant"
+            :title="$t('common.share')"
+            :href="canonicalUrl"
+            @click.prevent="shareEvent"
+          />
+          <v-list-item
+            v-else
             prepend-icon='mdi-content-copy'
-            :title="$t('common.copy_link')" @click="$copyToClipboard(`${settings.baseurl}/event/${event?.slug || event.id}`)" />
+            :title="$t('common.copy_link')"
+            @click="$copyToClipboard(canonicalUrl)"
+          />
 
           <!-- map -->
           <v-list-item
