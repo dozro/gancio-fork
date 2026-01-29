@@ -1,4 +1,4 @@
-import pluginController from '~~/server/utils/plugins'
+import { pluginController, publicSettings } from '~~/server/services'
 
 export default defineEventHandler(async () => {
   // return plugins and inner settings

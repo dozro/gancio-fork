@@ -8,10 +8,12 @@ import path from 'path'
 import fs from 'fs/promises'
 import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
-import { get as getConfig } from '../config'
-import { sequelize } from './sequelize'
+import { get as getConfig } from '../services/config'
+import { sequelize } from './db'
+import { useLogger } from '../lib/logger'
 
 import { createRequire } from 'module'
+import { publicSettings, setSetting } from './settings'
 const require = createRequire(import.meta.url)
 
 // import settingsController from './settingsController'

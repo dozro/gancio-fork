@@ -1,3 +1,6 @@
+import { useLogger } from '~~/server/lib/logger'
+import { User } from '~~/server/services'
+
 export default defineEventHandler(async (event) => {
   const log = useLogger('user/check_recover_code')
   const { recover_code } = await readBody(event)

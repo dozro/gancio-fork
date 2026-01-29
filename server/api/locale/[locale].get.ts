@@ -1,7 +1,8 @@
+import { useLogger } from '~~/server/lib/logger'
 /**
  */
 import merge from 'lodash.merge'
-import { getMaxLastModifieds } from '~~/server/utils/events'
+import { getMaxLastModifieds } from '~~/server/services'
 export default defineCachedEventHandler(async (event) => {
   const log = useLogger('locale')
   const localeStorage = useStorage('locale_storage')
@@ -36,7 +37,7 @@ export default defineCachedEventHandler(async (event) => {
     }
 
     // embedd vuetify locale
-    let $vuetify = {}
+    let $vuetify
     if (await localeStorage.hasItem('vuetify:' + locale + '.json')) {
       $vuetify = await localeStorage.getItem('vuetify:' + locale + '.json')
       const lastModifiedVuetifyMeta = await localeStorage.getMeta('vuetify:' + locale + '.json')

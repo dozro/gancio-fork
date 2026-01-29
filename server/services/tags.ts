@@ -1,8 +1,10 @@
 import { Op, col, where, fn } from '@sequelize/core'
-import { useLogger } from '../utils/useLogger'
+import { useLogger } from '../lib/logger'
+import { Tag, Event } from './db'
+import { getEvents } from './events'
 const log = useLogger('tags')
 
-export async function findOrCreateTags (tags) {
+export async function findOrCreateTags(tags: string[]) {
   if (!Array.isArray(tags) || tags.length === 0) {
     return []
   }
@@ -35,7 +37,7 @@ export async function findOrCreateTags (tags) {
   ]
 }
 
-export async function cleanOrphanTags () {
+export async function cleanOrphanTags() {
   const tags = await Tag.findAll({
     include: [{ model: Event, as: 'events', required: false, attributes: [], through: { attributes: [] } }],
     group: ['tag'],
@@ -50,4 +52,11 @@ export async function cleanOrphanTags () {
   await Tag.destroy({
     where: { tag: { [Op.in]: tags.map(p => p.tag) } }
   })
+}
+
+export async function getTagEvents(tag: string | undefined) {
+  if (!tag) {
+    throw createError({ status: 404, message: 'Tag not specified' })
+  }
+  return getEvents({ tags: [tag] })
 }

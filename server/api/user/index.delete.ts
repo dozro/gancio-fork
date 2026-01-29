@@ -1,5 +1,5 @@
-import { Event } from '#imports'
-
+import { Event, User } from '~~/server/services'
+import { useLogger } from '~~/server/lib/logger'
 /**
  * Delete the current authenticated user and disassociate all events created by this user
  * @auth

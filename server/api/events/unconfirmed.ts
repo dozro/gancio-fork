@@ -1,5 +1,6 @@
-import { Event } from '#imports'
 import { DateTime } from 'luxon'
+import { Place, Message, Event } from '~~/server/services'
+import { useLogger } from '~~/server/lib/logger'
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)

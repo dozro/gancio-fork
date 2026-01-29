@@ -1,3 +1,6 @@
+import { useLogger } from '~~/server/lib/logger'
+import { Announcement } from '~~/server/services'
+
 export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const log = useLogger('announcement delete')

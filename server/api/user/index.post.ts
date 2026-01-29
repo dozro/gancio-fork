@@ -1,3 +1,5 @@
+import { User, enqueueMail, publicSettings } from '../../services'
+import { useLogger } from '~~/server/lib/logger'
 /**
  * Create a new user.
  * the first user being created will automatically become an active admin.

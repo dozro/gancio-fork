@@ -1,4 +1,4 @@
-import { Event, Message } from '~~/server/utils/sequelize'
+import { Event, Message } from '~~/server/services'
 
 export default defineEventHandler(async (evt) => {
   const eventId = evt.context.params?.event_id

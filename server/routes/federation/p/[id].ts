@@ -1,3 +1,6 @@
+import { useLogger } from '~~/server/lib/logger'
+import { Place } from '~~/server/services'
+
 export default defineEventHandler(async (event) => {
   // const { preferHTML } = await import('./helpers')
   const log = useLogger('') // Assuming you have a logger composable or utility

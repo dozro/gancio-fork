@@ -1,3 +1,5 @@
+import { useLogger } from '~~/server/lib/logger'
+import { Place, getEvents, getLastModified, mapEvents } from '~~/server/services'
 /**
  * Return events and past events related to the specified place
  * @return {EventAPI[]}

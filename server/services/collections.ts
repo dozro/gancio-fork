@@ -1,8 +1,10 @@
 import type { WhereOptions } from '@sequelize/core'
 import { Op, literal, sql } from '@sequelize/core'
-import { APUser, Event, Place } from './sequelize'
+import { APUser, Event, Place, Filter, Collection } from './db'
 import { DateTime } from 'luxon'
 import z from 'zod'
+import { publicSettings } from './settings'
+import { useLogger } from '../lib/logger'
 
 export const collectionQuerySchema = z.object({
   name: z.string(),

@@ -1,10 +1,12 @@
 export default defineNuxtPlugin(async () => {
-  const settings = useState('settings', () => null)
+  const settings = useState<Settings>('settings')
 
   if (!settings.value) {
-    const { data } = await useFetch('/api/settings', {
+    const { data } = await useFetch<Settings>('/api/settings', {
       deep: true
     })
-    settings.value = data.value
+    if (data.value) {
+      settings.value = data.value
+    }
   }
 })

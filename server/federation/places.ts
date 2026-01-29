@@ -1,7 +1,7 @@
 // const { Place } = require('../api/models/models')
 // const log = require('../log')
-import { useLogger } from '../utils/useLogger'
-import { findOrCreatePlace } from '../lib/places'
+import { useLogger } from '../lib/logger'
+import { findOrCreatePlace } from '../services/places'
 
 // module exports = {
 //   async get (req, res) {
@@ -60,12 +60,12 @@ export async function parseAPLocation(APEvent: unknown) {
       ...(APPlace?.id && { place_ap_id: APPlace.id }),
       ...(APPlace?.latitude && APPlace?.longitude && { place_latitude: APPlace.latitude, place_longitude: APPlace.longitude }),
     }
-  // no physical but at least virtual location
+    // no physical but at least virtual location
   } else if (onlineLocations.length) {
     place = {
       place_name: 'online'
     }
-  // nothing...
+    // nothing...
   } else {
     log.warn(`[FEDI] No Physical nor Virtual location: ${JSON.stringify(APEvent.location)}`)
     return [null, null]

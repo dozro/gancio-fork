@@ -1,4 +1,5 @@
 import z from 'zod'
+import { Collection, Filter, getLastModified } from '~~/server/services'
 
 const queryParams = z.object({
   withFilters: z.stringbool().optional(),

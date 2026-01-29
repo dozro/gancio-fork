@@ -1,5 +1,10 @@
-import type { Event, Place } from '#build/types/nitro-imports'
 import type { CreationAttributes } from '@sequelize/core'
+import type { Announcement, Event, Place } from '~~/server/services/db'
+
+export type {
+  User, Event, Tag, Place, APUser, Notification, Announcement,
+  Message, Page, Filter, Collection, Media, Resource, Instance
+} from '~~/server/services/db'
 
 type ValidatorFn<T = unknown> = (value: T) => boolean | string
 

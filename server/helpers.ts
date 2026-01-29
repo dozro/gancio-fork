@@ -1,33 +1,15 @@
-// const ical = require('ical.js')
-// const express = require('express')
-// const dayjs = require('dayjs')
-// const timezone = require('dayjs/plugin/timezone')
-// dayjs.extend(timezone)
-
-// const config = require('./config')
-// const log = require('./log')
-// const pkg = require('../package.json')
-// const path = require('path')
-// const sharp = require('sharp')
-// const axios = require('axios')
-// const crypto = require('crypto')
-// const Microformats = require('microformat-node')
-// const get = require('lodash/get')
-
-// const DOMPurify = require('dompurify')
-// const { JSDOM } = require('jsdom')
-// const { window } = new JSDOM('<!DOCTYPE html>')
-// const domPurify = DOMPurify(window)
-// const URL = require('url')
-// const settingsController = require('./api/controller/settings')
-
-import { get as getConfig } from './config'
+import { get as getConfig } from './services/config'
 import sharp from 'sharp'
 import path from 'path'
 import crypto from 'crypto'
 import { Readable } from 'node:stream'
 import { JSDOM } from 'jsdom'
 import DOMPurify from 'dompurify'
+import { useLogger } from './lib/logger'
+import type { H3Event } from 'h3'
+import mime from 'mime-types'
+import { createReadStream } from 'fs'
+import { stat } from 'fs/promises'
 
 const window = new JSDOM('').window
 const domPurify = DOMPurify(window)
@@ -56,44 +38,6 @@ const config = getConfig()
 //   return node
 // })
 
-// class HttpError extends Error {
-//   constructor(status, message) {
-//     super(message);
-//     this.status = status;
-//   }
-// }
-
-// class BadRequestError extends HttpError {
-//   constructor(message = 'Bad Request') {
-//     super(400, message);
-//   }
-// }
-
-// class UnauthorizedError extends HttpError {
-//   constructor(message = 'Unauthorized') {
-//     super(401, message);
-//   }
-// }
-
-// class NotFoundError extends HttpError {
-//   constructor(message = 'Not Found') {
-//     super(404, message);
-//   }
-// }
-
-// const Helpers = {
-//   HttpError,
-//   BadRequestError,
-//   NotFoundError,
-//   UnauthorizedError,
-
-// randomString(length = 12) {
-//   const wishlist = '0123456789abcdefghijklmnopqrstuvwxyz'
-//   return Array.from(crypto.randomFillSync(new Uint32Array(length)))
-//     .map(x => wishlist[x % wishlist.length])
-//     .join('')
-// },
-
 export function sanitizeHTML(html: string) {
   return domPurify.sanitize(html, {
     ALLOWED_TAGS: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'br', 'i', 'span', 'em',
@@ -110,112 +54,6 @@ export function sanitizeHTML(html: string) {
 //   return ['application/activity+json', 'application/ld+json'].includes(req.accepts('html', 'application/activity+json', 'application/ld+json'))
 // },
 
-// async initSettings(_req, res, next) {
-//   // initialize settings
-//   const settings = settingsController.settings
-//   res.locals.settings = {
-//     title: settings.title || config.title,
-//     description: settings.description || config.description,
-//     baseurl: config.baseurl,
-//     hostname: config.hostname,
-//     version: pkg.version,
-//     instance_timezone: settings.instance_timezone,
-//     instance_locale: settings.instance_locale,
-//     instance_name: settings.instance_name,
-//     allow_registration: settings.allow_registration,
-//     allow_anon_event: settings.allow_anon_event,
-//     allow_recurrent_event: settings.allow_recurrent_event,
-//     allow_event_without_end_time: settings.allow_event_without_end_time,
-//     enable_moderation: settings.enable_moderation,
-//     enable_report: settings.enable_report,
-//     allow_multidate_event: settings.allow_multidate_event,
-//     allow_online_event: settings.allow_online_event,
-//     show_download_media: settings.show_download_media,
-//     recurrent_event_visible: settings.recurrent_event_visible,
-//     enable_federation: settings.enable_federation,
-//     enable_resources: settings.enable_resources,
-//     hide_boosts: settings.hide_boosts,
-//     trusted_sources_label: settings?.trusted_sources_label ?? settings.trusted_instances_label,
-//     'theme.is_dark': settings['theme.is_dark'],
-//     dark_colors: settings.dark_colors,
-//     light_colors: settings.light_colors,
-//     hide_thumbs: settings.hide_thumbs,
-//     hide_calendar: settings.hide_calendar,
-//     allow_geolocation: settings.allow_geolocation,
-//     calendar_first_day_of_week: settings.calendar_first_day_of_week || undefined,
-//     geocoding_provider_type: settings.geocoding_provider_type,
-//     geocoding_provider: settings.geocoding_provider,
-//     geocoding_countrycodes: settings.geocoding_countrycodes,
-//     tilelayer_provider: settings.tilelayer_provider,
-//     tilelayer_provider_attribution: settings.tilelayer_provider_attribution,
-//     footerLinks: settings.footerLinks,
-//     admin_email: settings.admin_email,
-//     about: settings.about,
-//     collection_in_home: settings.collection_in_home,
-//     custom_js: settings.custom_js,
-//     custom_css: settings.custom_css,
-//     default_fedi_hashtags: settings.default_fedi_hashtags,
-//     federated_events_in_home: settings.federated_events_in_home
-//   }
-//   next()
-// },
-
-// serveStatic() {
-//   const router = express.Router()
-//   // serve images/thumb
-//   router.use('/media/', express.static(config.upload_path, { immutable: true, maxAge: '1y' }),
-//     (_req, res) => res.redirect('/fallbackimage.png')
-//   )
-
-//   router.use('/download/:filename', (req, res) => {
-//     res.download(req.params.filename, undefined, { root: config.upload_path }, err => {
-//       if (err) {
-//         // Check if headers have been sent
-//         if(res.headersSent) {
-//           log.warn(err)
-//         } else {
-//           res.status(404).send('Not found (but nice try 😊)')
-//         }
-//       }
-//     })
-//   })
-
-//   router.use('/fallbackimage.png', (req, res, next) => {
-//     const fallbackImagePath =  settingsController.settings.fallback_image || './static/noimg.svg'
-//     return express.static(fallbackImagePath, { maxAge: '10m' })(req, res, next)
-//   })
-
-//   router.use('/headerimage.png', (req, res, next) => {
-//     const headerImagePath =  settingsController.settings.header_image || './static/noimg.svg'
-//     return express.static(headerImagePath, { maxAge: '10m' })(req, res, next)
-//   })
-
-//   router.use('/logo.png', (req, res, next) => {
-//     const logoPath = settingsController.settings.logo || './static/gancio'
-//     return express.static(logoPath + '.png', { maxAge: '10m' } )(req, res, next)
-//   })
-
-//   router.use('/favicon.ico', (req, res, next) => {
-//     const faviconPath = res.locals.settings.logo ? res.locals.settings.logo + '.png' : './assets/favicon.ico'
-//     return express.static(faviconPath, { immutable: true, maxAge: '10m' })(req, res, next)
-//   })
-
-//   router.use('/custom_js', (_req, res, next) => {
-//     return res.type('application/javascript').send(res.locals.settings?.custom_js ?? '')
-//   })
-
-//   router.use('/custom_css', (_req, res, next) => {
-//     return res.type('text/css').send(res.locals.settings?.custom_css ?? '')
-//   })
-
-//   return router
-// },
-
-// logRequest(req, _res, next) {
-//   log.debug(`${req.method} ${req.path}`)
-//   next()
-// },
-
 async function readableWebToNodeStream(webStream) {
   const reader = webStream.getReader()
   return new Readable({
@@ -226,16 +64,16 @@ async function readableWebToNodeStream(webStream) {
   })
 }
 
-export async function getImageFromURL(url: string, name: string, focalpoint: [number, number]): Promise<Media | undefined> {
+export async function getImageFromURL(url: string, name: string, focalpoint: [number, number]) {
   log.debug(`getImageFromURL ${url}`)
 
   const filename = crypto.randomBytes(16).toString('hex')
   const sharpStream = sharp({ failOnError: true })
   const promises = [
-    sharpStream.clone().rotate().resize(500, null, { withoutEnlargement: true }).jpeg({ effort: 6, mozjpeg: true })
+    sharpStream.clone().rotate().resize(500, null, { withoutEnlargement: true }).jpeg({ mozjpeg: true })
       .toFile(path.resolve(config.upload_path, 'thumb', filename + '.jpg')),
     sharpStream.clone().rotate().resize(1200, null, { withoutEnlargement: true })
-      .jpeg({ quality: 95, effort: 6, mozjpeg: true }).toFile(path.resolve(config.upload_path, filename + '.jpg')),
+      .jpeg({ quality: 95, mozjpeg: true }).toFile(path.resolve(config.upload_path, filename + '.jpg')),
   ]
 
   const response = await fetch(url)
@@ -262,9 +100,35 @@ export async function getImageFromURL(url: string, name: string, focalpoint: [nu
     })
 }
 
-export function isHiddenService(domain) {
+export function isHiddenService(domain: string) {
   const pattern = /^(http:\/\/)?[a-zA-Z0-9]+\.(onion|i2p)\/?$/
-  return pattern.test(domain.hostname)
+  return pattern.test(domain)
+}
+
+
+/**
+ * Serves a static file
+ * Sets appropriate Content-Type and cache headers based on the file.
+ * Streams the file content to the client.
+ *
+ * @param event - The H3Event representing the incoming request.
+ * @param path - The file system path to the file to be served.
+ */
+export async function serveFile(event: H3Event, path: string) {
+  const s = await stat(path).then(s => s.isFile() ? s : null).catch(() => null)
+  if (!s) {
+    throw createError({ statusCode: 404, statusMessage: 'File not found' })
+  }
+
+  const mimeType = mime.lookup(path) || 'application/octet-stream'
+  setHeader(event, 'Content-Type', mimeType)
+
+  s.mtime.setMilliseconds(0)
+  const modifiedTime = s.mtime
+  const etag = `"${s.size}-${Number(s.mtimeMs).toString(16)}"`
+  if (!handleCacheHeaders(event, { modifiedTime, etag }))
+
+    return sendStream(event, createReadStream(path))
 }
 
 /**
@@ -327,33 +191,6 @@ export function isHiddenService(domain) {
 //   }
 // },
 
-/**
- * Pre-load the data needed to load the first page saving the first 3 API calls from the server (the load goes from 0.8s to 0.2s)
-*/
-// async initLocals (res) {
-//   if (config.status !== 'READY') return
-//   const announceController = require('./api/controller/announce')
-//   const collectionController = require('./api/controller/collection')
-//   const eventController = require('./api/controller/event')
-//   const { DateTime } = require('luxon')
-//   const show_federated = res.locals.settings.federated_events_in_home
-//   const show_multidate = res.locals.settings.allow_multidate_event
-//   const show_recurrent = res.locals.settings.allow_recurrent_event && res.locals.settings.recurrent_event_visible
-//   const collection_in_home = res.locals.settings.collection_in_home
-
-//   const ret = await Promise.allSettled([
-//     announceController._getVisible(),
-//     collectionController._getVisible(),
-//     collection_in_home ?
-//       collectionController._getEvents({ name: collection_in_home, start: DateTime.local().startOf('month').toUnixInteger(), show_recurrent }) :
-//       eventController._select({ start: DateTime.local().startOf('month').toUnixInteger(), show_multidate, show_recurrent, show_federated })
-//   ])
-
-//   res.locals.announcements = ret[0]?.value
-//   res.locals.collections = ret[1]?.value
-//   res.locals.events = ret[2]?.value
-// },
-
 // getWeekdayN(date, n, weekday) {
 //   let cursor
 //   if (n === -1) {
@@ -403,30 +240,3 @@ export function isHiddenService(domain) {
 //   }
 //   next()
 // },
-
-// async reachable(req, res) {
-//   try {
-//     await axios(config.baseurl + '/api/ping')
-//     return res.sendStatus(200)
-//   } catch(e) {
-//     log.debug(e)
-//     return res.sendStatus(400)
-//   }
-// },
-
-// isGeocodingEnabled(req, res, next) {
-//   if (res.locals.settings.allow_geolocation) {
-//     next()
-//   } else {
-//     return res.sendStatus(403)
-//   }
-// },
-
-//   export queryParamToBool (value, defaultValue) {
-//     if (typeof value === 'undefined') return defaultValue
-//     return (String(value).toLowerCase() === 'true')
-//   }
-
-// }
-
-// module.exports = Helpers

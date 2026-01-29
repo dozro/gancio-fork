@@ -1,3 +1,4 @@
+import { Page } from '~~/server/services'
 export default defineEventHandler(async (event) => {
   const page = getRouterParam(event, 'page')
   const { user } = await getUserSession(event)

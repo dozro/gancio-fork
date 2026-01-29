@@ -1,3 +1,4 @@
+import { Announcement } from '~~/server/services'
 /**
  * get a specific announcement
  * this is used in announcement page

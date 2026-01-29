@@ -1,6 +1,7 @@
 import { z } from 'zod'
-// import { APUser } from "~/server/utils/sequelize"
 import { followActor, unfollowActor } from '~~/server/federation/helpers'
+import { useLogger } from '~~/server/lib/logger'
+import { APUser, Instance } from '~~/server/services'
 const schema = z.object({
   ap_id: z.string()
 })

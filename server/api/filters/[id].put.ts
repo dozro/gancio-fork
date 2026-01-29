@@ -1,3 +1,5 @@
+import { useLogger } from '~~/server/lib/logger'
+import { Filter } from '~~/server/services'
 export default defineEventHandler(async (event) => {
   await requireAdminSession(event)
   const log = useLogger('Filter put')

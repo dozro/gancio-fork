@@ -1,4 +1,4 @@
-import { Event } from '#imports'
+import { Event, Tag } from '~~/server/services'
 import { fn, col } from '@sequelize/core'
 
 export default defineEventHandler(async (evt) => {

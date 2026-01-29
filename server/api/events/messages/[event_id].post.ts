@@ -1,20 +1,20 @@
-import { Message, Event } from '~~/server/utils/sequelize'
+import { useLogger } from '~~/server/lib/logger'
+import { Message, Event, publicSettings, User, notifyAdmins, enqueueMail } from '~~/server/services'
 
 export default defineEventHandler(async (evt) => {
+  const log = useLogger('event:moderation')
   if (!publicSettings.enable_moderation) {
+    log.error('Disabled')
     throw createError({ status: 403 })
   }
 
-  const log = useLogger('event')
   // await requireAdminSession(evt)
   const eventId = Number(evt.context.params?.event_id)
   const event = await Event.findByPk(eventId, { include: [{ model: User, required: false }], raw: true })
   if (!event) {
-    log.warn(`[REPORT] Event does not exists: ${eventId}`)
+    log.warn(`Event does not exists: ${eventId}`)
     throw createError({ statusCode: 404 })
   }
-
-  console.error(event)
 
   const body = await readBody(evt)
   const user = await getUser(evt)
@@ -22,7 +22,7 @@ export default defineEventHandler(async (evt) => {
   const isAdminOrEditor = user?.is_editor || user?.is_admin
 
   if (!isAdminOrEditor && !isMine && !publicSettings.enable_report) {
-    log.warn(`[REPORT] Someone not allowed is trying to report an event -> "${event.title}" isMine: ${isMine} `)
+    log.warn(`Someone not allowed is trying to report an event -> "${event.title}" isMine: ${isMine} `)
     throw createError({ statusCode: 403 })
   }
 
@@ -37,7 +37,7 @@ export default defineEventHandler(async (evt) => {
 
     // notify admins
     notifyAdmins('report', { event, message: body.message, author })
-    log.info('[EVENT] Report event to admins')
+    log.info('Report event to admins')
 
     // notify author
     if (event?.user?.email && body.is_author_visible && !isMine) {

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Event } from '#build/types/nitro-imports'
 const route = useRoute()
 const settings = useState<Settings>('settings')
 

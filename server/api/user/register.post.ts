@@ -1,5 +1,7 @@
 // import { z } from 'zod'
 import * as linkify from 'linkifyjs'
+import { useLogger } from '~~/server/lib/logger'
+import { enqueueMail, publicSettings, User, notifyAdmins } from '~~/server/services'
 /**
  * Register a new user
  * This will send an email to the user and to all the administrators

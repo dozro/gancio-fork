@@ -1,7 +1,7 @@
 import { defineEventHandler, getRouterParam, setHeader, sendRedirect, sendStream } from 'h3'
 import { join } from 'path'
 import { createReadStream, existsSync, statSync } from 'fs'
-import { get as getConfig } from '../../config'
+import { get as getConfig } from '../../services/config'
 
 export default defineEventHandler(async (event) => {
   const path = getRouterParam(event, 'path')

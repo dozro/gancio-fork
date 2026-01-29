@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { publicSettingsLastModified } from '../utils/settings'
+import { publicSettings, publicSettingsLastModified } from '../services/settings'
 
 /**
  * return a custom js

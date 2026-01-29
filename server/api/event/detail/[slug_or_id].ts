@@ -1,6 +1,9 @@
-import { Event, Place, Tag, User, Resource, APUser } from '~~/server/utils/sequelize'
+import { Event, Place, Tag, User, Resource, APUser, mapEvent, Message } from '~~/server/services'
 import { Op } from '@sequelize/core'
 import { formatSchema } from '~~/server/types/validator'
+import { useLogger } from '~~/server/lib/logger'
+import { exportICS } from '~~/server/services/ics'
+import { eventToAP } from '~~/server/services/events'
 
 /**
  * Get event details.
@@ -71,7 +74,7 @@ export default defineEventHandler(async (evt) => {
     return mapEvent(event)
   } else if (format === 'json-ld') {
     setHeader(evt, 'Content-Type', 'application/activity+json')
-    return event.toAP()
+    return eventToAP(event)
   } else if (format === 'ics') {
     setHeader(evt, 'Content-Type', 'text/calendar')
     // last arg is alarms/reminder, ref: https://github.com/adamgibbons/ics#attributes (alarms)

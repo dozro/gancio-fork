@@ -1,3 +1,6 @@
+import { useLogger } from '~~/server/lib/logger'
+import { User } from '~~/server/services'
+
 export default defineEventHandler(async (event) => {
   const log = useLogger('user/recover')
 

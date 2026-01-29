@@ -1,3 +1,6 @@
+import { useLogger } from '~~/server/lib/logger'
+import { publicSettings } from '~~/server/services'
+
 export default defineEventHandler(async (event) => {
   const log = useLogger('webfinger')
   if (!publicSettings.enable_federation) {

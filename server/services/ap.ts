@@ -1,6 +1,7 @@
 import { Op } from '@sequelize/core'
 import { DateTime } from 'luxon'
-import { useLogger } from '../utils/useLogger'
+import { useLogger } from '../lib/logger'
+import { APUser, Resource, Event } from '../services/db'
 
 const log = useLogger('tags')
 
@@ -8,12 +9,14 @@ const log = useLogger('tags')
  * Removes past federated events and their related resources.
  * This is called twice a day from the TaskManager
  */
-export async function cleanPastEvents () {
+export async function cleanPastEvents() {
   const now = DateTime.now().toUnixInteger()
-  const events = await Event.findAll({ where: {
-    start_datetime: { [Op.lt]: now },
-    apUserApId: { [Op.ne]: null }
-  }, raw: true })
+  const events = await Event.findAll({
+    where: {
+      start_datetime: { [Op.lt]: now },
+      apUserApId: { [Op.ne]: null }
+    }, raw: true
+  })
 
   if (!events.length) {
     return
@@ -40,7 +43,7 @@ export async function cleanPastEvents () {
  * Removes unused ActivityPub actors from the database.
  * This is called once a day from the TaskManager
  */
-export async function cleanUnusedAPActor () {
+export async function cleanUnusedAPActor() {
   const ap_users = await APUser.findAll({
     limit: 500,
     where: {

@@ -1,13 +1,16 @@
-import { Event } from '#imports'
-import { parseMultipartFormData, saveUploadedEventImage } from '~~/server/utils/parseMultipartForm'
+import { parseMultipartFormData, saveUploadedEventImage } from '~~/server/lib/parseMultipartForm'
 import type { MultiPartData } from 'h3'
 import { DateTime } from 'luxon'
-import { findOrCreatePlace } from '~~/server/lib/places'
+import { findOrCreatePlace } from '~~/server/services/places'
 import { getImageFromURL, sanitizeHTML } from '~~/server/helpers'
 import linkifyHtml from 'linkify-html'
-import { findOrCreateTags } from '~~/server/lib/tags'
-import { mapEvent } from '~~/server/utils/events'
+import { findOrCreateTags } from '~~/server/services/tags'
+import { mapEvent } from '~~/server/services/events'
 import type { CreationAttributes } from '@sequelize/core'
+import type { Tag, Media } from '~~/server/services'
+import { Event, publicSettings } from '~~/server/services'
+import { useLogger } from '~~/server/lib/logger'
+import { notifyEvent } from '~~/server/services/notifier'
 
 /**
  * Add a new event

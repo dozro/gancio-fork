@@ -1,12 +1,15 @@
-import { Event } from '#imports'
 import type { InferCreationAttributes } from '@sequelize/core'
-import { parseMultipartFormData, saveUploadedEventImage } from '~~/server/utils/parseMultipartForm'
+import { parseMultipartFormData, saveUploadedEventImage } from '~~/server/lib/parseMultipartForm'
+import { useLogger } from '~~/server/lib/logger'
 import type { MultiPartData } from 'h3'
 import { DateTime } from 'luxon'
-import { findOrCreatePlace } from '~~/server/lib/places'
+import { findOrCreatePlace } from '~~/server/services/places'
 import { sanitizeHTML } from '~~/server/helpers'
 import linkifyHtml from 'linkify-html'
-import { findOrCreateTags } from '~~/server/lib/tags'
+import { findOrCreateTags } from '~~/server/services/tags'
+import type { Tag } from '~~/server/services'
+import { Event, mapEvent } from '~~/server/services'
+import { notifyEvent } from '~~/server/services/notifier'
 
 /**
  * Update an event

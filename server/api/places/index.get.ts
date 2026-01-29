@@ -1,4 +1,4 @@
-import { Event, Place } from '#imports'
+import { Place, Event } from '~~/server/services'
 import { Op, fn, col, where } from '@sequelize/core'
 
 import { z } from 'zod'

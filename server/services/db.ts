@@ -4,7 +4,7 @@ import slugify from 'slugify'
 import { Umzug, SequelizeStorage } from 'umzug'
 import fs from 'fs/promises'
 import path from 'path'
-import { useLogger } from './useLogger'
+import { useLogger } from '../lib/logger'
 
 import {
   Sequelize,
@@ -46,10 +46,7 @@ import {
   BeforeDestroy
 } from '@sequelize/core/decorators-legacy'
 
-import type { SecretSettings, Settings } from './settings'
-
-import { DateTime } from 'luxon'
-import { get as getConfig } from '../config'
+import { get as getConfig } from '../services/config'
 const config = getConfig()
 const log = useLogger('sequelize')
 
@@ -246,7 +243,7 @@ export class Event extends Model<
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
   })
-  declare userId: CreationOptional<number>
+  declare userId: CreationOptional<number | null>
 
   @BelongsTo(() => User, { foreignKey: 'userId', targetKey: 'id' })
   declare user: NonAttribute<User>
@@ -299,7 +296,7 @@ export class Event extends Model<
   declare setPlace: BelongsToSetAssociationMixin<Place, number>
 
   @BeforeDestroy
-  static async removeImg (instance: Event) {
+  static async removeImg(instance: Event) {
     // remove the image files (normal and thumb) associated with this event
     // if no image is associated, do nothing
     if (!instance.media || instance.media.length === 0 || !instance.media[0]?.url) {
@@ -336,87 +333,6 @@ export class Event extends Model<
       event.slug = slug
     }
   }
-
-  toAP() {
-    const username = publicSettings.instance_name
-    const opt = {
-      zone: publicSettings.instance_timezone,
-      locale: publicSettings.instance_locale
-    }
-
-    const datetime = DateTime.fromSeconds(this.start_datetime, opt).toLocaleString({ weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
-
-    // https://framagit.org/les/gancio/-/issues/304
-    // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-summary
-    const summary = `<p>${this.place && this.place.name}, ${datetime}</p>${this.description}`
-
-    let attachment: object[] = []
-    let location: object[] = []
-
-    if (this.online_locations?.length) {
-      location = this.online_locations.map(url => ({
-        type: 'VirtualLocation',
-        url
-      }))
-      attachment = this.online_locations.map(href => ({
-        type: 'Link',
-        mediaType: 'text/html',
-        name: href,
-        href
-      }))
-    }
-
-    if (this.place?.name !== 'online') {
-      location.push(this.place?.toAP())
-    }
-
-    // in case we only have a single location (the common case) do not use an array to simplify federation parser
-    // if (location?.length === 1) {
-    //   location = location[0]
-    // }
-
-    if (this?.media?.length) {
-      attachment.push({
-        type: 'Document',
-        mediaType: 'image/jpeg',
-        url: `${config.baseurl}/media/${this.media[0].url}`,
-        name: this.media[0].name || this.title || '',
-        focalPoint: this.media[0].focalpoint || [0, 0]
-      })
-    }
-
-    let tags = this.tags?.map(tag => tag.tag) ?? []
-
-    // add default fedi hashtags if needed on local events only
-    if (!this.ap_id && publicSettings.default_fedi_hashtags.length) {
-      tags = [...new Set([...tags, ...publicSettings.default_fedi_hashtags])]
-    }
-
-    const tag = tags?.map(tag => ({
-      type: 'Hashtag',
-      name: '#' + tag,
-      href: `${publicSettings.baseurl}/tag/${encodeURIComponent(tag)}`
-    })) ?? []
-
-    return {
-      id: this.ap_id ?? `${publicSettings.baseurl}/federation/m/${this.id}`,
-      name: this.title,
-      url: this?.ap_object?.url ?? this?.ap_object?.id ?? `${publicSettings.baseurl}/event/${this.slug || this.id}`,
-      type: 'Event',
-      startTime: DateTime.fromSeconds(this.start_datetime, opt).toISO(),
-      ...(this.end_datetime ? { endTime: DateTime.fromSeconds(this.end_datetime, opt).toISO() } : {}),
-      location: location.length === 1 ? location[0] : location,
-      attachment,
-      tag,
-      published: this.updatedAt,
-      updated: this.updatedAt,
-      attributedTo: this.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
-      to: ['https://www.w3.org/ns/activitystreams#Public'],
-      cc: this.ap_object?.cc ?? [`${publicSettings.baseurl}/federation/u/${username}/followers`],
-      content: this.description || '',
-      summary
-    }
-  }
 }
 
 @Table({
@@ -432,8 +348,13 @@ export class Tag extends Model<
   @Unique
   declare tag: string
 
-  // @BelongsToMany(() => Event, { through: 'event_tags' })
-  declare events?: NonAttribute<Event[]>
+  @BelongsToMany(() => Event, { through: 'event_tags' })
+  declare events: NonAttribute<Event[]>
+
+  // the mixins Sequelize automatically provides
+  // declare getEvents: BelongsToManySetAssociationsMixin<Tag, Event[]>
+  // declare removeEvents: BelongsToManySetAssociationsMixin<Tag, Event[]>
+  // declare setPlace: BelongsToSetAssociationMixin<Place, number>
 }
 
 @Table({
@@ -456,7 +377,7 @@ export class Place extends Model<
 
   @Attribute(DataTypes.STRING)
   @Index
-  declare ap_id?: string
+  declare ap_id: CreationOptional<string>
 
   @Attribute(DataTypes.STRING)
   declare address: string

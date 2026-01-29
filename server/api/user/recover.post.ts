@@ -1,3 +1,5 @@
+import { useLogger } from '../../lib/logger'
+import { User, enqueueMail, publicSettings } from '../../services'
 /**
  * enqueue a password recovery email for specified email address
  */

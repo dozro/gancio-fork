@@ -1,4 +1,4 @@
-import { Event } from '#imports'
+import { Event, publicSettings, Resource, User } from '~~/server/services'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)

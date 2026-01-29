@@ -1,7 +1,10 @@
 import { sendEvent } from '../federation/helpers'
-import type { NotificationAction } from './sequelize'
-import { Event, Notification } from './sequelize'
+import { useLogger } from '../lib/logger'
+import type { NotificationAction } from './db'
+import { Event, Notification, Place, Tag, User } from './db'
 import intersection from 'lodash.intersection'
+import { publicSettings } from './settings'
+import { enqueueMail } from './sendMail'
 
 const log = useLogger('notifier')
 

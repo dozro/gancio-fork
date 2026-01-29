@@ -1,3 +1,6 @@
+import { useLogger } from '~~/server/lib/logger'
+import { Collection } from '~~/server/services'
+
 /**
   */
 export default defineEventHandler(async (event) => {

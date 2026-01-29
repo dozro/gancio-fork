@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { useLogger } from '../utils/useLogger'
+import { useLogger } from '../lib/logger'
 export async function _signAndSend(message: string, inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
   const log = useLogger('sign_and_send')
   log.debug('[FEDI] Sign and %s %s', method, inbox)

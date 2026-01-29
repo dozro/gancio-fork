@@ -1,3 +1,4 @@
+import { APUser, getLastModified } from '~~/server/services'
 export default defineEventHandler(async (event) => {
   const trusted = await APUser.findAll({ where: { trusted: true } })
   const lastModified = getLastModified(trusted)

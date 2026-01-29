@@ -1,6 +1,8 @@
+import { useLogger } from '~~/server/lib/logger'
+import { publicSettings } from '~~/server/services'
 export default defineEventHandler(async (event) => {
   const nominatim = {
-    getIcon (item) {
+    getIcon(item) {
       if (item.class.includes(['place', 'amenity', 'shop', 'tourism', 'leisure', 'building'])) {
         return 'mdi-home'
       }

@@ -2,6 +2,9 @@ import Email from 'email-templates'
 import path from 'path'
 import { DateTime } from 'luxon'
 import locales from '~~/i18n/locales/index'
+import { useLogger } from '../lib/logger'
+import { publicSettings } from './settings'
+import { useTaskManager } from './taskManager'
 const log = useLogger('mail')
 
 /**

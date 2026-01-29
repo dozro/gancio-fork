@@ -1,4 +1,6 @@
-import { getCollectionEvents } from '~~/server/utils/collections'
+import { sendEvents } from '~~/server/services'
+import { getCollectionEvents } from '~~/server/services/collections'
+
 
 export default defineEventHandler(async (evt) => {
   // https://github.com/nitrojs/nitro/issues/3518
