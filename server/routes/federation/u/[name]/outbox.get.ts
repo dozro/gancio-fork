@@ -1,5 +1,6 @@
 import { useLogger } from '~~/server/lib/logger'
 import { Event, Place, publicSettings, Tag } from '~~/server/services'
+import { eventToAP } from '~~/server/services/events'
 
 // https://www.w3.org/TR/activitypub/#outbox
 export default defineEventHandler(async (event) => {
@@ -55,7 +56,7 @@ export default defineEventHandler(async (event) => {
         to: 'https://www.w3.org/ns/activitystreams#Public',
         published: e.createdAt.toISOString(),
         actor: `${publicSettings.baseurl}/federation/u/${name}`,
-        object: e.toAP()
+        object: eventToAP(e)
       }))
     }
   } else {

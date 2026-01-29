@@ -231,3 +231,84 @@ export async function getMessages(eventId: number) {
   }
   return event
 }
+
+export function eventToAP(event: Event) {
+  const username = publicSettings.instance_name
+  const opt = {
+    zone: publicSettings.instance_timezone,
+    locale: publicSettings.instance_locale
+  }
+
+  const datetime = DateTime.fromSeconds(event.start_datetime, opt).toLocaleString({ weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
+
+  // https://framagit.org/les/gancio/-/issues/304
+  // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-summary
+  const summary = `<p>${event.place && event.place.name}, ${datetime}</p>${event.description}`
+
+  let attachment: object[] = []
+  let location: object[] = []
+
+  if (event.online_locations?.length) {
+    location = event.online_locations.map(url => ({
+      type: 'VirtualLocation',
+      url
+    }))
+    attachment = event.online_locations.map(href => ({
+      type: 'Link',
+      mediaType: 'text/html',
+      name: href,
+      href
+    }))
+  }
+
+  if (event.place?.name !== 'online') {
+    location.push(event.place?.toAP())
+  }
+
+  // in case we only have a single location (the common case) do not use an array to simplify federation parser
+  // if (location?.length === 1) {
+  //   location = location[0]
+  // }
+
+  if (event?.media?.length) {
+    attachment.push({
+      type: 'Document',
+      mediaType: 'image/jpeg',
+      url: `${publicSettings.baseurl}/media/${event.media[0].url}`,
+      name: event.media[0].name || event.title || '',
+      focalPoint: event.media[0].focalpoint || [0, 0]
+    })
+  }
+
+  let tags = event.tags?.map(tag => tag.tag) ?? []
+
+  // add default fedi hashtags if needed on local events only
+  if (!event.ap_id && publicSettings.default_fedi_hashtags.length) {
+    tags = [...new Set([...tags, ...publicSettings.default_fedi_hashtags])]
+  }
+
+  const tag = tags?.map(tag => ({
+    type: 'Hashtag',
+    name: '#' + tag,
+    href: `${publicSettings.baseurl}/tag/${encodeURIComponent(tag)}`
+  })) ?? []
+
+  return {
+    id: event.ap_id ?? `${publicSettings.baseurl}/federation/m/${event.id}`,
+    name: event.title,
+    url: event?.ap_object?.url ?? event?.ap_object?.id ?? `${publicSettings.baseurl}/event/${event.slug || event.id}`,
+    type: 'Event',
+    startTime: DateTime.fromSeconds(event.start_datetime, opt).toISO(),
+    ...(event.end_datetime ? { endTime: DateTime.fromSeconds(event.end_datetime, opt).toISO() } : {}),
+    location: location.length === 1 ? location[0] : location,
+    attachment,
+    tag,
+    published: event.updatedAt,
+    updated: event.updatedAt,
+    attributedTo: event.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
+    to: ['https://www.w3.org/ns/activitystreams#Public'],
+    cc: event.ap_object?.cc ?? [`${publicSettings.baseurl}/federation/u/${username}/followers`],
+    content: event.description || '',
+    summary
+  }
+}

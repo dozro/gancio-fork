@@ -1,5 +1,6 @@
 import { useLogger } from '~~/server/lib/logger'
 import { Event } from '~~/server/services'
+import { eventToAP } from '~~/server/services/events'
 
 export default defineEventHandler(async (evt) => {
   // const { preferHTML } = await import('./helpers')
@@ -21,7 +22,7 @@ export default defineEventHandler(async (evt) => {
     return sendError(evt, createError({ statusCode: 404, statusMessage: 'Not found.' }))
   }
 
-  const ret = event.toAP()
+  const ret = eventToAP(event)
   // ret['@context'] = ['https://www.w3.org/ns/activitystreams']
   setHeader(evt, 'Content-Type', 'application/activity+json; charset=utf-8')
   return ret

@@ -10,6 +10,7 @@ import { useLogger } from '../lib/logger'
 import { useTaskManager } from '../services/taskManager'
 import { APUser, publicSettings, secretSettings } from '../services'
 import { Instance } from '../services/db'
+import { eventToAP } from '../services/events'
 
 const log = useLogger('federation')
 
@@ -179,7 +180,7 @@ export async function announceEvent(event) {
       'actor': `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
       'to': ['https://www.w3.org/ns/activitystreams#Public'],
       'cc': [...recipients[sharedInbox], `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}/followers`],
-      'object': event.toAP() // event?.ap_id ?? event.id // Must point to the original object's ID
+      'object': eventToAP(event) // event?.ap_id ?? event.id // Must point to the original object's ID
     }
     signAndSend(JSON.stringify(body), sharedInbox)
   }
@@ -202,7 +203,7 @@ export async function sendEvent(event, type = 'Create') {
       'to': ['https://www.w3.org/ns/activitystreams#Public'],
       'cc': [...recipients[sharedInbox], `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}/followers`],
       'actor': `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
-      'object': event.toAP()
+      'object': eventToAP(event)
     }
 
     signAndSend(JSON.stringify(body), sharedInbox)

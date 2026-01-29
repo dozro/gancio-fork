@@ -1,7 +1,7 @@
 import { Op } from '@sequelize/core'
 import { DateTime } from 'luxon'
 import { useLogger } from '../lib/logger'
-import { APUser, Resource, Event } from '../services'
+import { APUser, Resource, Event } from '../services/db'
 
 const log = useLogger('tags')
 

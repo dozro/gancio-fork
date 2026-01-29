@@ -7,6 +7,7 @@ const config = require('../services/config')
 const log = require('../log')
 const Helpers = require('./helpers')
 const settingsController = require('../api/controller/settings')
+const { eventToAP } = require('../services/events')
 
 module.exports = {
   get(req, res) {
@@ -180,7 +181,7 @@ module.exports = {
           to: 'https://www.w3.org/ns/activitystreams#Public',
           published: new DateTime(e.createdAt).toISO(),
           actor: `${config.baseurl}/federation/u/${name}`,
-          object: e.toAP()
+          object: eventToAP(e)
         }))
       })
     } else {
