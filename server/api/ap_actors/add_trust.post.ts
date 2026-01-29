@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     * or a nodeinfo url to search for
     */
   let url = body.url
-  let instance
+  let instance: Instance | undefined
 
   // @actor@instance.tld syntax, let's use webfinger
   if (!url.startsWith('http') && url.includes('@')) {
@@ -132,10 +132,10 @@ export default defineEventHandler(async (event) => {
       await actor.update({ trusted: true })
       return actor
     }
-    throw createError({ status: 404, message: 'No way' })
+    throw createError({ statusCode: 404, statusMessage: 'No way' })
   } catch (e) {
     console.error(e)
     log.error('[FEDI] Error adding trusted actor %s', e?.response?.data ?? String(e))
-    throw createError({ status: 404, message: 'Error adding trusted actor' })
+    throw createError({ statusCode: 404, statusMessage: 'Error adding trusted actor' })
   }
 })

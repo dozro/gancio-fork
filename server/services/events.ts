@@ -62,7 +62,7 @@ export async function getEvents(opts?: EventQueryType | undefined) {
     ...(!args.show_recurrent && { parentId: null }),
 
     // include parent event
-    ...(!args.include_parent && { recurrent: JSON_NULL })
+    ...(!args.include_parent && { recurrent: { [Op.is]: null } })
 
   }
 

@@ -221,7 +221,7 @@ export class Event extends Model<
   declare online_locations: string[] | null
 
   @Attribute(DataTypes.JSON)
-  declare recurrent: object | null
+  declare recurrent: CreationOptional<object | null>
 
   @Attribute(DataTypes.JSON)
   declare ap_object: CreationOptional<{ url?: string, attributedTo?: string, id: string, to: string, cc?: string }>
@@ -235,7 +235,7 @@ export class Event extends Model<
   /** represent the AP URI */
   @Attribute(DataTypes.STRING)
   @Index
-  declare ap_id: string | null
+  declare ap_id: CreationOptional<string>
 
   @Attribute({
     type: DataTypes.INTEGER.UNSIGNED,

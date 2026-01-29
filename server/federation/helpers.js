@@ -8,8 +8,8 @@ import { findOrCreateTags } from '../services/tags'
 import { _signAndSend } from './sign_and_send'
 import { useLogger } from '../lib/logger'
 import { useTaskManager } from '../services/taskManager'
-import { APUser, publicSettings, secretSettings } from '../services'
-import { Instance } from '../services/db'
+import { publicSettings, secretSettings } from '../services'
+import { Instance, Event, APUser } from '../services/db'
 import { eventToAP } from '../services/events'
 
 const log = useLogger('federation')
@@ -478,7 +478,7 @@ export async function getInstance(actor_url, force = false, fail_on_not_cached =
       log.debug('[FEDI] Use cached instance: %s', instance.name)
       return instance
     } else if (fail_on_not_cached) {
-      return false
+      return
     }
   }
 
@@ -497,7 +497,6 @@ export async function getInstance(actor_url, force = false, fail_on_not_cached =
     return instance
   } catch (e) {
     log.error('[FEDI] Wrong nodeInfo returned for "%s": %s', instance_url, e?.response?.data ?? String(e))
-    return false
   }
 }
 
