@@ -368,7 +368,7 @@
         "trusted_source_removed": "Retirouse a orixe de confianza",
         "trusted_sources_label": "Etiqueta de navegación para orixes federadas de confianza",
         "add_trusted_source": "Engade unha orixe federada de confianza",
-        "add_trusted_source_help": "Usa unha das seguintes opcións: <br/><ul><li>o enderezo web doutra instancia Gancio ou un software compatible como Application Actor / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (ex. <u>https://demo.gancio.org</u>)</li><li>un identificador ActivityPub como <u>@gancio@mastodon.cisti.org</u></li><li>o url dunha conta como <u>https://instance.tld/actor</u>.</li></ul><br/>Vanse importar os eventos publicados ou promovidos por esas orixes.",
+        "add_trusted_source_help": "Usa unha das seguintes opcións: <br/><ul><li>o enderezo web doutra instancia Gancio ou un software compatible como Application Actor / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (ex. <u>https://demo.gancio.org</u>)</li><li>un identificador ActivityPub como <u>{'@gancio@mastodon.cisti.org'}</u></li><li>o url dunha conta como <u>https://instance.tld/actor</u>.</li></ul><br/>Vanse importar os eventos publicados ou promovidos por esas orixes.",
         "federated_events_in_home": "Mostrar eventos federados na páxina de inicio",
         "federated_events_in_home_help": "Os eventos recibidos desde orixes federadas de confianza serán mostrados de xeito predeterminado na páxina de inicio. Para só mostrar algúns eventos podes usar as coleccións",
         "unconfirmed_events": "Eventos non confirmados",

@@ -351,7 +351,7 @@
         "instance_name_help": "حساب اکتیوتی‌پاب برای پی‌گرفتن: {ap_handler} (لطفاً با دقت زیاد بررسی کنید!)",
         "trusted_sources_label_help": "برچسب پیش‌فرض 'مکان‌های دیگر' است",
         "add_trusted_source": "یک منبع فدیورس مورد اعتماد اضافه کنید",
-        "add_trusted_source_help": "از یکی از تنظیمات زیر استفاده کنید: <br/><ul><li>نشانی وب یک گانسیو دیگر یا کاره‌ای که از یک Application Actor پشتیبانی می‌کند / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (مثلاً <u>https://demo.gancio.org</u>)</li><li>یک شناسه اکتیویتی‌پاب مانند <u>@gancio@mastodon.cisti.org</u></li><li>نشانی اینترنتی یک حساب کاربری مانند <u>https://instance.tld/actor</u>.</li></ul><br/>رویدادهای منتشر شده یا تقویت شده از این منابع وارد خواهند شد.",
+        "add_trusted_source_help": "از یکی از تنظیمات زیر استفاده کنید: <br/><ul><li>نشانی وب یک گانسیو دیگر یا کاره‌ای که از یک Application Actor پشتیبانی می‌کند / <a href='https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md'>FEP-2677</a> (مثلاً <u>https://demo.gancio.org</u>)</li><li>یک شناسه اکتیویتی‌پاب مانند <u>{'@gancio@mastodon.cisti.org'}</u></li><li>نشانی اینترنتی یک حساب کاربری مانند <u>https://instance.tld/actor</u>.</li></ul><br/>رویدادهای منتشر شده یا تقویت شده از این منابع وارد خواهند شد.",
         "trusted_source_removed": "منبع معتبر برداشته شد",
         "add_link": "افزودن پیوندٔ",
         "edit_tag_help": "شما می‌توانید برچسب را با جایگزینی آن با یک برچسب جدید یا ادغام آن با یک برچسب موجود تغییر دهید. رویدادهای {n} مرتبط نیز تغییر خواهند کرد.",
