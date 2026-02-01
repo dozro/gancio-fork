@@ -171,6 +171,9 @@ export interface Media {
   focalpoint?: [number, number]
 }
 
+// https://fediverse.codeberg.page/fep/fep/8a8e/#event-status
+export type EventStatus = 'EventCancelled' | 'EventScheduled' | 'EventTentative' | 'EventMovedOnline' | 'EventPostponed' | 'EventRescheduled'
+
 @Table({
   tableName: 'events'
 })
@@ -193,6 +196,10 @@ export class Event extends Model<
   @Attribute(DataTypes.STRING)
   @NotNull
   declare title: string
+
+  @Attribute(DataTypes.STRING)
+  @Default('EventScheduled')
+  declare status: EventStatus
 
   @Attribute(DataTypes.STRING)
   @Index
