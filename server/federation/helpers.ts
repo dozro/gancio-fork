@@ -314,6 +314,7 @@ export async function parseAPEvent(APEvent, actor) {
     title: APEvent?.name?.trim() ?? '',
     start_datetime: DateTime.fromISO(APEvent.startTime).toUnixInteger(),
     end_datetime: APEvent?.endTime ? DateTime.fromISO(APEvent.endTime).toUnixInteger() : null,
+    status: APEvent?.eventStatus ?? 'EventScheduled',
     description: sanitizeHTML(APEvent?.content ?? APEvent?.summary ?? ''),
     online_locations,
     media,
