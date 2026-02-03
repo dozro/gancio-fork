@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import ics from 'ics'
 import type { H3Event } from 'h3'
-import type { Event } from './db'
+import type { Event, EventStatus } from './db'
 import { htmlToText } from 'html-to-text'
 import { publicSettings } from './settings'
 
@@ -11,6 +11,14 @@ import { publicSettings } from './settings'
  * @param {*} alarms https://github.com/adamgibbons/ics#attributes (alarms)
  */
 export function exportICS(evt: H3Event, events: Event[], alarms?: ics.Alarm[]) {
+  const statusMap: Record<EventStatus, ics.EventStatus> = {
+    EventCancelled: 'CANCELLED',
+    EventTentative: 'TENTATIVE',
+    EventScheduled: 'CONFIRMED',
+    EventMovedOnline: 'CONFIRMED',
+    EventPostponed: 'TENTATIVE',
+    EventRescheduled: 'CONFIRMED'
+  }
   const eventsMap = events.map((e) => {
     const tmpStart = DateTime.fromSeconds(e.start_datetime, { zone: 'UTC' })
     const start: [number, number, number, number, number] = [tmpStart.year, tmpStart.month, tmpStart.day, tmpStart.hour, tmpStart.minute]
@@ -26,7 +34,7 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ics.Alarm[]) {
       htmlContent: e.description && e.description.replace(/\n/g, '<br>'),
       location,
       url: `${publicSettings.baseurl}/event/${e.slug || e.id}`,
-      status: 'CONFIRMED',
+      status: statusMap[e.status],
       categories: e?.tags?.map(t => t.tag || t) as string[],
       alarms
     }

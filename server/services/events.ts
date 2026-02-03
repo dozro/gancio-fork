@@ -160,8 +160,9 @@ export function getMaxLastModifieds(lastModifieds: Array<Date | undefined>) {
 export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User): EventAPI {
   const response: EventAPI = {
 
-    id: event?.id,
-    slug: event?.slug,
+    id: event.id,
+    slug: event.slug,
+    status: event.status,
 
     title: event.title,
     description: event.description,
@@ -301,6 +302,7 @@ export function eventToAP(event: Event) {
     name: event.title,
     url: event?.ap_object?.url ?? event?.ap_object?.id ?? `${publicSettings.baseurl}/event/${event.slug || event.id}`,
     type: 'Event',
+    eventStatus: event.status,
     startTime: DateTime.fromSeconds(event.start_datetime, opt).toISO(),
     ...(event.end_datetime ? { endTime: DateTime.fromSeconds(event.end_datetime, opt).toISO() } : {}),
     location: location.length === 1 ? location[0] : location,

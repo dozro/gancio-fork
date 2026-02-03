@@ -171,6 +171,10 @@ export interface Media {
   focalpoint?: [number, number]
 }
 
+// https://fediverse.codeberg.page/fep/fep/8a8e/#event-status
+export const EventStatusEnum = ['EventCancelled', 'EventScheduled', 'EventTentative', 'EventMovedOnline', 'EventPostponed', 'EventRescheduled'] as const
+export type EventStatus = typeof EventStatusEnum[number]
+
 @Table({
   tableName: 'events'
 })
@@ -193,6 +197,10 @@ export class Event extends Model<
   @Attribute(DataTypes.STRING)
   @NotNull
   declare title: string
+
+  @Attribute(DataTypes.ENUM(EventStatusEnum))
+  @Default('EventScheduled')
+  declare status: EventStatus
 
   @Attribute(DataTypes.STRING)
   @Index

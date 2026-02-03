@@ -1,22 +1,21 @@
 <script setup lang="ts">
 
-// import time from '~/utils/time'
-const props = defineProps({
-  event: { type: Object, default: () => ({}) },
-  lazy: { type: Boolean, default: false },
-  hideThumbs: { type: Boolean, default: false }
+const { event, lazy = false, hideThumbs = false } = defineProps<{
+  event: EventAPI
+  lazy?: boolean
+  hideThumbs?: boolean
+}>()
+
+const isPast = computed(() => {
+  const now = new Date()
+  if (event.end_datetime) {
+    return new Date(event.end_datetime * 1000) < now
+  } else {
+    return new Date((3 * 60 * 60 + event.start_datetime) * 1000) < now
+  }
 })
 
-// const { time, timeToISO } = useTime()
-
-function isPast() {
-  const now = new Date()
-  if (props.event.end_datetime) {
-    return new Date(props.event.end_datetime * 1000) < now
-  } else {
-    return new Date((3 * 60 * 60 + props.event.start_datetime) * 1000) < now
-  }
-}
+const isCancelled = computed(() => event.status === 'EventCancelled')
 </script>
 
 <template>
@@ -25,8 +24,8 @@ function isPast() {
     <!-- <nuxt-picture/> -->
     <CoreImg v-if='!hideThumbs' :event='event' thumb :lazy='lazy' />
     <v-icon v-if='event.parentId' class='float-right mr-1' color='success' icon='mdi-repeat' />
-    <v-icon v-if='isPast()' class='float-right mr-1' color='warning' icon='mdi-timer-sand' />
-    <h3 class='event-title' itemprop="name">{{ event.title }}</h3>
+    <v-icon v-if='isPast' class='float-right mr-1' color='warning' icon='mdi-timer-sand' />
+    <h3 class='event-title' itemprop="name" :class="isCancelled && 'text-decoration-line-through'">{{ event.title }}</h3>
   </nuxt-link>
 
   <v-avatar v-if='event?.ap_user?.image' size="small" class="position-absolute top-0 right-0 ma-2 pointer-ev-none">
