@@ -1,0 +1,52 @@
+import { z } from 'zod'
+import { useLogger } from '~~/server/lib/logger'
+import { EventStatusEnum, Event } from '~~/server/services/db'
+import { notifyEvent } from '~~/server/services/notifier'
+import { canModifyEvent, mapEvent } from '~~/server/services/events'
+
+const schema = z.object({
+  status: z.enum(EventStatusEnum).optional()
+}).refine(data => data.status !== undefined, {
+  error: 'At least one field must be provided'
+})
+
+export default defineEventHandler(async (evt) => {
+  const log = useLogger('Patch event')
+  const id = getRouterParam(evt, 'id')
+  const user = await getUser(evt)
+  if (!user) {
+    log.warn('Anonymous user cannot patch events')
+    throw createError({ statusCode: 403, statusMessage: 'Anonymous user cannot patch events' })
+  }
+
+  if (!id || !Number(id)) {
+    log.warn('Event not found: %s', id)
+    throw createError({ statusCode: 404, statusMessage: 'Event not found' })
+  }
+
+  const event = await Event.findByPk(id)
+  if (!event) {
+    log.warn('Event not found: %d', id)
+    throw createError({ statusCode: 404, statusMessage: 'Event not found' })
+  }
+
+  if (!canModifyEvent(event, user)) {
+    log.warn('Cannot modify the event %s', event.title)
+    throw createError({ statusCode: 401, statusMessage: 'Cannot modify this event' })
+  }
+
+  const { success, error, data } = await readValidatedBody(evt, schema.safeParse)
+  if (!success) {
+    throw createError({ statusCode: 404, statusMessage: error.message })
+  }
+
+  log.info('update event status ', data.status)
+  await event.update({ status: data.status })
+
+  if (!event.recurrent && event.is_visible) {
+    // send notifications
+    notifyEvent('Update', event.id)
+  }
+
+  return mapEvent(event)
+})

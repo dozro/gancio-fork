@@ -42,6 +42,7 @@ useHead({
 })
 
 const hasMedia = computed(() => event?.value?.media?.length)
+const isCancelled = computed(() => event?.value?.status === 'EventCancelled')
 const showEmbed = ref(false)
 const mapModal = ref(false)
 const openModeration = ref(route.query?.moderation ? true : false)
