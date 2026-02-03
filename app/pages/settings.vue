@@ -10,7 +10,7 @@ const { user, clear: clearSession } = useUserSession()
 
 async function forgot () {
   loading.value = true
-  await $fetch('/api/user/recover', { method: 'POST', body: { email: user.email } })
+  await $fetch('/api/user/recover', { method: 'POST', body: { email: user.value.email } })
   loading.value = false
   $notify('login.check_email')
 }
@@ -26,16 +26,18 @@ async function removeAccount () {
 </script>
 
 <template>
-<v-container class="pa-0 pa-md-3">
+<v-container>
   <v-card>
-    <v-card-title>{{user.email}}</v-card-title>
+    <v-card-title class="mb-4">{{ user.email }}</v-card-title>
     <v-card-text>
-      <v-container>
-        <v-btn variant="outlined" color="warning" @click='forgot'>{{$t('login.forgot_password')}}</v-btn>
-        <v-divider class='my-4' />
-        <p class="font-light">{{$t('settings.remove_account')}}</p>
-        <v-btn variant='outlined' color='error' @click='removeAccount'>{{$t('common.remove')}}</v-btn>
-      </v-container>
+      <div class="text-h6 mb-4">{{ $t('login.forgot_password') }}</div>
+      <v-btn variant="outlined" prepend-icon="mdi-email-outline" @click='forgot'>{{ $t('common.recover_password') }}</v-btn>
+      <v-divider class='my-6' />
+      <div class="text-h6 mb-4 text-error">{{ $t('settings.danger_section') }}</div>
+      <v-alert type="error" :icon="false" :border="false" rounded>
+        <div class="mb-3">{{ $t('settings.remove_account') }}</div>
+        <v-btn variant='outlined' color='error' @click='removeAccount'>{{ $t('common.remove') }}</v-btn>
+      </v-alert>
     </v-card-text>
   </v-card>
 </v-container>
