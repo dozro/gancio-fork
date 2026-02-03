@@ -225,7 +225,12 @@
         "send_to_admins": "Send to admins",
         "send_to_author_too": "Send to admins and author",
         "disable_author": "Disable author",
-        "disable_author_confirm": "Are you sure you want to disable the author of this event?"
+        "disable_author_confirm": "Are you sure you want to disable the author of this event?",
+        "cancelled": "This event has been cancelled",
+        "postponed": "Postponed",
+        "moved_onlined": "Moved online",
+        "rescheduled": "Rescheduled",
+        "tentative": "Tentative"
     },
     "admin": {
         "place_description": "If you have gotten the place or address wrong, you can change it.<br/>All current and past events associated with this place will change address.",
