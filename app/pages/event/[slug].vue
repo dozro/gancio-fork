@@ -110,13 +110,14 @@ async function report() {
 </script>
 <template>
 <v-container
-  v-if='event' class="h-event pa-2 pa-sm-2 pt-0 pt-sm-0" max-width='1200 ' itemscope
+  v-if='event'
+  class="h-event pa-2 pa-sm-2 pt-0 pt-sm-0" max-width='1200' itemscope
   itemtype="https://schema.org/Event">
   <!-- EVENT PAGE -->
   <!-- gancio supports microformats (http://microformats.org/wiki/h-event) -->
   <!-- and microdata https://schema.org/Event -->
   <h1 class="text-center text-md-h4 text-h5 pa-6">
-    <strong class="p-name text--primary" itemprop="name">{{ event?.title }}</strong>
+    <strong class="p-name text--primary" :class="isCancelled && 'text-decoration-line-through'" itemprop="name">{{ event?.title }}</strong>
   </h1>
 
   <v-row>
@@ -130,6 +131,7 @@ async function report() {
 
     <v-col cols='12' md='4'>
       <v-card class='border-2'>
+        <EventStatus :event="event" />
         <v-container class="eventDetails">
           <v-icon v-if="event?.parentId" class="float-right" color="success" icon="mdi-repeat" />
           <!-- :datetime="$time.unixFormat(event.start_datetime, 'yyyy-MM-dd HH:mm')" -->
