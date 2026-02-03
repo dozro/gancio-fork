@@ -2,18 +2,24 @@
 
 const route = useRoute()
 const settings = useState<Settings>('settings')
-useHead({ title: `${settings.value.title} - Recover` })
+useHead({ title: `${settings.value.title} - ${$t('common.recover_password')}` })
 
 const recoverCode = route.params.code
 const newPassword = ref('')
 const valid = ref(false)
 
-const user = await $fetch('/api/user/check_recover_code', { method: 'POST', body: { recoverCode } }).catch(() => {})
+const user = await $fetch('/api/user/check_recover_code', {
+  method: 'POST',
+  body: { recover_code: recoverCode }
+}).catch(() => {})
 const { $notify } = useNuxtApp()
 
 async function changePassword () {
   try {
-    await $fetch('/api/user/recover_password', { method: 'POST', body: { recoverCode, password: newPassword.value } })
+    await $fetch('/api/user/recover_password', {
+      method: 'POST',
+      body: { recover_code: recoverCode, password: newPassword.value }
+    })
     $notify('common.password_updated')
     navigateTo('/login')
   } catch (e) {
@@ -54,12 +60,3 @@ async function changePassword () {
   </v-form>
 </v-container>
 </template>
-
-<style>
-  h4 img {
-    max-height: 40px;
-    border-radius: 20px;
-    background-color: #333;
-    border: 1px solid #333;
-  }
-</style>

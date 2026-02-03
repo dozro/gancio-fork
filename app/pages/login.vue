@@ -5,7 +5,7 @@ const settings = useState<Settings>('settings')
 const { $notify } = useNuxtApp()
 
 useHead({
-  title: () => `${settings.value.title} - Login`
+  title: () => `${settings.value.title} - ${$t('common.login')}`
 })
 
 const credentials = reactive({
@@ -15,6 +15,8 @@ const credentials = reactive({
 
 const valid = ref(false)
 const loading = ref(false)
+
+const emailInput = ref()
 
 async function login() {
   $fetch('/api/login', {
@@ -32,6 +34,7 @@ async function login() {
 
 async function forgot () {
   if (!credentials.email) {
+    emailInput.value.focus()
     return
   }
   loading.value = true
@@ -55,9 +58,13 @@ async function forgot () {
           <v-card-subtitle v-html="$t('login.description')" />
           <v-card-text>
             <v-text-field
-              v-model='credentials.email' validate-on="blur"
+              ref="emailInput"
+              v-model='credentials.email'
+              validate-on="blur"
               :rules='$valid.email'
-              autofocus :label='$t("common.email")' />
+              autofocus
+              :label='$t("common.email")'
+            />
 
             <v-text-field
               v-model='credentials.password'
