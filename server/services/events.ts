@@ -1,15 +1,17 @@
 import { DateTime } from 'luxon'
 import type { WhereOptions } from '@sequelize/core'
-import { Op, literal, col, where, fn, JSON_NULL, sql } from '@sequelize/core'
+import { Op, literal, col, where, fn, sql } from '@sequelize/core'
+import type { User } from '#auth-utils'
 
 import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
 import type { EventAPI } from '~~/shared/types/generic'
 import type { H3Event } from 'h3'
 import { createHash } from 'crypto'
-import type { User } from './db'
+import type { UserRole } from './db'
 import { Place, Tag, Event, Message } from './db'
 import { publicSettings } from './settings'
+import type { UserSession } from '../utils/session'
 
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
@@ -316,4 +318,8 @@ export function eventToAP(event: Event) {
     content: event.description || '',
     summary
   }
+}
+
+export function canModifyEvent(event: Event, user?: UserSession) {
+  return !!user && (['admin', 'editor'].includes(user.role) || event.userId !== user.id)
 }

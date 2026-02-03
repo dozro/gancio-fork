@@ -40,7 +40,7 @@ const getInstanceInfo = debounce(() => {
     <v-alert class='mb-4' type="info" border="start" icon="mdi-information">
       {{$t('admin.stats', stats)}}
     </v-alert>
-
+    <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="$t('event.follow_me_description', { title: settings.title, account: `@${settings.instance_name}@${settings.hostname}`})" />
     <v-text-field
       v-model="instance_hostname"

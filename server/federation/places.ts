@@ -65,7 +65,7 @@ export async function parseAPLocation(APEvent: unknown) {
     place = {
       place_name: APPlace?.name,
       ...(APPlace?.id && { place_ap_id: APPlace.id }),
-      ...(place_latitude !== null && place_longitude !== null && { place_latitude, place_longitude }),
+      ...(place_latitude !== null && place_longitude !== null && { place_latitude, place_longitude })
     }
     // no physical but at least virtual location
   } else if (onlineLocations.length) {

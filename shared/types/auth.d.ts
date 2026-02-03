@@ -6,10 +6,5 @@ declare module '#auth-utils' {
     id: number
     email: string
     role: UserRole
-    is_editor: boolean
-    is_admin: boolean
   }
-
 }
-
-export { }

@@ -16,7 +16,7 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
     value: 'events',
     title: $t('common.events'),
     icon: 'mdi-calendar',
-    badge: unconfirmedEvents.value?.events?.length || null,
+    badge: unconfirmedEvents.value?.events?.length || null
   },
   { value: 'users', title: $t('common.users'), icon: 'mdi-account-group' },
 
@@ -35,7 +35,7 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
   { value: 'theme', title: $t('common.theme'), icon: 'mdi-shape' },
   { value: 'federation', title: $t('common.federation'), icon: 'mdi-web' },
   { value: 'geolocation', title: $t('admin.geolocation'), icon: 'mdi-map' },
-  { value: 'plugins', title: $t('common.plugins'), icon: 'mdi-toy-brick' },
+  { value: 'plugins', title: $t('common.plugins'), icon: 'mdi-toy-brick' }
 ])
 
 </script>

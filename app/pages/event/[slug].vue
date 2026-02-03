@@ -31,7 +31,7 @@ useHead({
     { property: 'og:site_name', content: settings.value.title },
     { property: 'twitter:card', content: 'summary ' },
     { property: 'twitter:image', content: mediaURL(event.value) },
-    { property: 'profile:username', content: `@${settings.value.instance_name}@${settings.value.hostname}` },
+    { property: 'profile:username', content: `@${settings.value.instance_name}@${settings.value.hostname}` }
     // { property: 'og:updated_time'},
     // { property: 'og:updated_time' },
   ],
@@ -84,10 +84,6 @@ const shareEvent = () => share.value?.({ url: canonicalUrl.value, title: documen
 //     ]
 //   }
 // },
-// computed: {
-//   showMap () {
-//     return this.settings.allow_geolocation && this.event.place?.latitude && this.event.place?.longitude
-//   },
 //   showResources () {
 //     return this.settings.enable_federation &&
 //     ( (!this.settings.hide_boosts && (this.event.boost?.length || this.event?.likes?.length)) ||

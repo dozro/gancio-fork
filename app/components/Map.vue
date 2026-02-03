@@ -14,7 +14,7 @@ const props = defineProps({
   showMarker: { type: Boolean, default: true },
   mapCenter: { type: Array, default: () => ([]) },
   zoom: { type: Number, default: () => (16) },
-  draggable: { type: Boolean, default: false },
+  draggable: { type: Boolean, default: false }
 })
 
 defineEmits(['tileload', 'tileerror'])

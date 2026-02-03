@@ -53,7 +53,7 @@ let config: Config
  * and merge it with the ENV vars incoming from `.env` or from
  * docker configuration
  */
-export function get(): Config | undefined {
+export function get() {
   if (config) return config
 
   // read the legacy v1 configuration file
@@ -103,8 +103,7 @@ export function get(): Config | undefined {
   // TODO: check is this is working as expected
   config = Object.assign(legacyConfiguration, defaultConfig)
   try {
-    config = ConfigSchema.parse(config)
-    return config
+    return ConfigSchema.parse(config)
   } catch (e) {
     console.error('Configuration error:', e)
     process.exit(-1)

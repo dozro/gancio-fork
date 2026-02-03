@@ -13,7 +13,7 @@ if (!page.value) {
 useHead(() => {
   const title = `${settings.value.title} - ${page.value?.title}`
   return {
-    title,
+    title
   }
 })
 

@@ -44,6 +44,7 @@ function selectAddress (v: object) {
     :items="addressList"
     @update:model-value='selectAddress'>
     <template #message>
+      <!-- eslint-disable-next-line vue/no-v-html -->
       <span v-html="$t('event.address_description_osm')" />
     </template>
     <template #item="{ item, props }">
@@ -68,6 +69,7 @@ function selectAddress (v: object) {
         :rules="$valid.longitude" />
     </v-col>
   </v-row>
+  <!-- eslint-disable-next-line vue/no-v-html -->
   <p v-if='place?.create' class='mt-4' v-html="$t('event.address_geocoded_disclaimer')" />
 
   <!-- //:LMapStyles="{height: mapHeight}" /> -->

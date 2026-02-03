@@ -40,6 +40,7 @@ const register = async () => {
           <v-card-title>{{ $t("common.register") }}</v-card-title>
 
           <v-card-text>
+            <!-- eslint-disable-next-line vue/no-v-html -->
             <p v-html="$t('register.description')" />
             <v-text-field
               ref="email" v-model="user.email" type="email" :rules="$valid.email"

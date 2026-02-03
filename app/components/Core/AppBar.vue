@@ -12,7 +12,8 @@ const show_collections_bar = computed(() => ['index', 'collection-name'].include
 
   <!-- title -->
   <component :is='$route.name === "index" ? "h1" : "div"' class="text-center">
-    <nuxt-link id="title" color='primary' to="/" v-text="settings?.title ?? 'Gancio'" />
+    <nuxt-link id="title" color='primary' to="/">{{ settings?.title ?? 'Gancio'}}</nuxt-link>
+
     <div
       class="text-body-1 font-weight-light pb-3"
       v-html="settings?.description ?? 'a shared agenda for local communities'"

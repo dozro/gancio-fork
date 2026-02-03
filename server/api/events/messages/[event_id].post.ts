@@ -1,5 +1,6 @@
 import { useLogger } from '~~/server/lib/logger'
 import { Message, Event, publicSettings, User, notifyAdmins, enqueueMail } from '~~/server/services'
+import { canModifyEvent } from '~~/server/services/events'
 
 export default defineEventHandler(async (evt) => {
   const log = useLogger('event:moderation')
@@ -8,9 +9,8 @@ export default defineEventHandler(async (evt) => {
     throw createError({ status: 403 })
   }
 
-  // await requireAdminSession(evt)
   const eventId = Number(evt.context.params?.event_id)
-  const event = await Event.findByPk(eventId, { include: [{ model: User, required: false }], raw: true })
+  const event = await Event.findByPk(eventId, { include: [{ model: User, required: false }] })
   if (!event) {
     log.warn(`Event does not exists: ${eventId}`)
     throw createError({ statusCode: 404 })
@@ -19,9 +19,9 @@ export default defineEventHandler(async (evt) => {
   const body = await readBody(evt)
   const user = await getUser(evt)
   const isMine = user?.id === event.userId
-  const isAdminOrEditor = user?.is_editor || user?.is_admin
+  const isAdminOrEditor = ['admin', 'editor'].includes(user?.role ?? '')
 
-  if (!isAdminOrEditor && !isMine && !publicSettings.enable_report) {
+  if (!canModifyEvent(event, user) && !publicSettings.enable_report) {
     log.warn(`Someone not allowed is trying to report an event -> "${event.title}" isMine: ${isMine} `)
     throw createError({ statusCode: 403 })
   }
@@ -41,7 +41,7 @@ export default defineEventHandler(async (evt) => {
 
     // notify author
     if (event?.user?.email && body.is_author_visible && !isMine) {
-      enqueueMail(event.user.email, 'report', { event, message: body.message, author }) // , TODO publicSettings.locals.locale)
+      enqueueMail(event.user.email, 'report', { event, message: body.message, author })
     }
 
     return message

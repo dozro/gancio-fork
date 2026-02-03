@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps({
   unconfirmedEvents: { type: Array, default: () => [] },
-  unconfirmedOldEvents: { type: Array, default: () => [] },
+  unconfirmedOldEvents: { type: Array, default: () => [] }
 })
 
 const emit = defineEmits(['confirmed', 'removed'])

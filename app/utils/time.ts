@@ -60,7 +60,7 @@ function unixFormat (timestamp, format = 'EEEE d MMMM HH:mm') {
 }
 
 function format (date, format = 'EEEE d MMMM HH:mm') {
-  return DateTime.fromISO(date,
+  return DateTime.fromISO(date
   //   {
   //   zone: store.state.settings.instance_timezone,
   //   locale: app.i18n.locale || store.state.settings.instance_locale

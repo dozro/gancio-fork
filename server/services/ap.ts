@@ -50,7 +50,7 @@ export async function cleanUnusedAPActor() {
       follower: { [Op.not]: true },
       following: { [Op.not]: true },
       trusted: { [Op.not]: true },
-      blocked: { [Op.not]: true },
+      blocked: { [Op.not]: true }
     },
     include: [
       { model: Event, required: false },

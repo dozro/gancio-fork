@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
       include: [{ model: Tag, required: false }, Place],
       limit: EVENTS_PER_PAGE,
       offset: (page - 1) * EVENTS_PER_PAGE,
-      order: [['start_datetime', 'DESC']],
+      order: [['start_datetime', 'DESC']]
     })
     return {
       // '@context': Helpers['@context'],

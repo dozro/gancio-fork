@@ -1,4 +1,5 @@
 import { Event, Place, Tag, User, Resource, APUser, mapEvent, Message } from '~~/server/services'
+import type { WhereOptions } from '@sequelize/core'
 import { Op } from '@sequelize/core'
 import { formatSchema } from '~~/server/types/validator'
 import { useLogger } from '~~/server/lib/logger'
@@ -17,12 +18,12 @@ import { eventToAP } from '~~/server/services/events'
 export default defineEventHandler(async (evt) => {
   const log = useLogger('event details!')
   const user = await getUser(evt)
-  const isAdminOrEditor = user?.is_editor || user?.is_admin
+  const isAdminOrEditor = ['admin', 'editor'].includes(user?.role ?? '')
 
   const slug_or_id = getRouterParam(evt, 'slug_or_id')
   const { format } = await getValidatedQuery(evt, formatSchema.parse)
 
-  const where: any = { [Op.or]: [{ slug: slug_or_id }] }
+  const where: WhereOptions<Event> = { [Op.or]: [{ slug: slug_or_id }] }
   const id = Number(slug_or_id)
   if (!isNaN(id) && Number.isInteger(id)) {
     where[Op.or].push({ id })
@@ -44,9 +45,9 @@ export default defineEventHandler(async (evt) => {
         required: false,
         attributes: ['id', 'activitypub_id', 'data', 'hidden']
       },
-      { model: Event, required: false, as: 'parent', attributes: ['id', 'recurrent', 'is_visible', 'start_datetime'] },
+      { model: Event, required: false, as: 'parent', attributes: ['id', 'recurrent', 'is_visible', 'start_datetime'] }
     ],
-    order: [[Resource, 'id', 'ASC']],
+    order: [[Resource, 'id', 'ASC']]
   })
 
   if (!event) {
@@ -66,7 +67,7 @@ export default defineEventHandler(async (evt) => {
 
   // manage cache (https://github.com/h3js/h3/issues/1261)
   event.updatedAt.setMilliseconds(0)
-  if (handleCacheHeaders(evt, { maxAge: 5, modifiedTime: event.updatedAt })) {
+  if (handleCacheHeaders(evt, { modifiedTime: event.updatedAt, cacheControls: ['must-revalidate'] })) {
     return
   }
 

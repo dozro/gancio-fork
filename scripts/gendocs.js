@@ -25,7 +25,7 @@ const docs = await Promise.all(apiFiles.map(async (file) => {
   const { code: jsCode } = babel.transformSync(tsSource, {
     filename: file,
     presets: ['@babel/preset-typescript'],
-    parserOpts: { plugins: ['typescript'] },
+    parserOpts: { plugins: ['typescript'] }
   })
 
   try {

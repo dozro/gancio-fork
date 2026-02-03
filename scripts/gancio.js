@@ -12,7 +12,7 @@ async function main() {
   const dialectMap = {
     sqlite: SqliteDialect,
     sqlite3: SqliteDialect,
-    mariadb: MariaDbDialect,
+    mariadb: MariaDbDialect
   }
 
   const dialectName = process.env.DB_DIALECT ?? 'sqlite3'
@@ -25,12 +25,12 @@ async function main() {
       user: process.env.DB_USER || 'gancio',
       password: process.env.DB_PASSWORD || 'gancio',
       host: process.env.DB_HOST || 'localhost',
-      port: process.env.DB_PORT || 3306,
+      port: process.env.DB_PORT || 3306
     }
   } else if (dialectName === 'sqlite3' || dialectName === 'sqlite') {
     dbOptions = {
       dialect: dialectMap[dialectName],
-      storage: process.env.DB_STORAGE || './gancio.sqlite',
+      storage: process.env.DB_STORAGE || './gancio.sqlite'
     }
   }
 

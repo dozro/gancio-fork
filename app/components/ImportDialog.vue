@@ -78,6 +78,7 @@ defineEmits(['imported', 'close'])
 <v-card>
   <v-card-title>{{ $t('common.import') }}</v-card-title>
   <v-card-text>
+    <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="$t('event.import_description')"/>
     <v-form ref="form" v-model="valid" @submit.prevent="importGeneric">
       <v-row>

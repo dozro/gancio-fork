@@ -59,7 +59,7 @@ const selectedDate = computed({
       event.value.start_datetime = fromDateAndTimeToDateTime(val as Date, sTime) // DateTime.fromJSDate(val).toUnixInteger()
       event.value.end_datetime = fromDateAndTimeToDateTime(val as Date, eTime) // DateTime.fromJSDate(val).toUnixInteger()
     }
-  },
+  }
 })
 
 // Start time
@@ -69,7 +69,7 @@ const startTime = computed({
   },
   set(val) {
     event.value.start_datetime = fromDateAndTimeToDateTime(selectedDate.value, val) // DateTime.fromJSDate(val).toUnixInteger()
-  },
+  }
 })
 
 // End time
@@ -79,7 +79,7 @@ const endTime = computed({
   },
   set(val) {
     event.value.end_datetime = fromDateAndTimeToDateTime(selectedDate.value, val)
-  },
+  }
 })
 
 </script>

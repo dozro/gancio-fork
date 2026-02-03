@@ -8,7 +8,7 @@ export default defineEventHandler(async (evt) => {
     attributes: ['tag', [fn('COUNT', col('tag')), 'count']],
     include: [{ model: Event, where: { is_visible: true }, attributes: [], through: { attributes: [] }, required: true }],
     group: ['tag'],
-    raw: true,
+    raw: true
   })
 
   return tags

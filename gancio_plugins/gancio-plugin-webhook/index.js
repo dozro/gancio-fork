@@ -16,7 +16,7 @@ const plugin = {
         description: 'HTTP endpoint to send webhook to',
         required: true,
         hint: 'The <strong>HTTP URL</strong> where to send the webhook.'
-      },
+      }
     }
   },
   gancio: null, // { helpers, log, settings }

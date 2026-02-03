@@ -13,7 +13,7 @@ export default function useShare() {
 
 const openShare = (data: ShareData = {
   title: document?.title,
-  url: window.location.toString(),
+  url: window.location.toString()
 }) => {
   try {
     navigator?.share?.(data)

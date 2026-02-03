@@ -129,7 +129,7 @@ export class TaskManager {
       method: cleanPastEvents,
       repeatDelay: 12 * hour + 5 * minute,
       repeat: true,
-      callAtStart: true,
+      callAtStart: true
     })
 
     this.add({

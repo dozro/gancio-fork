@@ -14,7 +14,7 @@ useHead(() => {
     link: [
       { rel: 'alternate', type: 'application/rss+xml', title, href: settings.value.baseurl + `/feed/rss/place/${data.value?.place.name}` },
       { rel: 'alternate', type: 'text/calendar', title, href: settings.value.baseurl + `/feed/ics/place/${data.value?.place?.name}` }
-    ],
+    ]
   }
 })
 
