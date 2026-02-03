@@ -34,6 +34,7 @@ function setOptions(plugin) {
 
 <template>
 <div>
+  <!-- eslint-disable-next-line vue/no-v-html -->
   <div class="text-subtitle-2 text-medium-emphasis" v-html="$t('admin.plugins_description')" />
 
   <v-dialog v-if='selectedPlugin.settingsValue' v-model='dialog' max-width='1200px' :fullscreen='$vuetify.display?.mobile'>
@@ -43,6 +44,7 @@ function setOptions(plugin) {
         <v-form ref='form' v-model='valid'>
           <v-row v-for='(setting, name) in selectedPlugin.settings' :key='name' class='mt-2'>
             <v-col cols="4">
+              <!-- eslint-disable-next-line vue/no-v-html -->
               <small v-html='setting.hint' />
             </v-col>
             <v-col cols="8">

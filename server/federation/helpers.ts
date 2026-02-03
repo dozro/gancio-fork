@@ -270,8 +270,6 @@ export async function parseAPMessage(APMessage, actor) {
    *  Event object.type
    */
 export async function parseAPEvent(APEvent, actor) {
-  // const tagController = require('../api/controller/tag')
-
   if (APEvent?.type !== 'Event') {
     log.warn(`[FEDI] parseAPEvent with another object type ${APEvent.type}`)
     throw createError({ status: 400, message: `Wrong object type: ${APEvent.type}` })
@@ -279,7 +277,7 @@ export async function parseAPEvent(APEvent, actor) {
 
   // validate incoming events
   const required_fields = ['name', 'startTime', 'id', 'type']
-  let missing_field = required_fields.find(required_field => !APEvent[required_field])
+  const missing_field = required_fields.find(required_field => !APEvent[required_field])
   if (missing_field) {
     log.warn(`[FEDI] ${missing_field} required`)
     throw createError({ status: 400, message: `${missing_field} required` })

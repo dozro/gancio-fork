@@ -18,7 +18,7 @@ const headers = [
 ]
 
 const { data: places, refresh } = await useFetch('/api/places', {
-  transform: places => places.filter(place => place.name?.toLowerCase() !== 'online'),
+  transform: places => places.filter(place => place.name?.toLowerCase() !== 'online')
 })
 
 //   methods: {

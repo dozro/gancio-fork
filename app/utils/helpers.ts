@@ -88,7 +88,7 @@ export function useAttributesFromEvents(events: EventAPI[]) {
         highlight: {
           start: { fillMode: 'outline' },
           base: { fillMode: 'light' },
-          end: { fillMode: 'outline' },
+          end: { fillMode: 'outline' }
         }
       })
       continue

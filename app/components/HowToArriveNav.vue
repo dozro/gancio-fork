@@ -11,7 +11,7 @@ function routeBy (type: 'foot' | 'bike' | 'car' | 'transit') {
     foot: 'engine=fossgis_osrm_foot',
     bike: 'engine=fossgis_osrm_bike',
     car: 'engine=fossgis_osrm_car',
-    transit: null,
+    transit: null
   }
   return `https://www.openstreetmap.org/directions?from=&to=${lat},${lon}&${routingType[type]}#map=14/${lat}/${lon}`
 }

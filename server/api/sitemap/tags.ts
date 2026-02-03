@@ -6,7 +6,7 @@ export default defineEventHandler(async () => {
   })
 
   const urls = tags.map(e => ({
-    loc: `/tag/${e.tag}`,
+    loc: `/tag/${e.tag}`
   }))
 
   return urls

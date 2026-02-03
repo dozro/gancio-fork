@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     const events = await Event.findAll({
       where: {
         parentId: null,
-        is_visible: false,
+        is_visible: false
       },
       // attributes: {
       //   include: [
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
       include: [
         Place,
         { model: Message, required: false, attributes: [] }
-      ],
+      ]
       // group: [col('event', 'id'), col('place.id')],
     })
 

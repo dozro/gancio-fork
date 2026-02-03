@@ -11,7 +11,7 @@ useHead({
   ],
   link: [
     { rel: 'alternate', type: 'application/rss+xml', title: settings.value.title, href: settings.value.baseurl + '/feed/rss?collection=' + route.params.name },
-    { rel: 'alternate', type: 'text/calendar', title: settings.value.title, href: settings.value.baseurl + '/feed/ics?collection=' + route.params.name },
+    { rel: 'alternate', type: 'text/calendar', title: settings.value.title, href: settings.value.baseurl + '/feed/ics?collection=' + route.params.name }
   ]
 })
 

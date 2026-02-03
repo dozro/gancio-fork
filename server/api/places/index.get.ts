@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
       where: {
         [Op.or]: [
           where(fn('LOWER', col('name')), Op.like, '%' + query + '%'),
-          where(fn('LOWER', col('address')), Op.like, '%' + query + '%'),
+          where(fn('LOWER', col('address')), Op.like, '%' + query + '%')
         ]
       },
       attributes: ['name', 'address', 'latitude', 'longitude', 'id', 'ap_id'],

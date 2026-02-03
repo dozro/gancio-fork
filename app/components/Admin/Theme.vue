@@ -133,6 +133,7 @@ const footerLinks = manageSetting('footerLinks')
 
   <div>
     <div class="text-h5 mb-2">{{ $t('admin.default_images') }}</div>
+    <!-- eslint-disable-next-line vue/no-v-html -->
     <span class="text-subtitle-2 text-medium-emphasis" v-html="$t('admin.default_images_help')" />
     <div>
       <v-row>

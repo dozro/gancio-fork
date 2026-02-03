@@ -13,14 +13,14 @@ export default defineNuxtConfig({
   // 2025-07-20
 
   devtools: {
-    enabled: true,
+    enabled: false,
     timeline: {
-      enabled: false,
-    },
+      enabled: false
+    }
   },
   sourcemap: {
     server: true,
-    client: true,
+    client: true
   },
   css: [
     'vuetify/styles',
@@ -76,7 +76,7 @@ export default defineNuxtConfig({
       cookie: {
         sameSite: 'lax',
         secure: false // process.env.NODE_ENV === 'production',
-      },
+      }
     },
     public: {
       version
@@ -93,18 +93,18 @@ export default defineNuxtConfig({
     server: {
       watch: {
         usePolling: false
-      },
+      }
     },
     clearScreen: false,
     define: {
-      'process.env.DEBUG': false,
+      'process.env.DEBUG': false
     },
     build: {
       // rollupOptions: {
       //   external: ['sharp']
       // },
-      target: 'esnext',
-    },
+      target: 'esnext'
+    }
   },
   nitro: {
     storage: {

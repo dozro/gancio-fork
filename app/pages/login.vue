@@ -10,7 +10,7 @@ useHead({
 
 const credentials = reactive({
   email: '',
-  password: '',
+  password: ''
 })
 
 const valid = ref(false)

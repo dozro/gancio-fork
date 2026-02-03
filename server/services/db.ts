@@ -96,7 +96,7 @@ export async function runMigrations() {
 }
 
 @Table({
-  tableName: 'announcements',
+  tableName: 'announcements'
 })
 export class Announcement extends Model<
   InferAttributes<Announcement>,
@@ -150,7 +150,7 @@ export class Message extends Model<
     type: DataTypes.INTEGER.UNSIGNED,
     references: { table: 'events', key: 'id' },
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
+    onDelete: 'CASCADE'
   })
   declare eventId: number
 
@@ -249,7 +249,7 @@ export class Event extends Model<
     type: DataTypes.INTEGER.UNSIGNED,
     references: { table: 'users', key: 'id' },
     onUpdate: 'CASCADE',
-    onDelete: 'SET NULL',
+    onDelete: 'SET NULL'
   })
   declare userId: CreationOptional<number | null>
 
@@ -261,7 +261,7 @@ export class Event extends Model<
     allowNull: true,
     references: { table: 'events', key: 'id' },
     onUpdate: 'CASCADE',
-    onDelete: 'SET NULL',
+    onDelete: 'SET NULL'
   })
   declare parentId: number | null
 
@@ -272,7 +272,7 @@ export class Event extends Model<
     type: DataTypes.INTEGER.UNSIGNED,
     references: { table: 'places', key: 'id' },
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
+    onDelete: 'CASCADE'
   })
   declare placeId: number
 
@@ -286,7 +286,7 @@ export class Event extends Model<
     type: DataTypes.STRING,
     references: { table: 'ap_users', key: 'ap_id' },
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
+    onDelete: 'CASCADE'
   })
   declare apUserApId: CreationOptional<string>
 
@@ -582,7 +582,7 @@ export class APUser extends Model<
     type: DataTypes.STRING,
     references: { table: 'instances', key: 'domain' },
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
+    onDelete: 'CASCADE'
   })
   declare instanceDomain: string
 
@@ -735,7 +735,7 @@ export class Resource extends Model<
     type: DataTypes.INTEGER.UNSIGNED,
     references: { table: 'events', key: 'id' },
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
+    onDelete: 'CASCADE'
   })
   declare eventId: number
 

@@ -165,7 +165,7 @@ module.exports = {
         include: [{ model: Tag, required: false }, Place],
         limit: events_per_page,
         offset: (page - 1) * events_per_page,
-        order: [['start_datetime', 'DESC']],
+        order: [['start_datetime', 'DESC']]
       })
       return res.json({
         '@context': Helpers['@context'],

@@ -116,6 +116,7 @@ const link = computed(() => {
         <v-tabs-window-item id='feed' value="feed">
           <v-card>
             <v-card-text>
+              <!-- eslint-disable-next-line vue/no-v-html -->
               <section v-html='$t(`export.feed_description`)' />
               <v-text-field v-model="link" readonly>
                 <template #prepend>

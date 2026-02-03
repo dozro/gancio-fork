@@ -73,7 +73,7 @@ export async function getImageFromURL(url: string, name: string, focalpoint: [nu
     sharpStream.clone().rotate().resize(500, null, { withoutEnlargement: true }).jpeg({ mozjpeg: true })
       .toFile(path.resolve(config.upload_path, 'thumb', filename + '.jpg')),
     sharpStream.clone().rotate().resize(1200, null, { withoutEnlargement: true })
-      .jpeg({ quality: 95, mozjpeg: true }).toFile(path.resolve(config.upload_path, filename + '.jpg')),
+      .jpeg({ quality: 95, mozjpeg: true }).toFile(path.resolve(config.upload_path, filename + '.jpg'))
   ]
 
   const response = await fetch(url)
@@ -104,7 +104,6 @@ export function isHiddenService(domain: string) {
   const pattern = /^(http:\/\/)?[a-zA-Z0-9]+\.(onion|i2p)\/?$/
   return pattern.test(domain)
 }
-
 
 /**
  * Serves a static file

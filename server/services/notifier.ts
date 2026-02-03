@@ -13,14 +13,13 @@ const log = useLogger('notifier')
   * @param {String} template The template to use to build the email (./server/emails/)
   * @param {Object} locals   Locals key/value object used in templates
   */
-export async function notifyAdmins (template: string, locals: object) {
+export async function notifyAdmins(template: string, locals: object) {
   const admins = await User.findAll({ where: { role: ['admin', 'editor'], is_active: true, to_notify: true }, attributes: ['email'], raw: true })
   let emails = [publicSettings.admin_email]
   emails = emails.concat(admins?.map(a => a.email))
   return enqueueMail(emails, template, locals)
 }
-
-export async function sendNotification (notification: Notification, event: Event) {
+export async function sendNotification(notification: Notification, event: Event) {
   log.info(`Send ${notification.type} notification ${notification.action}`)
   switch (notification.type) {
     // case 'mail': TODO: locale?
@@ -62,7 +61,7 @@ export async function getNotifications(event: Event, action: NotificationAction)
       return true
     }
     if (!filters.tags?.length) {
-    // if (!filters.tags?.length && !filters.places?.length) {
+      // if (!filters.tags?.length && !filters.places?.length) {
       return true
     }
     if (filters.tags?.length) {
@@ -92,11 +91,11 @@ export async function getNotifications(event: Event, action: NotificationAction)
  * for the event and action, and sends those notifications. It logs warnings if the event does not exist,
  * and logs debug information about the notification process.
  *
- * @param {NotificationAction} action - The action that triggered the notification (e.g., 'create', 'update').
- * @param {number} eventId - The ID of the event to notify about.
- * @returns {Promise<any[]>} A promise that resolves when all notifications have been processed.
+ * @param action - The action that triggered the notification (e.g., 'create', 'update').
+ * @param eventId - The ID of the event to notify about.
+ * @returns A promise that resolves when all notifications have been processed.
  */
-export async function notifyEvent (action: NotificationAction, eventId: number): Promise<[] | undefined> {
+export async function notifyEvent(action: NotificationAction, eventId: number) {
   const event = await Event.findByPk(eventId, {
     include: [
       { model: Tag, attributes: ['tag'], through: { attributes: [] } },
@@ -117,6 +116,7 @@ export async function notifyEvent (action: NotificationAction, eventId: number):
 
   // select valid notification for this event
   const notifications = await getNotifications(event, action)
+  if (!notifications) return
   const promises = notifications?.map(async (notification: Notification) => {
     // const event_notification = await EventNotification.create({ eventId: event.id, notificationId: notification.id, status: 'sending' })
     try {

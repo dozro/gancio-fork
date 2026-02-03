@@ -37,7 +37,7 @@ export async function sendMail(addresses: string | string[], template: emailTemp
   // https://framagit.org/les/gancio/-/issues/539#note_2198016
   const localeMapOverride = {
     'sr-Cyrl': 'Cy-sr-SP',
-    'sr-Latn': 'Lt-sr-SP',
+    'sr-Latn': 'Lt-sr-SP'
   }
   const settings = publicSettings
   locale = locale ?? settings.instance_locale

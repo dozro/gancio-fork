@@ -46,7 +46,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         messages: data.messages.value,
         useScope: 'local',
         legacy: false,
-        inheritLocale: false,
+        inheritLocale: false
       })
 
       watch(currentLocale, (val, oldVal) => {
@@ -65,7 +65,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         t,
         n,
         decimalSeparator: toRef(() => props.decimalSeparator ?? inferDecimalSeparator(n)),
-        provide: createProvideFunction({ current: currentLocale, fallback: data.fallback, messages: data.messages }),
+        provide: createProvideFunction({ current: currentLocale, fallback: data.fallback, messages: data.messages })
       }
     }
   }
@@ -85,7 +85,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         t: (key, ...params) => i18n.t(key, params),
         n: i18n.n,
         provide: createProvideFunction({ current: currentLocale, fallback, messages }),
-        decimalSeparator: toRef(() => inferDecimalSeparator(i18n.n)),
+        decimalSeparator: toRef(() => inferDecimalSeparator(i18n.n))
       },
       rtl: i18n.locales.value.reduce((acc: Record<string, boolean>, locale: any) => {
         acc[locale.code] = locale.dir === 'rtl'
@@ -104,7 +104,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           dark: true,
           colors: {
             primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00',
-            ...(settings.value?.dark_colors ?? {}),
+            ...(settings.value?.dark_colors ?? {})
           }
         },
         light: {
@@ -112,7 +112,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           colors: {
             surface: '#f8f8f8',
             primary: '#FF4500', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00',
-            ...(settings.value?.light_colors ?? {}),
+            ...(settings.value?.light_colors ?? {})
           }
         }
       }
@@ -131,7 +131,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         maxWidth: 1400
       },
       VDialog: {
-        maxWidth: '800',
+        maxWidth: '800'
       },
       VFileInput: {
         prependIcon: '',
@@ -139,7 +139,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         variant: 'underlined'
       },
       VSelect: {
-        variant: 'underlined',
+        variant: 'underlined'
       },
       VBtn: {
         elevation: 0,
@@ -163,7 +163,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       VAutocomplete: {
         VChip: {
           closable: true,
-          closeIcon: 'mdi-close-circle',
+          closeIcon: 'mdi-close-circle'
         },
         autocomplete: 'off',
         clearable: true,
@@ -178,10 +178,10 @@ export default defineNuxtPlugin((nuxtApp) => {
       VSwitch: {
         density: 'compact',
         inset: true,
-        color: 'primary',
+        color: 'primary'
       },
       VDataTableServer: {
-        density: 'compact',
+        density: 'compact'
       },
       VDataTableRow: {
         density: 'compact',

@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
         way: 'mdi-road-variant',
         house: 'mdi-home',
         node: 'mdi-map-marker',
-        relation: 'mdi-city-variant',
+        relation: 'mdi-city-variant'
       }
 
       return iconMap[type] || 'mdi-home'

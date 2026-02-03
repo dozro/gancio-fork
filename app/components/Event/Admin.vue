@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { EventStatus } from '~~/server/services/db'
 
-
 const { event } = defineProps<{ event: EventAPI }>()
 const emit = defineEmits(['update', 'openModeration', 'openAssignAuthor'])
 const settings = useState<Settings>('settings')

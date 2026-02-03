@@ -9,7 +9,7 @@ const props = defineProps({
   label: { type: String, default: '' },
   hint: { type: String, default: '' },
   placeholder: { type: String, default: '' },
-  height: { type: String, default: '' },
+  height: { type: String, default: '' }
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -19,7 +19,7 @@ const editor = useEditor({
   extensions: [StarterKit],
   onUpdate: ({ editor }) => {
     emit('update:modelValue', editor.getHTML())
-  },
+  }
 })
 
 const focused = ref(false)

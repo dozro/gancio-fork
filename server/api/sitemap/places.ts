@@ -7,7 +7,7 @@ export default defineEventHandler(async () => {
   })
 
   const urls = places.map(e => ({
-    loc: `/place/${e.id}/${e.name}`,
+    loc: `/place/${e.id}/${e.name}`
   }))
 
   return urls
