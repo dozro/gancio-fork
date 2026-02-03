@@ -13,12 +13,14 @@ const querySchema = z.object({
 
 export default defineEventHandler(async (evt) => {
   const user = await getUser(evt)
+
+  const isAdminOrEditor = ['admin', 'editor'].includes(user?.role ?? '')
   const { error, data } = await getValidatedQuery(evt, querySchema.safeParse)
   if (error) {
     throw createError({ statusCode: 400, message: error.message })
   }
 
-  if (data.full_attributes && (user?.is_admin || user?.is_editor)) {
+  if (data.full_attributes && isAdminOrEditor) {
     return Announcement.findAll()
   }
 

@@ -1,5 +1,6 @@
 import { useLogger } from '~~/server/lib/logger'
 import { Event } from '~~/server/services'
+import { canModifyEvent } from '~~/server/services/events'
 
 /**
  * toggle event confirmation status
@@ -18,7 +19,7 @@ export default defineEventHandler(async (evt) => {
     throw createError({ statusCode: 404 })
   }
 
-  if (!user?.is_editor && !user?.is_admin && Number(user?.id) !== event?.userId) {
+  if (!canModifyEvent(event, user)) {
     log.warn(`Someone not allowed is trying to ${event.is_visible ? 'unconfirm' : 'confirm'} -> "${event.title}`)
     throw createError({ statusCode: 403 })
   }
