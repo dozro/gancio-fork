@@ -175,6 +175,7 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
     plain_description: htmlToText(event.description),
 
     place: event?.place?.toJSON() ?? place?.toJSON(),
+    online_locations: event.online_locations,
     tags: (event.tags ?? tags)?.map(t => t.tag),
     is_mine: event.userId ? event.userId === user?.id : false,
     is_anon: event.userId === null || !event?.user?.is_active,
