@@ -200,6 +200,7 @@ export class Event extends Model<
 
   @Attribute(DataTypes.ENUM(EventStatusEnum))
   @Default('EventScheduled')
+  @NotNull
   declare status: EventStatus
 
   @Attribute(DataTypes.STRING)
