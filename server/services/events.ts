@@ -129,7 +129,8 @@ export async function getEvents(opts?: EventQueryType | undefined) {
         attributes: ['tag'],
         through: { attributes: [] }
       },
-      { model: Place, required: true, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] }
+      { model: Place, required: true, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] },
+      { association: 'APUser', attributes: ['ap_id', 'object'] }
     ],
     ...pagination,
     replacements
