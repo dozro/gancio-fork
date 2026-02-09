@@ -8,14 +8,14 @@ const { params, pending } = useEvents()
 const onSearchChanged = debounce((value) => {
   params.value.query = value || undefined
   navigateTo({ query: { query: params.value.query } })
-}, 500, { maxWait: 1500 })
+}, 500)
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections/home')
 
 const show_search = computed(() => route?.name === 'index')
 const show_calendar = computed(() => !settings.value?.hide_calendar && route?.name === 'index')
 const show_collections_bar = computed(() => ['index', 'collection-name'].includes(route?.name))
-
+const isCalendarDisabled = computed(oldValue => pending.value ? oldValue : !!params.value.query)
 </script>
 
 <template>
@@ -51,7 +51,11 @@ const show_collections_bar = computed(() => ['index', 'collection-name'].include
     </div>
 
     <!-- Calendar -->
-    <CoreCalendar v-if='show_calendar' />
+    <template v-if='show_calendar'>
+      <div v-show='!isCalendarDisabled'>
+        <CoreCalendar />
+      </div>
+    </template>
 
   </div>
 </div>

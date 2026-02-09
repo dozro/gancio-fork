@@ -10,7 +10,13 @@ export const useEvents = () => {
   }))
 
   const { data: events, refresh, pending } = useAsyncData(
-    () => $fetch<Event[]>('/api/events', { params: params.value }),
+    () => {
+      const reqParams = { ...params.value }
+      if (params.value.query) { // Either search by date or by query, not both
+        reqParams.start = undefined
+      }
+      return $fetch<Event[]>('/api/events', { params: reqParams })
+    },
     { watch: [params.value] }
   )
 
