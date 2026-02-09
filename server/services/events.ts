@@ -60,6 +60,8 @@ export async function getEvents(opts?: EventQueryType | undefined) {
     // include uncondirmed
     ...(!args.include_unconfirmed && { is_visible: true }),
 
+    ...(args.user_id && { userId: args.user_id }),
+
     // include recurrent events?
     ...(!args.show_recurrent && { parentId: null })
 
@@ -67,12 +69,6 @@ export async function getEvents(opts?: EventQueryType | undefined) {
     // ...(!args.include_parent && { recurrent: { [Op.is]: null } })
 
   }
-
-  // ...(args.user_id && { userId: args.user_id }),
-
-  // if (args.user_id) {
-  //   condition.userId = args.user_id
-  // }
 
   // if (!args.show_multidate) {
   //   condition.multidate = { [Op.not]: true }
