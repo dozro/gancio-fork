@@ -35,7 +35,7 @@ export const eventQuerySchema = z.object({
   page: z.coerce.number().optional(),
   older: z.coerce.boolean().optional(),
   reverse: z.coerce.boolean().optional(),
-  user_id: z.number().optional(),
+  mine: z.coerce.boolean().optional(),
   ap_user_id: z.string().optional(),
   include_unconfirmed: z.coerce.boolean().default(false).optional(),
   include_parent: z.coerce.boolean().default(false).optional(),
@@ -47,28 +47,31 @@ export const eventQuerySchema = z.object({
 }))
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-export async function getEvents(opts?: EventQueryType | undefined) {
+export async function getEvents(opts?: EventQueryType | undefined, user?: User) {
   const args = eventQuerySchema.parse(opts)
-  const condition: WhereOptions<Event> = {
-    [Op.or]: {
-      start_datetime: { [args.older ? Op.lte : Op.gte]: args.start },
-      end_datetime: { [args.older ? Op.lte : Op.gte]: args.start }
+
+  const andConditions: WhereOptions<Event> = [
+    {
+      [Op.or]: {
+        start_datetime: { [args.older ? Op.lte : Op.gte]: args.start },
+        end_datetime: { [args.older ? Op.lte : Op.gte]: args.start }
+      }
     },
+    { // AND
+      ...(args.end && { start_datetime: { [args.older ? Op.gte : Op.lte]: args.end } }),
 
-    ...(args.end && { start_datetime: { [args.older ? Op.gte : Op.lte]: args.end } }),
+      // include uncondirmed
+      ...(!args.include_unconfirmed && { is_visible: true }),
 
-    // include uncondirmed
-    ...(!args.include_unconfirmed && { is_visible: true }),
+      ...(args.mine && user && { userId: user.id }),
 
-    ...(args.user_id && { userId: args.user_id }),
+      // include recurrent events?
+      ...(!args.show_recurrent && { parentId: null })
 
-    // include recurrent events?
-    ...(!args.show_recurrent && { parentId: null })
-
-    // include parent event
-    // ...(!args.include_parent && { recurrent: { [Op.is]: null } })
-
-  }
+      // include parent event
+      // ...(!args.include_parent && { recurrent: { [Op.is]: null } })
+    }
+  ]
 
   // if (!args.show_multidate) {
   //   condition.multidate = { [Op.not]: true }
@@ -81,25 +84,23 @@ export async function getEvents(opts?: EventQueryType | undefined) {
 
   const replacements: { [key: string]: unknown } = {}
 
-  if (args.tags && args.places) {
-    condition[Op.and] = [
-      { placeId: args.places },
-      sql`event.id IN (SELECT eventId FROM event_tags WHERE tagTag IN  ${sql.list(args.tags)})`
-    ]
-  } else if (args.places) {
-    condition.placeId = args.places
-  } else if (args.tags) {
-    condition[Op.and] = sql`event.id IN (SELECT eventId FROM event_tags WHERE tagTag IN  ${sql.list(args.tags)})`
+  if (args.places) {
+    andConditions.push({ placeId: args.places })
+  }
+
+  if (args.tags) {
+    andConditions.push(sql`event.id IN (SELECT eventId FROM event_tags WHERE tagTag IN  ${sql.list(args.tags)})`)
   }
 
   if (args.query) {
     replacements.query = args.query
-    condition[Op.or] =
-      [
+    andConditions.push({
+      [Op.or]: [
         where(fn('LOWER', col('title')), Op.like, '%' + args.query + '%'),
         where(fn('LOWER', col('name')), Op.like, '%' + args.query + '%'),
         fn('EXISTS', literal(`SELECT 1 FROM event_tags WHERE event_tags.eventId=event.id AND LOWER(${col('tagTag').identifiers}) = LOWER(:query)`))
       ]
+    })
   }
 
   let pagination = {}
@@ -111,7 +112,7 @@ export async function getEvents(opts?: EventQueryType | undefined) {
   }
 
   return Event.findAll({
-    where: condition,
+    where: andConditions,
     attributes: {
       exclude: [
         'likes', 'boost', 'userId', 'createdAt', 'placeId', 'ap_object', 'ap_id'
