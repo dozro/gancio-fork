@@ -125,7 +125,7 @@ export async function loadSettings() {
         format: 'pem'
       }
     })
-    setSetting('publicKey', publicKey)
-    setSetting('privateKey', privateKey, true)
+    await setSetting('publicKey', publicKey)
+    await setSetting('privateKey', privateKey, true)
   }
 }

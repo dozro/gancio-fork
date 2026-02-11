@@ -29,7 +29,8 @@ useHead({
 const now = time.nowUnix()
 
 const selectedDate = useState<Date | null | undefined>('selectedDate', () => undefined)
-const { events, params } = useEvents()
+const { events, params, refresh } = useEvents()
+onMounted(() => refresh())
 
 // check if current month is selected
 const isCurrentMonth = computed(() => params.value.start === time.startMonth())

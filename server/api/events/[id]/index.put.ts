@@ -107,14 +107,14 @@ export default defineEventHandler(async (evt) => {
   }
   // find or create the place
 
-  const place = await findOrCreatePlace(body)
+  const place = await findOrCreatePlace({ name: body.place_name, address: body.place_address, latitude: body.latitude, longitude: body.longitude })
   if (!place) {
     throw createError({ statusCode: 400, statusMessage: 'Place not found' })
   }
 
   const recurrent = body.recurrent ? JSON.parse(body.recurrent as string) : null
 
-  const eventDetails: InferCreationAttributes<Event> = {
+  const eventDetails: CreationAttributes<Event> = {
     title: body.title?.trim(),
     // sanitize and linkify html
     description: sanitizeHTML(linkifyHtml(body.description as string || '', { target: '_blank', render: { email: ctx => ctx.content } })),

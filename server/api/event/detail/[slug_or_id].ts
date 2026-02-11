@@ -67,9 +67,17 @@ export default defineEventHandler(async (evt) => {
 
   // manage cache (https://github.com/h3js/h3/issues/1261)
   event.updatedAt.setMilliseconds(0)
-  if (handleCacheHeaders(evt, { modifiedTime: event.updatedAt, cacheControls: ['must-revalidate'] })) {
-    return
-  }
+  if (
+    handleCacheHeaders(evt, {
+      modifiedTime: event.updatedAt,
+      maxAge: 10,
+      cacheControls: [
+        'must-revalidate',
+        'stale-while-revalidate=30',
+        'stale-if-error=300'
+      ]
+    })
+  ) return
 
   if (format === 'json') {
     return mapEvent(event)

@@ -1,4 +1,7 @@
-import type { Event } from '#build/types/nitro-imports'
+let _events: Ref<EventAPI[] | undefined>
+let _pending: Ref<boolean>
+let _refresh: () => Promise<void>
+let _initialized = false
 
 export const useEvents = () => {
   const settings = useState<Settings>('settings')
@@ -9,18 +12,25 @@ export const useEvents = () => {
     query: route.query?.query
   }))
 
-  const { data: events, refresh, pending } = useAsyncData(
-    () => {
-      const reqParams = { ...params.value }
-      if (params.value.query) { // Either search by date or by query, not both
-        reqParams.start = undefined
-      }
-      return $fetch<Event[]>('/api/events', { params: reqParams })
-    },
-    { watch: [params.value] }
-  )
+  if (!_initialized) {
+    const { data, pending, refresh } = useAsyncData(
+      'events',
+      () => {
+        const reqParams = { ...params.value }
+        if (params.value.query) { // Either search by date or by query, not both
+          reqParams.start = undefined
+        }
+        return $fetch<EventAPI[]>('/api/events', { params: reqParams })
+      },
+      { watch: [params] }
+    )
+    _events = data
+    _pending = pending
+    _refresh = refresh
+    _initialized = true
+  }
 
-  const attributes = computed(() => events.value ? useAttributesFromEvents(events.value) : [])
+  const attributes = computed(() => _events.value ? useAttributesFromEvents(_events.value) : [])
 
-  return { params, events, attributes, refresh, pending }
+  return { params, events: _events, attributes, refresh: _refresh, pending: _pending }
 }
