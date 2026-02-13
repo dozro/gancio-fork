@@ -2,6 +2,7 @@ doctype xml
 rss(version='2.0' xmlns:atom="http://www.w3.org/2005/Atom")
     channel
         atom:link(href=`${link}` rel="self" type="application/rss+xml")
+        atom:link(rel="search" href=settings.baseurl + "/opensearch.xml" type="application/opensearchdescription+xml" title=settings.title)
         title #{title}
         link #{settings.baseurl}
         description #{settings.description}
@@ -28,4 +29,3 @@ rss(version='2.0' xmlns:atom="http://www.w3.org/2005/Atom")
                     | ]]>
                 pubDate= new Date(event.updatedAt).toUTCString()
                 guid #{settings.baseurl}/event/#{event.slug || event.id}
-

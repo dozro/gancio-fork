@@ -97,6 +97,7 @@ cp -ra i18n "${PKG_MAIN}/nuxt/server/i18n/"
 cp -ra ./server/emails "${PKG_MAIN}/nuxt/server/emails/"
 
 cp -ra ./server/services/rss.pug "${PKG_MAIN}/nuxt/server/rss.pug"
+cp -ra ./server/services/opensearch.pug "${PKG_MAIN}/nuxt/server/opensearch.pug"
 
 # default db
 # cp gancio.sqlite.rel "${PKG_MAIN}/gancio.sqlite"
