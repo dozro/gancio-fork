@@ -119,7 +119,7 @@ export function useAttributesFromEvents(events: EventAPI[]) {
     }
   }
   // add a bar to highlight today
-  attributes.push({ key: 'today', dates: new Date(), highlight: { color: 'green', fillMode: 'outline' } })
+  attributes.push({ key: 'today', dates: new Date(), highlight: { fillMode: 'outline' } })
 
   return attributes
 }

@@ -62,3 +62,15 @@ blockquote {
   pointer-events: none;
   user-select: none;
 }
+
+.vc-light *, .vc-dark * {
+  --vc-highlight-outline-content-color: rgb(var(--v-theme-primary)) !important;
+  --vc-highlight-outline-border: rgb(var(--v-theme-primary));
+  --vc-highlight-light-content-color: rgb(var(--v-theme-primary)) !important;
+  --vc-highlight-solid-bg: rgb(var(--v-theme-primary));
+  --vc-highlight-light-bg: rgb(var(--v-theme-primary), var(--v-activated-opacity));
+  --vc-day-content-hover-bg: rgb(var(--v-theme-primary), var(--v-activated-opacity));
+  --vc-focus-ring: 0 0 0 2px rgb(var(--v-theme-primary), 0.4);
+  --vc-nav-item-active-bg: rgb(var(--v-theme-primary));
+  --vc-nav-item-current-color: rgb(var(--v-theme-primary));
+}
