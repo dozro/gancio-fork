@@ -10,7 +10,6 @@ const settings = useState<Settings>('settings')
 const { t } = useI18n()
 const event = defineModel<EventAPI>('event', { type: Object, required: true })
 
-const type = ref('normal')
 const frequencies = [
   { value: '1w', text: t('event.each_week') },
   { value: '2w', text: t('event.each_2w') },
@@ -18,67 +17,43 @@ const frequencies = [
   { value: '1y', text: t('event.each_year') }
 ]
 
-function fromDateAndTimeToDateTime(dateObj: Date | string, timeStr: string): number {
+function fromDateAndTimeToDateTime(dateObj: Date, timeStr: string): number {
   const [hours, minutes] = timeStr.split(':').map(Number)
-  const dt = DateTime.fromJSDate(typeof dateObj === 'string' ? new Date(dateObj) : dateObj)
+  return DateTime.fromJSDate(dateObj)
     .set({ hour: hours, minute: minutes, second: 0, millisecond: 0 }).toUnixInteger()
-  return dt
 }
 
-function formatTime(date: Date | number): string {
-  let dt: DateTime
-  if (typeof date === 'number') {
-    // If it's a unix timestamp in seconds
-    dt = DateTime.fromSeconds(date)
-  } else {
-    dt = DateTime.fromJSDate(date)
-  }
-  return dt.toFormat('HH:mm')
+function formatTime(date: number): string {
+  return DateTime.fromSeconds(date).toFormat('HH:mm')
 }
 
-// selected date is the DatePicker v-model (Date or { start : Date, end: Date} on multidate)
-const selectedDate = computed({
-  get() {
-    if (type.value === 'multidate') {
-      return event.value.start_datetime ?
-          { start: DateTime.fromSeconds(event.value.start_datetime).toJSDate(),
-            end: DateTime.fromSeconds(event.value?.end_datetime).toJSDate() }
-        : null
-    } else {
-      return event.value.start_datetime ? DateTime.fromSeconds(event.value.start_datetime).toJSDate() : null
-    }
-  },
-  set(val) {
-    const sTime = startTime.value || '00:00'
-    const eTime = endTime.value || '00:00'
-    console.error(val)
-    if (type.value === 'multidate') {
-      event.value.start_datetime = fromDateAndTimeToDateTime(val.start, sTime) // DateTime.fromJSDate(val).toUnixInteger()
-      event.value.end_datetime = fromDateAndTimeToDateTime(val.end, eTime) // DateTime.fromJSDate(val).toUnixInteger()
-    } else {
-      event.value.start_datetime = fromDateAndTimeToDateTime(val as Date, sTime) // DateTime.fromJSDate(val).toUnixInteger()
-      event.value.end_datetime = fromDateAndTimeToDateTime(val as Date, eTime) // DateTime.fromJSDate(val).toUnixInteger()
-    }
-  }
-})
+const isMultiDate = (start: number, end?: number) => end && !DateTime.fromSeconds(end).hasSame(DateTime.fromSeconds(start), 'day')
+const eventIsMultidate = computed(() => isMultiDate(event.value.start_datetime, event.value.end_datetime))
 
-// Start time
-const startTime = computed({
-  get() {
-    return event.value.start_datetime ? formatTime(event.value.start_datetime) : ''
-  },
-  set(val) {
-    event.value.start_datetime = fromDateAndTimeToDateTime(selectedDate.value, val) // DateTime.fromJSDate(val).toUnixInteger()
-  }
-})
+const type = ref(eventIsMultidate.value ? 'multidate' : 'normal')
+const selectedDates = ref<Date | { start: Date, end: Date } | null>(
+  eventIsMultidate.value
+    ? {
+        start: new Date(event.value.start_datetime * 1000),
+        end: new Date((event.value.end_datetime as number) * 1000)
+      }
+    : (event.value.start_datetime ? new Date(event.value.start_datetime * 1000) : null)
+)
+const selectedStartTime = ref<string | null>(event.value.start_datetime ? formatTime(event.value.start_datetime) : null)
+const selectedEndTime = ref<string | null>(event.value.end_datetime ? formatTime(event.value.end_datetime) : null)
 
-// End time
-const endTime = computed({
-  get() {
-    return event.value.end_datetime ? formatTime(event.value.end_datetime) : ''
-  },
-  set(val) {
-    event.value.end_datetime = fromDateAndTimeToDateTime(selectedDate.value, val)
+watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, endTime]) => {
+  if (!startTime || !dates) {
+    event.value.start_datetime = 0
+    event.value.end_datetime = undefined
+  } else if (dates instanceof Date) { // Single date
+    event.value.start_datetime = fromDateAndTimeToDateTime(dates, startTime)
+    event.value.end_datetime = endTime
+      ? fromDateAndTimeToDateTime(dates, endTime)
+      : undefined
+  } else if (endTime) { // multidate
+    event.value.start_datetime = fromDateAndTimeToDateTime(dates.start, startTime)
+    event.value.end_datetime = fromDateAndTimeToDateTime(dates.end, endTime)
   }
 })
 
@@ -86,7 +61,6 @@ const endTime = computed({
 <template>
 <v-col cols="12">
   <div class="text-center">
-
     <v-btn-toggle
       v-if="!event.parentId && !event.recurrent"
       v-model="type"
@@ -113,10 +87,10 @@ const endTime = computed({
     </v-btn-toggle>
 
     <div class="mx-auto d-block mt-3">
-      <v-input v-model="selectedDate">
+      <v-input v-model="selectedDates" :rules="[$valid.required('common.when')]">
         <template #default>
           <DatePicker
-            v-model='selectedDate'
+            v-model='selectedDates'
             :rules="[$valid.required('common.when')]"
             class='mx-auto'
             :is-dark="theme.global.current.value.dark"
@@ -154,7 +128,7 @@ const endTime = computed({
 
     <v-col class="col-12 col-sm-6">
       <v-text-field
-        v-model='startTime'
+        v-model='selectedStartTime'
         :label="$t('event.from')"
         :rules="[$valid.required('event.from')]"
         prepend-icon='mdi-clock-time-four-outline'
@@ -165,8 +139,8 @@ const endTime = computed({
     <v-col class="col-12 col-sm-6">
       <!-- :disabled="!value.fromHour" -->
       <v-text-field
-        v-model='endTime'
-        :rules="[settings.allow_event_without_end_time ? true : $valid.required('event.due')]"
+        v-model='selectedEndTime'
+        :rules="[settings.allow_event_without_end_time && type !== 'multidate' ? true : $valid.required('event.due')]"
         :label="$t('event.due')"
         prepend-icon='mdi-clock-time-eight-outline' type='time' />
     </v-col>
