@@ -45,7 +45,10 @@ function when(event: EventAPI) {
   let time = start.toLocaleString({ weekday: 'long', ...(cy !== start.year && { year: 'numeric' }), month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', ...(addTimezone && { timeZoneName: 'short' }) })
   const end = event?.end_datetime && DateTime.fromSeconds(event?.end_datetime ?? 0, opt)
   if (end) {
-    time += event?.multidate ? ` → ${end.toLocaleString({ weekday: 'long', ...(cy !== end.year && { year: 'numeric' }), month: 'short', day: '2-digit' })}` : `-${end.toLocaleString({ hour: '2-digit', minute: '2-digit' })}`
+    const isMultiDate = !end.hasSame(start, 'day')
+    time += isMultiDate
+      ? ` → ${end.toLocaleString({ weekday: 'long', ...(cy !== end.year && { year: 'numeric' }), month: 'short', day: '2-digit' })}`
+      : `-${end.toLocaleString({ hour: '2-digit', minute: '2-digit' })}`
   }
 
   return time
