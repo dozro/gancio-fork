@@ -10,8 +10,8 @@ export async function findOrCreateTags(tags: string[]) {
   }
 
   // Normalize input tags
-  const trimmedTags = tags.map(t => t.trim()).filter(Boolean)
-  const lowercasedTags = trimmedTags.map(t => t.toLowerCase())
+  const normalizedTags = tags.map(normalizeTag).filter(Boolean)
+  const lowercasedTags = normalizedTags.map(t => t.toLowerCase())
 
   // Fetch all tags, then match manually
   const existingTags = await Tag.findAll()
@@ -21,7 +21,7 @@ export async function findOrCreateTags(tags: string[]) {
   )
 
   const seen = new Set()
-  const newTagsData = trimmedTags.reduce((acc, t) => {
+  const newTagsData = normalizedTags.reduce((acc, t) => {
     const lower = t.toLowerCase()
     if (!existingTagMap.has(lower) && !seen.has(lower)) {
       seen.add(lower)
@@ -59,4 +59,8 @@ export async function getTagEvents(tag: string | undefined) {
     throw createError({ status: 404, message: 'Tag not specified' })
   }
   return getEvents({ tags: [tag] })
+}
+
+export function normalizeTag(tag: string) {
+  return tag.trim().replace(/#/g, '')
 }

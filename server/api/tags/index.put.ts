@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { useLogger } from '~~/server/lib/logger'
 import { Tag } from '~~/server/services'
+import { normalizeTag } from '~~/server/services/tags'
 const schema = z.object({
   tag: z.string(),
   newTag: z.string()
@@ -16,7 +17,7 @@ const schema = z.object({
 export default defineEventHandler(async (evt) => {
   await requireAdminSession(evt)
   const log = useLogger('tag update')
-  const { tag, newTag } = await readValidatedBody(evt, schema.parse)
+  const { tag, newTag: newTagStr } = await readValidatedBody(evt, schema.parse)
 
   const oldtag = await Tag.findByPk(tag)
   if (!oldtag) {
@@ -24,13 +25,15 @@ export default defineEventHandler(async (evt) => {
     throw createError({ status: 404, message: 'This tag does not exists' })
   }
 
-  const newtag = await Tag.findByPk(newTag)
+  const newTagNormalized = normalizeTag(newTagStr)
+
+  const newtag = await Tag.findByPk(newTagNormalized)
   // if the new tag does not exists, just rename the old one
   if (!newtag) {
-    log.info(`Rename tag "${oldtag.tag}" to "${newTag}"`)
-    await Tag.update({ tag: newTag }, { where: { tag } })
+    log.info(`Rename tag "${oldtag.tag}" to "${newTagNormalized}"`)
+    await Tag.update({ tag: newTagNormalized }, { where: { tag } })
   } else {
-    log.info(`Merge tag "${oldtag.tag}" to "${newTag}"`)
+    log.info(`Merge tag "${oldtag.tag}" to "${newTagNormalized}"`)
     // in case it exists:
     // - search for events with old tag
     const events = await oldtag.getEvents()
