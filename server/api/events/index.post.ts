@@ -38,7 +38,6 @@ import { notifyEvent } from '~~/server/services/notifier'
 export default defineEventHandler(async (evt) => {
   const log = useLogger('New event')
   const user = await getUser(evt)
-  log.info(user, publicSettings.allow_anon_event)
   const isAnonymous = !user
   if (isAnonymous && !publicSettings.allow_anon_event) {
     log.warn('Anonymous event creation not allowed')
@@ -97,27 +96,38 @@ export default defineEventHandler(async (evt) => {
     throw createError({ statusCode: 400, statusMessage: 'Anonymous user cannot create past events' })
   }
 
-  // find or create the place
-  const place = await findOrCreatePlace(body)
-  if (!place) {
-    throw createError({ statusCode: 400, statusMessage: 'Place not found' })
+  const placeData = {
+    ...(body.place_id && { id: body.place_id }),
+    name: body.place_name,
+    latitude: body.latitude,
+    address: body.place_address,
+    longitude: body.longitude
   }
+
+  if (!placeData.id && !(placeData.name && placeData.address)) {
+    throw createError({ statusCode: 400, statusMessage: 'place_id or place_name and place_address are required' })
+  }
+  // find or create the place
+  const place = await findOrCreatePlace(placeData).catch(e => {
+    throw createError({ statusCode: 400, statusMessage: e })
+  })
 
   const recurrent = body.recurrent ? JSON.parse(body.recurrent as string) : undefined
 
   const eventDetails: CreationAttributes<Event> = {
-    title: body.title?.trim(),
+    title: body.title.trim(),
     // sanitize and linkify html
     description: sanitizeHTML(linkifyHtml(body.description as string || '', { target: '_blank', render: { email: ctx => ctx.content } })),
     // multidate: body.multidate,
     start_datetime,
     end_datetime: body.end_datetime && Number(body.end_datetime),
-    online_locations: body.online_locations,
-    recurrent,
+    ...(body.online_locations && { online_locations: body.online_locations }),
+    ...(recurrent && { recurrent }),
     // publish this event only if authenticated
     is_visible: !isAnonymous,
-    placeId: place.id,
+    placeId: place?.id,
     media: [],
+    status: 'EventScheduled',
     ...(user && { userId: user?.id })
   }
 
@@ -158,5 +168,5 @@ export default defineEventHandler(async (evt) => {
     notifyEvent('Create', event.id)
   }
 
-  return mapEvent(event, place, tags)
+  return mapEvent(event, place, tags, user)
 })

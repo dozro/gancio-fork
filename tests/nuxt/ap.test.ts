@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { $fetch, fetch } from '@nuxt/test-utils/e2e'
-import { setup } from '../setup'
+import { setup } from './setup'
 
 // const { _signAndSend } = await import('../../server/federation/sign_and_send')
 
-await setup()
+await setup(false)
 
 describe('AP', () => {
   it('should redirect to / on html as accepted content type', async () => {

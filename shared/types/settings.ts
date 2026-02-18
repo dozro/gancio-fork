@@ -62,5 +62,5 @@ export type Settings = {
 export type ThemeColorPalette = { [key: string]: string }
 
 export type SecretSettings = {
-  privateKey?: string
+  privateKey: string
 }

@@ -6,10 +6,9 @@ const headers = [
   { value: 'logo', title: 'Logo', width: 60, sortable: false },
   { value: 'name', title: 'Name' },
   { value: 'info', title: 'Info' },
-  { value: 'url', title: 'URL' },
   { value: 'following', title: 'Following' },
   { value: 'follower', title: 'Follower' },
-  { value: 'actions', title: 'Actions', align: 'right', sortable: false }
+  { value: 'actions', title: 'Actions', align: 'end', sortable: false }
 ]
 
 const { data: stats } = useFetch('/api/ap_actors/stats')
@@ -52,9 +51,7 @@ async function createTrustedInstance () {
     source_url.value = source_url.value.replace(/\/$/, '')
     await $fetch('/api/ap_actors/add_trust', { method: 'POST', body: { url: source_url.value } })
     refresh()
-    // this.$refs.form.reset()
     dialogAddTrustedSource.value = false
-    // this.$root.$emit('update_trusted_sources')
   } catch (e) {
     $notify(String(e), Statuses.ERROR)
   }
@@ -68,9 +65,8 @@ async function deleteTrustedSource (trusted_source) {
   }
   try {
     await $fetch('/api/ap_actors/trust', { method: 'DELETE', body: { ap_id: trusted_source.ap_id } })
-    refresh()
-    // this.$root.$emit('update_trusted_sources')
     $notify('admin.trusted_source_removed', Statuses.SUCCESS)
+    refresh()
   } catch (e) {
     $notify(e, Statuses.ERROR)
   }
@@ -191,19 +187,17 @@ async function deleteTrustedSource (trusted_source) {
       :items="trusted_sources"
     >
       <template v-slot:item.logo="{ item }">
-        <v-img height="20" width="20" :src="item?.object?.icon?.url"/>
+        <v-img height="20" width="20" :src="item?.icon"/>
       </template>
       <template v-slot:item.name="{ item }">
-        <span>{{ item.object.name }}</span><br>
+        <a :href="item.url">{{ item.name }}</a><br>
         <span>
-          @{{ item?.object?.preferredUsername ?? item?.instance?.data?.metadata?.nodeName }}@{{ item?.instance?.domain }}
+          @{{ item?.preferredUsername }}@{{ item?.domain }}<br>
+          <v-chip color="primary" density="compact" class='mb-1' variant="flat">{{ item?.software?.name }} {{ item?.software?.version }}</v-chip>
         </span>
       </template>
       <template v-slot:item.info="{ item }">
-        <span>{{ item?.object?.summary ?? item?.instance?.data?.metadata?.nodeDescription }}</span>
-      </template>
-      <template v-slot:item.url="{ item }">
-        <a :href="item.object.url">{{ item.object.url }}</a>
+        <small v-html="item.summary" />
       </template>
       <template v-slot:item.following="{ item }">
         <v-switch

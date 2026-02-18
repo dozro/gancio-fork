@@ -6,7 +6,7 @@ const config = useRuntimeConfig()
 const { t } = useI18n()
 const showFollowMe = ref<boolean>(false)
 
-const { data: trusted_sources } = await useFetch<APUser[]>('/api/ap_actors/trusted', { lazy: true })
+const { data: trusted_sources } = await useFetch('/api/ap_actors/trusted', { lazy: true })
 const footerLinks = computed(() => settings.value.footerLinks?.map((link) => {
   if (/^https?:\/\//.test(link.href)) {
     return { href: link.href, label: link.label.startsWith('common.') ? t(link.label) : link.label }
@@ -42,11 +42,11 @@ const footerLinks = computed(() => settings.value.footerLinks?.map((link) => {
         :key="instance.ap_id"
         lines="two"
         target="_blank"
-        :href="instance?.object.url ?? instance?.ap_id"
-        :prepend-avatar="instance.object?.icon.url"
+        :href="instance.url ?? instance.ap_id"
+        :prepend-avatar="instance.icon"
       >
-        <v-list-item-title>{{ instance?.object?.name ?? instance?.object?.preferredUsername }}</v-list-item-title>
-        <v-list-item-subtitle>{{ instance?.object?.summary }}</v-list-item-subtitle>
+        <v-list-item-title>{{ instance.name ?? instance.preferredUsername }}</v-list-item-title>
+        <v-list-item-subtitle v-html="instance?.summary" />
       </v-list-item>
     </v-list>
   </v-menu>

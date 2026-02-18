@@ -1,6 +1,6 @@
 import { z } from 'zod'
 // import { APUser } from "~/server/utils/sequelize"
-import { followActor, getInstance, getActor } from '~~/server/federation/helpers.js'
+import { followActor, getInstance, getActor } from '~~/server/federation/helpers'
 import { get as getConfig } from '../../services/config'
 import { isHiddenService } from '../../helpers'
 import { useLogger } from '~~/server/lib/logger'
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const config = getConfig()
 
   // authenticate
-  // await requireAdminSession(event)
+  await requireAdminSession(event)
 
   const log = useLogger('add trust')
   const body = await readValidatedBody(event, schema.parse)
@@ -24,10 +24,10 @@ export default defineEventHandler(async (event) => {
     * in case we have a full url could be an actor
     * or a nodeinfo url to search for
     */
-  let url = body.url
+  let url = body.url.trim()
   let instance: Instance | undefined
 
-  // @actor@instance.tld syntax, let's use webfinger
+  // @actor@instance.tld | actor@instance.tld syntax, let's use webfinger
   if (!url.startsWith('http') && url.includes('@')) {
     const [user, instance_url] = url.replace(/^@/, '').split('@')
     log.debug('[FEDI] Adds user: %s and instance: %s because url was: %s', user, instance_url, url)
@@ -48,16 +48,20 @@ export default defineEventHandler(async (event) => {
         throw createError({ status: 404, message: 'This ap instance does not exists' })
       }
 
-      const webfinger = await $fetch(`${protocol}${instance_url}/.well-known/webfinger?resource=acct:${user}@${instance_url}`)
-      if (webfinger?.links) {
+      const webfinger = await $fetch<{ links: { rel: string; href: string }[] }>(`${protocol}${instance_url}/.well-known/webfinger?resource=acct:${user}@${instance_url}`)
+      if (webfinger && Array.isArray(webfinger?.links)) {
         const actor_url = webfinger.links.find(l => l.rel === 'self')
         if (!actor_url) {
-          log.warn('[FEDI] Cannot found `self` links in webfinger of %s', url)
+          log.warn('Cannot found `self` links in webfinger of %s', url)
           throw createError({ status: 404, message: 'No self links in webfinger' })
         }
 
         log.info(`[FEDI] Adding trusted instance ${instance_url} and actor ${actor_url.href}...`)
         const actor = await getActor(actor_url.href, instance, true)
+        if (!actor) {
+          log.warn('Cannot found actor %s', actor_url.href)
+          throw createError({ status: 404, message: 'No actor found' })
+        }
         log.debug('[FEDI] Actor %s', actor.ap_id)
         await actor.update({ trusted: true })
         return actor
@@ -100,8 +104,10 @@ export default defineEventHandler(async (event) => {
     if (!actor && instance?.applicationActor) {
       log.debug('[FEDI] This node supports FEP-2677 and applicationActor is: %s', instance.applicationActor)
       actor = await getActor(instance.applicationActor, instance, true)
-      console.error('dopo il get actor!')
-      console.error(actor)
+      if (!actor) {
+        log.debug('[FEDI] applicationActor %s is probably not an actor', instance.applicationActor)
+        throw createError({ status: 404, message: 'Actor not found' })
+      }
       log.debug('[FEDI] Actor %s', actor.ap_id)
       await actor.update({ trusted: true })
       return actor

@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
+import { fetch } from '@nuxt/test-utils/e2e'
 
-import { fetchWithAuth } from './setup.js'
+import { fetchWithAuth, setup } from './setup'
+await setup()
 
-const base_url = 'http://localhost:13120'
-await setup({ host: base_url })
 // let places = []
 
 let collections = []

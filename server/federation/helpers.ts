@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import httpSignature from '@peertube/http-signature'
 import { DateTime } from 'luxon'
+import { ofetch } from 'ofetch'
 
 import { parseAPLocation } from './places'
 import { getImageFromURL, sanitizeHTML } from '../helpers'
@@ -11,31 +12,15 @@ import { useTaskManager } from '../services/taskManager'
 import { publicSettings, secretSettings } from '../services'
 import { Instance, Event, APUser } from '../services/db'
 import { eventToAP } from '../services/events'
-
+import type { H3Event } from 'h3'
+import { z } from 'zod'
+import { APActivityTypeSchema, type APActor, type APEvent } from './types'
+import { handleCreateEvent } from './events'
+import { APHandlers, handleActivity } from './handlers'
 const log = useLogger('federation')
 
 // ignore unimplemented ping url from fediverse
-export function spamFilter(req, res, next) {
-  const urlToIgnore = [
-    '/api/v1/instance',
-    '/api/meta',
-    '/api/statusnet/version.json',
-    '/api/gnusocial/version.json',
-    '/api/statusnet/config.json',
-    '/status.php',
-    '/siteinfo.json',
-    '/friendika/json',
-    '/friendica/json',
-    '/poco'
-  ]
-  if (urlToIgnore.includes(req.path)) {
-    log.debug(`[FEDI] Ignore noisy fediverse ${req.path}`)
-    return res.status(404).send('Not Found')
-  }
-  next()
-}
-
-export async function signAndSend(message, inbox, method = 'post') {
+export async function signAndSend(message: string, inbox: string, method = 'post') {
   useTaskManager().add({
     name: 'SIGN_AND_SEND',
     method: _signAndSend,
@@ -134,18 +119,18 @@ export async function updateActor() {
 export async function getFollowersInbox() {
   const followers = await APUser.findAll({ where: { follower: true } })
 
-  const recipients = {}
+  const recipients: Record<string, string[]> = {}
   for (const follower of followers) {
-    const sharedInbox = follower?.object?.endpoints?.sharedInbox ?? follower?.object?.inbox
-    if (!sharedInbox) continue
-    if (!recipients[sharedInbox]) recipients[sharedInbox] = []
-    recipients[sharedInbox].push(follower.ap_id)
+    const inbox = follower?.object?.endpoints?.sharedInbox ?? follower?.object?.inbox
+    if (!inbox) continue
+    if (!recipients[inbox]) recipients[inbox] = []
+    recipients[inbox].push(follower.ap_id)
   }
 
   return recipients
 }
 
-const APContext = [
+export const APContext = [
   'https://www.w3.org/ns/activitystreams',
   'https://w3id.org/security/v1',
   {
@@ -182,30 +167,6 @@ export async function announceEvent(event) {
       'cc': [...recipients[sharedInbox], `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}/followers`],
       'object': eventToAP(event) // event?.ap_id ?? event.id // Must point to the original object's ID
     }
-    signAndSend(JSON.stringify(body), sharedInbox)
-  }
-}
-
-export async function sendEvent(event, type = 'Create') {
-  if (!publicSettings.enable_federation) {
-    log.info('[FEDI] Event not sent, federation is disabled')
-    return
-  }
-
-  const recipients = await getFollowersInbox()
-
-  for (const sharedInbox in recipients) {
-    log.debug(`Notify ${sharedInbox} with event ${event.title} cc => ${recipients[sharedInbox].length}`)
-    const body = {
-      '@context': APContext,
-      'id': `${publicSettings.baseurl}/federation/m/${event.id}#${type}-${event.updatedAt.getTime()}`,
-      type,
-      'to': ['https://www.w3.org/ns/activitystreams#Public'],
-      'cc': [...recipients[sharedInbox], `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}/followers`],
-      'actor': `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
-      'object': eventToAP(event)
-    }
-
     signAndSend(JSON.stringify(body), sharedInbox)
   }
 }
@@ -266,77 +227,7 @@ export async function parseAPMessage(APMessage, actor) {
   }
 }
 
-/**
-   *  Event object.type
-   */
-export async function parseAPEvent(APEvent, actor) {
-  if (APEvent?.type !== 'Event') {
-    log.warn(`[FEDI] parseAPEvent with another object type ${APEvent.type}`)
-    throw createError({ status: 400, message: `Wrong object type: ${APEvent.type}` })
-  }
-
-  // validate incoming events
-  const required_fields = ['name', 'startTime', 'id', 'type']
-  const missing_field = required_fields.find(required_field => !APEvent[required_field])
-  if (missing_field) {
-    log.warn(`[FEDI] ${missing_field} required`)
-    throw createError({ status: 400, message: `${missing_field} required` })
-  }
-
-  // check if this event is in the past
-  if (DateTime.fromISO(APEvent.startTime) < DateTime.now()) {
-    log.warn(`[FEDI] Event startTime is in the past: ${APEvent.startTime}`)
-    throw createError({ status: 400, message: 'Event startTime is in the past' })
-  }
-
-  // check if this event is already added
-  const ap_id = APEvent.id
-  const exists = await Event.findOne({ where: { ap_id } })
-  if (exists) {
-    log.warn(`[FEDI] Avoid creating a duplicated event ${ap_id} - ${publicSettings.baseurl}/event/${exists.slug}`)
-    return exists
-  }
-
-  const [place, online_locations] = await parseAPLocation(APEvent)
-
-  let media = []
-  const image_url = APEvent?.attachment?.find(a => a?.mediaType.includes('image') && a.url)?.url
-  if (image_url) {
-    log.debug('[FEDI] Download attachment for event %s', image_url)
-    const image = await getImageFromURL(image_url, APEvent.attachment[0]?.name || APEvent.name.trim() || '', APEvent.attachment[0]?.focalPoint)
-    media = [image]
-  }
-
-  // create it
-  const event = await Event.create({
-    title: APEvent?.name?.trim() ?? '',
-    start_datetime: DateTime.fromISO(APEvent.startTime).toUnixInteger(),
-    end_datetime: APEvent?.endTime ? DateTime.fromISO(APEvent.endTime).toUnixInteger() : null,
-    status: APEvent?.eventStatus ?? 'EventScheduled',
-    description: sanitizeHTML(APEvent?.content ?? APEvent?.summary ?? ''),
-    online_locations,
-    media,
-    is_visible: true,
-    ap_id,
-    ap_object: APEvent,
-    apUserApId: actor?.ap_id ?? actor
-  })
-
-  if (place) {
-    await event.setPlace(place)
-  }
-
-  // create/assign tags
-  if (APEvent.tag) {
-    log.warn('TODO: APEvent with tags!')
-    const tags = await findOrCreateTags(APEvent.tag.map(t => t?.name?.replace('#', '')))
-    await event.setTags(tags)
-  }
-  log.debug(`[FEDI] Event created: ${publicSettings.baseurl}/event/${event.slug}`)
-  return event
-}
-
-export async function followActor(actor) {
+export async function followActor(actor: APUser) {
   log.debug(`[FEDI] Following actor ${actor.ap_id}`)
   const body = {
     '@context': 'https://www.w3.org/ns/activitystreams',
@@ -351,19 +242,31 @@ export async function followActor(actor) {
 
   log.info('After actor update following, get the outbox')
   // let's try to get remote outbox
-  const events = await getOutbox(actor, 10)
-  if (!events?.length) {
-    log.debug('[FEDI] No outbox events for %s', actor.ap_id)
+  const activities = await getOutbox(actor)
+  if (!activities?.length) {
+    log.debug('[FEDI] No outbox activities for %s', actor.ap_id)
     return
   }
 
-  log.info('Found some events in outbox', events.length)
-  for (const event of events) {
-    await parseAPMessage(event, actor).catch(e => log.warn(e))
+  log.info('Found some activities in outbox', activities.length)
+
+  for (const activity of activities) {
+    log.debug('Handle outbox activity %s from %s', activity.type, actor.ap_id)
+    log.debug('Activity content: %s', JSON.stringify(activity, null, 2))
+    const { success } = APActivityTypeSchema.safeParse(activity.type)
+    if (!success) {
+      log.warn('unknown activity `type` property: %s', activity.type)
+      continue
+    }
+
+    await handleActivity(activity, actor).catch((err) => {
+      log.error('Error handling activity %s from %s', activity.type, actor.ap_id)
+      log.error(err)
+    })
   }
 }
 
-export async function getOutbox(actor) {
+export async function getOutbox(actor: APUser) {
   log.debug('[FEDI] Get %s outbox: %s', actor?.ap_id, actor?.object?.outbox)
 
   if (!actor?.object?.outbox) return
@@ -384,7 +287,7 @@ export async function getOutbox(actor) {
   }
 }
 
-export async function unfollowActor(actor) {
+export async function unfollowActor(actor: APUser) {
   log.debug(`[FEDI] Unfollowing actor ${actor.ap_id}`)
 
   const object = {
@@ -405,10 +308,10 @@ export async function unfollowActor(actor) {
 }
 
 // get Actor from URL using GET HTTP Signature
-export async function getActor(URL, instance, force = false, fail_on_not_cached = false) {
+export async function getActor(URL: string, instance: Instance, force = false, fail_on_not_cached = false) {
   log.debug(`[FEDI] getActor for ${URL}`)
 
-  let fedi_user
+  let fedi_user: APUser | null
 
   // try with cache first
   if (!force) {
@@ -416,32 +319,38 @@ export async function getActor(URL, instance, force = false, fail_on_not_cached 
     if (fedi_user) {
       return fedi_user
     } else if (fail_on_not_cached) {
-      return false
+      return
     }
   }
 
   try {
-    fedi_user = await _signAndSend('', URL, 'get', secretSettings.privateKey)
-    if (!fedi_user?.id) {
+    const ret: APActor = await _signAndSend('', URL, 'get', secretSettings.privateKey)
+    if (!ret?.id) {
       log.debug('[FEDI] getActor failed for %s', URL)
-      return false
+      return
     }
-    if (fedi_user) {
-      log.info('[FEDI] Create/Update a new AP User "%s" and associate it to instance "%s"', fedi_user?.id, instance.domain)
+    if (ret) {
+      log.info('[FEDI] Create/Update a new AP User "%s" and associate it to instance "%s"', ret.id, instance.domain)
       try {
-        ([fedi_user] = await APUser.upsert({ ap_id: fedi_user?.id, object: fedi_user, instanceDomain: instance.domain, blocked: false }))
+        ([fedi_user] = await APUser.upsert({
+          ap_id: ret.id,
+          object: { ...ret, summary: sanitizeHTML(ret?.summary ?? '') },
+          instanceDomain: instance.domain,
+          blocked: false
+        }))
+        return fedi_user
       } catch (e) {
         log.debug('[FEDI] Error in update/create ', e)
       }
     }
   } catch (e) {
     log.debug('[FEDI] nope ', e)
+    return
   }
-  return fedi_user
 }
 
-export async function getNodeInfo(instance_url) {
-  let nodeInfo = await $fetch(`${instance_url}/.well-known/nodeinfo`, { headers: { Accept: 'application/json' } })
+export async function getNodeInfo(instance_url: string) {
+  let nodeInfo = await ofetch(`${instance_url}/.well-known/nodeinfo`, { headers: { Accept: 'application/json' } })
     .catch(() => {
       log.debug('[FEDI] Node %s does not support nodeInfo', instance_url)
     })
@@ -451,25 +360,24 @@ export async function getNodeInfo(instance_url) {
     const supportedVersion = nodeInfo.links.find(l => l.rel === 'http://nodeinfo.diaspora.software/ns/schema/2.1' || 'http://nodeinfo.diaspora.software/ns/schema/2.0')
     if (!supportedVersion) {
       log.info('No nodeinfo version supported!')
-      return false
+      return
     }
     const applicationActor = nodeInfo.links.find(l => l.rel === 'https://www.w3.org/ns/activitystreams#Application')
     log.debug('application actor url: ', applicationActor)
-    nodeInfo = await $fetch(supportedVersion.href)
+    nodeInfo = await ofetch(supportedVersion?.href)
     log.debug('[FEDI] getNodeInfo "%s", applicationActor: %s, nodeInfo: %s', instance_url, applicationActor?.href, nodeInfo)
 
     if (nodeInfo) {
       return { applicationActor: applicationActor?.href, nodeInfo }
     }
   }
-  throw new Error(nodeInfo)
 }
 
-export async function getInstance(actor_url, force = false, fail_on_not_cached = false) {
+export async function getInstance(actor_url: string, force = false, fail_on_not_cached = false) {
   log.debug(`[FEDI] getInstance for ${actor_url}`)
-  actor_url = new URL(actor_url)
-  const domain = actor_url.host
-  const instance_url = `${actor_url.protocol}//${actor_url.host}`
+  const url = new URL(actor_url)
+  const domain = url.host
+  const instance_url = `${url.protocol}//${url.host}`
   let instance
   if (!force) {
     instance = await Instance.findByPk(domain)
@@ -504,11 +412,11 @@ export async function getInstance(actor_url, force = false, fail_on_not_cached =
    * https://www.w3.org/wiki/SocialCG/ActivityPub/Authentication_Authorization#Signing_requests_using_HTTP_Signatures
    * Each POST to /inbox coming from fediverse has to be verified.
    * Signature checking needs Actor's public key
-   * @return true in case of successfull validation
+   * @return APUser in case of successfull validation
    * @throws {H3Error} throw in case of validation failure
    */
-export async function verifySignature(event) {
-  const name = event.context.params.name
+export async function verifySignature(event: H3Event) {
+  const name = event.context?.params?.name
   const body = await readBody(event)
   const actor_url = body?.actor
   const isDelete = body?.type === 'Delete'
@@ -537,7 +445,7 @@ export async function verifySignature(event) {
   if (!instance) {
     log.warn(`[FEDI] Verify Signature: Instance not found ${actor_url}`)
     if (isDelete) {
-      return true
+      return false
     }
     throw createError({ status: 401, message: 'Instance not found' })
   }
@@ -553,7 +461,7 @@ export async function verifySignature(event) {
   if (!ap_actor) {
     log.info(`[FEDI] Actor ${actor_url} not found`)
     if (isDelete) {
-      return true
+      return false
     }
     throw createError({ status: 401, message: 'Actor not found' })
   }
@@ -568,10 +476,7 @@ export async function verifySignature(event) {
     throw createError({ status: 401, message: 'No public key' })
   }
 
-  event.context.fedi_user = ap_actor
-
   // check Digest
-  // cannot do this with json bodyparser (4.a: Enhance HTTP Signature verification for generic AP messages)
   const rawBody = await readRawBody(event)
   const digest = crypto.createHash('sha256')
     .update(rawBody)
@@ -582,10 +487,10 @@ export async function verifySignature(event) {
     throw createError({ status: 401, message: 'Signature mismatch' })
   }
 
-  const parsed = httpSignature.parseRequest(event.req)
+  const parsed = httpSignature.parseRequest(event.node.req)
   if (httpSignature.verifySignature(parsed, ap_actor.object.publicKey.publicKeyPem)) {
     log.debug(`[FEDI] Valid signature from ${actor_url} `)
-    return true
+    return ap_actor
   }
 
   // signature not valid, try without cache
@@ -602,7 +507,7 @@ export async function verifySignature(event) {
 
   if (httpSignature.verifySignature(parsed, ap_actor.object.publicKey.publicKeyPem)) {
     log.debug(`[FEDI] Valid signature from ${actor_url} `)
-    return true
+    return ap_actor
   }
 
   // still not valid

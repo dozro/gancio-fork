@@ -23,7 +23,7 @@ Gancio largely follows ActivityPub's server-to-server specification.
 - [FEP-67ff: FEDERATION.md](https://codeberg.org/fediverse/fep/src/branch/main/fep/67ff/fep-67ff.md)
 - [FEP-fb2a: Actor metadata](https://codeberg.org/fediverse/fep/src/branch/main/fep/fb2a/fep-fb2a.md)
 - [FEP-2677: Identifying the Application Actor](https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md)
-- WIP: [FEP-8a8e: A common approach to using the Event object type](https://codeberg.org/fediverse/fep/src/commit/e2f4ffa020b01b654ba93ea128de3bc64e6abbf7/fep/8a8e/fep-8a8e.md)
+- [FEP-8a8e: A common approach to using the Event object type](https://fediverse.codeberg.page/fep/fep/8a8e)
 
 ## ActivityPub
 
@@ -59,3 +59,19 @@ All federation's related operations uses `/federation` as endpoint. You can disa
 - Hide or remove a remote event 
 - Block a remote user
 - Block a remote instance
+
+### Notes on [FEP-8a8e implementation](https://fediverse.codeberg.page/fep/fep/8a8e)
+
+The minimum `REQUIRED` properties for an Event are `name`, `startTime` and `endTime`
+
+```json
+{
+  name: "Event name", 
+  startTime: "2024-01-01T00:00:00Z", 
+  endTime: "2024-01-01T01:00:00Z"
+}
+```
+`startTime` and `endTime` are required to be in ISO 8601 format and must include a timezone designator (e.g., "Z" for UTC or an offset like "+01:00").
+
+> info "Note"  
+> To maximize interoperability across federated systems, **Gancio is forgiving in what it consumes but exacting in what it produces**, for example when an event without `endTime` is received, Gancio will accept generate an `endTime` by adding a default duration (3 hour) to the `startTime`.

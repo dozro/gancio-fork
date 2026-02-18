@@ -8,10 +8,13 @@ import { z } from 'zod'
 import type { EventAPI } from '~~/shared/types/generic'
 import type { H3Event } from 'h3'
 import { createHash } from 'crypto'
-import type { UserRole } from './db'
 import { Place, Tag, Event, Message } from './db'
 import { publicSettings } from './settings'
 import type { UserSession } from '../utils/session'
+import type { APAttachment, APEvent, APLocation, APTag } from '../federation/types'
+import { PlaceToAP } from '../federation/places'
+import { useLogger } from '../lib/logger'
+const log = useLogger('services:events')
 
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
@@ -176,7 +179,7 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
     online_locations: event.online_locations,
     tags: (event.tags ?? tags)?.map(t => t.tag),
     is_mine: event.userId ? event.userId === user?.id : false,
-    is_anon: event.userId === null || !event?.user?.is_active,
+    is_anon: event.userId === null,
     is_visible: event.is_visible,
     original_url: event?.ap_object?.url ?? event?.ap_id
 
@@ -201,7 +204,7 @@ export function mapEvents(events: Event[]): EventAPI[] {
 /**
  * Calculate an ETag from a list of generic items using `id` and `updatedAt` fields to build the hash
 */
-export function calculateEtag(items: readonly { id: number, updatedAt: Date }[]): string {
+export function calculateEtag(items: readonly { id: number | string, updatedAt: Date }[]): string {
   const base = items
     .map(e => `${e.id}:${e.updatedAt.toISOString()}`)
     .join('|')
@@ -250,8 +253,8 @@ export function eventToAP(event: Event) {
   // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-summary
   const summary = `<p>${event.place && event.place.name}, ${datetime}</p>${event.description}`
 
-  let attachment: object[] = []
-  let location: object[] = []
+  let attachment: APAttachment[] = []
+  let location: APLocation[] = []
 
   if (event.online_locations?.length) {
     location = event.online_locations.map(url => ({
@@ -267,21 +270,16 @@ export function eventToAP(event: Event) {
   }
 
   if (event.place?.name !== 'online') {
-    location.push(event.place?.toAP())
+    location.push(PlaceToAP(event.place))
   }
-
-  // in case we only have a single location (the common case) do not use an array to simplify federation parser
-  // if (location?.length === 1) {
-  //   location = location[0]
-  // }
 
   if (event?.media?.length) {
     attachment.push({
       type: 'Document',
       mediaType: 'image/jpeg',
-      url: `${publicSettings.baseurl}/media/${event.media[0].url}`,
-      name: event.media[0].name || event.title || '',
-      focalPoint: event.media[0].focalpoint || [0, 0]
+      url: `${publicSettings.baseurl}/media/${event.media[0]?.url}`,
+      name: event.media[0]?.name || event.title || '',
+      focalPoint: event.media[0]?.focalpoint || [0, 0]
     })
   }
 
@@ -292,31 +290,31 @@ export function eventToAP(event: Event) {
     tags = [...new Set([...tags, ...publicSettings.default_fedi_hashtags])]
   }
 
-  const tag = tags?.map(tag => ({
+  const tag: APTag[] = tags?.map(tag => ({
     type: 'Hashtag',
-    name: '#' + tag,
+    name: tag,
     href: `${publicSettings.baseurl}/tag/${encodeURIComponent(tag)}`
   })) ?? []
 
-  return {
+  const e: APEvent = {
     id: event.ap_id ?? `${publicSettings.baseurl}/federation/m/${event.id}`,
     name: event.title,
     url: event?.ap_object?.url ?? event?.ap_object?.id ?? `${publicSettings.baseurl}/event/${event.slug || event.id}`,
     type: 'Event',
     eventStatus: event.status,
-    startTime: DateTime.fromSeconds(event.start_datetime, opt).toISO(),
+    startTime: DateTime.fromSeconds(event.start_datetime, opt).toISO() ?? '',
     ...(event.end_datetime ? { endTime: DateTime.fromSeconds(event.end_datetime, opt).toISO() } : {}),
-    location: location.length === 1 ? location[0] : location,
+    location,
     attachment,
     tag,
     published: event.updatedAt,
     updated: event.updatedAt,
     attributedTo: event.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
     to: ['https://www.w3.org/ns/activitystreams#Public'],
-    cc: event.ap_object?.cc ?? [`${publicSettings.baseurl}/federation/u/${username}/followers`],
     content: event.description || '',
     summary
   }
+  return e
 }
 
 export function canModifyEvent(event: Event, user?: UserSession) {

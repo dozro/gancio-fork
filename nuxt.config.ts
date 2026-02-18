@@ -1,7 +1,8 @@
 import { version } from './package.json'
-import locales from './i18n/locales/index'
+import locales from './server/i18n/locales'
 
 const isBuild = process.env.NODE_ENV === 'production'
+const isTest = !!process.env.VITEST
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -27,7 +28,12 @@ export default defineNuxtConfig({
     '~/assets/css/main.css',
     '@mdi/font/css/materialdesignicons.css'
   ],
-  modules: ['@nuxt/eslint', 'nuxt-auth-utils', '@nuxtjs/i18n', '@nuxtjs/sitemap'],
+  modules: [
+    '@nuxt/eslint',
+    'nuxt-auth-utils',
+    '@nuxtjs/i18n',
+    (!isTest && '@nuxtjs/sitemap')
+  ],
   sitemap: {
     cacheMaxAgeSeconds: 3600, // 1 hour
 
@@ -45,11 +51,11 @@ export default defineNuxtConfig({
   },
   i18n: {
     defaultLocale: 'en',
-    lazy: true,
-    langDir: 'locales/', // must be set, but won’t be used for actual loading
+    lazy: !isTest,
+    langDir: !isTest ? 'locales/' : undefined, // must be set, but won’t be used for actual loading
     types: 'composition',
     pages: undefined,
-    locales: Object.keys(locales).map(key => ({
+    locales: isTest ? [] : Object.keys(locales).map(key => ({
       code: key,
       name: locales[key],
       dir: ['ar', 'fa', 'ta'].includes(key) ? 'rtl' : 'ltr',
@@ -86,11 +92,15 @@ export default defineNuxtConfig({
     transpile: ['vuetify', '@vue-leaflet/vue-leaflet']
   },
   vite: {
+    esbuild: {
+      sourcemap: false
+    },
     optimizeDeps: {
       include: ['lodash/debounce', 'luxon', 'linkifyjs', 'mitt', 'v-calendar', '@vue/devtools-core',
         '@vue/devtools-kit', '@tiptap/vue-3', '@tiptap/starter-kit', '@vueuse/core', '@vue-leaflet/vue-leaflet']
     },
     server: {
+      allowedHosts: ['localhost', '127.0.0.1', 'test.cisti.org'],
       watch: {
         usePolling: false
       }
@@ -100,9 +110,7 @@ export default defineNuxtConfig({
       'process.env.DEBUG': false
     },
     build: {
-      // rollupOptions: {
-      //   external: ['sharp']
-      // },
+      sourcemap: false,
       target: 'esnext'
     }
   },
@@ -116,11 +124,9 @@ export default defineNuxtConfig({
     externals: {
       external: ['sharp']
     },
-    // rollupConfig: {
-    //   external: ['sharp']
-    // },
     esbuild: {
       options: {
+        sourcemap: false,
         exclude: ['sharp'],
         target: 'esnext',
         tsconfigRaw: {

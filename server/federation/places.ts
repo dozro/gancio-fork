@@ -1,104 +1,92 @@
-// const { Place } = require('../api/models/models')
-// const log = require('../log')
+import type { CreationAttributes } from '@sequelize/core'
 import { useLogger } from '../lib/logger'
-import { findOrCreatePlace } from '../services/places'
+import type { APEvent, APLocation } from './types'
+import { publicSettings } from '../services'
 
-// module exports = {
-//   async get (req, res) {
-//     const { preferHTML } = require('./helpers')
-//     log.debug('[FEDI] Get location')
-//     const id = req.params.id
-//     if (!id) { return res.status(400).send('Bad request.') }
-
-//     if (preferHTML(req)) {
-//       return res.redirect(302, `/place/${id}`)
-//     }
-//     const place = await Place.findByPk(id)
-//     if (!place) {
-//       log.warn(`[FEDI] Place ${id} not found`)
-//       return res.status(404).send('Not found.')
-//     }
-
-//     const ret = place.toAP()
-//     ret['@context'] = ['https://www.w3.org/ns/activitystreams']
-//     res.type('application/activity+json; charset=utf-8')
-//     res.json(ret)
-//   },
-
-// * @returns {Array} An array containing the Place and a list of online locations
 /**
   * Parses the location of an ActivityPub Event to extract physical and online locations.
   * @link https://www.w3.org/TR/activitystreams-vocabulary/#places
-  * @link https://codeberg.org/fediverse/fep/src/commit/4a75a1bc50bc6d19fc1e6112f02c52621bc178fe/fep/8a8e/fep-8a8e.md#location
-  * @param {Object} APEvent - The ActivityPub Event object
+  * @link https://fediverse.codeberg.page/fep/fep/8a8e/#location
   */
-export async function parseAPLocation(APEvent: unknown) {
+export async function parseAPLocation(APEvent: APEvent) {
   const log = useLogger('federation:places')
-  // const eventController = require('../api/controller/event')
-  let place = null
+  let place: CreationAttributes<Place>
 
   if (!APEvent?.location) {
-    log.warn(`[FEDI] Event "${APEvent?.name}" has no location field`)
-    return [null, null]
+    log.warn(`Event "${APEvent?.name}" has no location field`)
+    throw new Error('Event has no location field')
   }
 
   const locations = Array.isArray(APEvent.location) ? APEvent.location : [APEvent.location]
 
-  // find the first physical place from locations
-  const APPlace = locations.find(location => location?.type !== 'VirtualLocation')
+  // find the first physical place from locations (we support only one physical place, if there are more we just ignore them)
+  const location = locations.find(location => location?.type !== 'VirtualLocation')
 
   // get the list of online locations
-  let onlineLocations = locations.filter(location => location.type === 'VirtualLocation' && location?.url).map(location => location.url)
+  let online_locations = locations.filter(location => location?.type === 'VirtualLocation' && location?.url).map(location => location.url)
 
   // online locations could be in attachments too
-  onlineLocations = onlineLocations.concat(APEvent?.attachment?.filter(a => a?.type === 'Link').map(a => a?.href).filter(a => a && !onlineLocations.includes(a)) ?? [])
+  online_locations = online_locations.concat(APEvent?.attachment?.filter(a => a?.type === 'Link').map(a => a?.href).filter(a => a && !online_locations.includes(a)) ?? [])
 
   // we have a physical place
-  if (APPlace) {
-    if (!APPlace?.name) {
-      log.warn(`[FEDI] Event has a location without a name: ${JSON.stringify(APPlace)}`)
-      throw createError({ status: 400, message: 'Location must have at least a name' })
+  if (location) {
+    if (!location?.name) {
+      log.warn(`Event has a location without a name: ${JSON.stringify(location)}`)
+      throw new Error('Location must have at least a name')
     }
 
-    const place_latitude = APPlace?.latitude ? Number(APPlace.latitude) : null
-    const place_longitude = APPlace?.longitude ? Number(APPlace.longitude) : null
+    const latitude = Number(location.latitude)
+    const longitude = Number(location.longitude)
     place = {
-      place_name: APPlace?.name,
-      ...(APPlace?.id && { place_ap_id: APPlace.id }),
-      ...(place_latitude !== null && place_longitude !== null && { place_latitude, place_longitude })
+      name: location?.name,
+      ...(location?.id && { ap_id: location.id }),
+      ...(!isNaN(latitude) && !isNaN(longitude) && { latitude, longitude })
     }
     // no physical but at least virtual location
-  } else if (onlineLocations.length) {
+  } else if (online_locations.length) {
     place = {
-      place_name: 'online'
+      name: 'online'
     }
     // nothing...
   } else {
-    log.warn(`[FEDI] No Physical nor Virtual location: ${JSON.stringify(APEvent.location)}`)
-    return [null, null]
+    log.warn(`No Physical nor Virtual location: ${JSON.stringify(APEvent.location)}`)
+    throw new Error('No Physical nor Virtual location')
   }
 
-  // the `address` field could be Text, PostalAddress or VirtualLocation, we do support the name as a fallback
-  const addr = APPlace?.address
-  if (addr) {
-    if (typeof addr === 'string') {
-      place.place_address = addr
-    } else if (addr?.streetAddress || addr?.addressLocality || addr?.addressCountry || addr?.addressRegion) {
-      place.place_address = [addr?.streetAddress, addr?.addressLocality, addr?.addressRegion, addr?.addressCountry].filter(part => part).join(', ')
-    } else if (addr?.url) {
-      place.place_name = 'online'
+  // the `address` field could be Text, PostalAddress we do support the name as a fallback
+  const address = location?.address
+  if (address) {
+    if (typeof address === 'string') {
+      place.address = address
+    } else if (address?.streetAddress || address?.addressLocality || address?.addressCountry || address?.addressRegion) {
+      place.address = [address?.streetAddress, address?.addressLocality, address?.addressRegion, address?.addressCountry]
+        .filter(part => part).join(', ')
     } else {
-      log.warn(`[FEDI] Event "${APEvent?.name}" has bad address location: ${JSON.stringify(APPlace?.address)}`)
+      log.warn(`Event "${APEvent?.name}" has bad address: ${JSON.stringify(address)}`)
     }
   } else {
-    place.place_address = place.place_name
+    place.address = place.name
   }
-
-  place = await findOrCreatePlace(place)
 
   if (!place) {
-    throw createError({ status: 400, message: 'Place not found nor created' })
+    throw new Error('Place not found nor created')
   }
 
-  return [place, onlineLocations]
+  return { place, online_locations }
+}
+
+
+/**
+ * @returns ActivityStream location representation
+ * @link https://www.w3.org/TR/activitystreams-vocabulary/#places
+ */
+export function PlaceToAP(place: Place) {
+  return {
+    id: place?.ap_id ?? `${publicSettings.baseurl}/federation/p/${place.id}`,
+    type: 'Place',
+    name: place.name,
+    address: place.address,
+    url: place?.ap_id ?? `${publicSettings.baseurl}/place/${place.id}/${encodeURIComponent(place.name)}`,
+    ...(place.latitude && place.longitude && ({ latitude: place.latitude, longitude: place.longitude }))
+  } as APLocation
 }

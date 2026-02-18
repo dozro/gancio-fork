@@ -47,6 +47,7 @@ import {
 } from '@sequelize/core/decorators-legacy'
 
 import { get as getConfig } from '../services/config'
+import type { APActor, APEvent, APNote } from '../federation/types'
 const config = getConfig()
 const log = useLogger('sequelize')
 
@@ -217,8 +218,7 @@ export class Event extends Model<
   declare end_datetime: CreationOptional<number>
 
   @Attribute(DataTypes.JSON)
-  @Default([])
-  declare media: Media[]
+  declare media?: CreationOptional<Media[]>
 
   @Attribute(DataTypes.TEXT)
   declare description: string
@@ -227,16 +227,16 @@ export class Event extends Model<
   declare is_visible: boolean
 
   @Attribute(DataTypes.JSON)
-  declare online_locations: string[] | null
+  declare online_locations: CreationOptional<string[]>
 
   @Attribute(DataTypes.JSON)
   declare recurrent: CreationOptional<object | null>
 
   @Attribute(DataTypes.JSON)
-  declare ap_object: CreationOptional<{ url?: string, attributedTo?: string, id: string, to: string, cc?: string }>
+  declare ap_object: CreationOptional<APEvent>
 
   @Attribute(DataTypes.JSON)
-  declare likes: CreationOptional<Array<object>>
+  declare likes: CreationOptional<Array<object | string>>
 
   @Attribute(DataTypes.JSON)
   declare boost: CreationOptional<Array<object>>
@@ -244,7 +244,7 @@ export class Event extends Model<
   /** represent the AP URI */
   @Attribute(DataTypes.STRING)
   @Index
-  declare ap_id: CreationOptional<string>
+  declare ap_id?: CreationOptional<string | null>
 
   @Attribute({
     type: DataTypes.INTEGER.UNSIGNED,
@@ -275,7 +275,7 @@ export class Event extends Model<
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE'
   })
-  declare placeId: number
+  declare placeId?: CreationOptional<number>
 
   @BelongsTo(() => Place, { foreignKey: 'placeId' })
   declare place: NonAttribute<Place>
@@ -389,7 +389,7 @@ export class Place extends Model<
   declare ap_id: CreationOptional<string>
 
   @Attribute(DataTypes.STRING)
-  declare address: string
+  declare address: CreationOptional<string>
 
   @Attribute(DataTypes.DOUBLE)
   declare latitude: CreationOptional<number>
@@ -399,23 +399,6 @@ export class Place extends Model<
 
   @HasMany(() => Event, /* foreign key */ 'placeId')
   declare events?: NonAttribute<Event[]>
-
-  /**
-   * @returns ActivityStream location representation
-   * @link https://www.w3.org/TR/activitystreams-vocabulary/#places
-   * @todo support PostalAddress type
-   * @link WIP -> https://codeberg.org/fediverse/fep/src/commit/4a75a1bc50bc6d19fc1e6112f02c52621bc178fe/fep/8a8e/fep-8a8e.md#location
-   */
-  toAP() {
-    return {
-      id: this?.ap_id ?? `${config.baseurl}/federation/p/${this.id}`,
-      type: 'Place',
-      name: this.name,
-      address: this.address,
-      url: this?.ap_id ?? `${config.baseurl}/place/${this.id}/${encodeURIComponent(this.name)}`,
-      ...(this.latitude && this.longitude && ({ latitude: this.latitude, longitude: this.longitude }))
-    }
-  }
 }
 
 export type UserRole = 'admin' | 'editor' | 'user'
@@ -433,9 +416,6 @@ export class User extends Model<
   declare readonly id: CreationOptional<number>
 
   @Attribute(DataTypes.STRING)
-  declare display_name: string
-
-  @Attribute(DataTypes.STRING)
   @NotNull
   @Index
   @Unique({
@@ -448,17 +428,17 @@ export class User extends Model<
   declare password: string
 
   @Attribute(DataTypes.STRING)
-  declare recover_code: string
+  declare recover_code: CreationOptional<string>
 
   @Attribute(DataTypes.BOOLEAN)
   declare is_active: boolean
 
   @Attribute(DataTypes.BOOLEAN)
   @Default(true)
-  declare to_notify: boolean
+  declare to_notify: CreationOptional<boolean>
 
   @Attribute(DataTypes.STRING)
-  declare description: string
+  declare description: CreationOptional<string>
 
   @Attribute(DataTypes.ENUM(['admin', 'editor', 'user']))
   declare role: UserRole
@@ -489,7 +469,6 @@ export class User extends Model<
     if (instance.changed('password')) {
       const password = instance.getDataValue('password')
       if (password) {
-        log.info('inside hashPassword', password)
         const hashedPassword = bcrypt.hashSync(password, 10)
         instance.setDataValue('password', hashedPassword)
       }
@@ -527,26 +506,6 @@ export class Instance extends Model<
   // declare events?: NonAttribute<Event[]>;
 }
 
-type APUserObject = {
-  name: string
-  icon: { url: string }
-  summary?: string
-  preferredUsername: string
-  discoverable?: boolean
-  indexable?: boolean
-  attachments?: Array<{
-    type: string
-    name: string
-    url: string
-  }>
-  url?: string
-  publicKey?: {
-    id: string
-    owner: string
-    publicKeyPem: string
-  }
-}
-
 @Table({
   tableName: 'ap_users'
 })
@@ -565,19 +524,19 @@ export class APUser extends Model<
   declare readonly updatedAt: CreationOptional<Date>
 
   @Attribute(DataTypes.BOOLEAN)
-  declare follower: boolean
+  declare follower: CreationOptional<boolean>
 
   @Attribute(DataTypes.BOOLEAN)
-  declare following: boolean
+  declare following: CreationOptional<boolean>
 
   @Attribute(DataTypes.BOOLEAN)
-  declare trusted: boolean
+  declare trusted: CreationOptional<boolean>
 
   @Attribute(DataTypes.BOOLEAN)
-  declare blocked: boolean
+  declare blocked: CreationOptional<boolean>
 
   @Attribute(DataTypes.JSON)
-  declare object: APUserObject
+  declare object: APActor
 
   @Attribute({
     type: DataTypes.STRING,
@@ -704,8 +663,7 @@ export class Filter extends Model<
 }
 
 @Table({
-  tableName: 'resources',
-  timestamps: false
+  tableName: 'resources'
 })
 export class Resource extends Model<
   InferAttributes<Resource>,
@@ -715,22 +673,28 @@ export class Resource extends Model<
   @PrimaryKey
   declare activitypub_id: string
 
+  @CreatedAt
+  declare readonly createdAt: CreationOptional<Date>
+
+  @UpdatedAt
+  declare readonly updatedAt: CreationOptional<Date>
+
   @Attribute(DataTypes.BOOLEAN)
-  declare hidden: boolean
+  declare hidden: CreationOptional<boolean>
 
   @Attribute(DataTypes.JSON)
-  declare data: any // @todo
+  declare data: APNote // @todo
 
-  // @Attribute({
-  //     type: DataTypes.STRING,
-  //     references: { table: "ap_users", key: "ap_id" },
-  //     onUpdate: "CASCADE",
-  //     onDelete: "CASCADE",
-  // })
-  // declare apUserApId: string
+  @Attribute({
+    type: DataTypes.STRING,
+    references: { table: 'ap_users', key: 'ap_id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
+  })
+  declare apUserApId: string
 
-  // @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
-  // declare apUser?: NonAttribute<APUser>
+  @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
+  declare APUser: NonAttribute<APUser>
 
   @Attribute({
     type: DataTypes.INTEGER.UNSIGNED,

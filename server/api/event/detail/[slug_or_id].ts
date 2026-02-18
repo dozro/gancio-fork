@@ -41,7 +41,10 @@ export default defineEventHandler(async (evt) => {
       {
         model: Resource,
         ...(!isAdminOrEditor && { where: { hidden: false } }),
-        include: [{ model: APUser, required: false, attributes: ['object', 'ap_id'] }],
+
+        include: [
+          { association: 'APUser', required: false, attributes: ['ap_id', 'object'] }
+        ],
         required: false,
         attributes: ['id', 'activitypub_id', 'data', 'hidden']
       },

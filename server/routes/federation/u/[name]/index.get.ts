@@ -54,6 +54,7 @@ export default defineEventHandler(async (event) => {
     'inbox': `${publicSettings.baseurl}/federation/u/${name}/inbox`,
     'outbox': `${publicSettings.baseurl}/federation/u/${name}/outbox`,
     'manuallyApprovesFollowers': false,
+    'upcomingEvents': `${publicSettings.baseurl}/federation/u/${name}/events`,
     'endpoints': { sharedInbox: `${publicSettings.baseurl}/federation/u/${name}/inbox` },
     'discoverable': true,
     'indexable': true,
