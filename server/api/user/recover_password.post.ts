@@ -6,13 +6,13 @@ export default defineEventHandler(async (event) => {
 
   const { recover_code, password } = await readBody(event)
   if (!recover_code || !password) {
-    throw createError({ status: 400 })
+    throw createError({ statusCode: 400, message: 'Wrong password or recover code' })
   }
 
   const user = await User.findOne({ where: { recover_code, is_active: true } })
   if (!user) {
     log.error('User not found')
-    throw createError({ status: 400 })
+    throw createError({ statusCode: 400, message: 'User not found' })
   }
 
   try {

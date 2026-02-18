@@ -7,7 +7,7 @@ const recover_code = route.params.code
 const new_password = ref('')
 const form = ref()
 
-async function change_password () {
+async function change_password() {
   const valid = await form.value.validate()
   if (!valid) {
     return
@@ -17,7 +17,7 @@ async function change_password () {
     $notify('common.password_updated', Statuses.SUCCESS)
     navigateTo('/login')
   } catch (e) {
-    $notify(String(e), Statuses.ERROR)
+    $notify(e, Statuses.ERROR)
   }
 }
 
@@ -38,7 +38,7 @@ const { data: user, error } = await useFetch('/api/user/check_recover_code', { m
 
             <v-card-actions>
               <v-spacer />
-              <v-btn color="primary" type='submit' :disabled='!new_password' variant="outlined" @click='change_password'> {{$t('common.send')}}</v-btn>
+              <v-btn color="primary" type='submit' :disabled='!new_password' variant="outlined"> {{$t('common.send')}}</v-btn>
             </v-card-actions>
           </template>
           <v-card-text v-else>
