@@ -1,31 +1,4 @@
-// let db
-// async function _initializeDB () {
-//   const config = require('../config')
-//   if (config.status !== 'CONFIGURED') {
-//     console.error(`> Cannot run CLI before setup (are you in the correct path?)`)
-//     process.exit(1)
-//   }
-//   config.log_level = 'error'
-//   db = require('../api/models/index')
-//   return db.initialize()
-// }
-
-// async function create (args) {
-//   await _initializeDB()
-//   const { User } = require('../api/models/models')
-//   try {
-//     const user = await User.create({
-//       email: args.email,
-//       password: args.password,
-//       is_active: true,
-//       role: args.role || 'user'
-//     })
-//     console.error(`User "${args.email}" created with role ${user.role}`)
-//   } catch(e) {
-//     console.error(String(e))
-//   }
-//   await db.close()
-// }
+import { connect, User } from '../services/db'
 
 // async function setRole (args) {
 //   await _initializeDB()
@@ -58,9 +31,6 @@
 //   await db.close()
 // }
 
-// import * as sequelize from "../utils/sequelize.ts"
-// import { getSequelize } from "../gancio.js"
-
 async function list() {
   await connect()
   const users = await User.findAll()
@@ -80,6 +50,22 @@ async function resetPassword(args) {
   user.password = args.password
   await user.save()
   console.log(`New password for user ${user.email} is '${args.password}'`)
+}
+
+async function create (args) {
+  const db = await connect()
+  try {
+    const user = await User.create({
+      email: args.email,
+      password: args.password,
+      is_active: true,
+      role: args.role || 'user'
+    })
+    console.error(`User "${args.email}" created with role ${user.role}`)
+  } catch(e) {
+    console.error(String(e))
+  }
+  return db.close()
 }
 
 // async function enable (args, enable) {
@@ -109,6 +95,8 @@ const usersCLI = yarg => yarg
   .command('list', 'List all users', list)
   .command('reset-password <email> <password>', 'Resets the password of the given user', {
   }, resetPassword)
+  .command('create <email> [password] [role]', 'Create an user (role could be `user`, `admin` or `editor`)',
+    { role: { describe: 'Define this user role', choices: ['user', 'admin', 'editor'] } }, create)
 
 export default usersCLI
 
