@@ -1,4 +1,4 @@
 import { publicSettings } from '~~/server/services/settings'
 export default defineEventHandler(() => {
-  return $fetch(`${publicSettings.baseurl}/api/utils/ping`)
+  return $fetch(`${publicSettings.baseurl}/api/utils/ping`, { timeout: 5000 })
 })

@@ -13,6 +13,8 @@ import { connect, runMigrations } from '../services/db'
 import { useCreateDirectoryStructure } from '../services/directories'
 
 export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
+  const isTest = process.env.VITEST === 'true'
+
   const log = useLogger('init')
   try {
     const config = getConfig()
@@ -27,11 +29,14 @@ export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
         log.info('Checking directory structure')
         useCreateDirectoryStructure()
 
-        log.info('Loading task manager')
-        useTaskManager().start()
+        if (!isTest) {
+          log.info('Loading task manager')
+          useTaskManager().start()
 
-        log.info('Loading plugins')
-        pluginController._load()
+          log.info('Loading plugins')
+          pluginController._load()
+        }
+
 
         const storage = useStorage()
         const driver = fsDriver({ base: config.user_locale })

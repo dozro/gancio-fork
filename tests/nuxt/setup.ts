@@ -1,31 +1,43 @@
 import { fetch, setup as nuxtSetup } from '@nuxt/test-utils/e2e'
-import { connect } from '../server/services/db'
+import { connect, User } from '../../server/services/db'
 import { DateTime } from 'luxon'
 
 export async function setup(register = true) {
   try {
-    await nuxtSetup({ host: 'http://localhost:13120' })
+    // await nuxtSetup({ host: 'http://localhost:13120' })
+    //await nuxtSetup({ host: 'http://localhost:13120' })
+    await nuxtSetup({ port: 13120, browser: false, dev: true })
+
     const sequelize = await connect()
-    // await sequelize.query(`DELETE FROM ${col('user_followers')}`)
-    await sequelize.query(`DELETE FROM events`)
-    await sequelize.query('DELETE FROM ap_users')
-    await sequelize.query('DELETE FROM events')
-    await sequelize.query('DELETE FROM event_tags')
-    await sequelize.query('DELETE FROM resources')
-    await sequelize.query('DELETE FROM instances')
-    await sequelize.query('DELETE FROM settings')
-    await sequelize.query('DELETE FROM announcements')
-    await sequelize.query('DELETE FROM oauth_tokens')
-    await sequelize.query('DELETE FROM users')
-    await sequelize.query('DELETE FROM tags')
-    await sequelize.query('DELETE FROM places')
-    await sequelize.query('DELETE FROM filters')
-    await sequelize.query('DELETE FROM collections')
-    await sequelize.query('DELETE FROM notifications')
-    await sequelize.query('DELETE FROM tasks')
+    try {
+      await Promise.allSettled([
+        sequelize.query(`DELETE FROM events`),
+        sequelize.query('DELETE FROM ap_users'),
+        sequelize.query('DELETE FROM events'),
+        sequelize.query('DELETE FROM event_tags'),
+        sequelize.query('DELETE FROM resources'),
+        sequelize.query('DELETE FROM instances'),
+        sequelize.query('DELETE FROM settings'),
+        sequelize.query('DELETE FROM announcements'),
+        sequelize.query('DELETE FROM oauth_tokens'),
+        sequelize.query('DELETE FROM users'),
+        sequelize.query('DELETE FROM tags'),
+        sequelize.query('DELETE FROM places'),
+        sequelize.query('DELETE FROM filters'),
+        sequelize.query('DELETE FROM collections'),
+        sequelize.query('DELETE FROM notifications'),
+        sequelize.query('DELETE FROM tasks')
+      ])
+    } catch (e) {
+      console.debug(e)
+    }
     if (register) {
-      await registerAdmin()
-      await login()
+      await User.create({
+        email: 'admin',
+        password: 'password',
+        role: 'admin',
+        is_active: true
+      })
     }
   } catch (e) {
     console.error('Nuxt setup error:', e)
@@ -53,11 +65,12 @@ export function setToken(t) {
 }
 
 export async function registerAdmin() {
-  await fetch('/api/user/register', {
+  const ret = await fetch('/api/user/register', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: admin
   })
+  console.error(ret.status)
 }
 
 export async function login() {

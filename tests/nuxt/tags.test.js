@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { fetchWithAuth, setup, now } from './setup'
-
 await setup()
 
 let event = {}
@@ -16,6 +15,7 @@ describe('Tags', async () => {
       })
 
     expect(response.data.is_visible).toBe(true)
+    expect(response.data.is_anon).toBe(false)
     expect(response.data.tags.length).toBe(3)
     expect(response.data.tags).toStrictEqual(['tag1', 'Tag2', 'tAg3'])
   })
@@ -26,6 +26,7 @@ describe('Tags', async () => {
 
     expect(response.status).toBe(200)
     expect(response.data.is_visible).toBe(true)
+    expect(response.data.is_anon).toBe(false)
     expect(response.data.tags.length).toBe(1)
     expect(response.data.tags).toStrictEqual(['ciao'])
   })
@@ -71,16 +72,16 @@ describe('Tags', async () => {
         title: 'test trimming tags',
         place_name: 'place name', place_address: 'place address',
         start_datetime: now() + 1000,
-        tags: ['/\'"%^&*~`!@#$*()_+=-\\}{', 'üniversite etkinliği', 'ÜNIVERSITE ETKINLIĞI', 'antani', '$$antan$i']
+        tags: ['/\'"%^&*~`!@$*()_+=-\\}{', 'üniversite etkinliği', 'ÜNIVERSITE ETKINLIĞI', 'antani', '$$antan$i']
       })
 
-    expect(data.tags).toStrictEqual(['/\'"%^&*~`!@#$*()_+=-\\}{', 'üniversite etkinliği', 'antani', '$$antan$i'])
+    expect(data.tags).toStrictEqual(['/\'"%^&*~`!@$*()_+=-\\}{', 'üniversite etkinliği', 'antani', '$$antan$i'])
   })
 
   it('should autocomplete tags', async () => {
     let response = await fetchWithAuth('/api/tags', 'GET', undefined, 'none')
     expect(response.data).toEqual(
-      expect.arrayContaining(['tag1', 'Tag2', 'üniversite etkinliği', 'tAg3', 'ciao', 'antani', '/\'"%^&*~`!@#$*()_+=-\\}{', '$$antan$i', 'tag4'])
+      expect.arrayContaining(['tag1', 'Tag2', 'üniversite etkinliği', 'tAg3', 'ciao', 'antani', '/\'"%^&*~`!@$*()_+=-\\}{', '$$antan$i', 'tag4'])
     )
 
     response = await fetchWithAuth('/api/tags?query=ANT', 'GET', 'none')

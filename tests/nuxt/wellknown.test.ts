@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
-
-const base_url = 'http://localhost:13120'
-
-await setup({ host: base_url })
+import { fetch } from '@nuxt/test-utils/e2e'
+import { setup } from './setup'
+await setup(false)
 
 describe('Webfinger', () => {
   it('should return a 404 on bad request', async () => {

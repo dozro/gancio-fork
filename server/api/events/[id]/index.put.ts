@@ -1,4 +1,4 @@
-import type { InferCreationAttributes } from '@sequelize/core'
+import type { CreationAttributes, InferCreationAttributes } from '@sequelize/core'
 import { parseMultipartFormData, saveUploadedEventImage } from '~~/server/lib/parseMultipartForm'
 import { useLogger } from '~~/server/lib/logger'
 import type { MultiPartData } from 'h3'
@@ -105,9 +105,16 @@ export default defineEventHandler(async (evt) => {
     log.debug('anonymous users cannot create past events')
     throw createError({ statusCode: 400, statusMessage: 'Anonymous user cannot create past events' })
   }
-  // find or create the place
 
-  const place = await findOrCreatePlace({ name: body.place_name, address: body.place_address, latitude: body.latitude, longitude: body.longitude })
+  // find or create the place
+  const placeData = {
+    id: body.place_id,
+    name: body.place_name,
+    latitude: body.latutude,
+    address: body.place_address,
+    longitude: body.longitude
+  }
+  const place = await findOrCreatePlace(placeData)
   if (!place) {
     throw createError({ statusCode: 400, statusMessage: 'Place not found' })
   }
@@ -158,5 +165,5 @@ export default defineEventHandler(async (evt) => {
     notifyEvent('Update', event.id)
   }
 
-  return mapEvent(event, place, tags)
+  return mapEvent(event, place, tags, user)
 })

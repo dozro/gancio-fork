@@ -1,4 +1,4 @@
-import { sendEvent } from '../federation/helpers'
+import { sendEvent } from '../federation/events'
 import { useLogger } from '../lib/logger'
 import type { NotificationAction } from './db'
 import { Event, Notification, Place, Tag, User } from './db'

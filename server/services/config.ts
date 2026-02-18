@@ -33,8 +33,8 @@ export const DbSchema = z.object({
 export const ConfigSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
-  baseurl: z.string().url(),
-  log_level: z.string(),
+  baseurl: z.url(),
+  log_level: z.enum(['fatal', 'error', 'warn', 'warning', 'normal', 'info', 'debug', 'trace']).optional().default('debug'),
   log_path: z.string(),
   db: DbSchema,
   user_locale: z.string(),
@@ -66,8 +66,10 @@ export function get() {
     legacyConfiguration = JSON.parse(configContent)
   }
 
+  const isTest = !!process.env.VITEST
+
   // read the .env
-  dotenv.config({ quiet: true })
+  dotenv.config({ quiet: true, path: isTest ? '.env.test' : '.env' })
   if (!process.env.NUXT_SESSION_PASSWORD) {
     console.error('NUXT_SESSION_PASSWORD cannot be empty (check your .env)!')
     process.exit(-1)
@@ -79,7 +81,7 @@ export function get() {
     log_path: path.resolve(process.env.LOG_PATH || '', 'logs'),
     db: {
       dialect: (process.env.DB_DIALECT || 'sqlite3') as DialectName,
-      storage: process.env.DB_STORAGE || 'gancio.sqlite'
+      storage: isTest ? 'memory:gancio.sqlite' : process.env.DB_STORAGE || 'gancio.sqlite'
     },
     user_locale: path.resolve(process.env.USER_LOCALE || 'user_locale'),
     upload_path: path.resolve(process.env.UPLOAD_PATH || 'uploads'),

@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
-
-const base_url = 'http://localhost:13120'
-
-await setup({ host: base_url })
+import { $fetch, fetch } from '@nuxt/test-utils/e2e'
+import { setup } from './setup'
+await setup(false)
 
 describe('Nodeinfo', () => {
   it('shoud return a json content', async () => {

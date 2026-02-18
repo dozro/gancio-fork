@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { $fetch, fetch } from '@nuxt/test-utils/e2e'
-import { fetchWithAuth, admin, setCookie, cookie, setup, now } from './setup.js'
+import { fetchWithAuth, admin, setCookie, cookie, setup, now } from './setup'
 
 await setup(false)
+
 let event_id
 let places = []
 
@@ -192,9 +193,10 @@ describe('Events', () => {
       place_address: 'address 2',
       start_datetime: now() + 1000
     },
-    'none')
+      'none')
 
     expect(response.data.is_visible).toBe(false)
+    expect(response.data.is_anon).toBe(true)
     event_id = response.data.id
   })
 
