@@ -20,8 +20,7 @@ const headers = [
   { key: 'is_active', title: t('common.enabled'), width: 50 },
   { key: 'to_notify', title: t('admin.receive_confirm_notification'), width: 200 },
   { key: 'role', title: t('common.role'), width: 150 },
-  // { value: 'is_editor', text: t('common.editor') },
-  { key: 'actions', title: t('common.actions'), align: 'right', width: 100, sortable: false }
+  { key: 'actions', title: t('common.actions'), align: 'end', width: 180, sortable: false }
 ]
 
 async function toggle (user) {
@@ -56,6 +55,13 @@ async function deleteUser (user) {
     $notify(e, Statuses.ERROR)
     loading.value = false
   }
+}
+
+const editUserDialog = ref(false)
+const selectedUser = ref()
+async function editUser (user) {
+  editUserDialog.value = true
+  selectedUser.value = user
 }
 
 async function toggle_to_notify (user) {
@@ -145,6 +151,8 @@ async function createUser() {
     </v-card>
   </v-dialog>
 
+  <AdminUserEdit v-model="editUserDialog" :user="selectedUser" />
+
   <div>
     <!-- USERS LIST -->
     <v-data-table
@@ -198,6 +206,12 @@ async function createUser() {
         </v-menu>
       </template>
       <template #[`item.actions`]="{item}">
+        <t-btn
+          color="success"
+          :tooltip="$t('admin.edit_user')"
+          icon='mdi-pencil'
+          @click="editUser(item)"
+        />
         <t-btn
           color="error"
           :tooltip="$t('admin.delete_user')"
