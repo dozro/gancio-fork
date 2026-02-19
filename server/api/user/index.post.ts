@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     newUser.recover_code = crypto.randomUUID()
+    newUser.is_active = true
     const user = await User.withScope('withRecoverCode').create(newUser)
     enqueueMail(user.email, 'user_confirm', { user, config: publicSettings })
     return user
