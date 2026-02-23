@@ -50,6 +50,7 @@ const openAssignAuthor = ref(false)
 const showModeration = computed(() => settings.value.enable_moderation && (event?.value?.is_mine || user?.value?.role === 'admin' || user?.value?.role === 'editor'))
 const canEdit = computed(() => event?.value?.is_mine || user?.value?.role === 'admin' || user?.value?.role === 'editor')
 const hasOnlineLocations = computed(() => event?.value?.online_locations?.length)
+const showResources = computed(() => settings.value.enable_federation)
 
 const share = useShare()
 const shareEvent = () => share.value?.({ url: canonicalUrl.value, title: document.title })
@@ -108,7 +109,7 @@ async function report() {
 <template>
 <v-container
   v-if='event'
-  class="h-event pa-2 pa-sm-2 pt-0 pt-sm-0" max-width='1200' itemscope
+  class="h-event mb-4" max-width='1200' itemscope
   itemtype="https://schema.org/Event">
   <!-- EVENT PAGE -->
   <!-- gancio supports microformats (http://microformats.org/wiki/h-event) -->
@@ -118,12 +119,16 @@ async function report() {
   </h1>
 
   <v-row>
-    <v-col cols='12' md='8' class="pr-sm-2 pr-md-0">
+    <v-col cols='12' md='8'>
       <!-- <MyPicture v-if="hasMedia" :event="event" /> -->
       <CoreImg v-if="hasMedia" :event="event" />
       <div
-        v-if="event?.description" class="p-description text-body-1 pa-3 rounded" itemprop="description"
-        v-html="event?.description" />
+        v-if="event?.description"
+        class="p-description text-body-1 my-4"
+        itemprop="description"
+        v-html="event?.description"
+      />
+
     </v-col>
 
     <v-col cols='12' md='4'>
@@ -226,8 +231,7 @@ async function report() {
     </v-col>
   </v-row>
 
-  <!-- resources from fediverse -->
-  <!-- <EventResource id="resources" class="mt-3" :event="event" v-if="showResources" /> -->
+  <EventFederatedInteractions v-if="showResources && !settings.hide_boosts" id="resources" class="mt-4" :event="event" />
 
   <v-dialog v-model="showEmbed" class='event-embed-dialog' width="700px" :fullscreen="$vuetify.display?.mobile">
     <EventEmbed :event="event" @close="showEmbed = false" />
@@ -254,9 +258,8 @@ async function report() {
 </v-container>
 </template>
 
-<style>
-.event {
-  word-wrap: break-word;
-  max-width: 1000px;
+<style scoped>
+.p-description :deep(p) {
+  margin-bottom: .5lh;
 }
 </style>

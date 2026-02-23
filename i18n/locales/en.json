@@ -435,5 +435,9 @@
         "copy_password_dialog": "Yes, you have to copy the password!",
         "start": "Start",
         "https_warning": "You're visiting from HTTP, remember to change baseurl in config.json if you switch to HTTPS!"
+    },
+    "activitypub": {
+        "n_boosts": "{n} boosts|{n} boost|{n} boosts",
+        "n_favorites": "{n} favorites|{n} favorite|{n} favorites"
     }
 }
