@@ -13,6 +13,9 @@ import {
   Model,
   type BelongsToManySetAssociationsMixin,
   type BelongsToSetAssociationMixin,
+  type BelongsToManyRemoveAssociationMixin,
+  type BelongsToManyGetAssociationsMixin,
+  type BelongsToManyAddAssociationsMixin,
   type AggregateOptions,
   type InferAttributes,
   type InferCreationAttributes,
@@ -380,12 +383,14 @@ export class Place extends Model<
 
   @Attribute(DataTypes.STRING)
   @Index
-  @Unique
+  @Unique({ name: 'unique_place_name', msg: 'error.place_name_exists' })
   @NotNull
   declare name: string
 
   @Attribute(DataTypes.STRING)
   @Index
+  @Unique({ name: 'unique_place_name', msg: 'error.place_name_exists' })
+  @Default('')
   declare ap_id: CreationOptional<string>
 
   @Attribute(DataTypes.STRING)
@@ -399,6 +404,11 @@ export class Place extends Model<
 
   @HasMany(() => Event, /* foreign key */ 'placeId')
   declare events?: NonAttribute<Event[]>
+
+  // the mixins Sequelize automatically provides
+  declare getEvents: BelongsToManyGetAssociationsMixin<Event>
+  declare addEvents: BelongsToManyAddAssociationsMixin<Event, number>
+  declare removeEvents: BelongsToManyRemoveAssociationMixin<Event[], number>
 }
 
 export type UserRole = 'admin' | 'editor' | 'user'
