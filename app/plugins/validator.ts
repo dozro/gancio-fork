@@ -17,6 +17,13 @@ export default defineNuxtPlugin((nuxtApp) => {
     email: [
       (v: string) => !!v || t('validators.required', { fieldName: t('common.email') }),
       (v: string) => ((v && (v === 'admin' || !!linkify.test(v, 'email'))) || t('validators.email'))
+    ],
+
+    latitude: [
+      (v: number) => (v < 90 && v > -90) || t('validators.latitude')
+    ],
+    longitude: [
+      (v: number) => (v < 180 && v > -180) || t('validators.longitude')
     ]
   }
 

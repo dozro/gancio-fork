@@ -1,60 +1,53 @@
-<!-- Choose event location -->
+<!--
+Choose event location
+-->
 <script setup lang='ts'>
 import { refDebounced } from '@vueuse/core'
-
 const settings = useState<Settings>('settings')
-
-interface Place {
-  name?: string
-  address?: string
-  online?: boolean
-  create?: boolean
-}
-
 const event = defineModel<EventAPI>('event', { type: Object, required: true })
-// const modelValue = defineModel('modelValue', { type: Object, default: () => ({ name: '', address: '' }) })
 
 const whereInputAdvancedDialog = ref(false)
-// const onlineLocations = ref([])
 
-const disableAddress = computed(() => !!event.value?.place?.id)
+// should I ask for address (only on new places)
+const disableAddress = computed(() => event.value?.place?.id)
 const isOnLine = computed(() => settings.value.allow_online_event && 'online' === event?.value?.place?.name)
-
-const showAdvancedDialogButton = computed(() => {
-  if (!event?.value?.place?.name) return false
-  // do not show advanced dialog button in case geolocation is not allowed
-  if (!(settings.value.allow_geolocation)) {
-    return false
-  }
-  // known places already have coords
-  if (!event?.value?.place?.create) return false
-  return true
-})
 
 const search = ref('')
 const searchDebounced = refDebounced(search, 200)
 const { data: places } = await useFetch<Place[]>('/api/places', { params: { query: searchDebounced },
-  dedupe: 'cancel',
-  transform: (originalPlaces) => {
-    const places = originalPlaces.filter(place => place.name?.toLowerCase() !== 'online')
-    if (settings.value.allow_online_event) {
-      places.push({ online: true, name: 'online', props: { prependIcon: 'mdi-laptop-account', color: 'primary' } })
-    }
-    if (!search.value && places.length) {
-      return places
-    }
-    const matches = places.find(p => search.value === p.name?.toLocaleLowerCase())
-    if (!matches && search.value) {
-      places.unshift({ create: true, name: search.value.trim(), props: { prependIcon: 'mdi-plus', color: 'primary' } })
-    }
-    return places
-  } })
+  dedupe: 'cancel'
+})
 
-function selectPlace (place) {
-  if (typeof place === 'string') {
-    event.value.place = ({ name: place })
+const selectablePlaces = computed(() => {
+  // select matched places without online
+  const ret = places?.value?.filter(place => place.name?.toLowerCase() !== 'online') ?? []
+
+  // add online if allowed
+  if (settings.value.allow_online_event) {
+    ret.push({ name: 'online', props: { prependIcon: 'mdi-laptop-account', color: 'primary' } })
+  }
+
+  const matches = ret.find(p => search.value === p.name?.toLocaleLowerCase())
+  if (!matches && search.value) {
+    ret.unshift({
+      name: search.value.trim(),
+      props: { prependIcon: 'mdi-plus', color: 'primary' } })
+  }
+  return ret
+})
+
+function selectPlace(place: Place) {
+  if (!place) {
+    event.value.place = { name: '', address: '' }
   } else {
-    event.value.place = place ?? {}
+    event.value.place = place
+  }
+}
+
+function selectFirst () {
+  const items = selectablePlaces.value
+  if (items && items.length > 0) {
+    selectPlace(items[0])
   }
 }
 
@@ -65,6 +58,7 @@ function selectPlace (place) {
     <v-combobox
       ref="place"
       v-model:search.trim.toLowerCase='search'
+      :model-value="event.place"
       :rules="[$valid.required('common.where')]"
       :label="$t('common.where')"
       :model-value="event.place.name"
@@ -73,33 +67,27 @@ function selectPlace (place) {
       hide-no-data
       density='default'
       :hint="$t('event.where_description')"
+      auto-select-first
       persistent-hint
-      :items="places"
+      return-object
+      :items="selectablePlaces"
       item-title='name'
+      item-subtitle='address'
+      @keydown.enter.prevent="selectFirst"
+      @keydown.tab="selectFirst"
+      @blur="selectFirst"
       @update:model-value="selectPlace"
-    >
-
-      <template #item="{ item, props }">
-        <v-list-item v-bind='props'>
-          <template v-if='item.raw.create' #title>{{ $t('common.add')}} {{ item.raw.name }}</template>
-          <template v-else #title>{{ item.raw.name }}</template>
-          <template v-if='item.raw.address' #subtitle>{{ item.raw.address }}</template>
-          <!-- <v-list-item-title v-if="item?.create" prepend-icon='mdi-plus' color='primary':aria-label='$t("common.add")'> {{$t('common.add')}} <strong>{{item?.name}}</strong></v-list-item-title>
-          <v-list-item-title v-else-if="item?.online" prepend-icon='mdi-laptop-account'
-            color='primary' :aria-label='$t("common.online")'> {{$t('common.online')}}</v-list-item-title>
-          <v-list-item-title v-else :title='item?.name' :subtitle='item?.address' /> -->
-        </v-list-item>
-      </template>
-    </v-combobox>
+    />
   </v-col>
 
   <!-- address -->
   <v-col v-if="!isOnLine" cols="12" :md="settings.allow_online_event?5:8">
     <v-text-field
-      ref="address" v-model="event.place.address" class="mr-4" prepend-icon="mdi-map" :disabled="disableAddress"
+      ref="address" v-model="event.place.address" class="mr-4" prepend-icon="mdi-map"
+      :disabled="typeof event?.place?.id === 'number' || !event.place.name"
       :rules="[ v => disableAddress ? true : $valid.required('common.address')(v)]" :label="$t('common.address')"
       :hint="$t('event.address_description')" persistent-hint>
-      <template v-if="showAdvancedDialogButton" #append>
+      <template v-if="settings.allow_geolocation" #append>
         <t-btn tooltip="admin.geolocation" size="small" icon='mdi-map-search' @click="whereInputAdvancedDialog = true" />
       </template>
     </v-text-field>
@@ -119,10 +107,6 @@ function selectPlace (place) {
       hide-selected
       persistent-hint
       :delimiters="[',', ';', '; ']" />
-    <!-- <template #chip="{ item, index, props }">
-        <v-chip v-bind="props" :outlined="index !== 0" closable close-icon="mdi-close-circle" @click:close="label="label" small="small">{{ item }}</v-chip>
-      </template> -->
-    <!-- </v-combobox> -->
   </v-col>
   <v-dialog
     v-model="whereInputAdvancedDialog"
@@ -135,133 +119,3 @@ function selectPlace (place) {
 </v-row>
 
 </template>
-<!-- // import { mdiMap, mdiMapMarker, mdiPlus, mdiCog, mdiLink, mdiCloseCircle, mdiLaptopAccount, mdiMapSearch } from '@mdi/js'
-// import { mapState } from 'vuex'
-// import debounce from 'lodash/debounce'
-// import WhereInputAdvanced from './WhereInputAdvanced.vue'
-// import TBtn from '../components/TBtn.vue'
-
-// export default {
-//   name: 'WhereInput',
-//   props: {
-//     value: { type: Object, default: () => ({}) },
-//     event: { type: Object, default: () => null },
-//   },
-//   components: { WhereInputAdvanced, TBtn },
-//   data ( {$store} ) {
-//     return {
-//       mdiMap, mdiMapMarker, mdiPlus, mdiCog, mdiLink, mdiCloseCircle, mdiLaptopAccount, mdiMapSearch,
-//       places: [],
-//       place: { isNew: false, name: '' },
-//       placeName: '',
-//       disableAddress: true,
-//       whereInputAdvancedDialog: false,
-//       onlineLocations: this.event.online_locations || [],
-//     }
-//   },
-//   computed: {
-//     ...mapState(['settings']),
-//     isOnLine () {
-//       return this.settings.allow_online_event && this.place.name === 'online'
-//     },
-//     showAdvancedDialogButton () {
-//       if (!this.place.name) return false
-//       // do not show advanced dialog button in case geolocation is not allowed
-//       if (!(this.settings.allow_geolocation)) {
-//         return false
-//       }
-//       // known places already have coords
-//       if (!this.place.isNew) return false
-//       return true
-//     }
-//   },
-//   mounted () {
-//     this.$nextTick( () => {
-//       this.search()
-//     })
-//   },
-//   methods: {
-//     search: debounce(async function(ev) {
-//       const search = ev ? ev.target.value.trim().toLowerCase() : ''
-//       this.places = await this.$axios.$get('place', { params: { search } }).catch()
-
-//       // Filter out the place with name 'online' if not allowed
-//       if (this.places.length) {
-//         this.places = this.places.filter(p => p.name?.toLocaleLowerCase() !== 'online')
-//       }
-//       if (this.settings.allow_online_event) {
-//         this.places.push({ online: true, name: 'online' })
-//       }
-
-//       if (!search && this.places.length) {
-//         return this.places
-//       }
-//       const matches = this.places.find(p => search === p.name.toLocaleLowerCase())
-//       if (!matches && search) {
-//         this.places.unshift({ create: true, name: ev.target.value.trim() })
-//       }
-//     }, 200),
-//     selectPlace (p) {
-//       // force online events under place: online address: online
-//       // this.event_only_online = false
-//       this.place.isNew = false
-//       // this.whereAdvancedId++
-
-//       if (!p) { return }
-//       if (typeof p === 'object' && !p.create && !p.online) {
-//         if (p.id === this.value.id) return
-//         this.place.name = p.name
-//         this.place.address = p.address
-//         if (this.settings.allow_geolocation) {
-//           this.place.latitude = p.latitude
-//           this.place.longitude = p.longitude
-//         }
-//         this.place.id = p.id
-//         // if (this.settings.allow_event_only_online && this.place.name === 'online') {
-//         //   this.event_only_online = true
-//         // }
-//         this.disableAddress = true
-//       } else { // this is a new place
-//         this.place.isNew = true
-//         this.place.name = (p.name || p).trim()
-//         const tmpPlace = this.place.name.toLocaleLowerCase()
-//         // search for a place with the same name
-//         const place = this.places.find(p => !p.create && p.name.trim().toLocaleLowerCase() === tmpPlace)
-//         if (place) {
-//           this.place.name = place.name
-//           this.place.id = place.id
-//           this.place.address = place.address
-//           this.disableAddress = true
-//         } else {
-//           delete this.place.id
-//           this.place.address = ''
-//           if (this.settings.allow_geolocation) {
-//             this.place.latitude = p.latitude
-//             this.place.longitude = p.longitude
-//           }
-//           this.disableAddress = false
-//           this.$refs.place.blur()
-//           this.$nextTick(() => { this.$refs.address && this.$refs.address.focus() })
-//         }
-//       }
-//       this.$emit('input', { ...this.place })
-//     },
-//     selectLocations () {
-//       this.event.online_locations = []
-
-//       if (this.onlineLocations) {
-//         // Insert up to 3 online location: the main one and 2 fallback
-//         if (this.onlineLocations.length > 3) {
-//           this.$nextTick(() => this.onlineLocations = this.onlineLocations.slice(0, 3))
-//         }
-//         // Remove duplicates
-//         this.$nextTick(() => this.onlineLocations = [...new Set(this.onlineLocations)])
-
-//         this.onlineLocations.forEach((item, i) => {
-//           if (!item.startsWith('http')) { this.onlineLocations[i] = `https://${item}` }
-//           this.event.online_locations[i] = this.onlineLocations[i]
-//         })
-//       }
-//     },
-//   }
-// } -->
