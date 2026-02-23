@@ -271,21 +271,49 @@ export async function getOutbox(actor: APUser) {
 
   if (!actor?.object?.outbox) return
   try {
-    let collection = await _signAndSend('', actor?.object?.outbox, 'get', secretSettings.privateKey)
+    const collection = await _signAndSend('', actor?.object?.outbox, 'get', secretSettings.privateKey)
     // embedded collection
     if (typeof collection?.first !== 'string') {
       return collection?.first?.orderedItems ?? []
-    } else if (/^https?:\/\//.test(collection?.first)) {
-      collection = await _signAndSend('', collection.first, 'get', secretSettings.privateKey)
-      if (Array.isArray(collection?.orderedItems)) {
-        return collection?.orderedItems ?? []
-      }
+    } else if (isUrl(collection?.first)) {
+      return getOutboxPaginated(collection?.first)
     }
   } catch (e) {
     log.warn('[FEDI] getOutbox %s failed: %s', actor.ap_id, e)
     return []
   }
 }
+
+async function getOutboxPaginated<Outbox = unknown>(
+  initialUrl: string,
+  {
+    maxSoftLimit = 50,
+    maxPages = 5
+  } = {}
+) {
+  let outbox: Outbox[] = []
+
+  let nextPageUrl = initialUrl
+  let thereIsMoreContent = true
+  let pageCount = 0
+
+  // Always get at least the first page, independently of the "soft limit"
+  do {
+    const collection = await _signAndSend('', nextPageUrl, 'get', secretSettings.privateKey)
+    thereIsMoreContent = false
+    if (Array.isArray(collection?.orderedItems) && collection.orderedItems.length) {
+      outbox = [...outbox, ...collection.orderedItems]
+      if (isUrl(collection.next) && collection.next !== nextPageUrl) {
+        thereIsMoreContent = true
+        nextPageUrl = collection.next
+      }
+    }
+    pageCount++
+  } while (thereIsMoreContent && outbox.length < maxSoftLimit && pageCount < maxPages)
+  return outbox
+}
+
+const isUrl = (url: unknown) => typeof url === 'string' && /^https?:\/\//.test(url)
 
 export async function unfollowActor(actor: APUser) {
   log.debug(`[FEDI] Unfollowing actor ${actor.ap_id}`)

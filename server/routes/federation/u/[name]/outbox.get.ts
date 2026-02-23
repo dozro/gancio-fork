@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
   const last_page = Math.ceil(n_events / 10)
   log.debug(`[FEDI] GET /outbox, should return all events from this instance: ${n_events}`)
 
-  if (page) {
+  if (page > 0) {
     events = await Event.findAll({
       where: { is_visible: true, ap_id: null },
       include: [{ model: Tag, required: false }, Place],
@@ -48,8 +48,10 @@ export default defineEventHandler(async (event) => {
       type: 'OrderedCollectionPage',
       totalItems: n_events,
       partOf: `${publicSettings.baseurl}/federation/u/${name}/outbox`,
-      ...(page > 1 && { prev: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${page - 1}` }),
-      ...(page !== last_page && { next: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${page + 1}` }),
+      ...(page > 1 && last_page > 0 && {
+        prev: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${Math.min(page - 1, last_page)}`
+      }),
+      ...(page < last_page && { next: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${page + 1}` }),
       orderedItems: events.map(e => ({
         id: `${publicSettings.baseurl}/federation/m/${e.id}#create`,
         type: 'Create',
@@ -65,8 +67,10 @@ export default defineEventHandler(async (event) => {
       'id': `${publicSettings.baseurl}/federation/u/${name}/outbox`,
       'type': 'OrderedCollection',
       'totalItems': n_events,
-      'first': `${publicSettings.baseurl}/federation/u/${name}/outbox?page=1`,
-      'last': `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${last_page}`
+      ...(last_page > 0 && {
+        first: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=1`,
+        last: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${last_page}`
+      })
     }
   }
 })
