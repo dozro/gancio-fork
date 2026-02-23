@@ -181,8 +181,10 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
     is_mine: event.userId ? event.userId === user?.id : false,
     is_anon: event.userId === null,
     is_visible: event.is_visible,
-    original_url: event?.ap_object?.url ?? event?.ap_id
+    original_url: event?.ap_object?.url ?? event?.ap_id,
 
+    boost: event.boost,
+    likes: event.likes
     // TODO
     // n_msgs: event?.,
   }
