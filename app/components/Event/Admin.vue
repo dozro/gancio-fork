@@ -47,6 +47,8 @@ async function toggle(parent = false) {
 
 const isScheduled = computed(() => event.status === 'EventScheduled')
 async function updateStatus(status: EventStatus) {
+  const ret = await $confirm('event.cancel_description')
+  if (!ret) return
   try {
     await $fetch(`/api/events/${event.id}`, { method: 'PATCH', body: { status } })
     emit('update')
@@ -57,7 +59,7 @@ async function updateStatus(status: EventStatus) {
 
 async function reannounce() {
   const id = event.id
-  const ret = await $confirm('event.reannounce', { event: event?.title })
+  const ret = await $confirm('event.reannounce_description', { event: event?.title })
   if (!ret) {
     return
   }
@@ -84,7 +86,7 @@ async function reannounce() {
   <v-list-item
     v-if="isScheduled"
     prepend-icon="mdi-calendar-remove"
-    :title="$t('event.cancel')"
+    :title="$t('common.cancel')"
     @click="updateStatus('EventCancelled')" />
 
   <!-- Edit event -->

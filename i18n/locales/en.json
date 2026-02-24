@@ -121,7 +121,8 @@
         "past_events": "Past Events",
         "pages": "Pages",
         "no_events_found": "No events found",
-        "no_events_found_hint": "Select different dates or criteria"
+        "no_events_found_hint": "Select different dates or criteria",
+        "dark_mode": "Dark mode"
     },
     "login": {
         "description": "By logging in you can publish new events.",
@@ -226,11 +227,14 @@
         "send_to_author_too": "Send to admins and author",
         "disable_author": "Disable author",
         "disable_author_confirm": "Are you sure you want to disable the author of this event?",
+        "cancel_description": "This event will be publicly marked as cancelled.",
         "cancelled": "This event has been cancelled",
         "postponed": "Postponed",
         "moved_onlined": "Moved online",
         "rescheduled": "Rescheduled",
-        "tentative": "Tentative"
+        "tentative": "Tentative",
+        "reannounce": "Reannounce",
+        "reannounce_description": "Should we reannounce (boost) this event to the federation?"
     },
     "admin": {
         "place_description": "If you have gotten the place or address wrong, you can change it.<br/>All current and past events associated with this place will change address.",
