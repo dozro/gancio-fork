@@ -24,7 +24,6 @@ const isCalendarDisabled = computed(oldValue => pending.value ? oldValue : !!par
     <v-text-field
       v-if="show_search"
       id="main-search"
-      :loading='pending'
       class="bg-transparent-semi"
       color="primary"
       variant="outlined"
