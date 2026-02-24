@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   // 2025-07-20
 
   devtools: {
-    enabled: false,
+    enabled: true,
     timeline: {
       enabled: false
     }
@@ -28,12 +28,7 @@ export default defineNuxtConfig({
     '~/assets/css/main.css',
     '@mdi/font/css/materialdesignicons.css'
   ],
-  modules: [
-    '@nuxt/eslint',
-    'nuxt-auth-utils',
-    '@nuxtjs/i18n',
-    (!isTest && '@nuxtjs/sitemap')
-  ],
+  modules: ['@nuxt/eslint', 'nuxt-auth-utils', '@nuxtjs/i18n', (!isTest && '@nuxtjs/sitemap'), '@nuxt/hints'],
   sitemap: {
     cacheMaxAgeSeconds: 3600, // 1 hour
 

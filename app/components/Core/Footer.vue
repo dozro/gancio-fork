@@ -21,7 +21,7 @@ const footerLinks = computed(() => settings.value.footerLinks?.map((link) => {
 
   <!-- follow me dialog -->
   <v-dialog v-model='showFollowMe' destroy-on-close max-width='700px' :fullscreen='$vuetify.display?.mobile'>
-    <FollowMe is-dialog @close='showFollowMe=false' />
+    <LazyFollowMe is-dialog @close='showFollowMe=false' />
   </v-dialog>
 
   <!-- footer links -->

@@ -32,6 +32,7 @@ const in_home = computed(() => route.name === 'index')
   <div class='d-flex'>
     <v-switch
       v-if='in_home'
+      id='show_recurrent_switch'
       v-model='params.show_recurrent'
       class='mr-2'
       color='primary'
@@ -41,9 +42,9 @@ const in_home = computed(() => route.name === 'index')
     />
 
     <!-- TODO <t-btn icon='mdi-magnify' to='/search' tooltip='common.search' /> -->
-    <t-btn icon="mdi-information" to='/about' tooltip='common.about' :aria-label='t("common.about")' />
+    <LazyTBtn icon="mdi-information" to='/about' tooltip='common.about' :aria-label='t("common.about")' />
 
-    <t-btn :icon="theme?.theme.current?.value?.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'" tooltip='common.dark' @click='theme.toggleTheme()' />
+    <LazyTBtn :icon="theme?.theme.current?.value?.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'" tooltip='common.dark' @click='theme.toggleTheme()' />
 
     <!-- language selection menu -->
     <v-menu transition="slide-y-transition">

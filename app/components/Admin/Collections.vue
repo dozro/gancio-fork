@@ -205,6 +205,7 @@ const { data: actors } = await useFetch('/api/ap_actors/trusted', { transform: r
         <v-autocomplete
           v-if="in_home"
           v-model="collection_in_home"
+          density='compact'
           variant='outlined'
           :label="$t('common.collections')"
           hide-details

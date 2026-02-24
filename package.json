@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "@babel/preset-typescript": "^7.28.5",
+    "@nuxt/hints": "1.0.0-alpha.7",
     "@nuxt/kit": "^4.2.2",
     "@nuxtjs/i18n": "10.2.3",
     "@nuxtjs/sitemap": "7.6.0",

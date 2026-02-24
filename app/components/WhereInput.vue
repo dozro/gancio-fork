@@ -55,16 +55,15 @@ function selectFirst () {
 <template>
 <v-row v-if="event.place" class="mb-4">
   <v-col cols="12" md="4">
+    <!-- name -->
     <v-combobox
       ref="place"
       v-model:search.trim.toLowerCase='search'
       :model-value="event.place"
       :rules="[$valid.required('common.where')]"
       :label="$t('common.where')"
-      :model-value="event.place.name"
       no-filter
       prepend-icon="mdi-map-marker"
-      hide-no-data
       density='default'
       :hint="$t('event.where_description')"
       auto-select-first

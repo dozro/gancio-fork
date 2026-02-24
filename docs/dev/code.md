@@ -238,7 +238,7 @@ this could not be done in SSR, let's test with <https://masteringnuxt.com/blog/m
 we use
 [composables](https://nuxt.com/docs/guide/directory-structure/composables) for
 utilities like validators, times formatter, events management. to share state
-in composable use `usestate`
+in composable use `useState`
 
 ### Call API
 

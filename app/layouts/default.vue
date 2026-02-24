@@ -21,10 +21,10 @@ useHead ({
 <v-app>
   <CoreAppBar />
   <v-main>
-    <CoreDialog />
+    <LazyCoreDialog />
     <slot />
   </v-main>
-  <CoreNotification />
+  <LazyCoreNotification />
   <CoreFooter />
 </v-app>
 </template>

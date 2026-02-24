@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import debounce from 'lodash/debounce'
 
 const modelValue = defineModel('modelValue', { type: Object, default: () => ({ }) })
-const settings = useState('settings')
+const settings = useState<Settings>('settings')
 
 const { data: collections } = await useFetch('/api/collections')
 
