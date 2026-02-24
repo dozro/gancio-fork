@@ -310,6 +310,7 @@
         "edit_place": "Edit place",
         "edit_tag": "Edit tag",
         "edit_tag_help": "You can change the tag by replacing it with a new one or merging it with an existing one. The {n} associated events will also be changed.",
+        "merge_place_help": "You are merging <strong>{place}</strong> with the selected place. The {n} associated events will also be changed.",
         "new_announcement": "New announcement",
         "show_smtp_setup": "Email settings",
         "smtp_hostname": "SMTP Hostname",
@@ -440,12 +441,4 @@
         "n_boosts": "{n} boosts|{n} boost|{n} boosts",
         "n_favorites": "{n} favorites|{n} favorite|{n} favorites"
     }
-  },
-  "setup": {
-    "completed": "Setup completed",
-    "completed_description": "<p>You can now login with the following user:<br/><br/>User: <b>{email}</b><br/>Password: <b>{password}<b/></p>",
-    "copy_password_dialog": "Yes, you have to copy the password!",
-    "start": "Start",
-    "https_warning": "You're visiting from HTTP, remember to change baseurl in config.json if you switch to HTTPS!"
-  }
 }
