@@ -52,6 +52,7 @@ async function remove(announcement: Announcement) {
   }
   await $fetch(`/api/announcements/${announcement.id}`, { method: 'DELETE' })
   $notify('admin.announcement_remove_ok')
+  refresh()
 }
 
 async function save() {
