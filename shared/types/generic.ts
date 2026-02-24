@@ -13,6 +13,8 @@ export interface ValidationService {
   requiredMulti: (fieldName: string) => ValidatorFn
   password: ValidatorFn<string>
   email: ValidatorFn<string>[]
+  latitude: ValidatorFn<number>[]
+  longitude: ValidatorFn<number>[]
 }
 
 declare module 'vue' {

@@ -310,6 +310,7 @@
         "edit_place": "Edit place",
         "edit_tag": "Edit tag",
         "edit_tag_help": "You can change the tag by replacing it with a new one or merging it with an existing one. The {n} associated events will also be changed.",
+        "merge_place_help": "You are merging <strong>{place}</strong> with the selected place. The {n} associated events will also be changed.",
         "new_announcement": "New announcement",
         "show_smtp_setup": "Email settings",
         "smtp_hostname": "SMTP Hostname",

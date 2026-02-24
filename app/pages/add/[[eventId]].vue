@@ -17,7 +17,7 @@ const event = ref<EventAPI>({
   start_datetime: 0,
   description: '',
   media: [{}],
-  place: {},
+  place: { name: '', address: '' },
   status: 'EventScheduled'
 })
 
@@ -184,7 +184,7 @@ const normalizedTags = computed({
 
             <!-- Where -->
             <v-col cols=12>
-              <WhereInput ref='where' v-model='event.place' :event='event' />
+              <WhereInput ref='where' v-model:event='event' />
             </v-col>
 
             <!-- When -->

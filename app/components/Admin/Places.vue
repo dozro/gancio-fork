@@ -1,30 +1,33 @@
 <script setup>
 const { t } = useI18n()
 const settings = useState('settings')
+const { $notify } = useNuxtApp()
 
 const form = ref()
 const loading = ref(false)
 const dialog = ref(false)
 const valid = ref(false)
-const address = ref('')
 const search = ref('')
 const place = reactive({ name: '', address: '', latitude: null, longitude: null, id: null })
+
+const newPlace = ref()
 
 const headers = [
   { value: 'name', title: t('common.name') },
   { value: 'address', title: t('common.address') },
   { value: 'map', title: 'Map' },
-  { value: 'actions', title: t('common.actions'), align: 'end' }
+  { value: 'actions', title: t('common.actions'), align: 'end', width: 170 }
 ]
 
-const { data: places, refresh } = await useFetch('/api/places', {
+const { data: places, refresh } = await useFetch('/api/places/list', {
   transform: places => places.filter(place => place.name?.toLowerCase() !== 'online')
 })
 
-//   methods: {
 function editPlace(item) {
+  newPlace.value = null
   place.name = item.name
   place.address = item.address
+  place.eventCount = item.eventCount
   if (settings.value.allow_geolocation) {
     place.geocodedAddress = ''
     place.latitude = item.latitude
@@ -40,17 +43,36 @@ async function savePlace() {
     return
   }
   loading.value = true
-  await $fetch('/place', {
-    method: 'PUT',
-    body: place
-  })
-  refresh()
+  try {
+    await $fetch(`/api/places/${place.id}`, {
+      method: 'PUT',
+      body: newPlace.value || place
+    })
+    refresh()
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
+  newPlace.value = null
   loading.value = false
   dialog.value = false
+}
+
+function updatePlace (p) {
+  if (!p) {
+    newPlace.value = null
+    return
+  }
+  if (typeof p === 'string') {
+    newPlace.value = null
+    place.name = p
+  } else {
+    newPlace.value = p
+  }
 }
 </script>
 <template>
 <div class="d-flex flex-column ga-4">
+  <!-- eslint-disable-next-line vue/no-v-html -->
   <div class="text-subtitle-2 text-medium-emphasis" v-html="$t('admin.place_description')" />
 
   <div class="d-flex justify-end">
@@ -60,24 +82,43 @@ async function savePlace() {
   <v-dialog v-model="dialog" width="600" :fullscreen="$vuetify.display?.mobile">
     <v-card>
       <v-card-title>
-        {{ $t('admin.edit_place') }}
+        {{ $t('admin.edit_place') }} -
+        <strong class='ml-2'>{{place.name}}</strong>
       </v-card-title>
       <v-card-text class="mb-4">
         <v-form ref="form" v-model="valid">
-          <v-text-field
-            v-model="place.name"
+
+          <v-combobox
+            :model-value="newPlace?.name ?? place.name"
             :rules="[$valid.required('common.name')]"
             :label="$t('common.name')"
             :placeholder="$t('common.name')"
-          />
+            :items='places.filter(p => place.id !== p.id)'
+            item-title='name'
+            @update:model-value="updatePlace"
+          >
+            <template #item="{ item, props }">
+              <v-list-item v-bind="props">
+                <template #title>
+                  {{item.raw.name}} <small>({{item.raw.eventCount}})</small>
+                </template>
+              </v-list-item>
+            </template>
+
+          </v-combobox>
           <v-text-field
+            v-if="!newPlace"
             ref="address"
             v-model="place.address"
             :rules="[ v => $valid.required('common.address')(v)]"
             :label="$t('common.address')"
             persistent-hint
           />
-          <SearchAddress v-if="settings.allow_geolocation" v-model:place="place" />
+          <v-alert v-else>
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <span v-html="$t('admin.merge_place_help', { place: place.name, n: place.eventCount })" />
+          </v-alert>
+          <SearchAddress v-if="settings.allow_geolocation && !newPlace" v-model:place="place" />
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -109,8 +150,8 @@ async function savePlace() {
         <v-icon v-if="item.latitude && item.longitude" icon='mdi-map-marker'/>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn color="primary" icon='mdi-pencil' @click="editPlace(item)" />
-        <v-btn :to="`/place/${item.id}/${encodeURIComponent(item.name)}`" icon='mdi-eye' />
+        <t-btn :tooltip="$t('common.edit')" color="primary" icon='mdi-pencil' @click="editPlace(item)" />
+        <t-btn :tooltip="$t('common.preview')" :to="`/place/${item.id}/${encodeURIComponent(item.name)}`" icon='mdi-eye' />
       </template>
     </v-data-table>
   </div>

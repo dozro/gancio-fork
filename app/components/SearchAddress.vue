@@ -3,7 +3,6 @@ import { refDebounced } from '@vueuse/core'
 const place = defineModel<Place>('place', { type: Object, required: true })
 
 const settings = useState<Settings>('settings')
-const showGeocoded = computed(() => settings.value.allow_geolocation && place.value.name !== 'online' && place.value.create)
 defineEmits(['close', 'update:event'])
 
 const search = ref(place.value.address)
@@ -32,7 +31,6 @@ function selectAddress (v: object) {
 <template>
 <div>
   <v-combobox
-    v-if='showGeocoded'
     ref='geocodedAddress'
     v-model:search='search'
     prepend-icon='mdi-map-search'
@@ -70,9 +68,8 @@ function selectAddress (v: object) {
     </v-col>
   </v-row>
   <!-- eslint-disable-next-line vue/no-v-html -->
-  <p v-if='place?.create' class='mt-4' v-html="$t('event.address_geocoded_disclaimer')" />
+  <p v-if='!place?.id' class='mt-4' v-html="$t('event.address_geocoded_disclaimer')" />
 
-  <!-- //:LMapStyles="{height: mapHeight}" /> -->
   <Map
     v-if="(settings.allow_geolocation && place.latitude && place.longitude)"
     class='mt-4' :place="place" :draggable="true"  />
