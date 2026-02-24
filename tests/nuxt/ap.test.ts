@@ -6,6 +6,40 @@ import { setup } from './setup'
 
 await setup(false)
 
+describe('Nodeinfo', () => {
+  it('shoud return a json content', async () => {
+    const { status, headers } = await fetch('/.well-known/nodeinfo')
+    expect(status).toBe(200)
+    expect(headers.get('content-type')).toBe('application/json')
+  })
+
+  it('shoud support nodeinfo 2.0 and 2.1', async () => {
+    const res = await $fetch('/.well-known/nodeinfo')
+    expect(res.links.find(l => l.rel === 'http://nodeinfo.diaspora.software/ns/schema/2.0')?.href).toContain('/.well-known/nodeinfo/2.0')
+    expect(res.links.find(l => l.rel === 'http://nodeinfo.diaspora.software/ns/schema/2.1')?.href).toContain('/.well-known/nodeinfo/2.1')
+  })
+
+  it('shoud implement FEP-2677 - Application Actor', async () => {
+    const response = await $fetch('/.well-known/nodeinfo')
+    expect(response.links.find(l => l.rel === 'https://www.w3.org/ns/activitystreams#Application')?.href).toContain('/federation/u/relay')
+  })
+})
+
+describe('Webfinger', () => {
+  it('should return a 404 on bad request', async () => {
+    const res = await fetch('/.well-known/webfinger')
+    expect(res.status).toBe(400)
+  })
+
+  it('should return webfinger response', async () => {
+    const res = await fetch('/.well-known/webfinger?resource=acct:relay@localhost:13120')
+    expect(res.status).toBe(200)
+    expect(res.headers.get('Content-Type')).toBe('application/jrd+json')
+    const data = await res.json()
+    expect(data?.subject).toBe('acct:relay@localhost:13120')
+  })
+})
+
 describe('AP', () => {
   it('should redirect to / on html as accepted content type', async () => {
     const res = await fetch('/federation/u/relay', { redirect: 'manual', headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' } })
