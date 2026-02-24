@@ -34,5 +34,6 @@ export default defineEventHandler(async (event) => {
     events = await getEvents(opt)
   }
 
+  setResponseHeader(event, 'Access-Control-Allow-Origin', '*')
   return sendEvents(event, events)
 })

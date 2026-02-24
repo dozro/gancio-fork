@@ -68,6 +68,8 @@ export default defineEventHandler(async (evt) => {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 
+  setResponseHeader(evt, 'Access-Control-Allow-Origin', '*')
+
   // manage cache (https://github.com/h3js/h3/issues/1261)
   event.updatedAt.setMilliseconds(0)
   if (
