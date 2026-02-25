@@ -14,7 +14,7 @@ const headers = [
   { value: 'actions', title: t('common.actions'), align: 'end', sortable: false }
 ]
 
-const { data: announcements, refresh } = await useFetch<Announcement[]>('/api/announcements', { params: { full_attributes: true } })
+const { data: announcements, refresh } = await useFetch<Announcement[]>('/api/announcements/list')
 
 function edit(newAnnouncement: Announcement) {
   announcement.title = newAnnouncement.title
@@ -37,9 +37,6 @@ async function toggle(announcement: Announcement) {
     announcement.visible = !announcement.visible
     await $fetch(`/api/announcements/${announcement.id}`, { method: 'PUT', body: announcement })
     refresh()
-    // announcements.value = this.announcements.map(a => a.id === announcement.id ? announcement : a)
-    // TODO: update global announcement useState!
-    // this.setAnnouncements(cloneDeep(this.announcements.filter(a => a.visible)))
   } catch (e) {
     console.error(e)
   }
@@ -68,7 +65,6 @@ async function save() {
       await $fetch('/api/announcements', { method: 'POST', body: announcement })
     }
     refresh()
-    // announcement = { title: '', announcement: '' }
     form.value.reset()
     editing.value = false
     dialog.value = false
@@ -81,6 +77,7 @@ async function save() {
 
 <template>
 <div class="d-flex flex-column ga-2">
+  <!-- eslint-disable-next-line vue/no-v-html -->
   <div class="text-subtitle-2 text-medium-emphasis" v-html="t('admin.announcement_description')" />
 
   <v-dialog v-model='dialog' width='800px' :fullscreen='$vuetify.display?.mobile'>
