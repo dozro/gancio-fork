@@ -1,6 +1,6 @@
 import { verifyJwtToken } from '../lib/jwt'
 import type { H3Event } from 'h3'
-import type { UserRole } from '../services/db'
+import { User, type UserRole } from '../services/db'
 
 export type UserSession = { id: number, email: string, role: UserRole }
 /**
@@ -8,31 +8,38 @@ export type UserSession = { id: number, email: string, role: UserRole }
  */
 export async function getUser(event: H3Event<EventHandlerRequest>) {
   const session = await getUserSession(event)
-  if (session?.user) {
-    return session.user
-  }
+  let user: UserSession | undefined = session.user
 
-  // FIX:
-  // ref: https://github.com/orgs/h3js/discussions/1250
-  clearResponseHeaders(event, ['set-cookie'])
+  if (!user) {
+    // FIX:
+    // ref: https://github.com/orgs/h3js/discussions/1250
+    clearResponseHeaders(event, ['set-cookie'])
 
-  const authHeader = getHeader(event, 'authorization')
-  const token = authHeader?.split(' ')[1]
+    const authHeader = getHeader(event, 'authorization')
+    const token = authHeader?.split(' ')[1]
 
-  if (token) {
-    try {
-      const payload = await verifyJwtToken(token)
+    if (token) {
+      try {
+        const payload = await verifyJwtToken(token)
 
-      // Attach decoded user info to context
-      return {
-        id: payload.userId,
-        email: payload.email,
-        role: payload.role
-      } as UserSession
-    } catch (err) {
-      console.warn('Invalid JWT:', err)
+        // Attach decoded user info to context
+        user = {
+          id: payload.userId,
+          email: payload.email,
+          role: payload.role
+        } as UserSession
+      } catch (err) {
+        console.warn('Invalid JWT:', err)
+      }
     }
   }
+
+  if (!user) return
+
+  // check if user exists and is enabled
+  return User.findByPk(user.id, { where: { is_active: true }, attributes: ['id', 'email', 'role'] })
+    .then(u => u || undefined)
+    .catch()
 }
 
 /**
@@ -47,50 +54,28 @@ export async function requireUser(event: H3Event<EventHandlerRequest>) {
   return user
 }
 
-/**
- * Require an user via a specified role (admin|editor) to be authenticated (via cookie or JWT token)
- */
-export async function requireRole(event: H3Event<EventHandlerRequest>, role: string) {
-  const user = await requireUser(event)
-
-  if (user?.role !== role) {
+// require current user role to be one of the specified
+export async function requireSessionRole(evt: H3Event<EventHandlerRequest>, roles: UserRole[] | UserRole) {
+  const user = await isSessionRole(evt, roles)
+  if (!user) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
-
   return user
 }
 
+// check if current user role is one of specified
+export async function isSessionRole(evt: H3Event<EventHandlerRequest>, roles: UserRole[] | UserRole) {
+  const user = await getUser(evt)
+  if (!user) return
+  if (!Array.isArray(roles)) {
+    roles = [roles]
+  }
+  return roles.includes(user?.role) ? user : false
+}
+
 /**
- * Require a user session, throw a 401 error if the user is not logged in
- * @param event
- * @param opts Options to customize the error message and status code
- * @param opts.statusCode The status code to use for the error (defaults to 401)
- * @param opts.message The message to use for the error (defaults to Unauthorized)
- * @see https://github.com/atinux/nuxt-auth-utils
+ * Require an admin session, throw a 401 error if the user is not logged in
  */
-export async function requireAdminSession(event: H3Event<EventHandlerRequest>, opts: { statusCode?: number, message?: string } = {}) {
-  const userSession = await getUser(event)
-
-  if (!userSession) {
-    if (isEvent(event)) {
-      throw createError({
-        statusCode: opts.statusCode || 401,
-        statusMessage: opts.message || 'Unauthorized'
-      })
-    }
-    else {
-      throw new Response(opts.message || 'Unauthorized', {
-        status: opts.statusCode || 401
-      })
-    }
-  }
-
-  if (userSession?.role !== 'admin') {
-    throw createError({
-      statusCode: opts.statusCode || 401,
-      statusMessage: opts.message || 'Unauthorized'
-    })
-  }
-
-  return userSession
+export async function requireAdminSession(evt: H3Event<EventHandlerRequest>) {
+  return requireSessionRole(evt, 'admin')
 }

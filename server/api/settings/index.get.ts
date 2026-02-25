@@ -1,10 +1,9 @@
 import { useLogger } from '~~/server/lib/logger'
 import { publicSettings, publicSettingsLastModified } from '~~/server/services'
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (evt) => {
   const log = useLogger('settings')
   log.info('get settings')
-  const { user } = await getUserSession(event)
-  if (user?.role === 'admin') {
+  if (await isSessionRole(evt, 'admin')) {
     return publicSettings
   }
 
@@ -23,7 +22,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  if (!handleCacheHeaders(event, { modifiedTime: lastModified })) {
+  if (!handleCacheHeaders(evt, { modifiedTime: lastModified })) {
     return data
   }
 })
