@@ -1,6 +1,6 @@
 import { verifyJwtToken } from '../lib/jwt'
 import type { H3Event } from 'h3'
-import type { UserRole } from '../services/db'
+import { User, type UserRole } from '../services/db'
 
 export type UserSession = { id: number, email: string, role: UserRole }
 /**
@@ -8,31 +8,36 @@ export type UserSession = { id: number, email: string, role: UserRole }
  */
 export async function getUser(event: H3Event<EventHandlerRequest>) {
   const session = await getUserSession(event)
-  if (session?.user) {
-    return session.user
-  }
+  let user: UserSession | undefined = session.user
 
-  // FIX:
-  // ref: https://github.com/orgs/h3js/discussions/1250
-  clearResponseHeaders(event, ['set-cookie'])
+  if (!user) {
+    // FIX:
+    // ref: https://github.com/orgs/h3js/discussions/1250
+    clearResponseHeaders(event, ['set-cookie'])
 
-  const authHeader = getHeader(event, 'authorization')
-  const token = authHeader?.split(' ')[1]
+    const authHeader = getHeader(event, 'authorization')
+    const token = authHeader?.split(' ')[1]
 
-  if (token) {
-    try {
-      const payload = await verifyJwtToken(token)
+    if (token) {
+      try {
+        const payload = await verifyJwtToken(token)
 
-      // Attach decoded user info to context
-      return {
-        id: payload.userId,
-        email: payload.email,
-        role: payload.role
-      } as UserSession
-    } catch (err) {
-      console.warn('Invalid JWT:', err)
+        // Attach decoded user info to context
+        user = {
+          id: payload.userId,
+          email: payload.email,
+          role: payload.role
+        } as UserSession
+      } catch (err) {
+        console.warn('Invalid JWT:', err)
+      }
     }
   }
+
+  if (!user) return
+
+  // check if user exists and is enabled
+  return User.findByPk(user.id, { where: { is_active: true } })
 }
 
 /**
