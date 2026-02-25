@@ -37,7 +37,9 @@ export async function getUser(event: H3Event<EventHandlerRequest>) {
   if (!user) return
 
   // check if user exists and is enabled
-  return User.findByPk(user.id, { where: { is_active: true } })
+  return User.findByPk(user.id, { where: { is_active: true }, attributes: ['id', 'email', 'role'] })
+    .then(u => u || undefined)
+    .catch()
 }
 
 /**
@@ -54,7 +56,7 @@ export async function requireUser(event: H3Event<EventHandlerRequest>) {
 
 // require current user role to be one of the specified
 export async function requireSessionRole(evt: H3Event<EventHandlerRequest>, roles: UserRole[] | UserRole) {
-  const user = isSessionRole(evt, roles)
+  const user = await isSessionRole(evt, roles)
   if (!user) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
@@ -64,7 +66,7 @@ export async function requireSessionRole(evt: H3Event<EventHandlerRequest>, role
 // check if current user role is one of specified
 export async function isSessionRole(evt: H3Event<EventHandlerRequest>, roles: UserRole[] | UserRole) {
   const user = await getUser(evt)
-  if (!user) return false
+  if (!user) return
   if (!Array.isArray(roles)) {
     roles = [roles]
   }
