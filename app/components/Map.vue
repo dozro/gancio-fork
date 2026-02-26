@@ -1,6 +1,6 @@
 <script setup>
 import 'leaflet/dist/leaflet.css'
-import { LMap, LTileLayer, LMarker } from '@vue-leaflet/vue-leaflet'
+import { LMap, LTileLayer, LMarker, LControlAttribution } from '@vue-leaflet/vue-leaflet'
 // import { LMap, LTileLayer, LMarker, LPopup, LControlAttribution } from '@vue-leaflet/vue-leaflet'
 // import { Icon } from 'leaflet'
 
