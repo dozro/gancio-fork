@@ -8,7 +8,7 @@ import { z } from 'zod'
 import type { EventAPI } from '~~/shared/types/generic'
 import type { H3Event } from 'h3'
 import { createHash } from 'crypto'
-import { Place, Tag, Event, Message } from './db'
+import { Place, Tag, Event, Message, EventStatus } from './db'
 import { publicSettings } from './settings'
 import type { UserSession } from '../utils/session'
 import type { APAttachment, APEvent, APLocation, APTag } from '../federation/types'
@@ -204,9 +204,9 @@ export function mapEvents(events: Event[]): EventAPI[] {
 }
 
 /**
- * Calculate an ETag from a list of generic items using `id` and `updatedAt` fields to build the hash
+ * Calculate an ETag from a list of generic items using `id`, `updatedAt` and `status` (if present) fields to build the hash
 */
-export function calculateEtag(items: readonly { id: number | string, updatedAt: Date }[]): string {
+export function calculateEtag(items: readonly { id: number | string, updatedAt: Date, status?: EventStatus }[]): string {
   const base = items
     .map(e => `${e.id}:${e?.status ?? ''}:${e.updatedAt.toISOString()}`)
     .join('|')
