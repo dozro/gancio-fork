@@ -42,7 +42,7 @@ async function save () {
   <v-card :loading='loading'>
     <v-card-title class="bg-primary">{{$t(isNew ? 'common.new_user' : 'admin.edit_user')}}</v-card-title>
     <v-card-text>
-      <v-form ref="userForm" v-model="valid" validate-on='lazy'>
+      <v-form ref="userForm" v-model="valid">
         <v-text-field
           v-if='isNew'
           v-model="user.email"
