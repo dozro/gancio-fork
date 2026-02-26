@@ -1,10 +1,11 @@
-import { Event, Place, Tag, User, Resource, APUser, mapEvent, Message } from '~~/server/services'
+import { Event, Place, Tag, User, Resource, mapEvent, Message } from '~~/server/services'
 import type { WhereOptions } from '@sequelize/core'
 import { Op } from '@sequelize/core'
 import { formatSchema } from '~~/server/types/validator'
 import { useLogger } from '~~/server/lib/logger'
 import { exportICS } from '~~/server/services/ics'
 import { eventToAP } from '~~/server/services/events'
+import { enableCors } from '~~/server/lib/API'
 
 /**
  * Get event details.
@@ -12,10 +13,9 @@ import { eventToAP } from '~~/server/services/events'
  * @param {string} format - The format of the response (json, json-ld, or ics) (default 'json')
  * @returns Event details in the requested format (JSON, JSON-LD, or ICS)
  * @throws {404} When event is not found or not visible to the current user
- * @example
- * https://demo.gancio.org/api/event/detail/manifestazione
  */
 export default defineEventHandler(async (evt) => {
+  enableCors(evt)
   const log = useLogger('event details!')
   const user = await getUser(evt)
   const isAdminOrEditor = ['admin', 'editor'].includes(user?.role ?? '')
@@ -23,11 +23,10 @@ export default defineEventHandler(async (evt) => {
   const slug_or_id = getRouterParam(evt, 'slug_or_id')
   const { format } = await getValidatedQuery(evt, formatSchema.parse)
 
-  const where: WhereOptions<Event> = { [Op.or]: [{ slug: slug_or_id }] }
   const id = Number(slug_or_id)
-  if (!isNaN(id) && Number.isInteger(id)) {
-    where[Op.or].push({ id })
-  }
+  const where: WhereOptions<Event> = isNaN(id) || !Number.isInteger(id)
+    ? { slug: slug_or_id }
+    : { [Op.or]: [{ slug: slug_or_id }, { id }] }
 
   const event = await Event.findOne({
     where,
@@ -67,22 +66,6 @@ export default defineEventHandler(async (evt) => {
   if (!event?.is_visible && !isAdminOrEditor) {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
-
-  setResponseHeader(evt, 'Access-Control-Allow-Origin', '*')
-
-  // manage cache (https://github.com/h3js/h3/issues/1261)
-  event.updatedAt.setMilliseconds(0)
-  if (
-    handleCacheHeaders(evt, {
-      modifiedTime: event.updatedAt,
-      maxAge: 10,
-      cacheControls: [
-        'must-revalidate',
-        'stale-while-revalidate=30',
-        'stale-if-error=300'
-      ]
-    })
-  ) return
 
   if (format === 'json') {
     return mapEvent(event)

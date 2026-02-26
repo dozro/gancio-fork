@@ -10,7 +10,7 @@ const onSearchChanged = debounce((value) => {
   navigateTo({ query: { query: params.value.query } })
 }, 500)
 
-const { data: collections } = await useFetch<Collection[]>('/api/collections/home')
+const { data: collections } = await useFetch<Collection[]>('/api/collections', { query: { pin: true } })
 
 const show_search = computed(() => route?.name === 'index')
 const show_calendar = computed(() => !settings.value?.hide_calendar && route?.name === 'index')

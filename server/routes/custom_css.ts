@@ -1,6 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { publicSettings, publicSettingsLastModified } from '../services/settings'
+import { handleCache } from '../lib/API'
 
 /**
  * return a custom css
@@ -27,7 +28,6 @@ export default defineEventHandler(async (event) => {
   }
 
   setHeader(event, 'Content-Type', 'text/css')
-  if (!handleCacheHeaders(event, { modifiedTime: lastModified })) {
-    return custom_css
-  }
+  if (await handleCache(event, lastModified)) return
+  return custom_css
 })

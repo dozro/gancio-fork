@@ -1,8 +1,9 @@
+import { handleCache } from '~~/server/lib/API'
 import { useLogger } from '~~/server/lib/logger'
+import { getMaxLastModifieds } from '~~/server/services'
 /**
  */
-import { getMaxLastModifieds } from '~~/server/services'
-export default defineCachedEventHandler(async (event) => {
+export default defineEventHandler(async (event) => {
   const log = useLogger('locale')
   const localeStorage = useStorage('locale_storage')
   const customUserLocaleStorage = useStorage('custom_user_locale')
@@ -50,10 +51,9 @@ export default defineCachedEventHandler(async (event) => {
       lastModifieds.push(lastModifiedVuetifyMeta?.mtime)
     }
 
-    const modifiedTime = getMaxLastModifieds(lastModifieds)
-    if (!handleCacheHeaders(event, { modifiedTime })) {
-      return Object.assign(defaultLocaleMessages, { $vuetify })
-    }
+    const maxLastModified = getMaxLastModifieds(lastModifieds)
+    if (await handleCache(event, maxLastModified)) return
+    return Object.assign(defaultLocaleMessages, { $vuetify })
   } catch (e) {
     throw createError({ status: 400, message: String(e) })
   }

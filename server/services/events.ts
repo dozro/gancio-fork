@@ -14,6 +14,7 @@ import type { UserSession } from '../utils/session'
 import type { APAttachment, APEvent, APLocation, APTag } from '../federation/types'
 import { PlaceToAP } from '../federation/places'
 import { useLogger } from '../lib/logger'
+import { handleCache } from '../lib/API'
 const log = useLogger('services:events')
 
 export const eventQuerySchema = z.object({
@@ -148,7 +149,6 @@ export function getLastModified(items: readonly { updatedAt: Date }[]) {
     return new Date(0)
   }
   const lastModified = items.reduce((last: Date, item) => item.updatedAt > last ? item.updatedAt : last, new Date(0))
-  lastModified.setMilliseconds(0)
   return lastModified
 }
 
@@ -208,30 +208,16 @@ export function mapEvents(events: Event[]): EventAPI[] {
 */
 export function calculateEtag(items: readonly { id: number | string, updatedAt: Date }[]): string {
   const base = items
-    .map(e => `${e.id}:${e.updatedAt.toISOString()}`)
+    .map(e => `${e.id}:${e?.status ?? ''}:${e.updatedAt.toISOString()}`)
     .join('|')
 
   return createHash('sha1').update(base).digest('hex')
 }
 
-export function sendEvents(event: H3Event, events: Event[]) {
-  const lastModified = getLastModified(events)
+export async function sendEvents(event: H3Event, events: Event[]) {
   const etag = calculateEtag(events)
-
-  if (
-    !handleCacheHeaders(event, {
-      modifiedTime: lastModified,
-      etag,
-      maxAge: 10,
-      cacheControls: [
-        'must-revalidate',
-        'stale-while-revalidate=30',
-        'stale-if-error=300'
-      ]
-    })
-  ) {
-    return events.map(e => mapEvent(e))
-  }
+  if (await handleCache(event, etag)) return
+  return events.map(e => mapEvent(e))
 }
 
 export async function getMessages(eventId: number) {

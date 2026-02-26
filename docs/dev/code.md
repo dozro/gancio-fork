@@ -264,10 +264,6 @@ const { isAdmin } = useAuth()
 
 ### Theme (system / light / dark)
 
-### Cache
-
-You can use `handleCacheHeaders` utility to manage HTTP cache.
-
 ## Manage errors
 
 Both in client and in server you can `throw createError` using `statusCode` and `statusMessage` fields.
@@ -289,7 +285,7 @@ In back-end (`server/api/event/detail/[slug_or_id].ts`) we can use the same `cre
 ```javascript
 if (!event) {
   log.warn(`Event not found: ${slug_or_id}`)
-  throw createError({ statusCode: 404, statusMessage: 'Event not found' })
+  throw createError({ statusCode: 404, message: 'Event not found' })
 }
 ```
 

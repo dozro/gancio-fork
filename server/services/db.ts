@@ -100,7 +100,8 @@ export async function runMigrations() {
 }
 
 @Table({
-  tableName: 'announcements'
+  tableName: 'announcements',
+  timestamps: true
 })
 export class Announcement extends Model<
   InferAttributes<Announcement>,
@@ -180,7 +181,8 @@ export const EventStatusEnum = ['EventCancelled', 'EventScheduled', 'EventTentat
 export type EventStatus = typeof EventStatusEnum[number]
 
 @Table({
-  tableName: 'events'
+  tableName: 'events',
+  timestamps: true
 })
 export class Event extends Model<
   InferAttributes<Event>,

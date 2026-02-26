@@ -55,7 +55,12 @@ chown www-data: /var/cache/nginx/gancio
 Add the directive `proxy_cache_path` that will define the zone `gancio_cache` inside the http section, for example in the main configuration file `/etc/nginx/nginx.conf` or directly in `<your-config>` like in the example below.
 
 ```nginx
-proxy_cache_path /var/cache/nginx/gancio keys_zone=gancio_cache:1g max_size=80m inactive=1w;
+proxy_cache_path /var/cache/nginx
+    levels=1:2
+    keys_zone=gancio_cache:10m
+    max_size=1g
+    inactive=60m
+    use_temp_path=off;
 ```
 
 - `path` default to /var/cache/nginx/gancio 

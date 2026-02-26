@@ -1,7 +1,8 @@
-import { eventQuerySchema, getEvents, sendEvents } from '~~/server/services/events'
-import { publicSettings } from '~~/server/services'
+import { eventQuerySchema, getEvents, mapEvent, sendEvents } from '~~/server/services/events'
+import { Event, publicSettings } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
 import { getCollectionEvents } from '~~/server/services/collections'
+import { enableCors, handleCache } from '~~/server/lib/API'
 
 /**
 * Get events
@@ -24,8 +25,11 @@ import { getCollectionEvents } from '~~/server/services/collections'
 */
 export default defineEventHandler(async (event) => {
   const log = useLogger('get events')
+  enableCors(event)
   const opt = await getValidatedQuery(event, eventQuerySchema.parse)
   let events
+
+  if (await handleCache(event, Event)) return
 
   if (publicSettings.collection_in_home && !(opt.tags || opt.places || opt.query)) {
     log.debug('get collection events', publicSettings.collection_in_home)
@@ -34,6 +38,5 @@ export default defineEventHandler(async (event) => {
     events = await getEvents(opt)
   }
 
-  setResponseHeader(event, 'Access-Control-Allow-Origin', '*')
-  return sendEvents(event, events)
+  return events.map(e => mapEvent(e))
 })
