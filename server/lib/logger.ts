@@ -1,4 +1,4 @@
-import { consola } from 'consola'
+import { createConsola } from 'consola'
 
 import { get as getConfig } from '../services/config'
 const levelMap = {
@@ -10,14 +10,11 @@ const levelMap = {
   info: 3,
   debug: 4,
   trace: 5
-
 }
-export function useLogger(tag: string = 'app') {
-  const conf = getConfig()
-  const logger = consola.withDefaults({
-    level: levelMap[conf.log_level]
-  })
-    .withTag(tag)
 
+const conf = getConfig()
+export function useLogger(tag: string = 'app') {
+  const logger = createConsola({ level: levelMap[conf.log_level] }).withTag(tag)
+  logger.level = levelMap[conf.log_level]
   return logger
 }
