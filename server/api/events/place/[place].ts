@@ -1,5 +1,6 @@
+import { handleCache } from '~~/server/lib/API'
 import { useLogger } from '~~/server/lib/logger'
-import { Place, getEvents, getLastModified, mapEvents } from '~~/server/services'
+import { Place, calculateEtag, getEvents, mapEvents } from '~~/server/services'
 /**
  * Return events and past events related to the specified place
  * @return {EventAPI[]}
@@ -12,16 +13,13 @@ export default defineEventHandler(async (evt) => {
     ? await Place.findByPk(id)
     : await Place.findOne({ where: { name: nameOrId } })
   if (!place) {
-    throw createError({ statusCode: 404, statusMessage: `Place not found` })
+    throw createError({ statusCode: 404, message: `Place not found` })
   }
 
   log.debug(`Events for place: ${place.name}`)
   const events = await getEvents({ places: [place.id], show_federated: true })
   const pastEvents = await getEvents({ places: [place.id], older: true, reverse: true, show_federated: true })
-  const lastModifiedEvents = getLastModified(events) ?? new Date(0)
-  const lastModifiedPastEvents = getLastModified(pastEvents) ?? new Date(0)
-  const modifiedTime = lastModifiedEvents > lastModifiedPastEvents ? lastModifiedEvents : lastModifiedPastEvents
-  if (!handleCacheHeaders(evt, { modifiedTime, maxAge: 60 })) {
-    return { events: mapEvents(events), pastEvents: mapEvents(pastEvents), place }
-  }
+  const etag = calculateEtag([...events, ...pastEvents])
+  if (await handleCache(evt, etag)) return
+  return { events: mapEvents(events), pastEvents: mapEvents(pastEvents), place }
 })

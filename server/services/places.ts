@@ -4,7 +4,7 @@ import { Place, Event } from './db'
 const log = useLogger('federation:places')
 
 export async function findOrCreatePlace(body: CreationAttributes<Place> & { id?: number }) {
-  if (body?.id ?? null !== null) {
+  if ((body?.id ?? null) !== null) {
     const place = await Place.findByPk(body.id)
     if (!place) {
       throw new Error('Place not found')

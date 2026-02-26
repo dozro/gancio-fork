@@ -10,6 +10,7 @@ import type { H3Event } from 'h3'
 import mime from 'mime-types'
 import { createReadStream } from 'fs'
 import { stat } from 'fs/promises'
+import { handleCache } from './lib/API'
 
 const window = new JSDOM('').window
 const domPurify = DOMPurify(window)
@@ -122,12 +123,8 @@ export async function serveFile(event: H3Event, path: string) {
   const mimeType = mime.lookup(path) || 'application/octet-stream'
   setHeader(event, 'Content-Type', mimeType)
 
-  s.mtime.setMilliseconds(0)
-  const modifiedTime = s.mtime
-  const etag = `"${s.size}-${Number(s.mtimeMs).toString(16)}"`
-  if (!handleCacheHeaders(event, { modifiedTime, etag }))
-
-    return sendStream(event, createReadStream(path))
+  if (await handleCache(event, s)) return
+  return sendStream(event, createReadStream(path))
 }
 
 /**

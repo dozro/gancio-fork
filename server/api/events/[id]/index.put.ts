@@ -1,4 +1,4 @@
-import type { CreationAttributes, InferCreationAttributes } from '@sequelize/core'
+import type { CreationAttributes } from '@sequelize/core'
 import { parseMultipartFormData, saveUploadedEventImage } from '~~/server/lib/parseMultipartForm'
 import { useLogger } from '~~/server/lib/logger'
 import type { MultiPartData } from 'h3'

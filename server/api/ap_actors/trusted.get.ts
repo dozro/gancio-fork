@@ -1,9 +1,9 @@
-import { APUser, calculateEtag, getLastModified, Instance } from '~~/server/services'
-export default defineEventHandler(async (event) => {
+import { APUser, Instance } from '~~/server/services'
+import { handleCache } from '~~/server/lib/API'
+
+export default defineEventHandler(async (evt) => {
+  if (await handleCache(evt, APUser)) return
   const trusted = await APUser.findAll({ where: { trusted: true }, include: [{ model: Instance, required: true }] })
-  // const lastModified = getLastModified(trusted)
-  // const etag = calculateEtag(trusted.map(t => ({ id: t.ap_id, updatedAt: t.updatedAt })))
-  // handleCacheHeaders(event, { etag, modifiedTime: lastModified, cacheControls: ['must-revalidate'] })
   return trusted.map(t => ({
     ap_id: t.ap_id,
     following: t.following,

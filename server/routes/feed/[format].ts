@@ -1,20 +1,23 @@
 import { exportICS } from '~~/server/services/ics'
 import { exportFeed } from '~~/server/services/rss'
-import { getLastModified, publicSettings } from '~~/server/services'
+import { Event, publicSettings } from '~~/server/services'
 import { formatSchema } from '~~/server/types/validator'
 import { useLogger } from '~~/server/lib/logger'
-import { calculateEtag, eventQuerySchema, getEvents, mapEvents } from '~~/server/services/events'
+import { eventQuerySchema, getEvents, mapEvents } from '~~/server/services/events'
 import { getCollectionEvents } from '~~/server/services/collections'
+import { handleCache } from '~~/server/lib/API'
 
 /**
  * Return events in different formats: rss, ics, json
  *
  */
-export default defineCachedEventHandler(async (evt) => {
+export default defineEventHandler(async (evt) => {
   const log = useLogger('feed events')
   const { format } = await getValidatedRouterParams(evt, formatSchema.parse)
 
   const opt = await getValidatedQuery(evt, eventQuerySchema.parse)
+
+  if (await handleCache(evt, Event)) return
 
   let events
   if (publicSettings.collection_in_home && !(opt.tags || opt.places || opt.query)) {
@@ -22,13 +25,6 @@ export default defineCachedEventHandler(async (evt) => {
     events = await getCollectionEvents({ name: publicSettings.collection_in_home, ...opt })
   } else {
     events = await getEvents(opt)
-  }
-
-  const lastModified = getLastModified(events)
-  const etag = calculateEtag(events)
-
-  if (handleCacheHeaders(evt, { modifiedTime: lastModified, etag, maxAge: 60, cacheControls: ['stale-with-revalidate'] })) {
-    return
   }
 
   switch (format) {

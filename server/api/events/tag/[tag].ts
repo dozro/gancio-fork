@@ -1,6 +1,6 @@
-import max from 'lodash/max'
+import { handleCache } from '~~/server/lib/API'
 import { useLogger } from '~~/server/lib/logger'
-import { Tag, calculateEtag, getEvents, getLastModified, mapEvents } from '~~/server/services'
+import { Tag, calculateEtag, getEvents, mapEvents } from '~~/server/services'
 
 export default defineEventHandler(async (evt) => {
   const log = useLogger('events/tag')
@@ -20,11 +20,7 @@ export default defineEventHandler(async (evt) => {
   const events = await getEvents({ tags: [tagName], show_federated: true })
   const pastEvents = await getEvents({ tags: [tagName], show_federated: true, older: true, reverse: true })
 
-  const lastModifiedPastEvents = getLastModified(pastEvents)
-  const lastModifiedEvents = getLastModified(events)
-  const etag = calculateEtag(events)
-  const modifiedTime = max([lastModifiedEvents, lastModifiedPastEvents])
-  if (!handleCacheHeaders(evt, { modifiedTime, etag, maxAge: 5 })) {
-    return { events: mapEvents(events), pastEvents: mapEvents(pastEvents) }
-  }
+  const etag = calculateEtag([...events, ...pastEvents])
+  if (await handleCache(evt, etag)) return
+  return { events: mapEvents(events), pastEvents: mapEvents(pastEvents) }
 })

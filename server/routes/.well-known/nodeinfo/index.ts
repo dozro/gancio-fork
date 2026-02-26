@@ -1,7 +1,7 @@
-import max from 'lodash/max'
-import { publicSettings, publicSettingsLastModified } from '~~/server/services'
+import { handleCache } from '~~/server/lib/API'
+import { getMaxLastModifieds, publicSettings, publicSettingsLastModified } from '~~/server/services'
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (evt) => {
   const nodeinfo = {
     links: [
       { href: `${publicSettings.baseurl}/.well-known/nodeinfo/2.0`, rel: 'http://nodeinfo.diaspora.software/ns/schema/2.0' },
@@ -15,9 +15,11 @@ export default defineEventHandler((event) => {
     ]
   }
 
-  const lastModified = max([publicSettingsLastModified.instance_name, publicSettingsLastModified.baseurl, publicSettingsLastModified.enable_federation])
+  const lastModified = getMaxLastModifieds([
+    publicSettingsLastModified.instance_name,
+    publicSettingsLastModified.baseurl,
+    publicSettingsLastModified.enable_federation])
 
-  if (!handleCacheHeaders(event, { modifiedTime: lastModified })) {
-    return nodeinfo
-  }
+  if (await handleCache(evt, lastModified)) return
+  return nodeinfo
 })
