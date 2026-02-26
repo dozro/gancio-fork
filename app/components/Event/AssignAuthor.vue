@@ -1,22 +1,22 @@
-<script setup>
+<script setup lang="ts">
 const props = defineProps({ event: { type: Object, default: () => ({}) } })
-defineEmits(['close'])
+const { $notify } = useNuxtApp()
+const emit = defineEmits(['close'])
 
 const loading = ref(false)
-const selectedUser = ref({})
+const selectedUser = ref()
 const { data: users } = await useFetch('/api/users')
 
 async function assign () {
   try {
     loading.value = true
-    await $fetch('/event/assign_to_author', { method: 'PUT', body: { id: props.event.id, user_id: selectedUser.value } })
+    await $fetch(`/api/events/${props.event.id}/assign_to_author`, { method: 'PUT', body: { userId: selectedUser.value } })
     loading.value = false
-    // this.$emit('close')
-    // this.$root.$message('event.saved', { color: 'success' })
+    emit('close')
+    $notify('event.saved')
   } catch(e) {
     loading.value = false
-    console.error(e)
-    // this.$root.$message(e, { color: 'warning' })
+    $notify(e, Statuses.ERROR)
   }
 }
 </script>
@@ -26,10 +26,11 @@ async function assign () {
   <v-card-text>
     <p class="mb-2">{{$t('event.assign_to_user_description')}}</p>
     <v-form>
+      <span>{{ selectedUser}}</span>
       <v-autocomplete
         v-model='selectedUser'
         :items="users"
-        :prepend-inner-icon="mdiAccount"
+        prepend-inner-icon="mdi-account"
         hide-no-data
         item-title="email"
         item-value="id"
