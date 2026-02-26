@@ -13,7 +13,7 @@ async function disableAuthor() {
     return
   }
   try {
-    await $fetch(`/api/event/disable_author/${event.id}`, { method: 'PUT' })
+    await $fetch(`/api/events/${event.id}/disable_author`, { method: 'PUT' })
     $notify('Author disabled!', Statuses.SUCCESS)
     event.is_anon = true
   } catch (e) {
@@ -116,7 +116,8 @@ async function reannounce() {
 
   <!-- Assign to user -->
   <v-list-item
-    v-if="event.is_anon && isAdmin" prepend-icon='mdi-clipboard-account'
+    v-if="event.is_anon && isAdmin"
+    prepend-icon='mdi-clipboard-account'
     :title="$t('event.assign_to_user')" @click="$emit('openAssignAuthor')" />
 
   <!-- Re-announce event -->
