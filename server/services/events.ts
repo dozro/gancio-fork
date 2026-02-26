@@ -306,5 +306,5 @@ export function eventToAP(event: Event) {
 }
 
 export function canModifyEvent(event: Event, user?: UserSession) {
-  return !!user && (['admin', 'editor'].includes(user.role) || event.userId !== user.id)
+  return ['admin', 'editor'].includes(user?.role) || event?.userId === user?.id
 }
