@@ -17,15 +17,14 @@ export const ProxySchema = z.object({
   headers: z.record(z.string(), z.string()).optional().default({})
 })
 
-export type DialectName = 'sqlite3' | 'mariadb' | 'postgresql'
+const DialectSchema = z.enum(['sqlite', 'sqlite3', 'mariadb', 'postgresql']).default('sqlite3').transform(t => t === 'sqlite' ? 'sqlite3' : t)
+
 export const DbSchema = z.object({
-  dialect: z.enum(['sqlite', 'sqlite3', 'mariadb', 'postgresql'])
-    .default('sqlite3')
-    .transform(t => t === 'sqlite' ? 'sqlite3' : t),
+  dialect: DialectSchema,
   storage: z.string().optional(), // sqlite only
   host: z.string().optional(),
   port: z.coerce.number().optional(),
-  username: z.string().optional(),
+  user: z.string().optional(),
   password: z.string().optional(),
   database: z.string().optional()
 })
@@ -75,14 +74,25 @@ export function get() {
     process.exit(-1)
   }
 
+  const dialect = DialectSchema.parse(process.env.DB_DIALECT || 'sqlite3')
+  const isSqlite = dialect === 'sqlite3'
+  const db = DbSchema.parse({
+    dialect,
+    ...(isSqlite && { storage: isTest ? 'gancio.sqlite?mode=memory' : process.env.DB_STORAGE || 'gancio.sqlite' }),
+    ...(!isSqlite && {
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 3306,
+      user: process.env.DB_USERNAME || 'root',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_DATABASE || 'gancio'
+    })
+  })
+
   const defaultConfig: Config = {
     baseurl: process.env.BASEURL || 'http://localhost:13120',
     log_level: process.env.LOG_LEVEL || 'debug',
     log_path: path.resolve(process.env.LOG_PATH || '', 'logs'),
-    db: {
-      dialect: (process.env.DB_DIALECT || 'sqlite3') as DialectName,
-      storage: isTest ? 'memory:gancio.sqlite' : process.env.DB_STORAGE || 'gancio.sqlite'
-    },
+    db,
     user_locale: path.resolve(process.env.USER_LOCALE || 'user_locale'),
     upload_path: path.resolve(process.env.UPLOAD_PATH || 'uploads'),
     plugins_path: path.resolve(process.env.PLUGINS_PATH || 'plugins'),
