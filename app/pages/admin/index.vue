@@ -19,13 +19,13 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
     badge: unconfirmedEvents.value?.events?.length || null
   },
   { value: 'users', title: $t('common.users'), icon: 'mdi-account-group' },
+  { value: 'moderation', title: $t('common.moderation'), icon: 'mdi-scale-balance' },
 
   { type: 'divider' },
 
   { value: 'collections', title: $t('common.collections'), icon: 'mdi-group' },
   { value: 'places', title: $t('common.places'), icon: 'mdi-map-marker' },
   { value: 'tags', title: $t('common.tags'), icon: 'mdi-tag-text' },
-  // { value: "moderation", title: $t('common.moderation') },
   { value: 'announcements', title: $t('common.announcements'), icon: 'mdi-bullhorn' },
   { value: 'pages', title: $t('common.pages'), icon: 'mdi-post-outline' },
 
@@ -71,9 +71,9 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
         <AdminFederation />
       </CoreSettingsView>
 
-      <!-- <CoreSettingsView value='moderation'>
+      <CoreSettingsView value='moderation'>
         <AdminModeration />
-      </CoreSettingsView> -->
+      </CoreSettingsView>
 
       <CoreSettingsView value='places'>
         <AdminPlaces />
