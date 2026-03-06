@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { refDebounced } from '@vueuse/core'
-const place = defineModel<Place>('place', { type: Object, required: true })
+const place = defineModel<PlaceAPI>('place', { type: Object, required: true })
 
 const settings = useState<Settings>('settings')
 defineEmits(['close', 'update:event'])
@@ -8,20 +8,24 @@ defineEmits(['close', 'update:event'])
 const search = ref(place.value.address)
 const searchDebounced = refDebounced(search, 600)
 
-const { data: addressList, status } = useFetch('/api/geocode', { params: { q: searchDebounced } })
+const { data: addressList, status, execute } = useFetch('/api/geocode', { params: { q: searchDebounced }, immediate: false, lazy: true })
+watch(searchDebounced, (q) => {
+  if (q?.length >= 2) {
+    execute()
+  }
+})
 
-// let prevAddress = ''
-function selectAddress (v: object) {
+function selectAddress (v) {
   if (!v) {
+    place.value.latitude = place.value.longitude = null
+    place.value.postal_address = null
     return
   }
   if (typeof v === 'object') {
     place.value.latitude = v.lat
     place.value.longitude = v.lon
-    // if (place.value.address === '' || place.value.address === prevAddress ) {
-    place.value.address = v.address
-    // prevAddress = v.address
-    // }
+    place.value.address = addressToString(v.address)
+    place.value.postal_address = v.address
   } else {
     place.value.latitude = place.value.longitude = undefined
   }
@@ -36,7 +40,7 @@ function selectAddress (v: object) {
     prepend-icon='mdi-map-search'
     :model-value="search"
     :label="$t('common.search_coordinates')"
-    item-title='address'
+    item-title='name'
     persistent-hint
     hide-no-data clearable no-filter :loading='status === "pending"'
     :items="addressList"
@@ -46,7 +50,11 @@ function selectAddress (v: object) {
       <span v-html="$t('event.address_description_osm')" />
     </template>
     <template #item="{ item, props }">
-      <v-list-item v-bind='props' :title='item.raw.name' :subtitle='item.raw.address' :prepend-icon='item.raw.icon' />
+      <v-list-item
+        v-bind='props'
+        :title='item.raw.name'
+        :subtitle='item.raw.display_name'
+        :prepend-icon='item.raw.icon' />
     </template>
   </v-combobox>
 

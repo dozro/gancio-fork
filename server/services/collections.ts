@@ -1,5 +1,5 @@
 import type { WhereOptions } from '@sequelize/core'
-import { Op, literal, sql } from '@sequelize/core'
+import { Op, col, sql } from '@sequelize/core'
 import { APUser, Event, Place, Filter, Collection, Tag } from './db'
 import { DateTime } from 'luxon'
 import z from 'zod'
@@ -40,13 +40,7 @@ function filterToConditions(filter: Filter) {
   // }
 
   if (filter.tags?.length) {
-    conditions.push(
-      literal(`event.id IN (
-        SELECT eventId
-        FROM event_tags
-        WHERE tagTag IN :tags_${filter.id}
-      )`)
-    )
+    conditions.push(sql`${col('Event.id')} IN (SELECT eventId FROM event_tags WHERE tagTag IN :tags_${filter.id})`)
     replacements[`tags_${filter.id}`] = sql.list(filter.tags)
   }
 
@@ -149,7 +143,6 @@ export async function getCollectionEvents(opts?: CollectionQueryType) {
     ],
     ...(opts?.limit && { limit: args.limit }),
     ...(opts?.page && args.limit && { offset: opts.page * args.limit }),
-    logging: console.log,
     replacements
   }).catch((e) => {
     log.error('[EVENT]', e)

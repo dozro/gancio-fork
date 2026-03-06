@@ -1,13 +1,17 @@
 import { defineConfig } from 'vitest/config'
-import { defineVitestProject } from '@nuxt/test-utils/config'
-import { resolve } from 'node:path'
+import { defineConfig as defineNitroConfig } from 'nitro-test-utils/config'
 
 export default defineConfig({
   test: {
+    reporters: ['tree'],
+    pool: 'threads',
+    fileParallelism: false,
     maxConcurrency: 1,
+    hookTimeout: 30000,
     maxWorkers: 1,
     sequence: {
-      concurrent: false
+      concurrent: false,
+      shuffle: false
     },
     projects: [
       {
@@ -17,21 +21,23 @@ export default defineConfig({
           environment: 'node'
         }
       },
-      await defineVitestProject({
-        resolve: {
-          alias: {
-            'bun:test': resolve('./vitest.config.ts'),
-            '~~/': resolve('./')
-          }
-        },
+      defineNitroConfig({
         test: {
+          hookTimeout: 30000,
+          pool: 'threads',
+          setupFiles: ['./vitest.setup.ts'],
+          name: 'API',
+          fileParallelism: false,
+          maxWorkers: 1,
           maxConcurrency: 1,
-          name: 'nuxt',
-          include: ['tests/nuxt/*.{test,spec}.{ts,js}'],
-          environment: 'nuxt',
           sequence: {
             concurrent: false,
-          }
+            shuffle: false
+          },
+          include: ['tests/api/*.{test,spec}.{ts,js}']
+        },
+        nitro: {
+          global: true
         }
       })
     ]

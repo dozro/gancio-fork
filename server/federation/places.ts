@@ -59,6 +59,7 @@ export async function parseAPLocation(APEvent: APEvent) {
     if (typeof address === 'string') {
       place.address = address
     } else if (address?.streetAddress || address?.addressLocality || address?.addressCountry || address?.addressRegion) {
+      place.postal_address = address
       place.address = [address?.streetAddress, address?.addressLocality, address?.addressRegion, address?.addressCountry]
         .filter(part => part).join(', ')
     } else {
@@ -80,13 +81,13 @@ export async function parseAPLocation(APEvent: APEvent) {
  * @returns ActivityStream location representation
  * @link https://www.w3.org/TR/activitystreams-vocabulary/#places
  */
-export function PlaceToAP(place: Place) {
+export function PlaceToAP(place: Place): APLocation {
   return {
-    id: place?.ap_id ?? `${publicSettings.baseurl}/federation/p/${place.id}`,
+    id: place?.ap_id || `${publicSettings.baseurl}/federation/p/${place.id}`,
     type: 'Place',
     name: place.name,
-    address: place.address,
-    url: place?.ap_id ?? `${publicSettings.baseurl}/place/${place.id}/${encodeURIComponent(place.name)}`,
+    address: place.postal_address || place.address,
+    url: place?.ap_id || `${publicSettings.baseurl}/place/${place.id}/${encodeURIComponent(place.name)}`,
     ...(place.latitude && place.longitude && ({ latitude: place.latitude, longitude: place.longitude }))
-  } as APLocation
+  }
 }

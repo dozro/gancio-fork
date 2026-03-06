@@ -20,10 +20,12 @@ export default defineNuxtPlugin((nuxtApp) => {
     ],
 
     latitude: [
-      (v: number) => (v < 90 && v > -90) || t('validators.latitude')
+      (v: number) => {
+        return typeof v === 'undefined' ? true : (v < 90 && v > -90) || t('validators.latitude')
+      }
     ],
     longitude: [
-      (v: number) => (v < 180 && v > -180) || t('validators.longitude')
+      (v: number) => typeof v === 'undefined' ? true : (v < 180 && v > -180) || t('validators.longitude')
     ]
   }
 

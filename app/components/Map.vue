@@ -1,12 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import 'leaflet/dist/leaflet.css'
 import { LMap, LTileLayer, LMarker, LControlAttribution } from '@vue-leaflet/vue-leaflet'
 // import { LMap, LTileLayer, LMarker, LPopup, LControlAttribution } from '@vue-leaflet/vue-leaflet'
 // import { Icon } from 'leaflet'
 
-const settings = useState('settings')
-const url = settings.tilelayer_provider || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-const attribution = settings.tilelayer_provider_attribution || '<a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+const settings = useState<Settings>('settings')
+const url = settings.value.tilelayer_provider || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+const attribution = settings.value.tilelayer_provider_attribution || '<a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 
 const props = defineProps({
   place: { type: Object, default: () => ({ latitude: 0, longitude: 0 }) },

@@ -2,6 +2,7 @@ import { Place, Event, publicSettings } from '~~/server/services'
 import { Op, fn, col, where } from '@sequelize/core'
 
 import { z } from 'zod'
+import { placeToJSON } from '~~/server/services/places'
 const schema = z.object({
   query: z.string().optional().transform(q => q?.toLocaleLowerCase(publicSettings.instance_locale)),
   limit: z.number().min(1).max(100).default(10)
@@ -18,21 +19,23 @@ export default defineEventHandler(async (event) => {
   const { query, limit } = await getValidatedQuery(event, schema.parse)
   const condition = query
     ? {
-        [Op.or]: [
+        [Op.or]:
+        [
           where(fn('LOWER', col('name')), Op.like, '%' + query + '%'),
           where(fn('LOWER', col('address')), Op.like, '%' + query + '%')
         ]
       }
     : undefined
 
-  return Place.findAll({
+  const places = await Place.findAll({
     order: [[fn('COUNT', col('events.placeId')), 'DESC']],
     where: condition,
     attributes: ['name', 'address', 'latitude', 'longitude', 'id', 'ap_id'],
     include: [{ model: Event, where: { is_visible: true }, required: true, attributes: [] }],
     group: ['Place.id'],
-    raw: true,
     limit,
     subQuery: false
   })
+
+  return places.map(placeToJSON)
 })

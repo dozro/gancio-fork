@@ -18,6 +18,7 @@ export const ProxySchema = z.object({
 })
 
 const DialectSchema = z.enum(['sqlite', 'sqlite3', 'mariadb', 'postgresql']).default('sqlite3').transform(t => t === 'sqlite' ? 'sqlite3' : t)
+const LogLevelSchema = z.enum(['fatal', 'error', 'warn', 'warning', 'normal', 'info', 'debug', 'trace']).optional().default('debug')
 
 export const DbSchema = z.object({
   dialect: DialectSchema,
@@ -33,7 +34,7 @@ export const ConfigSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   baseurl: z.url(),
-  log_level: z.enum(['fatal', 'error', 'warn', 'warning', 'normal', 'info', 'debug', 'trace']).optional().default('debug'),
+  log_level: LogLevelSchema,
   log_path: z.string(),
   db: DbSchema,
   user_locale: z.string(),
@@ -78,7 +79,7 @@ export function get() {
   const isSqlite = dialect === 'sqlite3'
   const db = DbSchema.parse({
     dialect,
-    ...(isSqlite && { storage: isTest ? 'gancio.sqlite?mode=memory' : process.env.DB_STORAGE || 'gancio.sqlite' }),
+    ...(isSqlite && { storage: process.env.DB_STORAGE || 'gancio.sqlite' }),
     ...(!isSqlite && {
       host: process.env.DB_HOST || 'localhost',
       port: process.env.DB_PORT || 3306,
@@ -90,7 +91,7 @@ export function get() {
 
   const defaultConfig: Config = {
     baseurl: process.env.BASEURL || 'http://localhost:13120',
-    log_level: process.env.LOG_LEVEL || 'debug',
+    log_level: process.env.LOG_LEVEL ? LogLevelSchema.parse(process.env.LOG_LEVEL) : 'debug',
     log_path: path.resolve(process.env.LOG_PATH || '', 'logs'),
     db,
     user_locale: path.resolve(process.env.USER_LOCALE || 'user_locale'),

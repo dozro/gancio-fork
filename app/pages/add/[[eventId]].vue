@@ -86,9 +86,14 @@ async function done() {
   if (evt?.place?.id) {
     formData.append('place_id', String(evt.place?.id))
   }
-  formData.append('place_name', evt.place?.name.trim())
+  formData.append('place_name', evt.place?.name ?? '')
+
   if (evt.place?.address) {
-    formData.append('place_address', evt.place.address)
+    formData.append('place_address', evt?.place?.address ?? '')
+  }
+
+  if (evt.place?.postal_address) {
+    formData.append('place_postal_address', JSON.stringify(evt.place.postal_address))
   }
 
   if (settings.value.allow_geolocation) {

@@ -14,13 +14,11 @@ const isOnLine = computed(() => settings.value.allow_online_event && 'online' ==
 
 const search = ref('')
 const searchDebounced = refDebounced(search, 200)
-const { data: places } = await useFetch<Place[]>('/api/places', { params: { query: searchDebounced },
-  dedupe: 'cancel'
-})
+const { data: places } = await useFetch('/api/places', { params: { query: searchDebounced } })
 
 const selectablePlaces = computed(() => {
   // select matched places without online
-  const ret = places?.value?.filter(place => place.name?.toLowerCase() !== 'online') ?? []
+  const ret: (PlaceAPI & { props?: { prependIcon?: string, color?: string } })[] = places?.value?.filter(place => place.name?.toLowerCase() !== 'online') ?? []
 
   // add online if allowed
   if (settings.value.allow_online_event) {
@@ -36,7 +34,7 @@ const selectablePlaces = computed(() => {
   return ret
 })
 
-function selectPlace(place: Place) {
+function selectPlace(place: PlaceAPI) {
   if (!place) {
     event.value.place = { name: '', address: '' }
   } else {
@@ -44,10 +42,12 @@ function selectPlace(place: Place) {
   }
 }
 
+const address = ref()
 function selectFirst () {
   const items = selectablePlaces.value
-  if (items && items.length > 0) {
+  if (items?.[0]) {
     selectPlace(items[0])
+    nextTick(address.value.focus)
   }
 }
 
@@ -73,8 +73,7 @@ function selectFirst () {
       item-title='name'
       item-subtitle='address'
       @keydown.enter.prevent="selectFirst"
-      @keydown.tab="selectFirst"
-      @blur="selectFirst"
+      @keydown.tab.prevent="selectFirst"
       @update:model-value="selectPlace"
     />
   </v-col>

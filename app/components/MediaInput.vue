@@ -42,10 +42,11 @@ const position = computed(() => {
 })
 
 function save () {
-  media.value ??= []
-  media.value[0] ??= {} as Media
-  media.value[0].focalpoint = focalpoint.value
-  media.value[0].name = name.value || props.event.title
+  media.value = [{
+    ...media.value[0],
+    focalpoint: focalpoint.value,
+    name: name.value || props.event.title
+  }]
 
   // name: this.name || (this.event.title) || '',
   openMediaDetails.value = false
@@ -60,20 +61,27 @@ async function remove () {
   media.value = []
 }
 
-function selectMedia (v: File | File[]) {
-  media.value ??= []
-  media.value[0] ??= {} as Media
-  media.value[0] = { image: v as File, name: props.event.title, focalpoint: [0, 0] }
+function selectMedia(v: File | File[]) {
+  media.value = [{
+    image: v as File,
+    name: props.event.title,
+    focalpoint: [0, 0]
+  }]
 }
 
 function selectUrl () {
-  media.value ??= []
-  media.value[0] ??= {} as Media
+  // media.value ??= []
+  // media.value[0] ??= {} as Media
 
   if (validateUrl(imgUrlInput.value) === true) {
-    media.value[0].url = imgUrlInput.value
+    media.value = [{
+      url: imgUrlInput.value,
+      name: props.event.title,
+      focalpoint: [0, 0]
+    }]
   }
 }
+
 function handleStart (ev: PointerEvent) {
   ev.preventDefault()
   dragging.value = true

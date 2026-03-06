@@ -1,7 +1,7 @@
 import type { JWTPayload } from 'jose'
 import { jwtVerify, SignJWT } from 'jose'
 
-const secret = new TextEncoder().encode(process.env.NUXT_SESSION_SECRET)
+const secret = new TextEncoder().encode(process.env.NUXT_SESSION_PASSWORD)
 
 export async function signJwt(payload: JWTPayload, expiresIn = '1m') {
   return new SignJWT(payload)

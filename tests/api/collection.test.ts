@@ -1,14 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { fetch } from '@nuxt/test-utils/e2e'
-
-import { fetchWithAuth, setup } from './setup'
-await setup()
-
-// let places = []
+import { $fetchRaw as fetch } from 'nitro-test-utils/e2e'
+import { fetchWithAuth, now, cleanDatabase } from './setup'
 
 let collections = []
 let filters = []
-describe('Collection', () => {
+describe('Collection', async () => {
+  await cleanDatabase(true)
   it('should not create a new collection if not allowed', async () => {
     const response = await fetch('/api/collections', {
       method: 'POST',
@@ -30,7 +27,7 @@ describe('Collection', () => {
     const response = await fetch('/api/collections/test')
 
     expect(response.status).toBe(200)
-    expect((await response.json()).length).toBe(0)
+    expect(response.data.length).toBe(0)
   })
 
   it('should add a new filter (tag: test) only when allowed', async () => {

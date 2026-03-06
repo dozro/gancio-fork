@@ -17,9 +17,10 @@ export default defineEventHandler(async (evt) => {
   }
 
   log.debug(`Events for place: ${place.name}`)
+  // place.address = addressToString(place.address)
   const events = await getEvents({ places: [place.id], show_federated: true })
   const pastEvents = await getEvents({ places: [place.id], older: true, reverse: true, show_federated: true })
-  const etag = calculateEtag([...events, ...pastEvents])
+  const etag = calculateEtag([...events, ...pastEvents, place])
   if (await handleCache(evt, etag)) return
   return { events: mapEvents(events), pastEvents: mapEvents(pastEvents), place }
 })

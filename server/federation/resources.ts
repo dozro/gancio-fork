@@ -43,8 +43,8 @@ export async function handleCreateNote(message: APNote, actor: APUser) {
   }
 
   if (!event) {
-    log.error('Create Activity for Note object are only supported for events or other local notes')
-    log.error(message)
+    log.warn('Create Activity for Note object are only supported for events or other local notes')
+    log.warn(message)
     throw new Error('Not found')
   }
 

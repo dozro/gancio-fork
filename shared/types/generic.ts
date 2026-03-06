@@ -1,4 +1,5 @@
 import type { CreationAttributes } from '@sequelize/core'
+import type { PostalAddress } from '~~/server/federation/types'
 import type { Announcement, Event, Place } from '~~/server/services/db'
 
 export type {
@@ -24,13 +25,19 @@ declare module 'vue' {
 }
 
 export type AnnouncementAPI = CreationAttributes<Announcement>
+
+// front end place representation
+export type PlaceAPI = CreationAttributes<Place>
+  & { postal_address?: PostalAddress | null }
+  & { eventCount?: number }
+
 /**
  * there are two Event interface / type. The first one is named `Event` and its the db model,
  * this is the second one and describes how events are represented in API (and in the frontend)
  */
 export type EventAPI = Omit<CreationAttributes<Event>, 'placeId' | 'is_visible'> & {
   tags?: string[]
-  place?: CreationAttributes<Place>
+  place?: PlaceAPI
 
   is_visible?: boolean
 
@@ -48,6 +55,8 @@ export type EventAPI = Omit<CreationAttributes<Event>, 'placeId' | 'is_visible'>
 
   /** plain text description */
   plain_description?: string
+
+  media: Media[]
 
   ap_user?: {
     image: string
