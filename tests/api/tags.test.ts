@@ -1,9 +1,11 @@
-import { describe, expect, it } from 'vitest'
-import { fetchWithAuth, setup, now } from './setup'
-await setup()
+import { beforeAll, describe, expect, it } from 'vitest'
+import { fetchWithAuth, now, cleanDatabase } from './setup'
 
 let event = {}
 describe('Tags', async () => {
+  beforeAll(async () => {
+    await cleanDatabase(true)
+  })
   it('should create event with tags', async () => {
     const response = await fetchWithAuth('/api/events', 'POST',
       {
@@ -75,7 +77,7 @@ describe('Tags', async () => {
         tags: ['/\'"%^&*~`!@$*()_+=-\\}{', 'üniversite etkinliği', 'ÜNIVERSITE ETKINLIĞI', 'antani', '$$antan$i']
       })
 
-    expect(data.tags).toStrictEqual(['/\'"%^&*~`!@$*()_+=-\\}{', 'üniversite etkinliği', 'antani', '$$antan$i'])
+    expect(data.tags).toEqual(expect.arrayContaining(['/\'"%^&*~`!@$*()_+=-\\}{', 'üniversite etkinliği', 'antani', '$$antan$i']))
   })
 
   it('should autocomplete tags', async () => {

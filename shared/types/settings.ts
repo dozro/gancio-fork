@@ -56,6 +56,7 @@ export type Settings = {
   'publicKey'?: string
   'about'?: string
   'trusted_sources_label'?: string
+  'status': 'loading' | 'ready'
 }
 
 // { primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00' },

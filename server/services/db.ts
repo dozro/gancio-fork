@@ -50,7 +50,7 @@ import {
 } from '@sequelize/core/decorators-legacy'
 
 import { get as getConfig } from '../services/config'
-import type { APActor, APEvent, APNote } from '../federation/types'
+import type { APActor, APEvent, APNote, PostalAddress } from '../federation/types'
 const config = getConfig()
 const log = useLogger('sequelize')
 
@@ -226,7 +226,7 @@ export class Event extends Model<
   declare media?: CreationOptional<Media[]>
 
   @Attribute(DataTypes.TEXT)
-  declare description: string
+  declare description?: string
 
   @Attribute(DataTypes.BOOLEAN)
   declare is_visible: boolean
@@ -372,7 +372,8 @@ export class Tag extends Model<
 }
 
 @Table({
-  tableName: 'places'
+  tableName: 'places',
+  timestamps: true
 })
 export class Place extends Model<
   InferAttributes<Place>,
@@ -389,6 +390,12 @@ export class Place extends Model<
   @NotNull
   declare name: string
 
+  @CreatedAt
+  declare readonly createdAt: CreationOptional<Date>
+
+  @UpdatedAt
+  declare readonly updatedAt: CreationOptional<Date>
+
   @Attribute(DataTypes.STRING)
   @Index
   @Unique({ name: 'unique_place_name', msg: 'error.place_name_exists' })
@@ -398,11 +405,14 @@ export class Place extends Model<
   @Attribute(DataTypes.STRING)
   declare address: CreationOptional<string>
 
-  @Attribute(DataTypes.DOUBLE)
-  declare latitude: CreationOptional<number>
+  @Attribute(DataTypes.JSON)
+  declare postal_address: CreationOptional<PostalAddress>
 
   @Attribute(DataTypes.DOUBLE)
-  declare longitude: CreationOptional<number>
+  declare latitude?: CreationOptional<number | null>
+
+  @Attribute(DataTypes.DOUBLE)
+  declare longitude?: CreationOptional<number | null>
 
   @HasMany(() => Event, /* foreign key */ 'placeId')
   declare events?: NonAttribute<Event[]>

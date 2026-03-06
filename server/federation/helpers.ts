@@ -431,7 +431,7 @@ export async function getInstance(actor_url: string, force = false, fail_on_not_
     log.debug('[FEDI] Create a new instance from %s: %s %s', instance_url, instance.name, nodeInfo)
     return instance
   } catch (e) {
-    log.error('[FEDI] Wrong nodeInfo returned for "%s": %s', instance_url, e?.response?.data ?? String(e))
+    log.warn('[FEDI] Wrong nodeInfo returned for "%s": %s', instance_url, e?.response?.data ?? String(e))
   }
 }
 

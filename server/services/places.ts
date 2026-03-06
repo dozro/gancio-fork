@@ -12,7 +12,6 @@ export async function findOrCreatePlace(body: CreationAttributes<Place> & { id?:
     return place
   }
 
-
   if (body?.ap_id) {
     const place = await Place.findOne({ where: { ap_id: body.ap_id } })
     if (place) {
@@ -59,4 +58,16 @@ export async function cleanOrphanPlaces() {
   return Place.destroy({
     where: { id: { [Op.in]: ids } }
   })
+}
+
+export function placeToJSON(place: Place) {
+  const eventCount = Number(place?.get('eventCount') ?? place?.eventCount)
+  return {
+    id: place.id,
+    address: place.address, // : addressToString(place.address),
+    name: place.name,
+    ...(!isNaN(eventCount) && { eventCount }),
+    ...(place.ap_id && { ap_id: place.ap_id }),
+    ...(place.latitude && place.longitude && { latitude: place.latitude, longitude: place.longitude })
+  }
 }

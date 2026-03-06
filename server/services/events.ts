@@ -8,14 +8,18 @@ import { z } from 'zod'
 import type { EventAPI } from '~~/shared/types/generic'
 import type { H3Event } from 'h3'
 import { createHash } from 'crypto'
-import { Place, Tag, Event, Message, EventStatus } from './db'
+import { Place, Tag, Event, Message, type EventStatus, EventStatusEnum } from './db'
 import { publicSettings } from './settings'
 import type { UserSession } from '../utils/session'
-import type { APAttachment, APEvent, APLocation, APTag } from '../federation/types'
+import { PostalAddressSchema, type APAttachment, type APEvent, type APLocation, type APTag } from '../federation/types'
 import { PlaceToAP } from '../federation/places'
-import { useLogger } from '../lib/logger'
 import { handleCache } from '../lib/API'
-const log = useLogger('services:events')
+import { placeToJSON } from './places'
+import { getImageFromURL, sanitizeHTML } from '../helpers'
+import linkifyHtml from 'linkify-html'
+import { multipartFileSchema, saveUploadedEventImage } from '../lib/parseMultipartForm'
+import { focalPointSchema, jsonCodec } from '../lib/validator'
+import { addressToString } from '../../shared/utils/addressToString'
 
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
@@ -93,7 +97,7 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
   }
 
   if (args.tags) {
-    andConditions.push(sql`event.id IN (SELECT eventId FROM event_tags WHERE tagTag IN  ${sql.list(args.tags)})`)
+    andConditions.push(sql`${col('Event.id')} IN (SELECT eventId FROM event_tags WHERE tagTag IN ${sql.list(args.tags)})`)
   }
 
   if (args.query) {
@@ -140,6 +144,93 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
   // return mapEvents(events as Event[])
 }
 
+const MAX_TIMESTAMP = 1000 * 24 * 60 * 60 * 365
+const eventAPISchema = z.object({
+  title: z.string({ message: 'title required' }).min(1).trim(),
+  start_datetime: z.preprocess(val => Number(val),
+    z.number({ error: 'start_datetime required' })
+      .int()
+      .positive()
+      .max(MAX_TIMESTAMP, { message: 'start_datetime is too far in the future' })
+  ),
+  end_datetime: z.preprocess(val => val ? Number(val) : undefined,
+    z.number()
+      .int()
+      .max(MAX_TIMESTAMP, { message: 'end_datetime is too far in the future' })
+      .optional()
+  ),
+  tags: z.array(z.string(), { error: 'tags field must be an array' }).optional(),
+  status: z.enum(EventStatusEnum).default('EventScheduled'),
+  description: z.preprocess((val) => {
+    const str = typeof val === 'string' ? val : val ? String(val) : ''
+    try {
+      // apply linkify then sanitize the resulting HTML
+      return sanitizeHTML(linkifyHtml(str, { target: '_blank', render: { email: (ctx: any) => ctx.content } }))
+    } catch {
+      return str
+    }
+  }, z.string().optional()),
+  online_locations: z.array(z.string()).optional(),
+  // image
+  image_name: z.string().optional(),
+  image: multipartFileSchema.optional(),
+  image_url: z.string().optional(),
+  image_focalpoint: focalPointSchema.default([0, 0]),
+  // location fields
+  place_id: z.coerce.number().int().optional(),
+  place_name: z.string().optional(),
+  place_postal_address: jsonCodec(PostalAddressSchema).optional(),
+  place_address: z.string().optional(),
+  place_latitude: z.coerce.number().optional(),
+  place_longitude: z.coerce.number().optional()
+})
+  .refine(data => data.place_id || Boolean(data.place_name && (data.place_address || data.place_postal_address)),
+    { message: 'place_id or place_name and place_address are required' })
+  .refine(data => data.end_datetime === undefined || data.start_datetime <= data.end_datetime,
+    { message: 'start_datetime is greater than end_datetime' })
+
+export function validateEvent(publicSettings: { allow_anon_event: boolean }, user?: User) {
+  const isAnonymous = !user
+  return eventAPISchema
+    .refine(() => !(isAnonymous && !publicSettings.allow_anon_event),
+      { error: 'Anonymous event update/creation not allowed' })
+    .refine(data => !(isAnonymous && data.start_datetime < DateTime.local().toUnixInteger()),
+      { error: 'Anonymous user cannot create past events' })
+    .transform((data) => {
+      const address = data.place_postal_address || data.place_address
+      const place = {
+        ...(data.place_id && { id: data.place_id }),
+        name: data.place_name,
+        postal_address: data.place_postal_address,
+        address: addressToString(address || ''),
+        latitude: data.place_latitude,
+        longitude: data.place_longitude
+      }
+      return { ...data, is_visible: !isAnonymous, userId: user?.id, place }
+    })
+}
+
+export type EventAPIType = z.infer<typeof eventAPISchema>
+
+export async function setEventMedia(eventPayload: EventAPIType) {
+  if (eventPayload.image || eventPayload.image_url) {
+    const focalpoint = eventPayload.image_focalpoint
+    if (!eventPayload.image && eventPayload.image_url) {
+      return getImageFromURL(
+        eventPayload.image_url,
+        eventPayload.image_name || eventPayload.title,
+        focalpoint
+      )
+    } else if (eventPayload.image) {
+      return saveUploadedEventImage(
+        eventPayload.image,
+        eventPayload.image_name || eventPayload.title || '',
+        focalpoint
+      )
+    }
+  }
+}
+
 /**
  * get the last modified date of items.
  * this is used to set `Last-Modified` header and to check for non modified 304 result
@@ -160,9 +251,8 @@ export function getMaxLastModifieds(lastModifieds: Array<Date | undefined>) {
   }, undefined)
 }
 
-export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User): EventAPI {
+export function mapEvent(event: Event, place?: Place | null, tags?: Tag[], user?: User): EventAPI {
   const response: EventAPI = {
-
     id: event.id,
     slug: event.slug,
     status: event.status,
@@ -175,18 +265,27 @@ export function mapEvent(event: Event, place?: Place, tags?: Tag[], user?: User)
     end_datetime: event.end_datetime,
     plain_description: htmlToText(event.description),
 
-    place: event?.place?.toJSON() ?? place?.toJSON(),
+    place: placeToJSON(event?.place ?? place),
     online_locations: event.online_locations,
     tags: (event.tags ?? tags)?.map(t => t.tag),
     is_mine: event.userId ? event.userId === user?.id : false,
-    is_anon: event.userId === null,
+    is_anon: typeof event.userId === 'undefined' || event.userId === null,
     is_visible: event.is_visible,
-    original_url: event?.ap_object?.url ?? event?.ap_id,
+    original_url: event?.ap_object?.url ?? event?.ap_id ?? undefined,
 
     boost: event.boost,
     likes: event.likes
     // TODO
     // n_msgs: event?.,
+  }
+
+  // remove undefined or empty fields from response
+  for (const key of Object.keys(response)) {
+    const val = response[key]
+    if (val === undefined || val === null || (Array.isArray(val) && val.length === 0)) {
+      delete response[key]
+      continue
+    }
   }
 
   if (event?.APUser?.object) {

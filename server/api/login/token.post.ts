@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
   log.info(`Login ${email}`)
 
   // search for the username
-  const user = await User.withScope('withPassword').findOne({ where: { email, is_active: true } })
+  const user = await User.withScope('withPassword').findOne({ where: { email, is_active: true }, raw: true })
   if (!user || !password) {
     log.warn('E-mail not found or not active', email)
     throw createError({ status: 401, message: 'Bad credentials' })
@@ -44,11 +44,9 @@ export default defineEventHandler(async (event) => {
   if (await bcrypt.compare(password, user.password)) {
     // set the user session in the jwt token
     const access_token = await signJwt({
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      }
+      id: user.id,
+      email: user.email,
+      role: user.role
     })
     return { access_token }
   } else {

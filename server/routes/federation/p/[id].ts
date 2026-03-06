@@ -1,3 +1,4 @@
+import { PlaceToAP } from '~~/server/federation/places'
 import { useLogger } from '~~/server/lib/logger'
 import { Place } from '~~/server/services'
 
@@ -21,7 +22,7 @@ export default defineEventHandler(async (event) => {
     return sendError(event, createError({ statusCode: 404, statusMessage: 'Not found.' }))
   }
 
-  const ret = place.toAP()
+  const ret = PlaceToAP(place)
   // ret['@context'] = ['https://www.w3.org/ns/activitystreams']
   setHeader(event, 'Content-Type', 'application/activity+json; charset=utf-8')
   return ret

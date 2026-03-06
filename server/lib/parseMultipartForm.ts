@@ -3,8 +3,15 @@ import { get as getConfig } from '../services/config'
 import path from 'path'
 import sharp from 'sharp'
 import { useLogger } from './logger'
-
+import { z } from 'zod'
 const log = useLogger('parseMultipartForm')
+
+export const multipartFileSchema = z.object({
+  name: z.string(),
+  filename: z.string().min(1),
+  type: z.string().startsWith('image/'),
+  data: z.instanceof(Buffer)
+})
 
 export async function parseMultipartFormData(event: H3Event) {
   const form = await readMultipartFormData(event)
@@ -77,9 +84,9 @@ export async function saveUploadedEventImage(image: MultiPartData, name: string,
     return {
       name,
       url: filename,
-      height: info.height,
-      width: info.width,
-      size: info.size,
+      height: info?.height,
+      width: info?.width,
+      size: info?.size,
       focalpoint
     }
   } catch (e) {

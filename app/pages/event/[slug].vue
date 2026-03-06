@@ -11,7 +11,7 @@ const { data: event, refresh, error } = await useFetch<EventAPI>(`/api/event/det
 if (!event.value || error.value) {
   throw createError({
     statusCode: error.value?.statusCode ?? 500,
-    statusMessage: error.value?.statusMessage ?? 'Fetch Error',
+    message: error.value?.message ?? error.value?.statusMessage ?? 'Fetch Error',
     data: error.value?.data
   })
 }

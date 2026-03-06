@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
   if (await bcrypt.compare(password, user.password)) {
     // set the user session in the cookie
     // this server util is auto-imported by the auth-utils module
-    await setUserSession(event, {
+    await setSession(event, {
       user: {
         id: user.id,
         email: user.email,

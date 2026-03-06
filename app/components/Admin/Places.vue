@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 const { t } = useI18n()
-const settings = useState('settings')
+const settings = useState<Settings>('settings')
 const { $notify } = useNuxtApp()
 
 const form = ref()
@@ -8,28 +8,27 @@ const loading = ref(false)
 const dialog = ref(false)
 const valid = ref(false)
 const search = ref('')
-const place = reactive({ name: '', address: '', latitude: null, longitude: null, id: null })
+const place: PlaceAPI = reactive({ name: '' })
 
 const newPlace = ref()
 
 const headers = [
-  { value: 'name', title: t('common.name') },
+  { value: 'name', title: t('common.name'), width: 140 },
   { value: 'address', title: t('common.address') },
-  { value: 'map', title: 'Map' },
-  { value: 'actions', title: t('common.actions'), align: 'end', width: 170 }
+  { value: 'map', title: 'Map', width: 10 },
+  { value: 'actions', title: t('common.actions'), align: 'end', width: 130 }
 ]
 
 const { data: places, refresh } = await useFetch('/api/places/list', {
   transform: places => places.filter(place => place.name?.toLowerCase() !== 'online')
 })
 
-function editPlace(item) {
+function editPlace(item: PlaceAPI) {
   newPlace.value = null
   place.name = item.name
   place.address = item.address
   place.eventCount = item.eventCount
   if (settings.value.allow_geolocation) {
-    place.geocodedAddress = ''
     place.latitude = item.latitude
     place.longitude = item.longitude
   }
@@ -41,6 +40,9 @@ async function savePlace() {
   const { valid } = await form.value.validate()
   if (!valid) {
     return
+  }
+  if (place.postal_address) {
+    place.address = addressToString(place.postal_address)
   }
   loading.value = true
   try {

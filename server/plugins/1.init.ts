@@ -7,7 +7,7 @@ import fsDriver from 'unstorage/drivers/fs'
 import { get as getConfig } from '../services/config'
 import { useLogger } from '../lib/logger'
 import { parseCLI } from '../cli'
-import { loadSettings } from '../services/settings'
+import { loadSettings, publicSettings, status } from '../services/settings'
 import { useTaskManager } from '../services/taskManager'
 import { connect, runMigrations } from '../services/db'
 import { useCreateDirectoryStructure } from '../services/directories'
@@ -42,6 +42,7 @@ export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
         const driver = fsDriver({ base: config.user_locale })
         storage.mount('custom_user_locale', driver)
 
+        publicSettings.status = 'ready'
         return true
       } catch (e) {
         log.error(`Error connecting to database?`)

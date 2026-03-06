@@ -60,7 +60,8 @@ export const publicSettings: Settings = {
   'custom_js': '',
   'custom_css': '',
   'admin_email': '',
-  'smtp': {}
+  'smtp': {},
+  'status': 'loading'
 }
 
 export const secretSettings: SecretSettings = {
