@@ -1,12 +1,11 @@
 <script setup>
 
 import time from '~/utils/time'
-import { useTheme } from 'vuetify'
 
 const selectedDate = useState('selectedDate')
 const { attributes, params } = useEvents()
 
-const theme = useTheme()
+const { theme } = useAppTheme()
 
 // const { startMonth } = useTime()
 function updatePages (pages) {
@@ -26,7 +25,7 @@ function updatePages (pages) {
   :locale='$i18n.locale'
   title-position='left'
   transition='fade'
-  :is-dark="theme?.global?.current?.value?.dark"
+  :is-dark="theme.current?.value?.dark"
   aria-label='Calendar'
   expanded
   :attributes='attributes'
