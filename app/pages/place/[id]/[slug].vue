@@ -28,7 +28,7 @@ useHead(() => {
 
   <!-- Map -->
   <div v-if='settings?.allow_geolocation && data.place?.latitude && data.place?.longitude' >
-    <div class="mt-4 mx-auto px-4" >
+    <div class="mt-4" >
       <Map :place='data.place' />
       <!-- :height='mapHeight' /> -->
     </div>
