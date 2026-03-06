@@ -60,7 +60,8 @@ export async function cleanOrphanPlaces() {
   })
 }
 
-export function placeToJSON(place: Place) {
+export function placeToJSON(place?: Place) {
+  if (!place) return undefined
   const eventCount = Number(place?.get('eventCount') ?? place?.eventCount)
   return {
     id: place.id,

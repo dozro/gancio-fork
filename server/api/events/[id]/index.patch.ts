@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { useLogger } from '~~/server/lib/logger'
-import { EventStatusEnum, Event } from '~~/server/services/db'
+import { EventStatusEnum, Event, Place } from '~~/server/services/db'
 import { notifyEvent } from '~~/server/services/notifier'
 import { canModifyEvent, mapEvent } from '~~/server/services/events'
 
@@ -24,7 +24,7 @@ export default defineEventHandler(async (evt) => {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 
-  const event = await Event.findByPk(id)
+  const event = await Event.findByPk(id, { include: [{ model: Place, required: false }] })
   if (!event) {
     log.warn('Event not found: %d', id)
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })

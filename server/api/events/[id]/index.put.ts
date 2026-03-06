@@ -48,6 +48,7 @@ export default defineEventHandler(async (evt) => {
   try {
     eventPayload = validateEvent(publicSettings, user).parse(multiPartBody || jsonBody)
   } catch (e) {
+    log.warn(e)
     const message = e instanceof z.ZodError ? e.issues[0]?.message : String(e)
     throw createError({ statusCode: 400, message })
   }
@@ -69,7 +70,6 @@ export default defineEventHandler(async (evt) => {
     eventPayload.placeId = place?.id
   }
 
-  console.error(eventPayload)
   // const recurrent = body.recurrent ? JSON.parse(body.recurrent as string) : null
   // do we have an image?
   const media = await setEventMedia(eventPayload)

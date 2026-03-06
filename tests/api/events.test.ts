@@ -82,6 +82,15 @@ describe('Events', () => {
     expect(response.status).toBe(200)
   })
 
+  it('should patch event status if allowed', async () => {
+    let response = await fetch(`/api/events/${event_id}`, { method: 'PATCH', body: { status: 'EventCancelled' } })
+    expect(response.status).toBe(403)
+
+    response = await fetchWithAuth(`/api/events/${event_id}`, 'PATCH', { status: 'EventCancelled' })
+    expect(response.status).toBe(200)
+    expect(response.data.status).toBe('EventCancelled')
+  })
+
   it('should not allow start_datetime greater than end_datetime', async () => {
     const event = {
       title: ' test title 5',
