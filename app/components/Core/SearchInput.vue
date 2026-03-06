@@ -1,4 +1,7 @@
 <script setup lang="ts">
+defineProps<{
+  label?: string
+}>()
 const model = defineModel<string>()
 </script>
 <template>
@@ -6,7 +9,7 @@ const model = defineModel<string>()
   <v-text-field
     v-model="model"
     prepend-inner-icon="mdi-magnify"
-    :label="$t('common.search')"
+    :label="label || $t('common.search')"
     single-line
     hide-details
     variant="outlined"
