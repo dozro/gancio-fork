@@ -46,7 +46,7 @@
     "migrate": "NODE_ENV=production sequelize db:migrate",
     "migrate:dev": "sequelize db:migrate",
     "analyze": "nuxt build --analyze",
-    "build:wc": "cd webcomponents; yarn build:lib; cp dist/gancio-events.umd.cjs ../wp-plugin/js/gancio-events.es.js; cp dist/gancio-events.umd.cjs ../public/gancio-events.es.js; cp dist/gancio-events.umd.cjs ../docs/assets/js/gancio-events.es.js;",
+    "build:wc": "cd webcomponents; pnpm run build:lib; cp dist/gancio-events.umd.cjs ../wp-plugin/js/gancio-events.es.js; cp dist/gancio-events.umd.cjs ../public/gancio-events.es.js; cp dist/gancio-events.umd.cjs ../docs/assets/js/gancio-events.es.js;",
     "circular": "madge --circular --extensions ts,js,vue server"
   },
   "dependencies": {

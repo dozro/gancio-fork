@@ -120,7 +120,7 @@
             >@{event.place.name}
             {#if event.place.name!=="online"}<span class="subtitle"> {event.place.address}</span>{/if}</span
           >
-          {#if event.tags.length}
+          {#if event.tags?.length}
             <div class="tags">
               {#each event.tags as tag}
                 <span class="tag">#{tag}</span>
