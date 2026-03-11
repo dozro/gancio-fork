@@ -84,8 +84,15 @@ function updateCoords(v) {
 
 <style>
   #leaflet-map {
-    border-radius: .3rem;
-    border: 1px solid #fff;
+    border-radius: 8px;
     z-index: 1;
+    background-color: rgb(var(--v-theme-surface));
+  }
+
+  .v-theme--dark .leaflet-layer,
+  .v-theme--dark .leaflet-control-zoom-in,
+  .v-theme--dark .leaflet-control-zoom-out,
+  .v-theme--dark .leaflet-control-attribution {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
   }
 </style>
