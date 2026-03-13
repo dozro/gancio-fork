@@ -15,13 +15,22 @@ function routeBy (type: 'foot' | 'bike' | 'car' | 'transit') {
   }
   return `https://www.openstreetmap.org/directions?from=&to=${lat},${lon}&${routingType[type]}#map=14/${lat}/${lon}`
 }
+const geoUrl = computed(() => `geo:${props.place.latitude},${props.place.longitude}?q=${props.place.name}`)
 </script>
 
 <template>
-<v-row color="primary">
-  <!-- <p class="my-4">{{ $t('common.getting_there') }}</p> -->
-  <v-btn class="mx-1" icon='mdi-walk' size="large" :href="routeBy('foot')" />
-  <v-btn class="mx-1" icon='mdi-bike' size="large" :href="routeBy('bike')" />
-  <v-btn class="mx-1" icon='mdi-car' size="large" :href="routeBy('car')" />
-</v-row>
+<div class="how-to-arrive d-flex ga-n2 ma-3 rounded-xl position-absolute bottom-0">
+  <v-btn variant="text" size="small" icon='mdi-walk' :href="routeBy('foot')" />
+  <v-btn variant="text" size="small" icon='mdi-bike' :href="routeBy('bike')" />
+  <v-btn variant="text" size="small" icon='mdi-car' :href="routeBy('car')" />
+  <v-btn variant="text" size="small" icon='mdi-open-in-new' :href="geoUrl" />
+</div>
 </template>
+<style lang="css" scoped>
+.how-to-arrive {
+  z-index: 1;
+  inset-inline-start: 0;
+  background: rgb(var(--v-theme-background));
+  box-shadow: 0 0 0 2px rgba(0,0,0,.2); /* mimick other leaflet buttons */
+}
+</style>
