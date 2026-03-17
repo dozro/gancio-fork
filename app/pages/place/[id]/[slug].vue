@@ -27,14 +27,12 @@ useHead(() => {
   <span v-if='data.place?.name!=="online"' class="d-block text-subtitle text-center w-100">{{ data.place?.address }}</span>
 
   <!-- Map -->
-  <div v-if='settings?.allow_geolocation && data.place?.latitude && data.place?.longitude' >
-    <div class="mt-4" >
-      <Map :place='data.place' />
-      <!-- :height='mapHeight' /> -->
-    </div>
-    <div class="mt-4">
-      <!-- <HowToArriveNav :place='place' class="justify-center" /> -->
-    </div>
+  <div
+    v-if='settings?.allow_geolocation && data.place?.latitude && data.place?.longitude'
+    class="position-relative my-4"
+  >
+    <Map :place='data.place' height="12rem" />
+    <HowToArriveNav :place='data.place' />
   </div>
 
   <!-- Events -->
