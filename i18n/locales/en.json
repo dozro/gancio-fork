@@ -160,7 +160,7 @@
         "anon_description_without_registration": "You can add an event, but it will need to be reviewed to confirm that it’s a suitable event.\nIt won’t be possible to modify it after submission.<br/><br/>\nGo ahead and submit your event, we'll review it as soon as possible.",
         "assign_to_user": "Assign to user",
         "assign_to_user_description": "You can assign an anonymous event to any user. This will allow the selected user to modify the event.",
-        "same_day": "on same day",
+        "same_day": "Events for selected date",
         "what_description": "Title",
         "description_description": "Description",
         "tag_description": "Tag",
