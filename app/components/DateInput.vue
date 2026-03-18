@@ -1,11 +1,10 @@
 <script setup lang='ts'>
 
 import { DateTime } from 'luxon'
-import { useTheme } from 'vuetify'
 
 const { isAdmin } = useAuth()
-
-const theme = useTheme()
+const { attributes, events } = useEvents()
+const { theme } = useAppTheme()
 const settings = useState<Settings>('settings')
 const { t } = useI18n()
 const event = defineModel<EventAPI>('event', { type: Object, required: true })
@@ -41,6 +40,24 @@ const selectedDates = ref<Date | { start: Date, end: Date } | null>(
 )
 const selectedStartTime = ref<string | null>(event.value.start_datetime ? formatTime(event.value.start_datetime) : null)
 const selectedEndTime = ref<string | null>(event.value.end_datetime ? formatTime(event.value.end_datetime) : null)
+
+const todayEvents = computed(() => {
+  if (!events.value ||
+    (type.value === 'normal' && !selectedDates.value) ||
+    (type.value == 'multidate' && !selectedDates?.value?.start)) {
+    console.error('no selected date')
+    return []
+  }
+  const startOfDay = selectedDates.value instanceof Date
+    ? DateTime.fromJSDate(selectedDates.value).startOf('day').toSeconds()
+    : DateTime.fromJSDate(selectedDates?.value?.start).startOf('day').toSeconds()
+  const endOfDay = selectedDates.value instanceof Date
+    ? DateTime.fromJSDate(selectedDates.value).endOf('day').toSeconds()
+    : DateTime.fromJSDate(selectedDates?.value?.end).endOf('day').toSeconds()
+
+  return events?.value?.filter(e => e.id !== event.value.id && e.start_datetime >= startOfDay && e.start_datetime <= endOfDay)
+})
+
 
 watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, endTime]) => {
   if (!startTime || !dates) {
@@ -93,15 +110,14 @@ watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, e
             v-model='selectedDates'
             :rules="[$valid.required('common.when')]"
             class='mx-auto'
-            :is-dark="theme.global.current.value.dark"
+            :is-dark="theme.current?.value?.dark"
             :is-range="type === 'multidate'"
             :locale="$i18n.locale"
+            :attributes="attributes" 
             is-inline
             :min-date="!isAdmin ? new Date() : undefined"
             is-expanded
           />
-          <!-- :attributes="attributes" -->
-          <!-- :is-dark="is_dark" -->
         </template>
       </v-input>
     </div>
@@ -146,83 +162,10 @@ watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, e
     </v-col>
 
   </v-row>
-  <!--
-      <v-menu
-        v-model="menuFromHour"
-        :close-on-content-click="false"
-        offset-y
-        :value="event.fromHour"
-        max-width="290px"
-        min-width="290px"
-        transition="scale-transition"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-text-field
-            clearable
-            :clear-icon="mdiClose"
-            @click:clear="() => change('fromHour')"
-            :label="$t('event.from')"
-            :value="$time.formatHour(value.fromHour)"
-            :disabled="!value.from"
-            readonly
-            :prepend-icon="mdiClockTimeFourOutline"
-            :rules="[$valid.required('event.from')]"
-            v-bind="attrs"
-            v-on="on"
-          ></v-text-field>
-        </template>
-        <v-time-picker
-          v-if="menuFromHour"
-          :value="value.fromHour"
-          :allowedMinutes="allowedMinutes"
-          full-width
-          :format="$time.timeFormat()"
-          @click:minute="menuFromHour = false"
-          @input="hr => change('fromHour', hr)"
-        ></v-time-picker>
-      </v-menu>
-    </v-col>
 
-    <v-col class="col-12 col-sm-6">
-      <v-menu
-        v-model="menuDueHour"
-        :close-on-content-click="false"
-        offset-y
-        max-width="290px"
-        min-width="290px"
-        :value="value.dueHour"
-        transition="scale-transition"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-text-field
-            clearable
-            :clear-icon="mdiClose"
-            @click:clear="() => change('dueHour')"
-            :value="$time.formatHour(value.dueHour)"
-            readonly
-            :disabled="!value.fromHour"
-            :label="$t('event.due')"
-            :prepend-icon="mdiClockTimeEightOutline"
-            :rules="[settings.allow_event_without_end_time ? true : $valid.required('event.due')]"
-            v-bind="attrs"
-            v-on="on"
-          ></v-text-field>
-        </template>
-        <v-time-picker
-          v-if="menuDueHour"
-          :value="value.dueHour"
-          full-width
-          :allowedMinutes="allowedMinutes"
-          :format="$time.timeFormat()"
-          @click:minute="menuDueHour = false"
-          @input="hr => change('dueHour', hr)"
-        ></v-time-picker>
-      </v-menu>
-    </v-col>
-  </v-row> -->
 </v-col>
 
-<!-- //List(v-if='type === "normal" && todayEvents.length' :events='todayEvents' :title='$t("event.same_day")') -->
+<CoreEventList v-if='todayEvents.length' :events='todayEvents' :title='$t("event.same_day")' />
 
 <!-- // import { DateTime } from 'luxon'
 // import { mapState, mapActions, mapGetters } from 'vuex'
