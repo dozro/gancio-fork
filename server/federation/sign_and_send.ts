@@ -1,9 +1,8 @@
 import crypto from 'crypto'
 import { useLogger } from '../lib/logger'
 import { publicSettings } from '../services'
-export async function _signAndSend(message: string, inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
-  const log = useLogger('sign_and_send')
-  log.debug('[FEDI] Sign and %s %s', method, inbox)
+
+export async function prepareHTTPSignature(message: string, inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
   const inboxUrl = new URL(inbox)
   const signer = crypto.createSign('sha256')
   const d = new Date()
@@ -28,13 +27,25 @@ export async function _signAndSend(message: string, inbox: string, method: 'post
     const signature_b64 = signature.toString('base64')
     header = `keyId="${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key",algorithm="rsa-sha256",headers="(request-target) host date",signature="${signature_b64}"`
   }
+  
+  return {
+    'host': inboxUrl.hostname,
+    'date': d.toUTCString(),
+    'signature': header,
+    ...(method === 'post' && ({ digest: `SHA-256=${digest}` })),
+  }
+}
+  
+
+export async function _signAndSend(message: string, inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
+  const log = useLogger('sign_and_send')
+  log.debug('[FEDI] Sign and %s %s', method, inbox)
+
+  const httpSignatureHeaders = await prepareHTTPSignature(message, inbox, method, privkey)
   try {
     const ret = await fetch(inbox, {
       headers: {
-        'Host': inboxUrl.hostname,
-        'Date': d.toUTCString(),
-        'Signature': header,
-        ...(method === 'post' && ({ Digest: `SHA-256=${digest}` })),
+        ...httpSignatureHeaders,
         'Content-Type': 'application/activity+json',
         'Accept': 'application/activity+json'
       },

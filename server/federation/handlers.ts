@@ -141,6 +141,7 @@ async function handleDelete(message: APActivityDelete, actor?: APUser) {
   const event = await Event.findOne({ where: { ap_id } })
   if (event) {
     if (actor && actor.ap_id !== event.apUserApId) return
+    log.debug(`Deleting event ${event.ap_id}`)
     await event.destroy()
     return
   }
@@ -149,6 +150,7 @@ async function handleDelete(message: APActivityDelete, actor?: APUser) {
   const apUser = await APUser.findOne({ where: { ap_id } })
   if (apUser) {
     if (actor && actor.ap_id !== apUser.ap_id) return
+    log.debug(`Deleting APUser ${apUser.ap_id}`)
     await apUser.destroy()
     return
   }

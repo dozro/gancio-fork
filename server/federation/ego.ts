@@ -41,7 +41,6 @@ const log = useLogger('federation:ego')
 export async function handleLike(message: APActivityLike, actor: APUser) {
   const obj = message.object
   if (!obj) return
-  console.error(obj)
   const match = obj.match(`^${publicSettings.baseurl}/federation/m/(.*)`)
   if (!match || match.length < 2) {
     log.debug('No match for like: %s', JSON.stringify(message))
@@ -51,6 +50,13 @@ export async function handleLike(message: APActivityLike, actor: APUser) {
   if (!event) {
     throw new Error('Event not found!')
   }
+  
+  // check if already liked
+  if (event.likes.includes(actor.ap_id)) {
+    log.debug(`${actor.ap_id} already liked ${event.title}`)
+    return
+  }
+  
   log.info(`${actor.ap_id} like ${event.title} (${event.likes.length})`)
   await event.update({ likes: [...event.likes, actor.ap_id] })
 }
