@@ -17,29 +17,18 @@ const title = ref('')
 
 function confirmDialog (ev) {
   type.value = 'confirmDialog'
-  msg.value = getMessageHTML(ev)
+  msg.value = t(ev.msg, ev.args)
   title.value = ''
   visible.value = true
 }
 
 function promptDialog (ev) {
   type.value = 'promptDialog'
-  msg.value = getMessageHTML(ev)
+  msg.value = t(ev.msg, ev.args)
   title.value = t(ev.title)
   name.value = ev?.label ? t(ev.label) : ''
   userInput.value = ev?.value ?? ''
   visible.value = true
-}
-
-function getMessageHTML(ev) {
-  let safeArgs
-  if (typeof ev.args === 'object' && ev.args) {
-    safeArgs = {}
-    for (const [key, rawValue] of Object.entries(ev.args)) {
-      safeArgs[key] = typeof rawValue === 'string' ? rawValue.replaceAll('<', '&lt;') : rawValue
-    }
-  }
-  return t(ev.msg, safeArgs)
 }
 
 function result (value) {
