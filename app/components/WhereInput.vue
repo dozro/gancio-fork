@@ -25,8 +25,9 @@ const selectablePlaces = computed(() => {
     ret.push({ name: 'online', props: { prependIcon: 'mdi-laptop-account', color: 'primary' } })
   }
 
-  const matches = ret.find(p => search.value === p.name?.toLocaleLowerCase())
-  if (!matches && search.value) {
+  const searchTerm = search.value.trim().toLocaleLowerCase()
+  const matches = ret.find(p => searchTerm === p.name?.toLocaleLowerCase())
+  if (!matches && searchTerm) {
     ret.unshift({
       name: search.value.trim(),
       props: { prependIcon: 'mdi-plus', color: 'primary' } })
