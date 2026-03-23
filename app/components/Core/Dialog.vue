@@ -17,11 +17,12 @@ const userInput = ref('')
 const name = ref('')
 const title = ref('')
 
-function confirmDialog (ev) {
+function confirmDialog(ev) {
   type.value = 'confirmDialog'
   msg.value = t(ev.msg, ev.args)
   title.value = ''
   visible.value = true
+  nextTick(() => cancelBtn.value?.$el?.focus())
 }
 
 function promptDialog (ev) {
@@ -43,17 +44,16 @@ function result (value) {
   }
 }
 
-watch(visible, () => {
-  nextTick(() => {
-    if (visible.value && cancelBtn.value && type.value === 'confirmDialog') {
-      cancelBtn.value.$el.focus()
-    }
-  })
-})
+function toggle(val) {
+  // needed to send results when dialog is closed (ESC / outside click)
+  if (!val && visible.value) {
+    result(false)
+  }
+}
 
 </script>
 <template>
-<v-dialog v-model='visible' max-width='550'>
+<v-dialog :model-value='visible' @update:modelValue="toggle" max-width='550'>
   <v-card class="border-0">
     <v-card-title :class="{ 'bg-error': type === 'confirmDialog' }">{{title || $t('common.confirm')}}</v-card-title>
     <v-card-text>
