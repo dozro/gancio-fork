@@ -87,7 +87,7 @@ export async function runMigrations() {
   if (!sequelize) return
   const umzug = new Umzug({
     storage: new SequelizeStorage({ sequelize }),
-    migrations: { glob: '**/migrations/*.js' },
+    migrations: { glob: '(nuxt/)?server/migrations/*.js' },
     context: sequelize.queryInterface,
     logger: console
   })
