@@ -1,5 +1,16 @@
 import { DataTypes } from '@sequelize/core'
 
 export async function up({ context: queryInterface }) {
-  await queryInterface.sequelize.query(`UPDATE events SET recurrent = NULL WHERE recurrent IS NULL OR recurrent = 'null' OR recurrent = 'null'`)
+  const dialect = queryInterface.sequelize.getDialect()
+
+  let castType = 'CHAR';
+  if (dialect === 'postgres') castType = 'TEXT'
+
+  await queryInterface.sequelize.query(`
+    UPDATE events
+    SET recurrent = NULL
+    WHERE recurrent IS NULL
+       OR CAST(recurrent AS ${castType}) = 'null'
+       OR CAST(recurrent AS ${castType}) = '"null"'
+  `)
 }
