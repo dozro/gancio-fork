@@ -1,9 +1,5 @@
-import crypto from 'crypto'
-
 import { describe, expect, it, vi } from 'vitest'
-import { handleActivity } from '../../server/federation/handlers'
-import { verifySignature } from '../../server/federation/helpers'
-import httpSignature from '@peertube/http-signature'
+import { verifyHTTPSignature } from '../../server/federation/helpers'
 import { getInstance, getActor } from '../../server/federation/lookup'
 import { prepareHTTPSignature } from '../../server/federation/sign_and_send'
 import { secretSettings } from '../../server/services'
@@ -66,14 +62,14 @@ describe('HTTPS Signature', () => {
       object: { publicKey: { publicKeyPem: publicSettings.publicKey, id: 'http://localhost:13120/federation/u/relay#main-key' } }
     })
   
-    const actor = await verifySignature(event)
+    const actor = await verifyHTTPSignature(event)
     expect(actor.ap_id).toBe(body.actor)
   })
   
   it('rejects when actor is missing', async () => {
     const event = mockEvent({ body: { type: 'Create' } })
   
-    await expect(verifySignature(event))
+    await expect(verifyHTTPSignature(event))
       .rejects.toThrow('Actor not found')
   })
   
@@ -83,7 +79,7 @@ describe('HTTPS Signature', () => {
   
     getInstance.mockResolvedValue({ blocked: true })
   
-    await expect(verifySignature(event))
+    await expect(verifyHTTPSignature(event))
       .rejects.toThrow('Instance blocked')
   })
   
@@ -94,7 +90,7 @@ describe('HTTPS Signature', () => {
     getInstance.mockResolvedValue({ blocked: false })
     getActor.mockResolvedValue({ blocked: true })
   
-    await expect(verifySignature(event))
+    await expect(verifyHTTPSignature(event))
       .rejects.toThrow('Actor blocked')
   })
   
@@ -105,7 +101,7 @@ describe('HTTPS Signature', () => {
     getInstance.mockResolvedValue({ blocked: false })
     getActor.mockResolvedValue({ object: {} })
   
-    await expect(verifySignature(event))
+    await expect(verifyHTTPSignature(event))
       .rejects.toThrow('No public key')
   })
   
@@ -125,7 +121,7 @@ describe('HTTPS Signature', () => {
       object: { publicKey: { publicKeyPem: 'pubkey' } }
     })
   
-    await expect(verifySignature(event))
+    await expect(verifyHTTPSignature(event))
       .rejects.toThrow('Signature mismatch')
   })
   

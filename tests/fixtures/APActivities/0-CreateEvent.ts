@@ -1,4 +1,5 @@
 export default {
+  '@context': 'https://www.w3.org/ns/activitystreams',
   type: 'Create',
   actor: 'http://localhost:13120/federation/u/relay',
   object: {

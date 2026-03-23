@@ -17,14 +17,13 @@ import { APHandlers } from './handlers'
 const log = useLogger('federation')
 
 // get Actor from URL using GET HTTP Signature
-export async function getActor(URL: string, instance: Instance, force = false, fail_on_not_cached = false) {
-  log.debug(`[FEDI] getActor for ${URL}`)
-
+export async function getActor(actorUrl: string, instance?: Instance, force = false, fail_on_not_cached = false) {
+  log.debug(`[FEDI] getActor for ${actorUrl}`)
   let fedi_user: APUser | null
 
   // try with cache first
   if (!force) {
-    fedi_user = await APUser.findByPk(URL, { include: Instance })
+    fedi_user = await APUser.findByPk(actorUrl, { include: Instance })
     if (fedi_user) {
       return fedi_user
     } else if (fail_on_not_cached) {
@@ -33,18 +32,18 @@ export async function getActor(URL: string, instance: Instance, force = false, f
   }
 
   try {
-    const ret: APActor = await _signAndSend('', URL, 'get', secretSettings.privateKey)
+    const ret: APActor = await _signAndSend('', actorUrl, 'get', secretSettings.privateKey)
     if (!ret?.id) {
-      log.debug('[FEDI] getActor failed for %s', URL)
+      log.debug('[FEDI] getActor failed for %s', actorUrl)
       return
     }
     if (ret) {
-      log.info('[FEDI] Create/Update a new AP User "%s" and associate it to instance "%s"', ret.id, instance.domain)
+      log.info('[FEDI] Create/Update a new AP User "%s" and associate it to instance "%s"', ret.id, instance?.domain)
       try {
         ([fedi_user] = await APUser.upsert({
           ap_id: ret.id,
           object: { ...ret, summary: sanitizeHTML(ret?.summary ?? '') },
-          instanceDomain: instance.domain,
+          instanceDomain: instance?.domain ?? new URL(actorUrl).origin,
           blocked: false
         }))
         return fedi_user

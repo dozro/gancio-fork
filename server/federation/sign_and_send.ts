@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import { useLogger } from '../lib/logger'
 import { publicSettings } from '../services'
+import { sign } from './ldsignature'
 
 export async function prepareHTTPSignature(message: string, inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
   const inboxUrl = new URL(inbox)
@@ -41,6 +42,16 @@ export async function _signAndSend(message: string, inbox: string, method: 'post
   const log = useLogger('sign_and_send')
   log.debug('[FEDI] Sign and %s %s', method, inbox)
 
+  // in case of POST sign with LDSignature
+  // TODO: add Object Integrity Proof: https://codeberg.org/fediverse/fep/src/branch/main/fep/8b32/fep-8b32.md
+  if (method === 'post') {
+    try {
+      message = await sign(message, privkey, `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key`)
+    } catch (e) {
+      log.error('[FEDI] Sign error', e)
+    }
+  }
+    
   const httpSignatureHeaders = await prepareHTTPSignature(message, inbox, method, privkey)
   try {
     const ret = await fetch(inbox, {

@@ -346,7 +346,7 @@ export async function unfollowActor(actor: APUser) {
    * @return APUser in case of successfull validation
    * @throws {H3Error} throw in case of validation failure
    */
-export async function verifySignature(event: H3Event) {
+export async function verifyHTTPSignature(event: H3Event) {
   const name = event.context?.params?.name
   const body = await readBody(event)
   const actor_url = body?.actor

@@ -2,67 +2,87 @@ import { useLogger } from '../lib/logger'
 import jsonld from 'jsonld'
 import crypto from 'crypto'
 const log = useLogger('LDSignature')
+import contexts from './contexts'
 
 export async function verify(activity: any, publicKey: string) {
-  if (!activity.signature) {
-    log.warn('No signature found')
-    throw new Error('No signature found')
-  }
+  const sig = activity.signature
+  if (!sig) throw new Error('No signature')
 
-  const { type, creator, created, signatureValue } = activity.signature
+  const { signatureValue } = sig
 
-  if (type !== 'RsaSignature2017') {
-    log.warn('Unsupported signature type: %s', type)
-    throw new Error('Unsupported signature type')
-  }
-
-  // clone without signature
   const doc = { ...activity }
   delete doc.signature
 
-  const canon = await canonicalize(doc)
+  const sigOpts = {
+    "@context": "https://w3id.org/identity/v1",
+    ...sig,
+  }
 
-  const hash = crypto.createHash('sha256')
-    .update(canon)
-    .digest()
+  delete sigOpts.type
+  delete sigOpts.id
+  delete sigOpts.signatureValue
+
+  const sigOptsHash = await hashJsonLd(sigOpts)
+  const docHash = await hashJsonLd(doc)
+
+  const message = sigOptsHash + docHash
 
   const verifier = crypto.createVerify('RSA-SHA256')
-  verifier.update(hash)
+  verifier.update(message)
   verifier.end()
 
   return verifier.verify(publicKey, signatureValue, 'base64')
 }
 
 export async function sign(activity: any, privateKey: string, keyId: string) {
-  const created = new Date().toISOString()
 
   // clone without signature
   const doc = { ...activity }
   delete doc.signature
 
-  const canon = await canonicalize(doc)
+  const sigOpts = {
+    "@context": "https://w3id.org/identity/v1" as const,
+    creator: keyId,
+    created: new Date().toISOString()
+  }
+  
+  const sigOptsHash = await hashJsonLd(sigOpts)
+  const docHash = await hashJsonLd(activity)
+  // concatenate
+  const message = sigOptsHash + docHash
 
-  const hash = crypto.createHash('sha256')
-    .update(canon)
-    .digest()
-
-  const signer = crypto.createSign('RSA-SHA256')
-  signer.update(hash)
+  // sign raw message (NO manual hashing)
+  const signer = crypto.createSign("RSA-SHA256")
+  signer.update(message)
   signer.end()
 
-  const signatureValue = signer.sign(privateKey).toString('base64')
+  const signatureValue = signer.sign(privateKey).toString("base64")
 
   return {
-    type: 'RsaSignature2017',
-    creator: keyId,
-    created,
-    signatureValue
+    ...activity,
+    signature: {
+      ...sigOpts,
+      signatureValue
+    }
   }
 }
 
-async function canonicalize(activity: any) {
-  return jsonld.canonize(activity, {
+const nodeDocumentLoader = jsonld.documentLoaders.node();
+export async function hashJsonLd(activity: any) {
+  console.error(activity)
+  const canon = await jsonld.canonize(activity, {
     algorithm: 'URDNA2015',
-    format: 'application/n-quads'
+    format: 'application/n-quads',
+    documentLoader: async (url: string) => {
+      if (contexts[url]) {
+        return {
+          contextUrl: null,
+          document: contexts[url],
+          documentUrl: url,
+        }
+      }
+      return nodeDocumentLoader(url)
+    },
   })
+  return crypto.createHash('sha256').update(canon).digest('hex')
 }

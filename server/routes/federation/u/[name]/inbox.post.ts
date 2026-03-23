@@ -1,7 +1,10 @@
-import { verifySignature } from '~~/server/federation/helpers'
+import { verifyHTTPSignature } from '~~/server/federation/helpers'
+import * as LDSignature from '~~/server/federation/ldsignature'
 import { useLogger } from '~~/server/lib/logger'
 import { APHandlers } from '~~/server/federation/handlers'
 import { APActivityTypeSchema } from '~~/server/federation/types'
+import { defineEventHandler, readBody, createError, setResponseStatus, setResponseHeader } from 'h3'
+import { getActor } from '~~/server/federation/lookup'
 
 /**
  * Federation route handler for ActivityPub (AP) POST requests to /inbox.
@@ -12,33 +15,58 @@ import { APActivityTypeSchema } from '~~/server/federation/types'
  */
 export default defineEventHandler(async (event) => {
   const log = useLogger('AP inbox')
-  const actor = await verifySignature(event)
-  const message = await readBody(event)
+  
+  const actor = await verifyHTTPSignature(event)
+  
+  const activity = await readBody(event)
 
   // has to have an object and a type property..
-  if (!message?.object || !message?.type) {
-    log.warn('message without `object` or `type` property: %s', message)
-    throw createError({ status: 400, message: 'Wrong AP message: no object or type property' })
+  if (!activity?.object || !activity?.type) {
+    log.warn('activity without `object` or `type` property: %s', activity)
+    throw createError({ status: 400, message: 'Wrong AP activity: no object or type property' })
   }
-
-  const { success, data: type } = APActivityTypeSchema.safeParse(message.type)
+  
+  const hasEmbeddedActivity = typeof activity.object === 'object'
+  const internalActor = hasEmbeddedActivity ? activity.object.actor : null
+  const isDifferentActor = activity.actor !== internalActor
+  
+  // check ldsignature only for forwarded objects not owned by the sender actor
+  if (hasEmbeddedActivity && internalActor && isDifferentActor) {
+    if (!activity.object.signature) {
+      throw new Error('Forwarded object missing LD signature')
+    }
+  
+    const actor = await getActor(activity.object.actor)
+    const publicKey = actor?.object.publicKey
+    console.error('publicKey', actor)
+    if (!publicKey) {
+      throw new Error('Forwarded object actor not found')
+    }
+    const valid = await LDSignature.verify(activity.object, publicKey)
+  
+    if (!valid) {
+      throw new Error('Invalid LD signature on forwarded object')
+    }
+  }
+  
+  const { success, data: type } = APActivityTypeSchema.safeParse(activity.type)
   if (!success) {
-    log.warn('unknown activity `type` property: %s', message.type)
+    log.warn('unknown activity `type` property: %s', activity.type)
     throw createError({ status: 400, message: 'wrong AP activity type' })
   }
   const handler = APHandlers[type]
 
   if (!handler) {
-    log.error('[FEDI] Unknown message type: %s', message.type)
-    throw createError({ status: 400, message: 'Unknown message type' })
+    log.error('[FEDI] Unknown activity type: %s', activity.type)
+    throw createError({ status: 400, message: 'Unknown activity type' })
   }
 
   if (actor) {
     try {
-      await handler(message, actor)
+      await handler(activity, actor)
     } catch (error) {
-      log.error('Error handling message: %s', error)
-      throw createError({ status: 500, message: 'Error handling message' })
+      log.error('Error handling activity: %s', error)
+      throw createError({ status: 500, message: 'Error handling activity' })
     }
     setResponseStatus(event, 202)
     setResponseHeader(event, 'Content-Type', 'application/activity+json')
