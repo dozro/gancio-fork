@@ -1,20 +1,18 @@
 import { connect, User } from '../services/db'
 
-// async function setRole (args) {
-//   await _initializeDB()
-//   const { User } = require('../api/models/models')
-//   const user = await User.findOne({ where: { email: args.email } })
-//   console.log()
-//   if (!user) {
-//     console.error(`User ${args.email} not found`)
-//     return
-//   }
+async function setRole(args) {
+  await connect()
+  const user = await User.findOne({ where: { email: args.email } })
+  console.log()
+  if (!user) {
+    console.error(`User ${args.email} not found`)
+    return
+  }
 
-//   user.role = args.role
-//   await user.save()
-//   console.log(`User ${user.email} role is now ${user.role}!`)
-//   await db.close()
-// }
+  user.role = args.role
+  await user.save()
+  console.log(`User ${user.email} role is now ${user.role}!`)
+}
 
 // async function remove (args) {
 //   await _initializeDB()
@@ -93,6 +91,8 @@ async function create (args) {
 // TODO: add other old supported commands (set_role, enable, disable, create)
 const usersCLI = yarg => yarg
   .command('list', 'List all users', list)
+  .command('set_role <email> <role>', 'Set specified role privileges to the given user',
+    { role: { describe: 'Define this user role', choices: ['user', 'admin', 'editor'] } }, setRole)
   .command('reset-password <email> <password>', 'Resets the password of the given user', {
   }, resetPassword)
   .command('create <email> [password] [role]', 'Create an user (role could be `user`, `admin` or `editor`)',

@@ -2,7 +2,7 @@ import pkg from '../../package.json' with { type: 'json' }
 import path from 'path'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import usersCLI from './users.js'
+import usersCLI from './users'
 
 /**
  * parse cli command
