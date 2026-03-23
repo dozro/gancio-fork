@@ -17,7 +17,9 @@ export const ProxySchema = z.object({
   headers: z.record(z.string(), z.string()).optional().default({})
 })
 
-const DialectSchema = z.enum(['sqlite', 'sqlite3', 'mariadb', 'postgresql']).default('sqlite3').transform(t => t === 'sqlite' ? 'sqlite3' : t)
+const DialectSchema = z.enum(['sqlite', 'sqlite3', 'mariadb', 'postgresql', 'postgres'])
+  .default('sqlite3')
+  .transform(t => t === 'sqlite' ? 'sqlite3' : (t === 'postgresql' ? 'postgres' : t))
 const LogLevelSchema = z.enum(['fatal', 'error', 'warn', 'warning', 'normal', 'info', 'debug', 'trace']).optional().default('debug')
 
 export const DbSchema = z.object({
