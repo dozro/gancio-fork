@@ -61,6 +61,13 @@ export async function getTagEvents(tag: string | undefined) {
   return getEvents({ tags: [tag] })
 }
 
+// normalize tags for consistent case/accent-insensitive matching (optional)
 export function normalizeTag(tag: string) {
-  return tag.trim().replace(/#/g, '')
+  return slugify(tag, {
+    replacement: '',
+    lower: true,
+    locale: publicSettings.instance_locale,
+    remove: /[#]/g
+  })
+  
 }
