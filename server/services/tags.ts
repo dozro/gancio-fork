@@ -2,37 +2,48 @@ import { Op, col, where, fn } from '@sequelize/core'
 import { useLogger } from '../lib/logger'
 import { Tag, Event } from './db'
 import { getEvents } from './events'
+import { publicSettings } from './settings'
+import slugify from 'slugify'
 const log = useLogger('tags')
 
 export async function findOrCreateTags(tags: string[]) {
   if (!Array.isArray(tags) || tags.length === 0) {
     return []
   }
-
-  // Normalize input tags
-  const normalizedTags = tags.map(normalizeTag).filter(Boolean)
-  const lowercasedTags = normalizedTags.map(t => t.toLowerCase())
-
-  // Fetch all tags, then match manually
-  const existingTags = await Tag.findAll()
-
-  const existingTagMap = new Map(
-    existingTags.map(tag => [tag.tag.toLowerCase(), tag])
-  )
-
-  const seen = new Set()
-  const newTagsData = normalizedTags.reduce((acc, t) => {
-    const lower = t.toLowerCase()
-    if (!existingTagMap.has(lower) && !seen.has(lower)) {
-      seen.add(lower)
-      acc.push({ tag: t })
+  
+  tags = tags.filter(tag => typeof tag === 'string' && tag.trim().length > 0)
+  
+  // solitarietà, Solitarietà
+  // normalize input tags, remove duplicates (take the first)
+  const normalizedTags = new Map<string, string>()
+  
+  for (const tag of tags) {
+    const normalized = normalizeTag(tag)
+    if (!normalizedTags.has(normalized)) {
+      normalizedTags.set(normalized, tag)
     }
-    return acc
-  }, [])
-  const createdTags = await Tag.bulkCreate(newTagsData, { returning: true })
+  }
+  
+  // search for existing tags
+  const existingTags = await Tag.findAll({ where: { normalizedTag: { [Op.in]: Array.from(normalizedTags.keys()) } } })
+  
+  const existingSet = new Set(existingTags.map(t => t.normalizedTag))
+  
+  // missing tags are the ones that are not in the existing tags
+  const missing = []
+  for (const normalizedTag of normalizedTags.keys()) {
+    if (!existingSet.has(normalizedTag)) {
+      missing.push({
+        tag: normalizedTags.get(normalizedTag)!,
+        normalizedTag: normalizedTag
+      })
+    }
+  }
+  
+  const createdTags = await Tag.bulkCreate(missing, { returning: true })
 
   return [
-    ...existingTags.filter(t => lowercasedTags.includes(t.tag.toLowerCase())),
+    ...existingTags,
     ...createdTags
   ]
 }
@@ -65,6 +76,8 @@ export async function getTagEvents(tag: string | undefined) {
 export function normalizeTag(tag: string) {
   return slugify(tag, {
     replacement: '',
+    trim: true,
+    strict: true,
     lower: true,
     locale: publicSettings.instance_locale,
     remove: /[#]/g

@@ -49,4 +49,27 @@ describe('Tags', () => {
     expect(result[0].tag).toBe('Tag1')
     expect(result[1].tag).toBe('tag2')
   })
+  
+  it('should ignore empty tags', async () => {
+    const { findOrCreateTags } = await import('../../server/services/tags')
+    const tags = ['', 'Tag1']
+    const result = await findOrCreateTags(tags)
+    expect(result).toHaveLength(1)
+    expect(result[0].tag).toBe('Tag1')
+  })
+  
+  it('should ignore duplicate existing tags', async () => {
+    const { findOrCreateTags } = await import('../../server/services/tags')
+    const tags = ['Tag1', 'Tag1']
+    const result = await findOrCreateTags(tags)
+    expect(result).toHaveLength(1)
+    expect(result[0].tag).toBe('Tag1')
+  })
+  
+  it('should ignore non string tags', async () => {
+    const { findOrCreateTags } = await import('../../server/services/tags')
+    const tags = [123, 'tag1']
+    const result = await findOrCreateTags(tags)
+    expect(result).toHaveLength(1)
+  })
 })

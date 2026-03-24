@@ -366,7 +366,7 @@ export class Tag extends Model<
   @Attribute(DataTypes.STRING)
   @Index
   @Unique
-  declare normalizedTag?: string
+  declare normalizedTag: string
 
   @BelongsToMany(() => Event, { through: 'event_tags' })
   declare events: NonAttribute<Event[]>
