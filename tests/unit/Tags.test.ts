@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 // import { connect } from '../../server/services/db'
 import { cleanDatabase } from '../api/setup'
+import { mockH3Event, now } from './utils'
 
 await cleanDatabase()
 describe('Tags', () => {
@@ -71,5 +72,20 @@ describe('Tags', () => {
     const tags = [123, 'tag1']
     const result = await findOrCreateTags(tags)
     expect(result).toHaveLength(1)
+  })
+
+  it('should create event with tags', async () => {
+    const { default: handleEvent } = await import('../../server/api/events/index.post')
+    const event = mockH3Event({ body: {
+      title: 'test tags',
+      place_name: 'test',
+      place_address: 'test',
+      start_datetime: now() + 1000,
+      tags: ['tag1', 'Tag2', 'tAg3']
+    }})
+    const result = await handleEvent(event)
+    expect(result.tags).toHaveLength(3)
+    expect(result.tags).toStrictEqual(['Tag1', 'tag2', 'tAg3'])
+
   })
 })

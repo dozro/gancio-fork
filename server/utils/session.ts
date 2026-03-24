@@ -1,5 +1,5 @@
 import { verifyJwtToken } from '../lib/jwt'
-import type { H3Event } from 'h3'
+import { type H3Event, useSession, clearResponseHeaders, getHeader } from 'h3'
 import { User, type UserRole } from '../services/db'
 
 export type UserSession = { id: number, email: string, role: UserRole }
