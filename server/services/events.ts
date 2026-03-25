@@ -48,8 +48,7 @@ export const eventQuerySchema = z.object({
   ap_user_id: z.string().optional(),
   include_unconfirmed: z.coerce.boolean().default(false).optional(),
   include_parent: z.coerce.boolean().default(false).optional(),
-  include_description: z.coerce.boolean().default(false).optional(),
-  inlude_ap_events: z.coerce.boolean().default(false).optional()
+  include_description: z.coerce.boolean().default(false).optional()
 }).transform(o => ({
   ...o,
   ...(o.max && { limit: o.max })
@@ -92,7 +91,7 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
     andConditions.push({ placeId: args.places })
   }
 
-  if (args.tags) {
+  if (args.tags?.length) {
     andConditions.push(sql`${col('Event.id')} IN (
       SELECT ${col('eventId')}
       FROM ${sql.identifier('event_tags')}
