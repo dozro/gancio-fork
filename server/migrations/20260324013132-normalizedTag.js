@@ -67,6 +67,9 @@ function normalizeTag(tag) {
 
 export async function up({ context: queryInterface }) {
   
+  // this is needed espacially for sqlite
+  await queryInterface.sequelize.query('PRAGMA foreign_keys=OFF')
+
   await queryInterface.sequelize.transaction(async (transaction) => {
 
     // mock Tag model because its easier to do updates with it than raw queries and is not easy to import from the model in a migration
@@ -93,7 +96,6 @@ export async function up({ context: queryInterface }) {
       await Tag.update({ normalizedTag }, { where: { tag: row.tag }, transaction })
     }
 
-
     // count event tags by normalizedTag so I can choose which ones to keep
     const eventTags = await EventTag.findAll({
       attributes: [
@@ -106,7 +108,6 @@ export async function up({ context: queryInterface }) {
       transaction,
       raw: true
     })
-    
     const groups = {}
     for (const row of eventTags) {
       const normalized = row['tag.normalizedTag']
@@ -151,13 +152,15 @@ export async function up({ context: queryInterface }) {
 
     }
 
-    // make normalizedTag non-nullable and unique
+    // make normalizedTag non-nullable and unique (dangerous! in sqlite this will break foreign key constraints,
+    // so we need to disable foreign keys temporarily)
     await queryInterface.changeColumn('tags', 'normalizedTag', { type: DataTypes.STRING, allowNull: false }, { transaction })
     await queryInterface.addConstraint('tags', {
       fields: ['normalizedTag'],
       type: 'unique',
       name: 'unique_normalized_tag'
     }, { transaction })
-    
   })
+
+  await queryInterface.sequelize.query('PRAGMA foreign_keys=ON')
 }
