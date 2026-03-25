@@ -5,10 +5,13 @@ import { IncomingMessage, ServerResponse } from 'node:http'
 import { createEvent } from 'h3'
 
 
-export function mockH3Event({ body = {}, method = 'POST', url = '/', headers = {} } = {}) {
+export function mockH3Event({ body = null, method = 'POST', url = '/', query = {}, headers = {} } = {}) {
+  // build query string
+  const qs = new URLSearchParams(query).toString()
+  
   const req = new IncomingMessage(null as any)
   req.method = method
-  req.url = url
+  req.url = qs ? `${url}?${qs}` : url
 
   if (body) {
     const json = JSON.stringify(body)

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
-// import { connect } from '../../server/services/db'
 import { cleanDatabase } from '../api/setup'
 import { mockH3Event, now } from './utils'
+import { Event } from '../../server/services'
+import { findOrCreateTags } from '../../server/services/tags'
 
 await cleanDatabase()
 describe('Tags', () => {
@@ -15,13 +16,15 @@ describe('Tags', () => {
     expect(normalizeTag('İstanbul')).toBe('istanbul')
     expect(normalizeTag('  #Test  ')).toBe('test')
     expect(normalizeTag('música')).toBe('musica')
+    expect(normalizeTag('$so spetto%:,')).toBe('sospetto')
+    expect(normalizeTag('üniversite etkinliği')).toBe('universiteetkinligi')
+    expect(normalizeTag('ÜNIVERSITE ETKINLIĞI')).toBe('universiteetkinligi')
   })
   
   it('should find or create tags removing duplicates (taking the first occurrence)', async () => {
     const { findOrCreateTags } = await import('../../server/services/tags')
     const tags = ['Tag1', 'tag1', 'TAG1']
     const result = await findOrCreateTags(tags)
-    console.error(result)
     expect(result).toHaveLength(1)
     expect(result[0].tag).toBe('Tag1')
   })
@@ -86,6 +89,44 @@ describe('Tags', () => {
     const result = await handleEvent(event)
     expect(result.tags).toHaveLength(3)
     expect(result.tags).toStrictEqual(['Tag1', 'tag2', 'tAg3'])
-
   })
+
+  it('should show no tags on non confirmed events', async () => {
+    const { default: handleEvent } = await import('../../server/api/tags/index.get')
+    const event = mockH3Event({ method: 'GET' })
+    const result = await handleEvent(event)
+    expect(result).toBeDefined()
+    expect(result).toStrictEqual([])
+  })
+  
+  it('should autocomplete tags for confirmed events', async () => {
+    const event = await Event.create({ title: 'test', is_visible: true, status: 'EventScheduled', start_datetime: now() })
+    const tags = await findOrCreateTags(['tag1','Tag2'])
+    await event.setTags(tags)
+
+    const { default: handleEvent } = await import('../../server/api/tags/index.get')
+    const h3event = mockH3Event({ method: 'GET' })
+    const result = await handleEvent(h3event)
+    expect(result).toContain('Tag1')
+    expect(result).toContain('tag2')
+    expect(result).toHaveLength(2)
+  })
+  
+  it('should autocomplete on search', async () => {
+    const { default: handleEvent } = await import('../../server/api/tags/index.get')
+    const h3event = mockH3Event({ method: 'GET', query: { query: 'tag1' } })
+    const result = await handleEvent(h3event)
+    expect(result).toContain('Tag1')
+    expect(result).toHaveLength(1)
+  })
+  
+  it('should return events searching by tag', async () => {
+    const { default: handleEvent } = await import('../../server/api/events/index.get')
+    const h3event = mockH3Event({ method: 'GET', query: { tags: 'tag1' } })
+    const result = await handleEvent(h3event)
+    expect(result).toHaveLength(1)
+    
+  })
+  
+  
 })

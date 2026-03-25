@@ -20,6 +20,7 @@ import linkifyHtml from 'linkify-html'
 import { multipartFileSchema, saveUploadedEventImage } from '../lib/parseMultipartForm'
 import { focalPointSchema, jsonCodec } from '../lib/validator'
 import { addressToString } from '../../shared/utils/addressToString'
+import { normalizeTag } from './tags'
 
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
@@ -29,7 +30,7 @@ export const eventQuerySchema = z.object({
     if (Array.isArray(val)) return val
     if (typeof val === 'string') return val.split(',')
     return []
-  }, z.array(z.string())).optional(),
+  }, z.array(z.string().transform(t => normalizeTag(t))).optional()),
   places: z.preprocess((val) => {
     if (Array.isArray(val)) return val
     if (typeof val === 'string') return val.split(',')
@@ -85,11 +86,6 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
   //   condition.multidate = { [Op.not]: true }
   // }
 
-  // // normalize tags
-  // if (args.tags) {
-  //   args.tags = args.tags.map(t => t.trim())
-  // }
-
   const replacements: { [key: string]: unknown } = {}
 
   if (args.places) {
@@ -97,7 +93,12 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
   }
 
   if (args.tags) {
-    andConditions.push(sql`${col('Event.id')} IN (SELECT eventId FROM event_tags WHERE tagTag IN ${sql.list(args.tags)})`)
+    andConditions.push(sql`${col('Event.id')} IN (
+      SELECT ${col('eventId')}
+      FROM ${sql.identifier('event_tags')}
+      JOIN ${sql.identifier('tags')} ON ${col('tagTag')} = ${col('tags', 'tag')}
+      WHERE ${col('tags', 'normalizedTag')} IN ${sql.list(args.tags)}
+    )`)
   }
 
   if (args.query) {
@@ -134,14 +135,13 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
         attributes: ['tag'],
         through: { attributes: [] }
       },
-      { model: Place, required: true, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] },
+      { model: Place, required: false, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] },
       { association: 'APUser', attributes: ['ap_id', 'object'] }
     ],
     ...pagination,
     replacements
   })
 
-  // return mapEvents(events as Event[])
 }
 
 const MAX_TIMESTAMP = 1000 * 24 * 60 * 60 * 365

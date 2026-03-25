@@ -73,6 +73,7 @@ export async function getTagEvents(tag: string | undefined) {
 }
 
 // normalize tags for consistent case/accent-insensitive matching (optional)
+slugify.extend({ '$': '', '%': '', ',': '', ':': '', '!': '', '?': '', '#': '' })
 export function normalizeTag(tag: string) {
   return slugify(tag, {
     replacement: '',
@@ -80,7 +81,5 @@ export function normalizeTag(tag: string) {
     strict: true,
     lower: true,
     locale: publicSettings.instance_locale,
-    remove: /[#]/g
   })
-  
 }

@@ -1,4 +1,4 @@
-import type { H3Event } from 'h3'
+import { type H3Event, setHeader, handleCacheHeaders } from 'h3'
 import type { Model, ModelStatic } from '@sequelize/core'
 import { Stats } from 'node:fs'
 
