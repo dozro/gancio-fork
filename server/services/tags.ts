@@ -10,38 +10,22 @@ export async function findOrCreateTags(tags: string[]) {
   if (!Array.isArray(tags) || tags.length === 0) {
     return []
   }
-  
-  tags = tags.filter(tag => typeof tag === 'string' && tag.trim().length > 0)
-  
-  // solitarietà, Solitarietà
-  // normalize input tags, remove duplicates (take the first)
-  const normalizedTags = new Map<string, string>()
-  
-  for (const tag of tags) {
-    const normalized = normalizeTag(tag)
-    if (!normalizedTags.has(normalized)) {
-      normalizedTags.set(normalized, tag)
-    }
-  }
-  
-  // search for existing tags
-  const existingTags = await Tag.findAll({ where: { normalizedTag: { [Op.in]: Array.from(normalizedTags.keys()) } } })
-  
-  const existingSet = new Set(existingTags.map(t => t.normalizedTag))
-  
-  // missing tags are the ones that are not in the existing tags
-  const missing = []
-  for (const normalizedTag of normalizedTags.keys()) {
-    if (!existingSet.has(normalizedTag)) {
-      missing.push({
-        tag: normalizedTags.get(normalizedTag)!,
-        normalizedTag: normalizedTag
-      })
-    }
-  }
-  
-  const createdTags = await Tag.bulkCreate(missing, { returning: true })
 
+  tags = tags
+    .filter(tag => typeof tag === 'string')
+    .map(tag => tag.trim())
+    .filter(tag => tag.length > 0)
+
+  // search for existing tags
+  const existingTags = await Tag.findAll({ where: { tag: { [Op.in]: tags } } })
+  
+  // missing tags
+  const missing = tags
+    .filter(t => !existingTags.some(existingTag => existingTag.tag === t))
+    .map(tag => ({ tag, normalizedTag: normalizeTag(tag) }))
+
+  const createdTags = await Tag.bulkCreate(missing, { returning: true })
+  
   return [
     ...existingTags,
     ...createdTags
@@ -80,6 +64,6 @@ export function normalizeTag(tag: string) {
     trim: true,
     strict: true,
     lower: true,
-    locale: publicSettings.instance_locale,
+    locale: publicSettings.instance_locale
   })
 }

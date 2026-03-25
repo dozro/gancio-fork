@@ -364,8 +364,6 @@ export class Tag extends Model<
   
   /** normalizedTag is used for search, it is the normalized version of tag (lowercase, accents removed, etc.) */
   @Attribute(DataTypes.STRING)
-  @Index
-  @Unique
   declare normalizedTag: string
 
   @BelongsToMany(() => Event, { through: 'event_tags' })
