@@ -82,4 +82,10 @@ describe('Event Schema Validator', () => {
     expect(data?.attachment?.[0]?.url).toBe('https://example.com/image.jpg')
   })
 
+  it('should parse an event from mobilizon', async () => {
+    const { default: event } = await import('../fixtures/APEvent/mobilizon.json')
+    const { success, error, data } = APEventSchema.safeParse(event)
+    console.error(error, data)
+    expect(success).toBe(true)
+  })
 })

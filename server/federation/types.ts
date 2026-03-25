@@ -107,11 +107,11 @@ export interface APActivityDelete extends APActivityBase {
 // https://schema.org/PostalAddress
 export const PostalAddressSchema = z.object({
   type: z.literal('PostalAddress'),
-  streetAddress: z.string().optional(),
-  addressLocality: z.string().optional(),
-  addressRegion: z.string().optional(),
-  postalCode: z.string().optional(),
-  addressCountry: z.string().optional()
+  streetAddress: z.string().optional().nullable(),
+  addressLocality: z.string().optional().nullable(),
+  addressRegion: z.string().optional().nullable(),
+  postalCode: z.string().optional().nullable(),
+  addressCountry: z.string().optional().nullable()
 })
 export type PostalAddress = z.infer<typeof PostalAddressSchema>
 

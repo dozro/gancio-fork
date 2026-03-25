@@ -6,6 +6,7 @@
 import path from 'path'
 import { describe, expect, it } from 'vitest'
 import { parseAPLocation } from '../../server/federation/places'
+import { APLocationSchema } from '../../server/federation/types'
 
 async function loadJSON(filePath: string) {
   const fullPath = path.resolve(__dirname, filePath)
@@ -23,6 +24,9 @@ describe('Location', () => {
     const { place } = await parseAPLocation({ location })
     expect(place.name).toBe('Location without id')
     expect(place.ap_id).toBeUndefined()
+
+    const parsedLocation = APLocationSchema.parse(location)
+    expect(parsedLocation.name).toBe('Location without id')
   })
 
   it('should parse a location with id and name', async () => {
@@ -30,12 +34,18 @@ describe('Location', () => {
     const { place } = await parseAPLocation({ location })
     expect(place.name).toBe('Location with a name')
     expect(place.address).toBe('Location with a name')
+
+    const parsedLocation = APLocationSchema.parse(location)
+    expect(parsedLocation.name).toBe('Location with a name')
   })
 
   it('should parse a location with a simple string address', async () => {
     const location = await loadJSON('../fixtures/APLocation/physical-location-with-simple-string-address.json')
     const { place } = await parseAPLocation({ location })
     expect(place.name).toBe('Location with a simple string address')
+
+    const parsedLocation = APLocationSchema.parse(location)
+    expect(parsedLocation.name).toBe('Location with a simple string address')
   })
 
   it('should parse a location with a Postal Address', async () => {
@@ -43,6 +53,9 @@ describe('Location', () => {
     const { place } = await parseAPLocation({ location })
     expect(place.name).toBe('Location with a postal address')
     expect(place.address).toBe('15 Fediverse Street, Fediverse Town, Steiermark, Austria')
+
+    const parsedLocation = APLocationSchema.parse(location)
+    expect(parsedLocation.name).toBe('Location with a postal address')
   })
 
   it('should parse a Virtual Location', async () => {
@@ -75,5 +88,15 @@ describe('Location', () => {
     expect(place.name).toBe('Location with a name')
     expect(online_locations.length).toBe(2)
     expect(online_locations[0]).toBe('https://virtual.location.org')
+  })
+
+  it('should parse a location with null address fields', async () => {
+    const { default: location } = await import('../fixtures/APLocation/location-with-null-address-fields.json')
+    const { place } = await parseAPLocation({ location })
+    expect(place.name).toBe('Teatro Ponchielli')
+    expect(place.address).toBe('Corso Vittorio Emanuele Ii 52, Cremona')
+
+    const parsedLocation = APLocationSchema.parse(location)
+    expect(parsedLocation.name).toBe('Teatro Ponchielli')
   })
 })
