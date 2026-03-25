@@ -2,6 +2,8 @@ import { Op, col, where, fn } from '@sequelize/core'
 import { useLogger } from '../lib/logger'
 import { Tag, Event } from './db'
 import { getEvents } from './events'
+import { publicSettings } from './settings'
+import slugify from 'slugify'
 const log = useLogger('tags')
 
 export async function findOrCreateTags(tags: string[]) {
@@ -9,30 +11,23 @@ export async function findOrCreateTags(tags: string[]) {
     return []
   }
 
-  // Normalize input tags
-  const normalizedTags = tags.map(normalizeTag).filter(Boolean)
-  const lowercasedTags = normalizedTags.map(t => t.toLowerCase())
+  tags = tags
+    .filter(tag => typeof tag === 'string')
+    .map(tag => tag.trim())
+    .filter(tag => tag.length > 0)
 
-  // Fetch all tags, then match manually
-  const existingTags = await Tag.findAll()
+  // search for existing tags
+  const existingTags = await Tag.findAll({ where: { tag: { [Op.in]: tags } } })
+  
+  // missing tags
+  const missing = tags
+    .filter(t => !existingTags.some(existingTag => existingTag.tag === t))
+    .map(tag => ({ tag, normalizedTag: normalizeTag(tag) }))
 
-  const existingTagMap = new Map(
-    existingTags.map(tag => [tag.tag.toLowerCase(), tag])
-  )
-
-  const seen = new Set()
-  const newTagsData = normalizedTags.reduce((acc, t) => {
-    const lower = t.toLowerCase()
-    if (!existingTagMap.has(lower) && !seen.has(lower)) {
-      seen.add(lower)
-      acc.push({ tag: t })
-    }
-    return acc
-  }, [])
-  const createdTags = await Tag.bulkCreate(newTagsData, { returning: true })
-
+  const createdTags = await Tag.bulkCreate(missing, { returning: true })
+  
   return [
-    ...existingTags.filter(t => lowercasedTags.includes(t.tag.toLowerCase())),
+    ...existingTags,
     ...createdTags
   ]
 }
@@ -61,6 +56,14 @@ export async function getTagEvents(tag: string | undefined) {
   return getEvents({ tags: [tag] })
 }
 
+// normalize tags for consistent case/accent-insensitive matching (optional)
+slugify.extend({ '$': '', '%': '', ',': '', ':': '', '!': '', '?': '', '#': '' })
 export function normalizeTag(tag: string) {
-  return tag.trim().replace(/#/g, '')
+  return slugify(tag, {
+    replacement: '',
+    trim: true,
+    strict: true,
+    lower: true,
+    locale: publicSettings.instance_locale
+  })
 }

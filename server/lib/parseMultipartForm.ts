@@ -1,4 +1,4 @@
-import type { H3Event, MultiPartData } from 'h3'
+import { type H3Event, type MultiPartData, readMultipartFormData } from 'h3'
 import { get as getConfig } from '../services/config'
 import path from 'path'
 import sharp from 'sharp'

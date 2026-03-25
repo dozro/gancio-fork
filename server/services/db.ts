@@ -87,7 +87,7 @@ export async function runMigrations() {
   if (!sequelize) return
   const umzug = new Umzug({
     storage: new SequelizeStorage({ sequelize }),
-    migrations: { glob: '**/migrations/*.js' },
+    migrations: { glob: '(nuxt/)?server/migrations/*.js' },
     context: sequelize.queryInterface,
     logger: console
   })
@@ -361,6 +361,10 @@ export class Tag extends Model<
   @Index
   @Unique
   declare tag: string
+  
+  /** normalizedTag is used for search, it is the normalized version of tag (lowercase, accents removed, etc.) */
+  @Attribute(DataTypes.STRING)
+  declare normalizedTag: string
 
   @BelongsToMany(() => Event, { through: 'event_tags' })
   declare events: NonAttribute<Event[]>

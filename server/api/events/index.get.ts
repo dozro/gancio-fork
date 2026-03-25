@@ -1,3 +1,4 @@
+import { defineEventHandler, getValidatedQuery } from 'h3'
 import { eventQuerySchema, getEvents, mapEvent, sendEvents } from '~~/server/services/events'
 import { Event, publicSettings } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
