@@ -2,6 +2,7 @@
 
  -->
 <script setup lang="ts">
+import { refDebounced } from '@vueuse/core'
 
 const { loggedIn } = useUserSession()
 const { $notify } = useNuxtApp()
@@ -43,8 +44,8 @@ const form = ref()
 
 const openImportDialog = ref(false)
 const searchTag = ref('')
-
-const { data: tags, status: statusTags } = await useFetch('/api/tags', { params: { query: searchTag } })
+const searchTagDebounced = refDebounced(searchTag, 200)
+const { data: tags, status: statusTags } = await useFetch('/api/tags', { params: { query: searchTagDebounced } })
 
 async function done() {
   const evt = event.value
@@ -210,7 +211,7 @@ const normalizedTags = computed({
             <!-- TAGS -->
             <v-col cols=12 md=6>
               <v-combobox
-                v-model:search="searchTag" v-model="normalizedTags" prepend-icon="mdi-tag-multiple" chips
+                v-model:search="searchTag" v-model="normalizedTags" prepend-icon="mdi-tag-multiple" chips no-filter
                 multiple closable-chips hide-no-data hide-selected persistent-hint :loading="statusTags === 'pending'"
                 :delimiters="[',', ';']" :items="tags || []"
                 :label="$t('common.tags')"/>
