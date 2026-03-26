@@ -5,8 +5,8 @@ import fs from 'fs'
 import pug from 'pug'
 import type { InferAttributes } from '@sequelize/core'
 import { publicSettings, type Event } from '../services'
+import { isBuild } from './config'
 
-const isBuild = process.env.NODE_ENV === 'production'
 const rssTemplateStr = fs.readFileSync(
   path.resolve(isBuild ? './nuxt/server/rss.pug' : './server/services/rss.pug'),
   'utf-8'

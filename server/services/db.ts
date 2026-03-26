@@ -49,7 +49,7 @@ import {
   BeforeDestroy
 } from '@sequelize/core/decorators-legacy'
 
-import { get as getConfig } from '../services/config'
+import { get as getConfig, isBuild } from '../services/config'
 import type { APActor, APEvent, APNote, PostalAddress } from '../federation/types'
 const config = getConfig()
 const log = useLogger('sequelize')
@@ -87,7 +87,7 @@ export async function runMigrations() {
   if (!sequelize) return
   const umzug = new Umzug({
     storage: new SequelizeStorage({ sequelize }),
-    migrations: { glob: '(nuxt/)?server/migrations/*.js' },
+    migrations: { glob: isBuild ? 'nuxt/server/migrations/*.js' : 'server/migrations/*.js' },
     context: sequelize.queryInterface,
     logger: console
   })

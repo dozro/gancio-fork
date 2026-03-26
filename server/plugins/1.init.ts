@@ -4,10 +4,10 @@
 import type { NitroApp } from 'nitropack'
 import pluginController from '../services/plugins'
 import fsDriver from 'unstorage/drivers/fs'
-import { get as getConfig } from '../services/config'
+import { get as getConfig, isBuild } from '../services/config'
 import { useLogger } from '../lib/logger'
 import { parseCLI } from '../cli'
-import { loadSettings, publicSettings, status } from '../services/settings'
+import { loadSettings, publicSettings } from '../services/settings'
 import { useTaskManager } from '../services/taskManager'
 import { connect, runMigrations } from '../services/db'
 import { useCreateDirectoryStructure } from '../services/directories'
@@ -37,7 +37,6 @@ export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
           pluginController._load()
         }
 
-
         const storage = useStorage()
         const driver = fsDriver({ base: config.user_locale })
         storage.mount('custom_user_locale', driver)
@@ -52,7 +51,6 @@ export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
     }
 
     // this is an hack to simulate process.argv while developing
-    const isBuild = process.env.NODE_ENV === 'production'
     if (!isBuild && process.env.ARGV) {
       process.argv = process.env.ARGV.split(' ')
       log.warn('Using ARGV to test process.argv in dev mode', process.argv, process.argv0)

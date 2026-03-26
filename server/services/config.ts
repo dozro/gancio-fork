@@ -3,6 +3,8 @@ import dotenv from 'dotenv'
 import fs from 'fs'
 import { z } from 'zod'
 
+export const isBuild = process.env.NODE_ENV === 'production'
+
 export const ProxyAuthSchema = z.object({
   username: z.string().optional().default(''),
   password: z.string().optional().default('')

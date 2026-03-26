@@ -3,6 +3,7 @@ import fs from 'fs'
 import pug from 'pug'
 import { publicSettings } from '../services'
 import { useLogger } from '../lib/logger'
+import { isBuild } from '../services/config'
 
 const log = useLogger('Open Search')
 
@@ -28,7 +29,6 @@ export default defineEventHandler(async (event) => {
 })
 
 function loadOpenSearchTemplate() {
-  const isBuild = process.env.NODE_ENV === 'production'
   const templatePath = isBuild ? './nuxt/server/opensearch.pug' : './server/services/opensearch.pug'
   try {
     const templateStr = fs.readFileSync(path.resolve(templatePath), 'utf-8')
