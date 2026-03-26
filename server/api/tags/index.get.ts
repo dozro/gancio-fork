@@ -1,9 +1,8 @@
 import { defineEventHandler, getValidatedQuery } from 'h3'
 import { Event, Tag } from '~~/server/services'
-import { Op, fn, col, where } from '@sequelize/core'
+import { Op, fn, col } from '@sequelize/core'
 
 import { z } from 'zod'
-import { useLogger } from '~~/server/lib/logger'
 import { normalizeTag } from '~~/server/services/tags'
 
 const schema = z.object({
@@ -11,12 +10,10 @@ const schema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const log = useLogger('api:tags')  
   const { query } = await getValidatedQuery(event, schema.parse)
-
   const tags = await Tag.findAll({
     order: [[fn('COUNT', col('tag')), 'DESC']],
-    attributes: ['tag', 'normalizedTag', [fn('COUNT', col('tag')), 'count']],
+    attributes: ['tag'],
     where: query
       ? { normalizedTag: { [Op.like]: `%${query}%` } }
       : undefined,
@@ -27,8 +24,5 @@ export default defineEventHandler(async (event) => {
     subQuery: false
   })
 
-  
-  const ret = tags.map(t => t.tag)
-  console.error(ret)
-  return ret
+  return tags.map(t => t.tag)
 })
