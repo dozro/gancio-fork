@@ -145,19 +145,20 @@ async function done() {
   }
   loading.value = false
 }
+
 const normalizedTags = computed({
-  get: () => event?.value?.tags,
-  set: (newTags: [string]) => {
+  get: () => event?.value?.tags ?? [],
+  set: (newTags: string[]) => {
     const seen = new Set()
     const tags = []
     for (const tag of newTags) {
-      const norm = tag.toLocaleLowerCase()
+      const norm = tag.toLocaleLowerCase().trim()
       if (!seen.has(norm)) {
         seen.add(norm)
         tags.push(tag)
       }
     }
-    event.value = { ...event.value, tags }
+    event.value.tags = tags
   }
 })
 
