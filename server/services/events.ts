@@ -214,7 +214,7 @@ export type EventAPIType = z.infer<typeof eventAPISchema>
 export async function setEventMedia(eventPayload: EventAPIType) {
   if (eventPayload.image || eventPayload.image_url) {
     const focalpoint = eventPayload.image_focalpoint
-    if (!eventPayload.image && eventPayload.image_url) {
+    if (!eventPayload.image && eventPayload.image_url && /^https?:\/\//.test(eventPayload.image_url)) {
       return getImageFromURL(
         eventPayload.image_url,
         eventPayload.image_name || eventPayload.title,
