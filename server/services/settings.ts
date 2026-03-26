@@ -83,7 +83,7 @@ export async function setSetting<K extends keyof AllSettings>(
   is_secret: boolean = false
 ): Promise<[entity: Setting, created: boolean | null]> {
   const log = useLogger('settings')
-  log.info(`SET '${key}' -> '${value}'`)
+  log.info(`SET '${key}' -> '${is_secret ? '<HIDDEN FROM LOG>' : value}'`)
   if (is_secret) {
     secretSettings[key] = value
   } else {
