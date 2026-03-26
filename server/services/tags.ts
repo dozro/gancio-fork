@@ -15,17 +15,18 @@ export async function findOrCreateTags(tags: string[]) {
     .filter(tag => typeof tag === 'string')
     .map(tag => tag.trim())
     .filter(tag => tag.length > 0)
+    .filter((tag, idx, arr) => arr.indexOf(tag) === idx)
 
   // search for existing tags
   const existingTags = await Tag.findAll({ where: { tag: { [Op.in]: tags } } })
-  
+
   // missing tags
   const missing = tags
     .filter(t => !existingTags.some(existingTag => existingTag.tag === t))
     .map(tag => ({ tag, normalizedTag: normalizeTag(tag) }))
 
   const createdTags = await Tag.bulkCreate(missing, { returning: true })
-  
+
   return [
     ...existingTags,
     ...createdTags

@@ -67,7 +67,7 @@ describe('Tags', () => {
 
   it('should ignore duplicate existing tags', async () => {
     const { findOrCreateTags } = await import('../../server/services/tags')
-    const tags = ['Tag1', 'Tag1']
+    const tags = ['Tag1', 'Tag1 ']
     const result = await findOrCreateTags(tags)
     expect(result).toHaveLength(1)
     expect(result[0].tag).toBe('Tag1')
@@ -108,7 +108,7 @@ describe('Tags', () => {
     const event = await Event.create({ title: 'test', is_visible: true, status: 'EventScheduled', start_datetime: now() + 1000 })
     const tags = await findOrCreateTags(['tag1', 'Tag2', 'another'])
     await event.setTags(tags)
-    
+
     const event2 = await Event.create({ title: 'test 2', is_visible: false, status: 'EventScheduled', start_datetime: now() + 1000 })
     const tags2 = await findOrCreateTags(['other', 'example'])
     await event2.setTags(tags2)
@@ -137,14 +137,14 @@ describe('Tags', () => {
     const result = await handleEvent(h3event)
     expect(result).toHaveLength(1)
   })
-  
+
   it('should return events searching by multiple tags on partial tag match', async () => {
     const { default: handleEvent } = await import('../../server/api/events/index.get')
     const h3event = mockH3Event({ method: 'GET', query: { tags: ['nonexistent', 'tag2'] } })
     const result = await handleEvent(h3event)
     expect(result).toHaveLength(1)
   })
-  
+
   it('should return events searching non normalized tag', async () => {
     const { default: handleEvent } = await import('../../server/api/events/index.get')
     const h3event = mockH3Event({ method: 'GET', query: { tags: ' #tag2 ' } })
