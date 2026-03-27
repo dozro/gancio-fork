@@ -5,12 +5,10 @@
 *.sql
 *.dump
 *.sqlite
+!example_db.sqlite
 _*.js
 .output
 config*.json
-tests/seeds/testdb.sqlite
-gancio.sqlite
-db.sqlite
 releases
 wp-plugin/wpgancio
 config/development.json
