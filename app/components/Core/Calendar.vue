@@ -1,5 +1,4 @@
 <script setup>
-
 import time from '~/utils/time'
 
 const selectedDate = useState('selectedDate')
@@ -13,6 +12,9 @@ function updatePages (pages) {
   const tmpStart = time.startMonth(start.year, start.month)
   if (tmpStart != params.value.start) {
     params.value.start = tmpStart
+    if (selectedDate.value) {
+      selectedDate.value = null
+    }
   }
 }
 const initialPage = useInitialCalendarPage()
