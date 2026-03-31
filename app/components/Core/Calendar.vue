@@ -15,6 +15,7 @@ function updatePages (pages) {
     params.value.start = tmpStart
   }
 }
+const initialPage = useInitialCalendarPage()
 </script>
 <template>
 <!-- :first-day-of-week='settings.calendar_first_day_of_week ?? undefined' -->
@@ -29,6 +30,7 @@ function updatePages (pages) {
   aria-label='Calendar'
   expanded
   :attributes='attributes'
+  :initial-page="initialPage"
   @update:pages="updatePages"
 />
 </template>
