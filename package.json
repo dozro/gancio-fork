@@ -63,9 +63,9 @@
   },
   "dependencies": {
     "@babel/preset-typescript": "^7.28.5",
-    "@nuxt/hints": "1.0.0-alpha.10",
+    "@nuxt/hints": "1.0.2",
     "@nuxt/kit": "^4.2.2",
-    "@nuxtjs/i18n": "10.2.3",
+    "@nuxtjs/i18n": "10.2.4",
     "@nuxtjs/sitemap": "7.6.0",
     "@peertube/http-signature": "^1.7.0",
     "@popperjs/core": "^2.11.8",
