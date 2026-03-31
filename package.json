@@ -25,6 +25,17 @@
     "server",
     "gancio_plugins"
   ],
+  "tsup": {
+    "entry": [
+      "server/cli/index.ts"
+    ],
+    "outDir": ".output",
+    "format": "esm",
+    "minify": true,
+    "banner": {
+      "js": "#!/usr/bin/env node"
+    }
+  },
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
@@ -33,6 +44,9 @@
   "type": "module",
   "scripts": {
     "build": "nuxi build",
+    "build:cli": "tsup-node",
+    "build:doc": "cd docs && bundle exec jekyll b",
+    "build:wc": "cd webcomponents; pnpm run build:lib; cp dist/gancio-events.umd.cjs ../wp-plugin/js/gancio-events.es.js; cp dist/gancio-events.umd.cjs ../public/gancio-events.es.js; cp dist/gancio-events.umd.cjs ../docs/assets/js/gancio-events.es.js;",
     "dev": "NODE_OPTIONS='--trace-warnings' nuxi dev",
     "postinstall": "nuxi prepare",
     "start": "NODE_ENV=production node .output/server/index.mjs",
@@ -41,12 +55,10 @@
     "test": "vitest run",
     "test:dev": "vitest dev",
     "test:ui": "TZ=UTC vitest --ui --open",
-    "doc": "cd docs && bundle exec jekyll b",
     "doc:dev": "cd docs && bundle exec jekyll s --drafts",
     "migrate": "NODE_ENV=production sequelize db:migrate",
     "migrate:dev": "sequelize db:migrate",
     "analyze": "nuxt build --analyze",
-    "build:wc": "cd webcomponents; pnpm run build:lib; cp dist/gancio-events.umd.cjs ../wp-plugin/js/gancio-events.es.js; cp dist/gancio-events.umd.cjs ../public/gancio-events.es.js; cp dist/gancio-events.umd.cjs ../docs/assets/js/gancio-events.es.js;",
     "circular": "madge --circular --extensions ts,js,vue server"
   },
   "dependencies": {
@@ -137,6 +149,8 @@
     "playwright-core": "^1.57.0",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "unplugin-auto-import": "^21.0.0",
     "unplugin-vue-components": "^31.0.0",

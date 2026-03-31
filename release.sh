@@ -76,8 +76,10 @@ npx nuxi cleanup
 # build web UI
 npx nuxi build
 
+# build CLI
+pnpm build:cli
+
 mkdir -p "${PKG_MAIN}/uploads"
-# mkdir -p "${PKG_MAIN}/prisma"
 
 # nuxt built app
 cp -ra .output/ "${PKG_MAIN}/nuxt/"
@@ -87,7 +89,7 @@ cp -ra ./server/migrations "${PKG_MAIN}/nuxt/server/migrations/"
 
 # small cli utility
 # cp -ra cli "${PKG_MAIN}/.output/server/cli/"
-# cp gancio.js "${PKG_MAIN}/.output/server/gancio.js"
+cp .output/index.js "${PKG_MAIN}/gancio"
 
 ## note that this is in an internal folder as users should not access it directly as it would be overwritten by the next build
 # all locales (UI and mails)
