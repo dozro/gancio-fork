@@ -129,4 +129,5 @@ export async function loadSettings() {
     await setSetting('publicKey', publicKey)
     await setSetting('privateKey', privateKey, true)
   }
+  return publicSettings
 }
