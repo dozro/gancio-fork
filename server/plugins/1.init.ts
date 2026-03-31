@@ -15,39 +15,34 @@ export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
   const isTest = process.env.VITEST === 'true'
 
   const log = useLogger('init')
+  const config = getConfig()
   try {
-    const config = getConfig()
-      try {
-        log.info('Connecting to database')
-        await connect()
-        await runMigrations()
-        log.info('Loading settings')
-        await loadSettings()
+    log.info('Connecting to database')
+    await connect()
+    await runMigrations()
+    log.info('Loading settings')
+    await loadSettings()
 
-        log.info('Checking directory structure')
-        useCreateDirectoryStructure()
+    log.info('Checking directory structure')
+    useCreateDirectoryStructure()
 
-        if (!isTest) {
-          log.info('Loading task manager')
-          useTaskManager().start()
+    if (!isTest) {
+      log.info('Loading task manager')
+      useTaskManager().start()
 
-          log.info('Loading plugins')
-          pluginController._load()
-        }
-
-        const storage = useStorage()
-        const driver = fsDriver({ base: config.user_locale })
-        storage.mount('custom_user_locale', driver)
-
-        publicSettings.status = 'ready'
-        return true
-      } catch (e) {
-        log.error(`Error connecting to database?`)
-        log.error(e)
-        process.exit(1)
+      log.info('Loading plugins')
+      pluginController._load()
     }
+
+    const storage = useStorage()
+    const driver = fsDriver({ base: config.user_locale })
+    storage.mount('custom_user_locale', driver)
+
+    publicSettings.status = 'ready'
+    return true
   } catch (e) {
-    console.error(e)
+    log.error(`Error connecting to database?`)
+    log.error(e)
     process.exit(1)
   }
 })
