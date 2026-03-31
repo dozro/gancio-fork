@@ -3,6 +3,7 @@ import path from 'path'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import usersCLI from './users'
+import settingsCLI from './settings'
 
 /**
  * gancio CLI
@@ -32,7 +33,7 @@ await yarg
     }
   })
   .command(['users'], 'Manage users', usersCLI)
-  // .command(['settings'], 'Manage settings', settingsCLI)
+  .command(['settings'], 'Manage settings', settingsCLI)
   .help('h')
   .alias('h', 'help')
   .epilog('Made with ❤ by underscore hacklab - https://gancio.org')
