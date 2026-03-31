@@ -9,6 +9,8 @@ const settings = useState<Settings>('settings')
 const { t } = useI18n()
 const event = defineModel<EventAPI>('event', { type: Object, required: true })
 
+const initialCalendarPage = useInitialCalendarPage()
+
 const frequencies = [
   { value: '1w', text: t('event.each_week') },
   { value: '2w', text: t('event.each_2w') },
@@ -57,7 +59,6 @@ const todayEvents = computed(() => {
 
   return events?.value?.filter(e => e.id !== event.value.id && e.start_datetime >= startOfDay && e.start_datetime <= endOfDay)
 })
-
 
 watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, endTime]) => {
   if (!startTime || !dates) {
@@ -113,9 +114,10 @@ watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, e
             :is-dark="theme.current?.value?.dark"
             :is-range="type === 'multidate'"
             :locale="$i18n.locale"
-            :attributes="attributes" 
+            :attributes="attributes"
             is-inline
             :min-date="!isAdmin ? new Date() : undefined"
+            :initial-page="initialCalendarPage"
             is-expanded
           />
         </template>
