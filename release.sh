@@ -89,7 +89,8 @@ cp -ra ./server/migrations "${PKG_MAIN}/nuxt/server/migrations/"
 
 # small cli utility
 # cp -ra cli "${PKG_MAIN}/.output/server/cli/"
-cp .output/index.js "${PKG_MAIN}/gancio"
+cp .cli/index.js "${PKG_MAIN}/nuxt/server/gancio"
+ln -s "${PKG_MAIN}/nuxt/server/gancio" "${PKG_MAIN}/gancio"
 
 ## note that this is in an internal folder as users should not access it directly as it would be overwritten by the next build
 # all locales (UI and mails)

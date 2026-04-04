@@ -1,4 +1,4 @@
-import { connect, User, Setting } from '../services/db'
+import { connect } from '../services/db'
 import { useLogger } from '../lib/logger'
 import { loadSettings, setSetting } from '../services/settings'
 

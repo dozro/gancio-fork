@@ -4,7 +4,7 @@
 import type { NitroApp } from 'nitropack'
 import pluginController from '../services/plugins'
 import fsDriver from 'unstorage/drivers/fs'
-import { get as getConfig, isBuild } from '../services/config'
+import { get as getConfig } from '../services/config'
 import { useLogger } from '../lib/logger'
 import { loadSettings, publicSettings } from '../services/settings'
 import { useTaskManager } from '../services/taskManager'

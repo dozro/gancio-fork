@@ -2,7 +2,7 @@ import { version } from './package.json'
 import locales from './server/i18n/locales'
 
 const isBuild = process.env.NODE_ENV === 'production'
-const isTest = !!process.env.VITEST
+const isTest = process.env.VITEST == 'true'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -116,13 +116,8 @@ export default defineNuxtConfig({
         base: isBuild ? './nuxt/server/i18n/locales' : './i18n/locales'
       }
     },
-    externals: {
-      external: ['sharp']
-    },
     esbuild: {
       options: {
-        sourcemap: false,
-        exclude: ['sharp'],
         target: 'esnext',
         tsconfigRaw: {
           // See https://github.com/nuxt/nuxt/issues/14126
