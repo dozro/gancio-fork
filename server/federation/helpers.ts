@@ -12,6 +12,7 @@ import type { H3Event } from 'h3'
 import { APActivityTypeSchema } from './types'
 import { handleActivity } from './handlers'
 import { getActor, getInstance } from './lookup'
+import emitter from '../lib/emitter'
 
 const log = useLogger('federation')
 
@@ -78,6 +79,12 @@ function _getUser() {
   }
 }
 
+emitter.on('settings:updated', ({ key, value }: { key: keyof Settings; value: unknown }) => {
+  // when changing this we have to update the actor
+  if (['description', 'logo'].includes(key)) {
+    updateActor()
+  }
+})
 export async function updateActor() {
   if (!publicSettings.enable_federation) {
     log.info('[FEDI] Federation is disabled')
