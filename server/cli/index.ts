@@ -11,7 +11,7 @@ import { isBuild } from '../services/config'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 
-const { version } = require('./package.json')
+const { version } = isBuild ? require('./package.json') : require('../../package.json')
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const serverEntry = path.resolve(__dirname, 'index.mjs')
