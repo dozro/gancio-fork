@@ -53,6 +53,5 @@ const settingsCLI = yargs => yargs
   .command('set <setting> <value>', 'Set value of specified setting', {}, set)
   .recommendCommands()
   .demandCommand(1, '')
-  .argv
 
 export default settingsCLI

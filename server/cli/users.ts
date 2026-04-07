@@ -93,7 +93,7 @@ async function enable (args: { email: string }, enable: boolean) {
   await db.close()
 }
 
-const usersCLI = yarg => yarg
+const usersCLI = yargs => yargs
   .command('list', 'List all users', list)
   .command('set-role <email> <role>', 'Set specified role privileges to the given user',
     { role: { describe: 'Define this user role', choices: ['user', 'admin', 'editor'] } }, setRole)

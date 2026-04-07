@@ -14,22 +14,24 @@ has_toc: true
 {:toc}
 
 ## Using CLI
-Gancio is distributed with an embedded CLI.
-To use the CLI you need to specify the `config.json` configuration file via `--config <your_config.json>` flag; by default the CLI will look for one in the current directory, so if your current directory is /opt/gancio (having followed the [installation instructions](/install/debian)) there is no need to specify it.
+Gancio is distributed with an embedded CLI.  
+To use the CLI you can execute it directly from the installation directory with `./gancio <your command>`.
+
+<!--To use the CLI you need to specify the `config.json` configuration file via `--config <your_config.json>` flag; by default the CLI will look for one in the current directory, so if your current directory is /opt/gancio (having followed the [installation instructions](/install/debian)) there is no need to specify it.-->
 
 ### Using CLI with Docker installation
 To use the CLI in a docker installation you can execute a shell inside the container with:
-`docker exec --workdir /home/node/data -it gancio  sh` and following the normal CLI usage or running commands with:
+`docker exec <gancio_container_name> sh` and following the normal CLI usage or running commands with:
 
-`docker exec --workdir /home/node/data gancio gancio <your command>`
-
-(the first "gancio" is the container name)
+`docker exec <gancio_container_name> ./gancio <your command>`
 
 
 ## Users <span class='label label-yellow'>since 1.6.14</span>
 All users related sub-commands starts with `gancio users`.
 Note that most of this actions could be done from administration panel (Admin > Users).
 
+### Run db migration
+`gancio migrate`
 
 ### List all users
 To list all users use
@@ -87,25 +89,24 @@ To list all settings use
 `gancio settings set <setting> <value>`
 
 ```bash
-# change federated actor's name
-➜ gancio settings set instance_name '"gancio"'
-📅 gancio - v1.24.0 - A shared agenda for local communities (nodejs: v20.15.0)
-> Reading configuration from: /home/les/dev/hacklab/gancio/config.json
+# enable moderation
+➜ ./gancio settings set enable_moderation true
+enable_report
+Old value: false
+New value: true
 
-instance_name
-Old value: "relay"
-New value: "gancio"
-
-Note that this will likely break current federation (all your follower / following connections will be destroyed)!
 Note that a restart is needed to get the new setting
+[settings] ℹ SET 'enable_report' -> 'true'
+
 ```
 
 
 > warning "JSON"
-> Note that settings are stored in JSON, so your value will be parsed.
+> Note that settings are stored in JSON format, so your value will be parsed.
 
 > warning "Restart needed"
 > A restart is needed after a setting is changed
 
 > info "References"
 > [#365](https://framagit.org/les/gancio/-/issues/365)
+> [!188](https://framagit.org/les/gancio/-/merge_requests/188)

@@ -32,7 +32,7 @@
     "outDir": ".cli",
     "format": "esm",
     "target": "esnext",
-    "sourcemap": true,
+    "sourcemap": false,
     "minify": true,
     "bundle": true,
     "clean": true,

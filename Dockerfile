@@ -24,6 +24,7 @@ WORKDIR /app
 
 COPY --from=builder /app/.output/ ./nuxt
 COPY --from=builder /app/.cli/index.js ./nuxt/server/gancio
+RUN ln -s /app/nuxt/server/gancio /app/gancio
 
 RUN mkdir uploads
 COPY ./server/migrations ./nuxt/server/migrations/
