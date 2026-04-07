@@ -5,6 +5,7 @@ import { get as getConfig } from './config'
 import type { SecretSettings, Settings } from '~~/shared/types/settings'
 import { useLogger } from '../lib/logger'
 import { Setting } from './db'
+import emitter from '../lib/emitter'
 
 const generateKeyPair = promisify(crypto.generateKeyPair)
 
@@ -87,12 +88,8 @@ export async function setSetting<K extends keyof AllSettings>(
   if (is_secret) {
     secretSettings[key] = value
   } else {
-    // when changing this we have to update the actor
-    if (['description', 'logo'].includes(key)) {
-      const { updateActor } = await import('../federation/helpers')
-      updateActor()
-    }
     publicSettings[key] = value
+    emitter.emit('settings:updated', { key, value })
   }
   const setting = await Setting.upsert({ key, value, is_secret })
   if (!is_secret) {
@@ -129,4 +126,5 @@ export async function loadSettings() {
     await setSetting('publicKey', publicKey)
     await setSetting('privateKey', privateKey, true)
   }
+  return publicSettings
 }

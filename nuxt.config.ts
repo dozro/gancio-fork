@@ -2,7 +2,7 @@ import { version } from './package.json'
 import locales from './server/i18n/locales'
 
 const isBuild = process.env.NODE_ENV === 'production'
-const isTest = !!process.env.VITEST
+const isTest = process.env.VITEST == 'true'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -20,8 +20,8 @@ export default defineNuxtConfig({
     }
   },
   sourcemap: {
-    server: true,
-    client: true
+    server: !isBuild,
+    client: !isBuild
   },
   css: [
     'vuetify/styles',
@@ -76,7 +76,7 @@ export default defineNuxtConfig({
       maxAge: 60 * 60 * 24 * 365, // 1 year,
       cookie: {
         sameSite: 'lax',
-        secure: false // process.env.NODE_ENV === 'production',
+        secure: isBuild // process.env.NODE_ENV === 'production',
       }
     },
     public: {
@@ -88,7 +88,7 @@ export default defineNuxtConfig({
   },
   vite: {
     esbuild: {
-      sourcemap: false
+      sourcemap: !isBuild
     },
     optimizeDeps: {
       include: ['lodash/debounce', 'luxon', 'linkifyjs', 'mitt', 'v-calendar', '@vue/devtools-core',
@@ -105,7 +105,7 @@ export default defineNuxtConfig({
       'process.env.DEBUG': false
     },
     build: {
-      sourcemap: false,
+      sourcemap: !isBuild,
       target: 'esnext'
     }
   },
@@ -116,13 +116,8 @@ export default defineNuxtConfig({
         base: isBuild ? './nuxt/server/i18n/locales' : './i18n/locales'
       }
     },
-    externals: {
-      external: ['sharp']
-    },
     esbuild: {
       options: {
-        sourcemap: false,
-        exclude: ['sharp'],
         target: 'esnext',
         tsconfigRaw: {
           // See https://github.com/nuxt/nuxt/issues/14126

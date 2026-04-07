@@ -19,6 +19,7 @@ thumb
 docs/_site
 .vscode
 package
+.cli
 
 ### Node template
 # Logs

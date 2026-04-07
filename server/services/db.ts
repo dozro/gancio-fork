@@ -1,9 +1,7 @@
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import slugify from 'slugify'
 import { Umzug, SequelizeStorage } from 'umzug'
-import fs from 'fs/promises'
-import path from 'path'
 import { useLogger } from '../lib/logger'
 
 import {
@@ -87,7 +85,7 @@ export async function runMigrations() {
   if (!sequelize) return
   const umzug = new Umzug({
     storage: new SequelizeStorage({ sequelize }),
-    migrations: { glob: isBuild ? 'nuxt/server/migrations/*.js' : 'server/migrations/*.js' },
+    migrations: { glob: isBuild ? './nuxt/server/migrations/*.js' : './server/migrations/*.js' },
     context: sequelize.queryInterface,
     logger: console
   })
@@ -309,24 +307,24 @@ export class Event extends Model<
   declare setTags: BelongsToManySetAssociationsMixin<Tag, string>
   declare setPlace: BelongsToSetAssociationMixin<Place, number>
 
-  @BeforeDestroy
-  static async removeImg(instance: Event) {
-    // remove the image files (normal and thumb) associated with this event
-    // if no image is associated, do nothing
-    if (!instance.media || instance.media.length === 0 || !instance.media[0]?.url) {
-      return
-    }
-    for (const media of instance.media) {
-      if (!media?.url) continue
-      const thumbPath = path.resolve(config.upload_path, 'thumb', path.basename(media.url))
-      const normalPath = path.resolve(config.upload_path, path.basename(media.url))
-      log.info(`Removing event images for event ${instance.id}: `, normalPath, thumbPath)
-      await Promise.allSettled([
-        fs.unlink(normalPath),
-        fs.unlink(thumbPath)
-      ])
-    }
-  }
+  // @BeforeDestroy
+  // static async removeImg(instance: Event) {
+  //   // remove the image files (normal and thumb) associated with this event
+  //   // if no image is associated, do nothing
+  //   if (!instance.media || instance.media.length === 0 || !instance.media[0]?.url) {
+  //     return
+  //   }
+  //   for (const media of instance.media) {
+  //     if (!media?.url) continue
+  //     // const thumbPath = path.resolve(config.upload_path, 'thumb', path.basename(media.url))
+  //     // const normalPath = path.resolve(config.upload_path, path.basename(media.url))
+  //     // log.info(`Removing event images for event ${instance.id}: `, normalPath, thumbPath)
+  //     // await Promise.allSettled([
+  //     //   fs.unlink(normalPath),
+  //     //   fs.unlink(thumbPath)
+  //     // ])
+  //   }
+  // }
 
   @BeforeCreate
   static async generateSlug(event: Event) {
@@ -481,13 +479,6 @@ export class User extends Model<
   async generateRecoverCode() {
     this.recover_code = crypto.randomUUID()
     await this.save()
-  }
-
-  async comparePassword(pwd: string) {
-    if (!this.password) {
-      return false
-    }
-    return bcrypt.compare(pwd, this.password)
   }
 
   @BeforeSave
