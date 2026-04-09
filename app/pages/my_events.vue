@@ -28,7 +28,7 @@ async function remove (event: EventAPI, parent) {
   if (!ret) {
     return
   }
-  await $fetch(`/event/${event.id}`, { method: 'DELETE' })
+  await $fetch(`/api/events/${event.id}`, { method: 'DELETE' })
   refresh()
   $notify('admin.event_remove_ok')
 }
