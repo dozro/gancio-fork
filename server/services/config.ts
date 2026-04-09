@@ -74,7 +74,7 @@ export function get() {
 
   // read the .env
   dotenv.config({ quiet: true, path: isTest ? '.env.test' : '.env' })
-  if (!process.env.NUXT_SESSION_PASSWORD) {
+  if (!process.env.NUXT_SESSION_PASSWORD || process.env.NUXT_SESSION_PASSWORD.length < 32) {
     console.error('NUXT_SESSION_PASSWORD cannot be empty (check your .env)!')
     process.exit(-1)
   }
