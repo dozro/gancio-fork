@@ -239,8 +239,9 @@ const normalizedTags = computed({
       <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='draft'>{{
         eventId ?
           event.is_visible ? $t('common.convert_draft') : $t('common.save_draft')
-          : $t('common.create_draft') }}</v-btn>
-      <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='publish'>{{ $t('common.publish') }}</v-btn>
+          : loggedIn ? $t('common.create_draft') : $t('common.send') }}</v-btn>
+      <v-btn v-if='loggedIn' :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='publish'>
+        {{ $t('common.publish') }}</v-btn>
     </v-card-actions> </v-card>
 </v-container>
 </template>
