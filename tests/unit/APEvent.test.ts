@@ -1,4 +1,3 @@
-
 /**
  * Parsing tests for ActivityPub Event objects
  * https://fediverse.codeberg.page/fep/fep/8a8e/

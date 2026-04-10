@@ -79,7 +79,7 @@ describe('AP Activity handler', () => {
     const ret = handleActivity(event, { ...actor, ap_id: 'different_actor_id' })
     return expect(ret).rejects.toThrow('Event actor is not the original event actor')
   })
-  
+
   it('should fail an Update > Event on non existing event (adversarial)', async () => {
     const { default: event } = await import('../fixtures/APActivities/1-UpdateEvent')
     const ret = handleActivity({ ...event, object: { ...event.object, id: 'non_existing_event' } }, actor)
@@ -172,14 +172,14 @@ describe('AP Activity handler', () => {
     const event = await Event.findOne({ where: { ap_id: activity.object.object } })
     expect(event.likes.length).toBe(0)
   })
-  
+
   it('should handle a Delete > Event', async () => {
     const { default: activity } = await import('../fixtures/APActivities/10-DeleteEvent')
     await handleActivity(activity, actor)
     const event = await Event.findOne({ where: { ap_id: activity.object } })
     expect(event).toBeNull()
   })
-  
+
   it('should handle a Delete > Event with non existing event (adversarial)', async () => {
     const { default: activity } = await import('../fixtures/APActivities/10-DeleteEvent')
     const ret = handleActivity({ ...activity, object: 'non_existing_event' }, actor)
@@ -195,7 +195,7 @@ describe('AP Activity handler', () => {
     const events = await Event.findAll({ where: { ap_id: event.object.id } })
     expect(events.length).toBe(1)
   })
-  
+
   it('should be idempotent on duplicate Delete (adversarial)', async () => {
     const { default: createEvent } = await import('../fixtures/APActivities/0-CreateEvent')
     const { default: deleteEvent } = await import('../fixtures/APActivities/10-DeleteEvent')
@@ -209,7 +209,7 @@ describe('AP Activity handler', () => {
     events = await Event.findAll({ where: { ap_id: deleteEvent.object } })
     expect(events.length).toBe(0)
   })
-  
+
   it('should be idempotent on duplicate Like (adversarial)', async () => {
     const { default: like } = await import('../fixtures/APActivities/8-LikeEvent')
     await handleActivity(like, actor)
@@ -217,7 +217,7 @@ describe('AP Activity handler', () => {
     const event = await Event.findOne({ where: { ap_id: like.object } })
     expect(event.likes.length).toBe(1)
   })
-  
+
   it('should be idempotent duplicate on Follow (adversarial)', async () => {
     const { default: follow } = await import('../fixtures/APActivities/5-Follow')
     await handleActivity(follow, actor)
@@ -225,5 +225,4 @@ describe('AP Activity handler', () => {
     const user = await APUser.findAll({ where: { follower: true } })
     expect(user.length).toBe(1)
   })
-  
 })
