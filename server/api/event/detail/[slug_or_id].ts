@@ -1,4 +1,4 @@
-import { Event, Place, Tag, User, Resource, mapEvent, Message } from '~~/server/services'
+import { Event, Place, Tag, User, Resource, mapEvent, Message, APUser } from '~~/server/services'
 import type { WhereOptions } from '@sequelize/core'
 import { Op } from '@sequelize/core'
 import { formatSchema } from '~~/server/types/validator'
@@ -37,19 +37,8 @@ export default defineEventHandler(async (evt) => {
       { model: Tag, required: false, attributes: ['tag'], through: { attributes: [] } },
       { model: Place, attributes: ['name', 'address', 'latitude', 'longitude', 'id', 'ap_id'] },
       { model: User, required: false, attributes: ['is_active'] },
-      {
-        model: Resource,
-        ...(!isAdminOrEditor && { where: { hidden: false } }),
-
-        include: [
-          { association: 'APUser', required: false, attributes: ['ap_id', 'object'] }
-        ],
-        required: false,
-        attributes: ['id', 'activitypub_id', 'data', 'hidden']
-      },
       { model: Event, required: false, as: 'parent', attributes: ['id', 'recurrent', 'is_visible', 'start_datetime'] }
-    ],
-    order: [[Resource, 'id', 'ASC']]
+    ]
   })
 
   if (!event) {
@@ -63,7 +52,7 @@ export default defineEventHandler(async (evt) => {
     n_messages = await Message.count({ where: { eventId: event.id, ...(!isAdminOrEditor && { is_author_visible: true }) } }).catch(() => 0)
   }
 
-  if (!event?.is_visible && !isAdminOrEditor) {
+  if (!event.is_visible && !isAdminOrEditor) {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 

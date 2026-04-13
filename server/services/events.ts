@@ -140,7 +140,6 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
     ...pagination,
     replacements
   })
-
 }
 
 const MAX_TIMESTAMP = 1000 * 24 * 60 * 60 * 365
