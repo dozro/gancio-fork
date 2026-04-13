@@ -3,6 +3,8 @@
 <script>
   import { onMount } from 'svelte'
   import { when } from './helpers'
+  import { I18n } from 'i18n-js'
+
   export let baseurl = ''
   export let title = ''
   export let maxlength = false
@@ -16,37 +18,88 @@
   export let external_style = ''
 
   let mounted = false
+  let loading = false
+  let page = 0
+  let hasMore = true
   let events = []
 
-  function update(v) {
-    if (!mounted) return
-    const params = []
-    if (maxlength) {
-      params.push(`max=${maxlength}`)
+  let i18n = new I18n({})
+  i18n.enableFallback = true
+  i18n.defaultLocale = 'en'
+  i18n.locale = navigator.language
+
+  async function loadLocale(locale) {
+    try {
+      const resp = await fetch(new URL(`api/locale/${locale}`, baseurl))
+      if (!resp.ok) {
+        throw Error(`Request failed: ${response.status}`)
+      }
+      const result = {}
+      result[locale] = await resp.json()
+      i18n.store(result)
+    } catch (error) {
+      console.error(`Failed to load locale '${locale}'`, error)
+    }
+  }
+
+  // Update UI on translation load
+  i18n.onChange(() => {
+    i18n = i18n
+  })
+
+
+  async function loadEvents() {
+    if (!mounted || !hasMore) return
+    loading = true
+
+    const url = new URL('/api/events', baseurl)
+
+    if (page > 0) {
+      url.searchParams.set('page', page)
     }
 
-    let api = '/api/events'
+    if (maxlength) {
+      url.searchParams.set('max', maxlength)
+    }
+
     if (collection) {
-      api = `/feed/json/collection/${collection}`
+      url.pathname = `/feed/json/collection/${collection}`
     } else {
       if (tags) {
-        params.push(`tags=${tags}`)
+        url.searchParams.set('tags', tags)
       }
 
       if (places) {
-        params.push(`places=${places}`)
+        url.searchParams.set('places', places)
       }
     }
-    params.push(`show_recurrent=${show_recurrent ? 'true' : 'false'}`)
 
-    fetch(`${baseurl}${api}?${params.join('&')}`)
-      .then((res) => res.json())
-      .then((e) => {
-        events = e.events || e
-      })
-      .catch((e) => {
-        console.error('Error loading Gancio API -> ', e)
-      })
+    url.searchParams.set('show_recurrent', show_recurrent)
+
+    try {
+      const resp = await fetch(url)
+      if (!resp.ok) {
+        throw Error(`Request failed with ${response.status}`)
+      }
+      const json = await resp.json()
+      const fetched = json.events || json
+      if (!maxlength || fetched.length < Number(maxlength)) {
+        hasMore = false
+      }
+      page++
+      events = events.concat(fetched)
+    } catch (e) {
+      console.error('Error loading Gancio API -> ', e)
+    }
+    loading = false
+  }
+
+  function update(v) {
+    if (!mounted) return
+    page = 0
+    hasMore = true
+    events = []
+    loadEvents()
   }
 
   function position(event) {
@@ -59,6 +112,11 @@
 
   onMount(() => {
     mounted = true
+    loadLocale('en')
+    if (navigator.language) {
+      loadLocale(navigator.language)
+      loadLocale(navigator.language.split('-')[0])
+    }
     update()
   })
   $: update(
@@ -130,6 +188,13 @@
         </div>
       </a>
     {/each}
+    {#if hasMore}
+      <button id="footer" on:click={loadEvents} disabled={loading}>
+        <div class="content">
+          {i18n.t('common.load_more', {defaultValue: 'Load More'})}
+        </div>
+      </button>
+    {/if}
   </div>
 {/if}
 
@@ -291,5 +356,32 @@
   .tag {
     margin-right: 10px;
     display: inline-block;
+  }
+
+  #footer {
+    display: flex;
+    border: none;
+    width: 100%;
+    padding: 1.2rem 1rem;
+    background-color: var(--bg-odd-color);
+    color: var(--title-color);
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  #footer:hover,
+  #footer:focus,
+  #footer:active {
+    text-decoration: underline;
+    background-color: var(--bg-hover-color);
+  }
+
+  #footer .content {
+    margin: auto;
+  }
+
+  .nosidebar #footer {
+    border-radius: 15px;
   }
 </style>
