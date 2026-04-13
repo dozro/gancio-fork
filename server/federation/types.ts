@@ -78,10 +78,10 @@ export const APNoteSchema = z.object({
   inReplyTo: z.string().optional(),
   url: z.url().optional(),
   content: z.string().optional(),
-  summary: z.string().optional()
+  summary: z.string().optional(),
+  published: z.iso.date().optional()
 })
 export type APNote = z.infer<typeof APNoteSchema>
-
 
 export interface APActivityUpdate extends APActivityBase {
   type: 'Update'

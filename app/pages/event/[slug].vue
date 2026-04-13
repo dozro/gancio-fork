@@ -50,7 +50,6 @@ const openAssignAuthor = ref(false)
 const showModeration = computed(() => settings.value.enable_moderation && (event?.value?.is_mine || user?.value?.role === 'admin' || user?.value?.role === 'editor'))
 const canEdit = computed(() => event?.value?.is_mine || user?.value?.role === 'admin' || user?.value?.role === 'editor')
 const hasOnlineLocations = computed(() => event?.value?.online_locations?.length)
-const showResources = computed(() => settings.value.enable_federation)
 
 const share = useShare()
 const shareEvent = () => share.value?.({ url: canonicalUrl.value, title: document.title })
@@ -85,11 +84,6 @@ const shareEvent = () => share.value?.({ url: canonicalUrl.value, title: documen
 //     ]
 //   }
 // },
-//   showResources () {
-//     return this.settings.enable_federation &&
-//     ( (!this.settings.hide_boosts && (this.event.boost?.length || this.event?.likes?.length)) ||
-//     ( this.settings.enable_resources && this.event?.resources?.length))
-//   }
 // },
 
 async function report() {
@@ -231,7 +225,19 @@ async function report() {
     </v-col>
   </v-row>
 
-  <EventFederatedInteractions v-if="showResources && !settings.hide_boosts" id="resources" class="mt-4" :event="event" />
+  <EventFederatedInteractions
+    v-if="settings.enable_federation && !settings.hide_boosts"
+    class="mt-4"
+    :event="event"
+  />
+  <LazyEventFederatedResources
+    v-if="settings.enable_federation && settings.enable_resources"
+    id="resources"
+    class="mt-4"
+    :event-id="event.id"
+    :can-moderate="canEdit"
+    hydrate-on-visible
+  />
 
   <v-dialog v-model="showEmbed" class='event-embed-dialog' width="700px" :fullscreen="$vuetify.display?.mobile">
     <EventEmbed :event="event" @close="showEmbed = false" />
