@@ -74,7 +74,14 @@
       }
     }
 
-    url.searchParams.set('show_recurrent', show_recurrent)
+    url.searchParams.set(
+      'show_recurrent',
+      // If attribute is present but doesn't have a value
+      ((show_recurrent === '') ? true
+       // If attribute is not present
+       : !show_recurrent ? false
+       // Else parse given string
+       : show_recurrent))
 
     try {
       const resp = await fetch(url)
