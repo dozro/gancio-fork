@@ -97,7 +97,7 @@ export default defineEventHandler(async (evt) => {
         event.ld_signature = await sign(eventToAP(event), secretSettings.privateKey, `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key`)
         await event.save({ silent: true })
       } catch (e) {
-        log.warn
+        log.warn('Error signing Event ', e)
       }
     }
     // send notifications

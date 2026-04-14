@@ -2,7 +2,7 @@ import { publicSettings } from '../services'
 import { useLogger } from '../lib/logger'
 import { signAndSend } from './sign_and_send'
 import crypto from 'crypto'
-import type {, APActivityFollow, APActivityUndo } from './types'
+import type { APActivityFollow, APActivityUndo } from './types'
 
 const log = useLogger('AP follow')
 

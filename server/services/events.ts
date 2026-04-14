@@ -325,7 +325,7 @@ export async function getMessages(eventId: number) {
   return event
 }
 
-export async function eventToAP(event: Event) {
+export function eventToAP(event: Event) {
   const username = publicSettings.instance_name
   const opt = {
     zone: publicSettings.instance_timezone,

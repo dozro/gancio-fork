@@ -39,7 +39,7 @@ export async function buildEventActivity(event: Event, recipients: string[],
     to: ['https://www.w3.org/ns/activitystreams#Public'],
     cc: recipients,
     actor: `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
-    object: await eventToAP(event)
+    object: eventToAP(event)
   }
 }
 

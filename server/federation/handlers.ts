@@ -1,12 +1,9 @@
 import { handleFollow, handleUnfollow } from './follows'
-import type {
-  APActivityDelete, APActivityCreate, APActivityUndo,
-  APHandlerMap, APActivityAnnounce, APActivity,
-  APActivityUpdate,
-  APActivityTypeSchema,
-  APActivityBase,
-  APEvent,
-  APNote
+import {
+  type APActivityDelete, type APActivityCreate, type APActivityUndo,
+  type APHandlerMap, type APActivityAnnounce, type APActivity,
+  type APActivityUpdate, APActivityTypeSchema,
+  type APActivityBase, type APEvent, type APNote
 } from './types'
 import { useLogger } from '../lib/logger'
 import { handleCreateEvent, handleUpdateEvent } from './events'
