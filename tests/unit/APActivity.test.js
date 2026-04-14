@@ -150,10 +150,12 @@ describe('AP Activity handler', () => {
   })
 
   // (e.g. the trusted source is a mastodon actor that Boost an event)
-  it('should not handle an Announce > Create > Event', async () => {
+  it('should handle an Announce > Create > Event', async () => {
     const { default: activity } = await import('../fixtures/APActivities/7-AnnounceCreateEvent')
-    const ret = handleActivity(activity, actor)
-    return expect(ret).rejects.toThrow('Announce wrapping Create is not supported')
+    await handleActivity(activity, actor)
+    const ev = await Event.findOne({ where: { ap_id: activity.object.object.id } })
+    expect(ev).toBeDefined()
+    expect(ev.title).toBe('Announce > Create > Event')
   })
 
   it('should handle Like > Event', async () => {

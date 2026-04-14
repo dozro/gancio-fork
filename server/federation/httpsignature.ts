@@ -3,7 +3,7 @@ import { publicSettings } from '../services'
 import { type H3Event, getHeader, createError } from 'h3'
 import type { APActivityBase } from './types'
 import { useLogger } from '../lib/logger'
-import { getActor, getInstance } from './lookup'
+import { getActor } from './lookup'
 import httpSignature from '@peertube/http-signature'
 const log = useLogger('HTTPSignature')
 
@@ -54,7 +54,6 @@ export async function verifyHTTPSignature(event: H3Event, rawBody: string, body:
   if (!signatureHeader) {
     throw createError({ status: 401, message: 'Missing signature header' })
   }
-
   const parsed = httpSignature.parseRequest(event.node.req)
 
   if (!parsed.keyId) {
@@ -75,23 +74,23 @@ export async function verifyHTTPSignature(event: H3Event, rawBody: string, body:
   // get actor
   let ap_actor = await getActor(actor_url, false)
   if (!ap_actor) {
-    log.info(`[FEDI] Actor ${actor_url} not found`)
+    log.info(`Actor ${actor_url} not found`)
     throw createError({ status: 401, message: 'Actor not found' })
   }
 
   // Is this instance blocked?
-  if (ap_actor.instance.blocked) {
-    log.warn(`[FEDI] Instance ${ap_actor.instance.domain} blocked`)
+  if (ap_actor.instance?.blocked) {
+    log.warn(`Instance ${ap_actor.instance.domain} blocked`)
     throw createError({ status: 401, message: 'Instance blocked' })
   }
 
   if (ap_actor.blocked) {
-    log.info(`[FEDI] Actor ${ap_actor.ap_id} blocked`)
+    log.info(`Actor ${ap_actor.ap_id} blocked`)
     throw createError({ status: 401, message: 'Actor blocked' })
   }
 
   if (!ap_actor?.object?.publicKey?.publicKeyPem) {
-    log.info(`[FEDI] Actor %s has no publicKey at %s`, ap_actor.ap_id, actor_url)
+    log.info(`Actor %s has no publicKey at %s`, ap_actor.ap_id, actor_url)
     throw createError({ status: 401, message: 'No public key' })
   }
 
@@ -106,9 +105,18 @@ export async function verifyHTTPSignature(event: H3Event, rawBody: string, body:
   const digest = crypto.createHash('sha256')
     .update(rawBody)
     .digest('base64')
+
   const signature = getHeader(event, 'digest')
-  if (`SHA-256=${digest}` !== signature) {
-    log.warn(`Signature mismatch ${signature} - ${digest}`)
+  const prefix = 'sha-256='
+  // some software use uppsercase SHA-256 to indicate the algo
+  if (!signature?.toLowerCase().startsWith(prefix)) {
+    log.warn(`Unsupported digest algorithm: ${signature}`)
+    throw createError({ status: 400, message: 'Unsupported digest algorithm' })
+  }
+
+  const value = signature.slice(prefix.length)
+  if (value !== digest) {
+    log.warn(`Signature mismatch ${value} - ${digest}`)
     throw createError({ status: 401, message: 'Signature mismatch' })
   }
 
@@ -117,7 +125,7 @@ export async function verifyHTTPSignature(event: H3Event, rawBody: string, body:
     return ap_actor
   }
 
-  // signature not valid, try without cache
+  // signature not valid, try get the actor again skipping the cache
   ap_actor = await getActor(actor_url, true)
   if (!ap_actor) {
     log.info(`Actor ${actor_url} not found`)

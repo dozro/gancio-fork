@@ -1,58 +1,23 @@
-import crypto from 'crypto'
 import { useLogger } from '../lib/logger'
-import { publicSettings } from '../services'
-import { sign } from './ldsignature'
+import { secretSettings } from '../services'
+import { useTaskManager } from '../services/taskManager'
+import { prepareHTTPSignature } from './httpsignature'
+import type { APActivityBase } from './types'
 
-export async function prepareHTTPSignature(message: string, inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
-  const inboxUrl = new URL(inbox)
-  const signer = crypto.createSign('sha256')
-  const d = new Date()
-
-  let header
-  let digest
-  if (method === 'post') {
-    digest = crypto.createHash('sha256')
-      .update(message)
-      .digest('base64')
-    const stringToSign = `(request-target): post ${inboxUrl.pathname}\nhost: ${inboxUrl.hostname}\ndate: ${d.toUTCString()}\ndigest: SHA-256=${digest}`
-    signer.update(stringToSign)
-    signer.end()
-    const signature = signer.sign(privkey)
-    const signature_b64 = signature.toString('base64')
-    header = `keyId="${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key",algorithm="rsa-sha256",headers="(request-target) host date digest",signature="${signature_b64}"`
-  } else {
-    const stringToSign = `(request-target): get ${inboxUrl.pathname}\nhost: ${inboxUrl.hostname}\ndate: ${d.toUTCString()}`
-    signer.update(stringToSign)
-    signer.end()
-    const signature = signer.sign(privkey)
-    const signature_b64 = signature.toString('base64')
-    header = `keyId="${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key",algorithm="rsa-sha256",headers="(request-target) host date",signature="${signature_b64}"`
-  }
-  
-  return {
-    'host': inboxUrl.hostname,
-    'date': d.toUTCString(),
-    'signature': header,
-    ...(method === 'post' && ({ digest: `SHA-256=${digest}` })),
-  }
+export async function signAndSend(object: APActivityBase, inbox: string, method = 'post') {
+  useTaskManager().add({
+    name: 'SIGN_AND_SEND',
+    method: _signAndSend,
+    args: [object, inbox, method, secretSettings.privateKey]
+  })
 }
-  
 
-export async function _signAndSend(message: string, inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
+export async function _signAndSend(object: APActivityBase | '', inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
   const log = useLogger('sign_and_send')
   log.debug('[FEDI] Sign and %s %s', method, inbox)
 
-  // in case of POST sign with LDSignature
-  // TODO: add Object Integrity Proof: https://codeberg.org/fediverse/fep/src/branch/main/fep/8b32/fep-8b32.md
-  if (method === 'post') {
-    try {
-      message = await sign(message, privkey, `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key`)
-    } catch (e) {
-      log.error('[FEDI] Sign error', e)
-    }
-  }
-    
-  const httpSignatureHeaders = await prepareHTTPSignature(message, inbox, method, privkey)
+  const body = JSON.stringify(object)
+  const httpSignatureHeaders = await prepareHTTPSignature(body, inbox, method, privkey)
   try {
     const ret = await fetch(inbox, {
       headers: {
@@ -61,22 +26,29 @@ export async function _signAndSend(message: string, inbox: string, method: 'post
         'Accept': 'application/activity+json'
       },
       method,
-      ...(method === 'post' && ({ body: message }))
+      ...(method === 'post' ? { body } : {})
     })
 
     const contentType = ret.headers.get('content-type')
     // check if content-type is json
-    if (!contentType?.includes('json')) {
+    if (!contentType?.includes('json') && !contentType?.includes('text/plain')) {
       log.error(`[FEDI] Error in sign and send, wrong content-type returned: ${contentType} - status: ${ret.status}`)
       console.error(await ret.text())
       return
     }
 
+    const text = await ret.text()
     if (ret.ok) {
       log.debug(`[FEDI] Signed and verified! ${ret.status} => ${contentType}`)
-      return ret.json().catch(() => '')
+      if (!text) return ''
+      try {
+        return JSON.parse(text)
+      } catch {
+        log.warn('Invalid JSON response', text)
+        return ''
+      }
     } else {
-      const body = await ret.json()
+      const body = JSON.parse(text)
       log.error('[FEDI] Error in sign and send status [%s]: %s', inbox, body)
       throw body
     }

@@ -1,58 +1,57 @@
 import { ofetch } from 'ofetch'
-import { parseAPLocation } from './places'
-import { getImageFromURL, sanitizeHTML } from '../helpers'
-import { findOrCreateTags } from '../services/tags'
+import { sanitizeHTML } from '../helpers'
 import { _signAndSend } from './sign_and_send'
 import { useLogger } from '../lib/logger'
-import { useTaskManager } from '../services/taskManager'
-import { publicSettings, secretSettings } from '../services'
-import { Instance, Event, APUser } from '../services/db'
-import { eventToAP } from '../services/events'
-import type { H3Event } from 'h3'
-import { z } from 'zod'
-import { APActivityTypeSchema, type APActor, type APEvent } from './types'
-import { handleCreateEvent } from './events'
-import { APHandlers } from './handlers'
+import { secretSettings } from '../services'
+import { Instance, APUser } from '../services/db'
+import type { APActor } from './types'
 
 const log = useLogger('federation')
 
-// get Actor from URL using GET HTTP Signature
-export async function getActor(actorUrl: string, instance?: Instance, force = false, fail_on_not_cached = false) {
+/**
+ * Get an Actor from a URL using GET HTTP Signature.
+ * @param actorUrl - The URL of the Actor to get.
+ * @param force - bypass the cache and make a fresh request.
+ * @returns The APUser representing the Actor, or null if not found.
+ */
+export async function getActor(actorUrl: string, force = false) {
   log.debug(`[FEDI] getActor for ${actorUrl}`)
-  let fedi_user: APUser | null
+  let fedi_user
 
   // try with cache first
   if (!force) {
-    fedi_user = await APUser.findByPk(actorUrl, { include: Instance })
+    fedi_user = await APUser.findByPk(actorUrl, { include: { model: Instance, required: true } }) as APUser & { instance: Instance }
     if (fedi_user) {
       return fedi_user
-    } else if (fail_on_not_cached) {
-      return
     }
   }
 
   try {
     const ret: APActor = await _signAndSend('', actorUrl, 'get', secretSettings.privateKey)
     if (!ret?.id) {
-      log.debug('[FEDI] getActor failed for %s', actorUrl)
+      log.debug('getActor failed for %s', actorUrl)
       return
     }
+
     if (ret) {
+      const instance = await getInstance(actorUrl, false)
       log.info('[FEDI] Create/Update a new AP User "%s" and associate it to instance "%s"', ret.id, instance?.domain)
       try {
         ([fedi_user] = await APUser.upsert({
           ap_id: ret.id,
           object: { ...ret, summary: sanitizeHTML(ret?.summary ?? '') },
-          instanceDomain: instance?.domain ?? new URL(actorUrl).origin,
+          instanceDomain: instance.domain ?? new URL(actorUrl).origin,
           blocked: false
         }))
+
+        await fedi_user.setInstance(instance)
         return fedi_user
       } catch (e) {
         log.debug('[FEDI] Error in update/create ', e)
       }
     }
   } catch (e) {
-    log.debug('[FEDI] nope ', e)
+    log.debug('getActor failed for %s, %s', actorUrl, e)
     return
   }
 }
@@ -81,9 +80,8 @@ export async function getNodeInfo(instance_url: string) {
   }
 }
 
-export async function getInstance(actor_url: string, force = false, fail_on_not_cached = false) {
+export async function getInstance(actor_url: string, force = false) {
   log.debug(`[FEDI] getInstance for ${actor_url}`)
-  console.error('getInstance', actor_url)
   const url = new URL(actor_url)
   const domain = url.host
   const instance_url = `${url.protocol}//${url.host}`
@@ -93,8 +91,6 @@ export async function getInstance(actor_url: string, force = false, fail_on_not_
     if (instance) {
       log.debug('[FEDI] Use cached instance: %s', instance.name)
       return instance
-    } else if (fail_on_not_cached) {
-      return
     }
   }
 
@@ -112,6 +108,14 @@ export async function getInstance(actor_url: string, force = false, fail_on_not_
     log.debug('[FEDI] Create a new instance from %s: %s %s', instance_url, instance.name, nodeInfo)
     return instance
   } catch (e) {
-    log.warn('[FEDI] Wrong nodeInfo returned for "%s": %s', instance_url, e?.response?.data ?? String(e))
+    const [instance] = await Instance.upsert({
+      name: domain,
+      domain,
+      data: '',
+      blocked: false,
+      applicationActor: undefined
+    })
+    log.info('nodeInfo not supported for "%s": %s', instance_url, e?.response?.data ?? String(e))
+    return instance
   }
 }

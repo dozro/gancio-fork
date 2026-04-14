@@ -1,11 +1,13 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { $fetchRaw as fetch } from 'nitro-test-utils/e2e'
 import { fetchWithAuth, now, cleanDatabase } from './setup'
 
-let collections = []
-let filters = []
+const collections = []
+const filters = []
 describe('Collection', async () => {
-  await cleanDatabase(true)
+  beforeAll(async () => {
+    await cleanDatabase(true)
+  })
   it('should not create a new collection if not allowed', async () => {
     const response = await fetch('/api/collections', {
       method: 'POST',
