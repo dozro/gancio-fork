@@ -1,9 +1,12 @@
+import { APActor } from "../../../server/federation/types"
+
 export default {
-  ap_id: 'http://localhost:13120/federation/u/alice',
-  blocked: false,
-  object: {
-    publicKey: {
-      publicKeyPem: `-----BEGIN PUBLIC KEY-----
+  type: 'Person',
+  name: 'alice',
+  preferredUsername: 'alice',
+  id: 'http://localhost:13120/federation/u/alice',
+  publicKey: {
+    publicKeyPem: `-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAm+RxzRBOnv9RGFv3vMhD
 iN6c71prmYIVvfp6VUHDWRqYDuzhF8faqFN87jS+ZI8rokkF9Sh/ExvBrjzLwqp7
 n4onQLHelfM4n//RMuaSizYN55cMNnCFs/NgJv85c8bP4n25dQYKMubuYoftfOOK
@@ -17,9 +20,8 @@ fMMFd3ecrB+TTWHasTlrrq1wShUHiyf3eZN1RaWMHGQ5n0ZwP26FkihdwLToTOKr
 e0iPEykiVOg5U3b7dBv8WPr4Rqxrxjr42+7o3IdqBOU7kEW+1CzfZ9rBjr3NhWXY
 Dh7k2BGPIrU8Y+GLBSPXILUCAwEAAQ==
 -----END PUBLIC KEY-----`,
-      id: 'http://localhost:13120/federation/u/alice#main-key',
-      owner: 'http://localhost:13120/federation/u/alice'
-    }
+    id: 'http://localhost:13120/federation/u/alice#main-key',
+    owner: 'http://localhost:13120/federation/u/alice'
   }
 }
 

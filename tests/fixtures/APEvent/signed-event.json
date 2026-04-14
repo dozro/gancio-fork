@@ -4,7 +4,7 @@
     "https://w3id.org/security/v1"
   ],
   "type": "Announce",
-  "actor": "http://localhost:13120/federation/u/relay2",
+  "actor": "http://localhost:13120/federation/u/relay",
   "object": {
     "id": "http://localhost:13120/federation/m/1",
     "type": "Event",

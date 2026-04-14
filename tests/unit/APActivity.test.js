@@ -39,7 +39,7 @@ await APUser.create({
 const instance = await getInstance('http://localhost:13120', false)
 
 if (!instance) throw new Error('Instance not found')
-const actor = await getActor('http://localhost:13120/federation/u/relay', instance, false)
+const actor = await getActor('http://localhost:13120/federation/u/relay', false)
 if (!actor) throw new Error('Actor not found')
 await actor.update({ trusted: true, following: true })
 
@@ -150,12 +150,10 @@ describe('AP Activity handler', () => {
   })
 
   // (e.g. the trusted source is a mastodon actor that Boost an event)
-  it('should handle an Announce > Create > Event', async () => {
+  it('should not handle an Announce > Create > Event', async () => {
     const { default: activity } = await import('../fixtures/APActivities/7-AnnounceCreateEvent')
-    await handleActivity(activity, actor)
-    const event = await Event.findOne({ where: { ap_id: activity.object.object.id } })
-    expect(event).not.toBeNull()
-    expect(event.title).toBe('Announce > Create > Event')
+    const ret = handleActivity(activity, actor)
+    return expect(ret).rejects.toThrow('Announce wrapping Create is not supported')
   })
 
   it('should handle Like > Event', async () => {
@@ -197,7 +195,7 @@ describe('AP Activity handler', () => {
   })
 
   it('should be idempotent on duplicate Delete (adversarial)', async () => {
-    const { default: createEvent } = await import('../fixtures/APActivities/0-CreateEvent')
+    // const { default: createEvent } = await import('../fixtures/APActivities/0-CreateEvent')
     const { default: deleteEvent } = await import('../fixtures/APActivities/10-DeleteEvent')
 
     // await handleActivity(createEvent, actor)
@@ -211,6 +209,8 @@ describe('AP Activity handler', () => {
   })
 
   it('should be idempotent on duplicate Like (adversarial)', async () => {
+    const { default: createEvent } = await import('../fixtures/APActivities/0-CreateEvent')
+    await handleActivity(createEvent, actor)
     const { default: like } = await import('../fixtures/APActivities/8-LikeEvent')
     await handleActivity(like, actor)
     await handleActivity(like, actor)

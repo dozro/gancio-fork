@@ -26,6 +26,6 @@
   "updated": "2026-02-05T12:02:03.403Z",
   "attributedTo": "https://demo.gancio.org/federation/u/customized",
   "to": [ "https://www.w3.org/ns/activitystreams#Public" ],
-  "cc": [ "https://demo.gancio.org/federation/u/customized/followers" ],
   "content": "<p>test</p><h1>antani</h1>",
-  "summary":    "<p>Theaterplatz  63739 Aschaffenburg, Thursday, February 12 at 12:00 AM GMT+1</p><p>test</p><h1>antani</h1>" }
+  "summary":    "<p>Theaterplatz  63739 Aschaffenburg, Thursday, February 12 at 12:00 AM GMT+1</p><p>test</p><h1>antani</h1>"
+}
