@@ -1,3 +1,5 @@
+import { publicSettings } from '~~/server/services'
+
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Type', 'application/xrd+xml')
   return `<?xml version="1.0" encoding="UTF-8"?>

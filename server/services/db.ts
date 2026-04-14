@@ -178,6 +178,13 @@ export interface Media {
 export const EventStatusEnum = ['EventCancelled', 'EventScheduled', 'EventTentative', 'EventMovedOnline', 'EventPostponed', 'EventRescheduled'] as const
 export type EventStatus = typeof EventStatusEnum[number]
 
+export type LDSignature = {
+  '@context': 'https://w3id.org/identity/v1'
+  'creator': string
+  'created': string
+  signatureValue: string
+}
+
 @Table({
   tableName: 'events',
   timestamps: true
@@ -205,7 +212,7 @@ export class Event extends Model<
   @Attribute(DataTypes.ENUM(EventStatusEnum))
   @Default('EventScheduled')
   @NotNull
-  declare status: EventStatus
+  declare status: CreationOptional<EventStatus>
 
   @Attribute(DataTypes.STRING)
   @Index
@@ -234,6 +241,9 @@ export class Event extends Model<
 
   @Attribute(DataTypes.JSON)
   declare recurrent: CreationOptional<object | null>
+
+  @Attribute(DataTypes.JSON)
+  declare ld_signature: CreationOptional<LDSignature>
 
   @Attribute(DataTypes.JSON)
   declare ap_object: CreationOptional<APEvent>
@@ -359,7 +369,7 @@ export class Tag extends Model<
   @Index
   @Unique
   declare tag: string
-  
+
   /** normalizedTag is used for search, it is the normalized version of tag (lowercase, accents removed, etc.) */
   @Attribute(DataTypes.STRING)
   declare normalizedTag: string
@@ -565,6 +575,8 @@ export class APUser extends Model<
 
   @BelongsTo(() => Instance, { foreignKey: 'instanceDomain', targetKey: 'domain' })
   declare instance?: NonAttribute<Instance>
+
+  declare setInstance: BelongsToSetAssociationMixin<Instance, number>
 
   @HasMany(() => Event, { foreignKey: 'apUserApId', sourceKey: 'ap_id' })
   declare events?: NonAttribute<Event[]>

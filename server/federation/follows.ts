@@ -1,8 +1,8 @@
 import { publicSettings } from '../services'
 import { useLogger } from '../lib/logger'
-import { signAndSend } from './helpers'
+import { signAndSend } from './sign_and_send'
 import crypto from 'crypto'
-import type { APActivityFollow, APActivityUndo } from './types'
+import type {, APActivityFollow, APActivityUndo } from './types'
 
 const log = useLogger('AP follow')
 
@@ -28,7 +28,7 @@ export async function handleFollow(ap_message: APActivityFollow, actor: APUser) 
     'actor': `${publicSettings.baseurl}/federation/u/${username}`,
     'object': ap_message
   }
-  await signAndSend(JSON.stringify(message), actor.object.inbox)
+  await signAndSend(message, actor.object.inbox)
   await actor.update({ follower: true })
 }
 

@@ -1,5 +1,5 @@
 import { useLogger } from '../lib/logger'
-import { type APUser, Event, publicSettings } from '../services'
+import { type APUser, Event, publicSettings, Resource } from '../services'
 import type { APActivityLike, APActivityUndo } from './types'
 const log = useLogger('federation:ego')
 
@@ -37,26 +37,38 @@ const log = useLogger('federation:ego')
 //     }
 //   },
 
-
 export async function handleLike(message: APActivityLike, actor: APUser) {
   const obj = message.object
   if (!obj) return
+  let event
+
   const match = obj.match(`^${publicSettings.baseurl}/federation/m/(.*)`)
-  if (!match || match.length < 2) {
-    log.debug('No match for like: %s', JSON.stringify(message))
-    throw new Error('Event not found!')
+  if (match && match.length > 1) {
+    event = await Event.findByPk(Number(match[1]))
   }
-  const event = await Event.findByPk(Number(match[1]))
+
+  // if (!event) {
+  // in reply to another resource...
+  // const resource = await Resource.findOne({ where: { activitypub_id: obj }, include: [Event] })
+  // }
+
   if (!event) {
-    throw new Error('Event not found!')
+    // in reply to a remote event
+    event = await Event.findOne({ where: { ap_id: obj } })
   }
-  
+
+  if (!event) {
+    log.warn(`Like to unknown: ${obj}`)
+    return
+    // throw new Error('Not found')
+  }
+
   // check if already liked
   if (event.likes.includes(actor.ap_id)) {
     log.debug(`${actor.ap_id} already liked ${event.title}`)
     return
   }
-  
+
   log.info(`${actor.ap_id} like ${event.title} (${event.likes.length})`)
   await event.update({ likes: [...event.likes, actor.ap_id] })
 }
@@ -65,15 +77,27 @@ export async function handleUnlike(message: APActivityUndo, actor: APUser) {
   const obj = message.object.object
   if (!obj) return
 
-  const match = obj?.match(`^${publicSettings.baseurl}/federation/m/(.*)`)
-  if (!match || match.length < 2) {
-    log.debug('No match for like: %s', JSON.stringify(message))
-    throw new Error('Event not found!')
+  let event
+
+  const match = obj.match(`^${publicSettings.baseurl}/federation/m/(.*)`)
+  if (match && match.length > 1) {
+    event = await Event.findByPk(Number(match[1]))
   }
-  const event = await Event.findByPk(Number(match[1]))
+
+  // if (!event) {
+  // in reply to another resource...
+  // const resource = await Resource.findOne({ where: { activitypub_id: obj }, include: [Event] })
+  // }
+
   if (!event) {
-    throw new Error('Event not found!')
+    // in reply to a remote event
+    event = await Event.findOne({ where: { ap_id: obj } })
   }
+
+  if (!event) {
+    throw new Error('Not found')
+  }
+
   log.info(`${actor.ap_id} unlike ${event.title} (${event.likes.length})`)
   await event.update({ likes: event.likes.filter(id => id !== actor.ap_id) })
 }

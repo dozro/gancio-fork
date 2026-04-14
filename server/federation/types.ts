@@ -2,15 +2,18 @@ import { z } from 'zod'
 import { EventStatusEnum } from '../services/db'
 import { DateTime } from 'luxon'
 
-export const APActivityTypeSchema = z.enum(['Follow', 'Undo', 'Like', 'Announce', 'Create', 'Delete', 'Update', 'Accept'])
+export const APActivityTypeSchema = z.enum(['Follow', 'Undo', 'Like', 'Announce', 'Create', 'Delete', 'Update', 'Accept', 'EchoRequest'])
+export type APActivityType = z.infer<typeof APActivityTypeSchema>
 
-export interface APActivityBase {
-  id?: string // id is not mandatory for some activities (i.e. Follow)
-  type: APActivityType
-  actor: string
-}
+export const APActivityBaseSchema = z.object({
+  id: z.string().optional(), // id is not mandatory for some activities (i.e. Follow)
+  type: APActivityTypeSchema,
+  actor: z.url().optional()
+})
 
-// https:// www.w3.org/wiki/ActivityPub/Primer/Actors
+export type APActivityBase = z.infer<typeof APActivityBaseSchema>
+
+// https://www.w3.org/wiki/ActivityPub/Primer/Actors
 // https://www.w3.org/TR/activitypub/#actors
 export interface APActor {
   id: string
@@ -44,7 +47,7 @@ export interface APActivityFollow extends APActivityBase {
 
 export interface APActivityAnnounce extends APActivityBase {
   type: 'Announce'
-  object: string
+  object: string | APNote | APEvent
 }
 
 export interface APActivityLike extends APActivityBase {
@@ -64,10 +67,7 @@ export interface APActivityLike extends APActivityBase {
 
 export interface APActivityUndo extends APActivityBase {
   type: 'Undo'
-  object: {
-    type: 'Follow' | 'Like' | 'Announce'
-    object: string
-  }
+  object: APActivityFollow | APActivityLike | APActivityAnnounce
 }
 
 // https://fediverse.codeberg.page/fep/fep/8a8e/
@@ -82,15 +82,14 @@ export const APNoteSchema = z.object({
 })
 export type APNote = z.infer<typeof APNoteSchema>
 
-
 export interface APActivityUpdate extends APActivityBase {
   type: 'Update'
-  object: APEvent | APNote | { type?: string }
+  object: APEvent | APNote
 }
 
 export interface APActivityCreate extends APActivityBase {
   type: 'Create'
-  object: APEvent | APNote | { type?: string, id: string }
+  object: APEvent | APNote
 }
 
 export interface APActivityDelete extends APActivityBase {
@@ -163,8 +162,9 @@ export const APEventSchema = z.object({
   attachment: z.array(APAttachmentSchema).optional(),
   location: z.union([APLocationSchema, z.array(APLocationSchema)]).optional(),
   tag: z.array(APTagSchema).optional(),
-  published: z.string().optional(),
-  updated: z.string().optional()
+  published: z.iso.datetime().optional(),
+  signature: z.object().optional().nullable(),
+  updated: z.iso.datetime().optional()
 }).transform(event => ({
   ...event,
   endTime: event.endTime ?? DateTime.fromISO(event.startTime, { setZone: true })
@@ -187,7 +187,6 @@ export interface APActivityMap {
 }
 
 export type APActivity = APActivityMap[keyof APActivityMap]
-export type APActivityType = keyof APActivityMap
 
 export type APHandlerMap = {
   [K in APActivityType]: (
