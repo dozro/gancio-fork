@@ -1,11 +1,12 @@
 import { DateTime } from 'luxon'
 import type { CreationAttributes } from '@sequelize/core'
 import { useLogger } from '../lib/logger'
-import { type APUser, publicSettings, Event } from '../services'
+import { type APUser, publicSettings, Event, secretSettings } from '../services'
 import { eventToAP } from '../services/events'
-import { APContext, getFollowersInbox, signAndSend } from './helpers'
+import { APContext, getFollowersInbox } from './helpers'
+import { signAndSend } from './sign_and_send'
 import { type APActivityCreate, APEventSchema, type APEvent, type APActivityUpdate } from './types'
-
+import { createError } from 'h3'
 import { getImageFromURL, sanitizeHTML } from '../helpers'
 import { parseAPLocation } from './places'
 import { findOrCreatePlace } from '../services/places'
@@ -14,30 +15,31 @@ import { findOrCreateTags } from '../services/tags'
 const log = useLogger('Federated Event')
 
 /**
- * Send a Create/Update activity for an Event to out followers (using sharedInbox when possible)
+ * send a Create, Update, Delete or Announce activity for an Event to our followers (using sharedInbox when possible)
  */
-export async function sendEvent(event: Event, type = 'Create') {
-  if (!publicSettings.enable_federation) {
-    log.info('[FEDI] Event not sent, federation is disabled')
-    return
-  }
-
+export async function sendEvent(event: Event, type: 'Create' | 'Update' | 'Announce' | 'Delete' = 'Create') {
   const recipients = await getFollowersInbox()
+  if (!recipients) return
 
   for (const sharedInbox in recipients) {
     if (!recipients[sharedInbox]?.length) continue
     log.debug(`Notify ${sharedInbox} with event ${event.title} cc => ${recipients[sharedInbox]?.length}`)
-    const body = {
-      '@context': APContext,
-      'id': `${publicSettings.baseurl}/federation/m/${event.id}#${type}-${event.updatedAt.getTime()}`,
-      type,
-      'to': ['https://www.w3.org/ns/activitystreams#Public'],
-      'cc': [...recipients[sharedInbox], `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}/followers`],
-      'actor': `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
-      'object': eventToAP(event)
-    }
+    const body = await buildEventActivity(event, recipients[sharedInbox], type)
 
-    signAndSend(JSON.stringify(body), sharedInbox)
+    signAndSend(body, sharedInbox)
+  }
+}
+
+export async function buildEventActivity(event: Event, recipients: string[],
+  type: 'Create' | 'Update' | 'Announce' | 'Delete' = 'Create') {
+  return {
+    '@context': APContext,
+    id: `${publicSettings.baseurl}/federation/m/${event.id}#${type}-${event.updatedAt.getTime()}`,
+    type,
+    to: ['https://www.w3.org/ns/activitystreams#Public'],
+    cc: recipients,
+    actor: `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
+    object: eventToAP(event)
   }
 }
 
@@ -57,7 +59,7 @@ export async function APEventToEvent(APEvent: APEvent, actor: APUser) {
     start_datetime: DateTime.fromISO(APEvent.startTime).toUnixInteger(),
     end_datetime: DateTime.fromISO(APEvent.startTime).toUnixInteger(),
     is_visible: true,
-    online_locations,
+    ...(online_locations ? { online_locations } : {}),
     // tag: APEvent.tag?.filter(t => t?.type === 'Hashtag').map(t => t.name) ?? [],
     ap_id: APEvent.id,
     media,
@@ -75,12 +77,11 @@ export async function APEventToEvent(APEvent: APEvent, actor: APUser) {
   return { event, tags, place }
 }
 
-
 export async function handleCreateEvent(message: APActivityCreate, actor: APUser) {
   // only trusted actor could send events
   if (!actor.following || !actor.trusted) {
     log.warn(`APUser not followed or not trusted`)
-    throw new Error('Not followed or not trusted')
+    throw createError({ status: 401, message: 'Not followed or not trusted' })
   }
 
   const { success, data, error } = APEventSchema.safeParse(message.object)
@@ -114,7 +115,6 @@ export async function handleCreateEvent(message: APActivityCreate, actor: APUser
   dbEvent.setTags(dbTags)
   return dbEvent
 }
-
 
 /**
  * an Update > Event from remote actor

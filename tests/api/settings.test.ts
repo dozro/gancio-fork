@@ -1,9 +1,7 @@
 import { $fetchRaw as fetch } from 'nitro-test-utils/e2e'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, beforeAll } from 'vitest'
 
 import { fetchWithAuth, cleanDatabase } from './setup'
-import { beforeAll } from 'vitest'
-
 
 describe('Settings', () => {
   beforeAll(async () => {
@@ -19,5 +17,4 @@ describe('Settings', () => {
     expect(status).toBe(200)
     expect(data).toBe(true)
   })
-
 })

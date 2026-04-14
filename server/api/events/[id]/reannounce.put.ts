@@ -1,4 +1,4 @@
-import { announceEvent } from '~~/server/federation/helpers'
+import { sendEvent } from '~~/server/federation/events'
 import { useLogger } from '~~/server/lib/logger'
 import { Event, Place } from '~~/server/services'
 import { canModifyEvent } from '~~/server/services/events'
@@ -16,9 +16,9 @@ export default defineEventHandler(async (evt) => {
   }
 
   if (!canModifyEvent(event, user)) {
-    log.warn(`Someone not allowed is trying to unconfirm -> "${event.title}`)
+    log.warn(`Someone not allowed is trying to reannounce -> "${event.title}`)
     throw createError({ status: 403 })
   }
 
-  await announceEvent(event)
+  await sendEvent(event, 'Announce')
 })

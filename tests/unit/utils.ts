@@ -3,16 +3,26 @@ import { DateTime } from 'luxon'
 import { Readable } from 'node:stream'
 import { IncomingMessage, ServerResponse } from 'node:http'
 import { createEvent } from 'h3'
+import type { IncomingHttpHeaders } from 'node:http2'
 
+type MockH3EventOptions = {
+  method?: 'GET' | 'POST'
+  body?: unknown
+  url?: string
+  query?: string | Record<string, string> | URLSearchParams | string[][] | undefined
+  headers?: IncomingHttpHeaders
+  params?: Record<string, string>
+}
 
-export function mockH3Event({ body = null, method = 'POST', url = '/', query = {}, headers = {} } = {}) {
+export function mockH3Event({ body = null, method = 'POST', url = '/', query = {}, headers = {}, params = {} }: MockH3EventOptions) {
   // build query string
   const qs = new URLSearchParams(query).toString()
-  
+
   const req = new IncomingMessage(null as any)
   req.method = method
   req.url = qs ? `${url}?${qs}` : url
 
+  req.headers = { ...headers }
   if (body) {
     const json = JSON.stringify(body)
 
@@ -20,62 +30,24 @@ export function mockH3Event({ body = null, method = 'POST', url = '/', query = {
     const stream = Readable.from([Buffer.from(json)])
     Object.assign(req, stream)
 
-    req.headers = {
-      'content-type': 'application/json',
-      'content-length': Buffer.byteLength(json).toString(),
-      ...headers,
-    }
+    req.headers['content-type'] = req.headers['content-type'] || 'application/json'
+    req.headers['content-length'] = Buffer.byteLength(json).toString()
   }
 
   const res = new ServerResponse(req)
-  return createEvent(req, res)
+  const evt = createEvent(req, res)
+  evt.context.params = { ...params }
+  return evt
 }
 
-
-// export function mockH3Event({
-//   body,
-//   method = 'POST',
-//   headers = {},
-//   params = {},
-//   rawBody
-// }) {
-//   return new H3Event({
-//     context: { params },
-//     node: {
-//       req: {
-//         headers,
-//         method,
-//         url: '/inbox'
-//       }
-//     },
-//     __body: body,
-//     __rawBody: rawBody || JSON.stringify(body)
-//   })
-// //   return {
-// //     context: { params },
-// //     node: {
-// //       req: {
-// //         headers,
-// //         method,
-// //         url: '/inbox'
-// //       }
-// //     },
-// //     __body: body,
-// //     __rawBody: rawBody || JSON.stringify(body)
-// //   }
-// // }
-
-// export function mockH3() {
-//   return vi.mock('h3', async () => {
-//     const actual = await vi.importActual<any>('h3')
-//     return {
-//       ...actual,
-//       readBody: (event) => event.__body,
-//       readRawBody: (event) => Buffer.from(event.__rawBody),
-//       getHeader: (event, name) => event.node.req.headers[name.toLowerCase()]
-//     }
-//   })
-// }
+export function mockInboxActivity(body: any) {
+  return mockH3Event({
+    headers: { Accept: 'application/activity+json' },
+    method: 'POST',
+    params: { name: 'relay' },
+    body
+  })
+}
 
 export function now() {
   return DateTime.now().toUnixInteger()

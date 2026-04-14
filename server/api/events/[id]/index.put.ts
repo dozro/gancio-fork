@@ -4,10 +4,11 @@ import { useLogger } from '~~/server/lib/logger'
 import { findOrCreatePlace } from '~~/server/services/places'
 import { findOrCreateTags } from '~~/server/services/tags'
 import type { Tag } from '~~/server/services'
-import { Event, mapEvent, publicSettings } from '~~/server/services'
+import { Event, mapEvent, publicSettings, secretSettings } from '~~/server/services'
 import { notifyEvent } from '~~/server/services/notifier'
-import { setEventMedia, validateEvent } from '~~/server/services/events'
+import { eventToAP, setEventMedia, validateEvent } from '~~/server/services/events'
 import { z } from 'zod'
+import { sign } from '~~/server/federation/ldsignature'
 
 /**
  * Update an event
@@ -90,6 +91,15 @@ export default defineEventHandler(async (evt) => {
   if (event?.recurrent && event.is_visible) {
     // eventController._createRecurrent()
   } else {
+    // sign Event if federation is enabled
+    if (publicSettings.enable_federation) {
+      try {
+        event.ld_signature = await sign(eventToAP(event), secretSettings.privateKey, `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key`)
+        await event.save({ silent: true })
+      } catch (e) {
+        log.warn('Error signing Event ', e)
+      }
+    }
     // send notifications
     notifyEvent('Update', event.id)
   }

@@ -1,7 +1,8 @@
 export default {
-  type: 'Create',
-  actor: 'http://localhost:13120/federation/u/relay',
-  object: {
+  '@context': 'https://www.w3.org/ns/activitystreams',
+  'type': 'Create',
+  'actor': 'http://localhost:13120/federation/u/relay',
+  'object': {
     id: 'http://localhost:13120/federation/m/1',
     type: 'Event',
     name: 'Create > Event',

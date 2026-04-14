@@ -1,11 +1,11 @@
 export default {
-  type: 'Announce',
+  type: 'Announce' as const,
   actor: 'http://localhost:13120/federation/u/relay',
   object: {
-    type: 'Create',
+    type: 'Create' as const,
     object: {
       id: 'http://localhost:13120/federation/m/2',
-      type: 'Event',
+      type: 'Event' as const,
       name: 'Announce > Create > Event',
       startTime: '2023-01-01T12:00:00Z',
       endTime: '2023-01-01T13:00:00Z',

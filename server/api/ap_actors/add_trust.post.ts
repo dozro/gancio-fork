@@ -1,5 +1,4 @@
 import { z } from 'zod'
-// import { APUser } from "~/server/utils/sequelize"
 import { followActor } from '~~/server/federation/helpers'
 import { getInstance, getActor } from '~~/server/federation/lookup'
 import { get as getConfig } from '../../services/config'
@@ -31,7 +30,7 @@ export default defineEventHandler(async (event) => {
   // @actor@instance.tld | actor@instance.tld syntax, let's use webfinger
   if (!url.startsWith('http') && url.includes('@')) {
     const [user, instance_url] = url.replace(/^@/, '').split('@')
-    log.debug('[FEDI] Adds user: %s and instance: %s because url was: %s', user, instance_url, url)
+    log.debug('Adds user: %s and instance: %s because url was: %s', user, instance_url, url)
     try {
       let protocol = 'https://'
       if (config.hidden_service === 'true' && isHiddenService(url)) {
@@ -39,17 +38,11 @@ export default defineEventHandler(async (event) => {
       }
 
       if (config.hidden_service !== 'true' && isHiddenService(url)) {
-        log.warn('[FEDI] Trying to trust instance %s but hidden services are not enabled', instance_url)
+        log.warn('Trying to trust instance %s but hidden services are not enabled', instance_url)
         throw createError({ status: 403, message: 'Hidden service not allowed' })
       }
 
-      instance = await getInstance(protocol + instance_url, true)
-
-      if (!instance) {
-        throw createError({ status: 404, message: 'This ap instance does not exists' })
-      }
-
-      const webfinger = await $fetch<{ links: { rel: string; href: string }[] }>(`${protocol}${instance_url}/.well-known/webfinger?resource=acct:${user}@${instance_url}`)
+      const webfinger = await $fetch<{ links: { rel: string, href: string }[] }>(`${protocol}${instance_url}/.well-known/webfinger?resource=acct:${user}@${instance_url}`)
       if (webfinger && Array.isArray(webfinger?.links)) {
         const actor_url = webfinger.links.find(l => l.rel === 'self')
         if (!actor_url) {
@@ -57,18 +50,18 @@ export default defineEventHandler(async (event) => {
           throw createError({ status: 404, message: 'No self links in webfinger' })
         }
 
-        log.info(`[FEDI] Adding trusted instance ${instance_url} and actor ${actor_url.href}...`)
-        const actor = await getActor(actor_url.href, instance, true)
+        log.info(`Adding trusted instance ${instance_url} and actor ${actor_url.href}...`)
+        const actor = await getActor(actor_url.href, true)
         if (!actor) {
           log.warn('Cannot found actor %s', actor_url.href)
           throw createError({ status: 404, message: 'No actor found' })
         }
-        log.debug('[FEDI] Actor %s', actor.ap_id)
+        log.debug('Actor %s', actor.ap_id)
         await actor.update({ trusted: true })
         return actor
       }
     } catch (e) {
-      log.error('[FEDI] Wrong webfinger response from %s: %s ', url, e?.response?.data ?? String(e))
+      log.error('Wrong webfinger response from %s: %s ', url, e?.response?.data ?? String(e))
       throw createError({ status: 404, message: 'Wrong webfinger response' })
     }
   }
@@ -80,7 +73,7 @@ export default defineEventHandler(async (event) => {
     }
     url = url.replace(/\/$/, '')
 
-    log.info(`[FEDI] Adding trusted instance ${url} ...`)
+    log.info(`Adding trusted instance ${url} ...`)
     instance = await getInstance(url, true)
     if (!instance) {
       throw createError({ status: 404, message: 'No instance' })
@@ -89,27 +82,29 @@ export default defineEventHandler(async (event) => {
     let actor
     // should we try to use URL as actor? to review
     try {
-      log.debug('[FEDI] Trying to use %s as actor', url)
-      actor = await getActor(url, instance)
+      log.debug('Trying to use %s as actor', url)
+      actor = await getActor(url)
       if (actor) {
-        log.debug('[FEDI] Actor %s', actor.ap_id)
+        log.debug('Actor %s', actor.ap_id)
         await actor.update({ trusted: true })
         await followActor(actor)
         return actor
+      } else {
+        log.error('not an actor? ')
       }
     } catch (e) {
-      log.debug('[FEDI] %s is probably not an actor: %s', url, String(e))
+      log.debug('%s is probably not an actor: %s', url, String(e))
     }
 
     // ok this wasn't an actor, let's use the applicationActor if exists
     if (!actor && instance?.applicationActor) {
-      log.debug('[FEDI] This node supports FEP-2677 and applicationActor is: %s', instance.applicationActor)
-      actor = await getActor(instance.applicationActor, instance, true)
+      log.debug('This node supports FEP-2677 and applicationActor is: %s', instance.applicationActor)
+      actor = await getActor(instance.applicationActor, true)
       if (!actor) {
-        log.debug('[FEDI] applicationActor %s is probably not an actor', instance.applicationActor)
+        log.debug('applicationActor %s is probably not an actor', instance.applicationActor)
         throw createError({ status: 404, message: 'Actor not found' })
       }
-      log.debug('[FEDI] Actor %s', actor.ap_id)
+      log.debug('Actor %s', actor.ap_id)
       await actor.update({ trusted: true })
       return actor
     }
@@ -120,7 +115,7 @@ export default defineEventHandler(async (event) => {
     // } else if (instance?.data?.software?.name === 'gancio') {
     //   instance.actor = instance?.data?.metadata?.nodeActor' ?? 'relay'
     // }
-    log.debug(`[FEDI] instance .well-known: ${instance.name} - ${instance.domain}`)
+    log.debug(`instance .well-known: ${instance.name} - ${instance.domain}`)
 
     // if we have an actor, let's make a new friend
     if (instance.actor) {
@@ -135,14 +130,14 @@ export default defineEventHandler(async (event) => {
       const actorURL = webfinger?.links.find(l => l.rel === 'self').href
 
       // retrieve the AP actor and flag it as trusted
-      const actor = await getActor(actorURL, instance, true)
+      const actor = await getActor(actorURL, true)
       await actor.update({ trusted: true })
       return actor
     }
     throw createError({ statusCode: 404, statusMessage: 'No way' })
   } catch (e) {
     console.error(e)
-    log.error('[FEDI] Error adding trusted actor %s', e?.response?.data ?? String(e))
+    log.error('Error adding trusted actor %s', e?.response?.data ?? String(e))
     throw createError({ statusCode: 404, statusMessage: 'Error adding trusted actor' })
   }
 })

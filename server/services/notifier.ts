@@ -27,6 +27,10 @@ export async function sendNotification(notification: Notification, event: Event)
     case 'admin_email':
       return notifyAdmins('event', { event, to_confirm: !event.is_visible, notification })
     case 'ap':
+      if (!publicSettings.enable_federation) {
+        log.info('Event not sent, federation is disabled')
+        return
+      }
       return sendEvent(event, notification.action)
   }
 }

@@ -1,4 +1,3 @@
-
 /**
  * Parsing tests for ActivityPub Event objects
  * https://fediverse.codeberg.page/fep/fep/8a8e/
@@ -84,8 +83,7 @@ describe('Event Schema Validator', () => {
 
   it('should parse an event from mobilizon', async () => {
     const { default: event } = await import('../fixtures/APEvent/mobilizon.json')
-    const { success, error, data } = APEventSchema.safeParse(event)
-    console.error(error, data)
+    const { success } = APEventSchema.safeParse(event)
     expect(success).toBe(true)
   })
 })

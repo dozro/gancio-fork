@@ -3,14 +3,15 @@ import { getUser } from '~~/server/utils/session'
 import { parseMultipartFormData } from '~~/server/lib/parseMultipartForm'
 import { findOrCreatePlace } from '~~/server/services/places'
 import { findOrCreateTags } from '~~/server/services/tags'
-import { mapEvent, setEventMedia, validateEvent } from '~~/server/services/events'
+import { eventToAP, mapEvent, setEventMedia, validateEvent } from '~~/server/services/events'
 import type { CreationAttributes } from '@sequelize/core'
 import type { Tag } from '~~/server/services'
-import { publicSettings } from '~~/server/services'
+import { publicSettings, secretSettings } from '~~/server/services'
 import { Event } from '~~/server/services/db'
 import { useLogger } from '~~/server/lib/logger'
 import { notifyEvent } from '~~/server/services/notifier'
 import { z } from 'zod'
+import { sign } from '~~/server/federation/ldsignature'
 
 /**
  * Add a new event
@@ -84,6 +85,15 @@ export default defineEventHandler(async (evt) => {
   if (event?.recurrent && event.is_visible) {
     // eventController._createRecurrent()
   } else {
+    // sign Event if federation is enabled
+    if (publicSettings.enable_federation) {
+      try {
+        event.ld_signature = await sign(eventToAP(event), secretSettings.privateKey, `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key`)
+        await event.save({ silent: true })
+      } catch (e) {
+        log.warn('Error signing Event ', e)
+      }
+    }
     // send notifications
     notifyEvent('Create', event.id)
   }

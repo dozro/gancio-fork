@@ -26,19 +26,19 @@ export async function handleCreateNote(message: APNote, actor: APUser) {
   const inReplyTo = message?.inReplyTo
   if (inReplyTo) {
     // .. to an event ?
-    const match = inReplyTo && inReplyTo.match('.*/federation/m/(.*)')
+    const match = inReplyTo && inReplyTo.match(`^${publicSettings.baseurl}/federation/m/(.*)`)
     log.info(`Event reply => ${inReplyTo}`)
-    if (match) {
+    if (match && match.length > 1) {
       event = await Event.findByPk(Number(match[1]))
     } else {
       // in reply to another resource...
       const resource = await Resource.findOne({ where: { activitypub_id: inReplyTo }, include: [Event] })
       event = resource && resource.event
+    }
 
-      if (!event) {
-        // in reply to a remote event
-        event = await Event.findOne({ where: { ap_id: inReplyTo } })
-      }
+    if (!event) {
+      // in reply to a remote event
+      event = await Event.findOne({ where: { ap_id: inReplyTo } })
     }
   }
 
@@ -58,9 +58,7 @@ export async function handleCreateNote(message: APNote, actor: APUser) {
     data: message,
     eventId: event && event.id
   })
-
 }
-
 
 /**
  * Update a resource from AP Note
@@ -86,7 +84,6 @@ export async function handleUpdateNote(message: APNote, actor: APUser) {
 
   log.debug('Note updated!')
 }
-
 
 export async function handleDeleteNote(message: APNote, actor: APUser) {
   const resource = await Resource.findOne({ where: { activitypub_id: message?.id, apUserApId: actor.ap_id } })

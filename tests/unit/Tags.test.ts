@@ -22,7 +22,6 @@ describe('Tags', () => {
   })
 
   it('should find or create tags', async () => {
-    const { findOrCreateTags } = await import('../../server/services/tags')
     const tags = ['Tag1', 'tag1', 'TAG1']
     const result = await findOrCreateTags(tags)
     const tagNames = result.map(tag => tag.tag)
@@ -33,7 +32,6 @@ describe('Tags', () => {
   })
 
   it('should return existing tag when found', async () => {
-    const { findOrCreateTags } = await import('../../server/services/tags')
     const tags = ['TAG1']
     const result = await findOrCreateTags(tags)
     expect(result).toHaveLength(1)
@@ -41,7 +39,6 @@ describe('Tags', () => {
   })
 
   it('should create new tag when not found', async () => {
-    const { findOrCreateTags } = await import('../../server/services/tags')
     const tags = ['NewTag']
     const result = await findOrCreateTags(tags)
     expect(result).toHaveLength(1)
@@ -49,7 +46,6 @@ describe('Tags', () => {
   })
 
   it('should return multiple tags when found', async () => {
-    const { findOrCreateTags } = await import('../../server/services/tags')
     const tags = ['tAg1', 'tag2']
     const result = await findOrCreateTags(tags)
     expect(result).toHaveLength(2)
@@ -58,7 +54,6 @@ describe('Tags', () => {
   })
 
   it('should ignore empty tags', async () => {
-    const { findOrCreateTags } = await import('../../server/services/tags')
     const tags = ['', 'Tag1']
     const result = await findOrCreateTags(tags)
     expect(result).toHaveLength(1)
@@ -66,7 +61,6 @@ describe('Tags', () => {
   })
 
   it('should ignore duplicate existing tags', async () => {
-    const { findOrCreateTags } = await import('../../server/services/tags')
     const tags = ['Tag1', 'Tag1 ']
     const result = await findOrCreateTags(tags)
     expect(result).toHaveLength(1)
@@ -74,7 +68,6 @@ describe('Tags', () => {
   })
 
   it('should ignore non string tags', async () => {
-    const { findOrCreateTags } = await import('../../server/services/tags')
     const tags = [123, 'tag1']
     const result = await findOrCreateTags(tags)
     expect(result).toHaveLength(1)
@@ -140,7 +133,7 @@ describe('Tags', () => {
 
   it('should return events searching by multiple tags on partial tag match', async () => {
     const { default: handleEvent } = await import('../../server/api/events/index.get')
-    const h3event = mockH3Event({ method: 'GET', query: { tags: ['nonexistent', 'tag2'] } })
+    const h3event = mockH3Event({ method: 'GET', query: { tags: 'nonexistent,tag2' } })
     const result = await handleEvent(h3event)
     expect(result).toHaveLength(1)
   })

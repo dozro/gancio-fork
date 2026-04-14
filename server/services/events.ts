@@ -336,7 +336,7 @@ export function eventToAP(event: Event) {
 
   // https://framagit.org/les/gancio/-/issues/304
   // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-summary
-  const summary = `<p>${event.place && event.place.name}, ${datetime}</p>${event.description}`
+  const summary = `<p>${event.place?.name ?? ''} ${datetime}</p>${event?.description ?? ''}`
 
   let attachment: APAttachment[] = []
   let location: APLocation[] = []
@@ -354,7 +354,7 @@ export function eventToAP(event: Event) {
     }))
   }
 
-  if (event.place?.name !== 'online') {
+  if (event.place && event.place?.name !== 'online') {
     location.push(PlaceToAP(event.place))
   }
 
@@ -382,26 +382,34 @@ export function eventToAP(event: Event) {
   })) ?? []
 
   const e: APEvent = {
+    '@context': [
+      'https://www.w3.org/ns/activitystreams',
+      'https://w3id.org/fep/8a8e',
+      'https://schema.org',
+      'https://w3id.org/security/v1'
+    ],
     id: event.ap_id ?? `${publicSettings.baseurl}/federation/m/${event.id}`,
     name: event.title,
     url: event?.ap_object?.url ?? event?.ap_object?.id ?? `${publicSettings.baseurl}/event/${event.slug || event.id}`,
-    type: 'Event',
+    type: 'Event' as const,
     eventStatus: event.status,
     startTime: DateTime.fromSeconds(event.start_datetime, opt).toISO() ?? '',
     ...(event.end_datetime ? { endTime: DateTime.fromSeconds(event.end_datetime, opt).toISO() } : {}),
+    ...(event.ld_signature ? { signature: event.ld_signature } : {}),
     location,
     attachment,
     tag,
-    published: event.updatedAt,
-    updated: event.updatedAt,
+    published: event.updatedAt.toISOString(),
+    updated: event.updatedAt.toISOString(),
     attributedTo: event.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
     to: ['https://www.w3.org/ns/activitystreams#Public'],
     content: event.description || '',
     summary
   }
+
   return e
 }
 
 export function canModifyEvent(event: Event, user?: UserSession) {
-  return ['admin', 'editor'].includes(user?.role) || event?.userId === user?.id
+  return user && (['admin', 'editor'].includes(user.role) || event?.userId === user?.id)
 }
