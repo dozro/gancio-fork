@@ -3,8 +3,6 @@
 <script>
   import { onMount } from 'svelte'
   import { when } from './helpers'
-  import { I18n } from 'i18n-js'
-
   export let baseurl = ''
   export let title = ''
   export let maxlength = false
@@ -22,31 +20,6 @@
   let page = 0
   let hasMore = true
   let events = []
-
-  let i18n = new I18n({})
-  i18n.enableFallback = true
-  i18n.defaultLocale = 'en'
-  i18n.locale = navigator.language
-
-  async function loadLocale(locale) {
-    try {
-      const resp = await fetch(new URL(`api/locale/${locale}`, baseurl))
-      if (!resp.ok) {
-        throw Error(`Request failed: ${response.status}`)
-      }
-      const result = {}
-      result[locale] = await resp.json()
-      i18n.store(result)
-    } catch (error) {
-      console.error(`Failed to load locale '${locale}'`, error)
-    }
-  }
-
-  // Update UI on translation load
-  i18n.onChange(() => {
-    i18n = i18n
-  })
-
 
   async function loadEvents() {
     if (!mounted || !hasMore) return
@@ -119,11 +92,6 @@
 
   onMount(() => {
     mounted = true
-    loadLocale('en')
-    if (navigator.language) {
-      loadLocale(navigator.language)
-      loadLocale(navigator.language.split('-')[0])
-    }
     update()
   })
   $: update(
@@ -196,9 +164,16 @@
       </a>
     {/each}
     {#if hasMore}
-      <button id="footer" on:click={loadEvents} disabled={loading}>
+      <button title="More" id="footer" on:click={loadEvents} disabled={loading}>
         <div class="content">
-          {i18n.t('common.load_more', {defaultValue: 'Load More'})}
+          <svg class="icon"
+               viewBox="0 0 32 32"
+               xmlns="http://www.w3.org/2000/svg"
+               xmlns:svg="http://www.w3.org/2000/svg"
+               style="fill-opacity:0;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;">
+            <path d="M 2,16 16,28 30,16"/>
+            <path d="M 2,4 16,16 30,4"/>
+          </svg>
         </div>
       </button>
     {/if}
@@ -390,5 +365,9 @@
 
   .nosidebar #footer {
     border-radius: 15px;
+  }
+  #footer .icon {
+    height: 1.1rem;
+    stroke: var(--title-color);
   }
 </style>

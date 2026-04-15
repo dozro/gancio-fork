@@ -128,10 +128,5 @@ export default defineNuxtConfig({
         }
       }
     }
-  },
-  routeRules: {
-    '/api/locale/**': {
-      cors: true
-    }
   }
 })

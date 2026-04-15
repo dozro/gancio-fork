@@ -122,8 +122,7 @@
         "pages": "Pages",
         "no_events_found": "No events found",
         "no_events_found_hint": "Select different dates or criteria",
-        "dark_mode": "Dark mode",
-        "load_more": "Load More"
+        "dark_mode": "Dark mode"
     },
     "login": {
         "description": "By logging in you can publish new events.",
