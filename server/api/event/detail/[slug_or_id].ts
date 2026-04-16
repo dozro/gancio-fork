@@ -52,7 +52,7 @@ export default defineEventHandler(async (evt) => {
     n_messages = await Message.count({ where: { eventId: event.id, ...(!isAdminOrEditor && { is_author_visible: true }) } }).catch(() => 0)
   }
 
-  if (!event.is_visible && !isAdminOrEditor) {
+  if (!event.is_visible && !isAdminOrEditor && event.userId !== user?.id) {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 
