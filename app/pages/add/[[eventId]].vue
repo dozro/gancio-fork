@@ -15,6 +15,7 @@ const route = useRoute()
 
 const event = ref<EventAPI>({
   title: '',
+  is_visible: true,
   start_datetime: 0,
   description: '',
   media: [{}],
@@ -47,7 +48,15 @@ const searchTag = ref('')
 const searchTagDebounced = refDebounced(searchTag, 200)
 const { data: tags, status: statusTags } = await useFetch('/api/tags', { params: { query: searchTagDebounced } })
 
-async function done() {
+async function draft() {
+  await done(false)
+}
+
+async function publish() {
+  await done(true)
+}
+
+async function done(publish) {
   const evt = event.value
   if (loading.value) {
     return
@@ -63,6 +72,8 @@ async function done() {
 
   const formData = new FormData()
   // formData.append('recurrent', JSON.stringify(evt.date.recurrent))
+
+  formData.append('is_visible', publish)
 
   if (evt?.media?.[0]) {
     const media: Media = evt.media[0]
@@ -168,6 +179,7 @@ const normalizedTags = computed({
   <v-card>
     <v-card-title>
       <!-- <v-btn variant='outlined' class='float-right' color='primary' @click='openImportDialog = true' prepend-icon="mdi-file-import">{{$t('common.import') }}</v-btn> -->
+      <v-chip v-if="!event.is_visible" class='float-right' size='small'>{{ $t('common.draft') }}</v-chip>
       <h4>{{ eventId ? $t('common.edit_event') : $t('common.add_event') }}</h4>
     </v-card-title>
     <!-- <v-dialog v-model='openImportDialog' :fullscreen='$vuetify.display.mobile'>
@@ -224,9 +236,12 @@ const normalizedTags = computed({
     </v-card-text>
     <v-card-actions>
       <v-spacer />
-      <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='done'>{{
+      <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='draft'>{{
         eventId ?
-          $t('common.save') : $t('common.send') }}</v-btn>
+          event.is_visible ? $t('common.convert_draft') : $t('common.save_draft')
+          : loggedIn ? $t('common.create_draft') : $t('common.send') }}</v-btn>
+      <v-btn v-if='loggedIn' :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='publish'>
+        {{ $t('common.publish') }}</v-btn>
     </v-card-actions> </v-card>
 </v-container>
 </template>

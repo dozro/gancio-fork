@@ -122,7 +122,12 @@
         "pages": "Pages",
         "no_events_found": "No events found",
         "no_events_found_hint": "Select different dates or criteria",
-        "dark_mode": "Dark mode"
+        "dark_mode": "Dark mode",
+        "publish": "Publish",
+        "convert_draft": "Convert to draft",
+        "create_draft": "Create as draft",
+        "save_draft": "Save draft",
+        "draft": "Draft"
     },
     "login": {
         "description": "By logging in you can publish new events.",

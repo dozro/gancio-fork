@@ -31,6 +31,7 @@ import { sign } from '~~/server/federation/ldsignature'
  * @param {string} [recurrent.frequency] - could be `1w` or `2w`
  * @param {array} [recurrent.days] - array of days
  * @param {image} [image] - Image
+ * @param {boolean} [is_visible] - Event is visible or not
  * @param {string} [image_url] - Image URL
  * @todo Multiple images upload
  */

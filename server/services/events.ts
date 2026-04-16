@@ -145,6 +145,7 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
 const MAX_TIMESTAMP = 1000 * 24 * 60 * 60 * 365
 const eventAPISchema = z.object({
   title: z.string({ message: 'title required' }).min(1).trim(),
+  is_visible: z.stringbool().default(true),
   start_datetime: z.preprocess(val => Number(val),
     z.number({ error: 'start_datetime required' })
       .int()
@@ -204,7 +205,8 @@ export function validateEvent(publicSettings: { allow_anon_event: boolean }, use
         latitude: data.place_latitude,
         longitude: data.place_longitude
       }
-      return { ...data, is_visible: !isAnonymous, userId: user?.id, place }
+      data.is_visible = isAnonymous ? false : data.is_visible
+      return { ...data, userId: user?.id, place }
     })
 }
 
