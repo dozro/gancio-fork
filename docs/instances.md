@@ -66,6 +66,7 @@ nav_order: 7
 - [antroposofiachile.net](https://gancio.antroposofiachile.net) (Red de Eventos de Antroposofía en Chile)
 - [pelumpen.com](https://eventos.pelumpen.com) (Red de eventos del Valle de Pelumpén; Limache y Olmué, V Región, Chile)
 - [calendar.clonmel.town](https://calendar.clonmel.town) (What's On Clonmel; Local events guide, Ireland)
+- [KeepKarlsruheBoring](https://keepkarlsruheboring.org/) (Tireless effort to make the fan-city less boring; Karlsruhe, Germany)
 
 
 You can also check federated instances on [fedidb.org](https://fedidb.org/software/gancio) or on [fediverse.observer](https://gancio.fediverse.observer/list)
