@@ -4,7 +4,7 @@ import { Op } from '@sequelize/core'
 import { formatSchema } from '~~/server/types/validator'
 import { useLogger } from '~~/server/lib/logger'
 import { exportICS } from '~~/server/services/ics'
-import { eventToAP } from '~~/server/services/events'
+import { canModifyEvent, eventToAP } from '~~/server/services/events'
 import { enableCors } from '~~/server/lib/API'
 
 /**
@@ -52,7 +52,7 @@ export default defineEventHandler(async (evt) => {
     n_messages = await Message.count({ where: { eventId: event.id, ...(!isAdminOrEditor && { is_author_visible: true }) } }).catch(() => 0)
   }
 
-  if (!event.is_visible && !isAdminOrEditor && event.userId !== user?.id) {
+  if (!event.is_visible && !canModifyEvent(event, user)) {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 
