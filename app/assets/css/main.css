@@ -74,3 +74,27 @@ blockquote {
   --vc-nav-item-active-bg: rgb(var(--v-theme-primary));
   --vc-nav-item-current-color: rgb(var(--v-theme-primary));
 }
+
+.events {
+  margin-inline: auto;
+  gap: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.event {
+  flex: 1 1 350px;
+  max-width: 440px;
+  min-height: 387px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: all .5s;
+  overflow: hidden;
+}
+
+/* Align events with the grid only if there is more than 1 row. */
+.events > .event:last-child:nth-child(n+3) {
+  margin-inline-end: auto;
+}

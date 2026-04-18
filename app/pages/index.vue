@@ -83,28 +83,3 @@ const { data: announcements } = await useFetch<Announcement[]>('/api/announcemen
 
 </v-container>
 </template>
-<style>
-.events {
-  margin: 0 auto;
-  gap: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  /* display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(350px,1fr)); */
-}
-
-.event {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  max-width: 500px !important;
-  width: 330px;
-  position: relative;
-  /* margin-top: 16px;
-  margin-right: 16px; */
-  transition: all .5s;
-  overflow: hidden;
-}
-
-</style>
