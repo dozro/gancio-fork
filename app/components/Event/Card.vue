@@ -98,4 +98,7 @@ const isCancelled = computed(() => event.status === 'EventCancelled')
   line-height: 1.2em !important;
 }
 
+.dt-start::first-letter, .dt-end::first-letter {
+  text-transform: uppercase;
+}
 </style>
