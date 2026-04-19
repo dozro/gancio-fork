@@ -46,9 +46,11 @@ function when(event: EventAPI) {
   const end = event?.end_datetime && DateTime.fromSeconds(event?.end_datetime ?? 0, opt)
   if (end) {
     const isMultiDate = !end.hasSame(start, 'day')
-    time += isMultiDate
-      ? ` → ${end.toLocaleString({ weekday: 'long', ...(cy !== end.year && { year: 'numeric' }), month: 'short', day: '2-digit' })}`
-      : `-${end.toLocaleString({ hour: '2-digit', minute: '2-digit' })}`
+    if (isMultiDate) {
+      time += ` → ${end.toLocaleString({ weekday: 'long', ...(cy !== end.year && { year: 'numeric' }), month: 'short', day: '2-digit' })}`
+    } else if (end.diff(start, 'minutes').minutes > 0) {
+      time += `-${end.toLocaleString({ hour: '2-digit', minute: '2-digit' })}`
+    }
   }
 
   return time
