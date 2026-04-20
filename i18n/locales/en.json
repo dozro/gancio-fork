@@ -256,6 +256,7 @@
         "user_create_ok": "User created",
         "user_update_ok": "User updated",
         "event_remove_ok": "Event removed",
+        "page_remove_ok": "Page removed",
         "allow_registration_description": "Allow open registrations?",
         "allow_anon_event": "Allow anonymous events (has to be confirmed)?",
         "enable_moderation": "Enable moderation",
