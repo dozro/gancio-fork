@@ -34,12 +34,12 @@ export async function buildEventActivity(event: Event, recipients: string[],
   type: 'Create' | 'Update' | 'Announce' | 'Delete' = 'Create') {
   return {
     '@context': APContext,
-    id: `${publicSettings.baseurl}/federation/m/${event.id}#${type}-${event.updatedAt.getTime()}`,
+    'id': `${publicSettings.baseurl}/federation/m/${event.id}#${type}-${event.updatedAt.getTime()}`,
     type,
-    to: ['https://www.w3.org/ns/activitystreams#Public'],
-    cc: recipients,
-    actor: `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
-    object: eventToAP(event)
+    'to': ['https://www.w3.org/ns/activitystreams#Public'],
+    'cc': recipients,
+    'actor': `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
+    'object': eventToAP(event)
   }
 }
 
@@ -57,7 +57,7 @@ export async function APEventToEvent(APEvent: APEvent, actor: APUser) {
   const event: CreationAttributes<Event> = {
     title: APEvent.name.trim(),
     start_datetime: DateTime.fromISO(APEvent.startTime).toUnixInteger(),
-    end_datetime: DateTime.fromISO(APEvent.startTime).toUnixInteger(),
+    end_datetime: APEvent.endTime ? DateTime.fromISO(APEvent.endTime).toUnixInteger() : undefined,
     is_visible: true,
     ...(online_locations ? { online_locations } : {}),
     // tag: APEvent.tag?.filter(t => t?.type === 'Hashtag').map(t => t.name) ?? [],
