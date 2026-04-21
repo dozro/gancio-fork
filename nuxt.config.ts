@@ -1,3 +1,4 @@
+import { defineNuxtConfig } from 'nuxt/config'
 import { version } from './package.json'
 import locales from './server/i18n/locales'
 
@@ -9,6 +10,9 @@ export default defineNuxtConfig({
   devServer: {
     host: '0.0.0.0',
     port: 13120
+  },
+  experimental: {
+    serverAppConfig: false
   },
   compatibilityDate: '2025-07-20',
   // 2025-07-20
@@ -50,12 +54,14 @@ export default defineNuxtConfig({
     langDir: !isTest ? 'locales/' : undefined, // must be set, but won’t be used for actual loading
     types: 'composition',
     pages: undefined,
-    locales: isTest ? [] : Object.keys(locales).map(key => ({
-      code: key,
-      name: locales[key],
-      dir: ['ar', 'fa', 'ta'].includes(key) ? 'rtl' : 'ltr',
-      file: 'loader.ts'
-    })),
+    locales: isTest
+      ? []
+      : Object.keys(locales).map(key => ({
+          code: key,
+          name: locales[key],
+          dir: ['ar', 'fa', 'ta'].includes(key) ? 'rtl' : 'ltr',
+          file: 'loader.ts'
+        })),
     compilation: {
       strictMessage: false
     },
@@ -110,6 +116,9 @@ export default defineNuxtConfig({
     }
   },
   nitro: {
+    imports: {
+      autoImport: false
+    },
     storage: {
       locale_storage: {
         driver: 'fs',

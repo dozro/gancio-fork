@@ -15,7 +15,8 @@ async function disableAuthor() {
   try {
     await $fetch(`/api/events/${event.id}/disable_author`, { method: 'PUT' })
     $notify('Author disabled!', Statuses.SUCCESS)
-    event.is_anon = true
+    emit('update')
+    // event.is_anon = true
   } catch (e) {
     $notify(e, Statuses.WARNING)
   }

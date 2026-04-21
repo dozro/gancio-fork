@@ -61,7 +61,7 @@ describe('Place', async () => {
 
   it('should search for a place', async () => {
     const { default: placesHandler } = await import('../../server/api/places/index.get')
-    const ret = await placesHandler(mockH3Event({ query: { query: 'test' } } ))
+    const ret = await placesHandler(mockH3Event({ query: { query: 'test' } }))
     expect(ret.length).toBe(1)
   })
 

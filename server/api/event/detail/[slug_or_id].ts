@@ -1,7 +1,7 @@
 import { defineEventHandler, getRouterParam, getValidatedQuery, createError, setHeader } from 'h3'
 import { getUser } from '~~/server/lib/getUser'
 
-import { Event, Place, Tag, User, mapEvent, Message } from '~~/server/services'
+import { Event, Place, Tag, User, mapEvent } from '~~/server/services'
 import type { WhereOptions } from '@sequelize/core'
 import { Op } from '@sequelize/core'
 import { formatSchema } from '~~/server/types/validator'
@@ -21,7 +21,6 @@ export default defineEventHandler(async (evt) => {
   enableCors(evt)
   const log = useLogger('event details!')
   const user = await getUser(evt)
-  const isAdminOrEditor = ['admin', 'editor'].includes(user?.role ?? '')
 
   const slug_or_id = getRouterParam(evt, 'slug_or_id')
   const { format } = await getValidatedQuery(evt, formatSchema.parse)

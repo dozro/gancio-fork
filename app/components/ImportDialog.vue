@@ -14,62 +14,62 @@ function importGeneric () {
   }
 }
 
-function importICS () {
-  // const reader = new FileReader()
-  // reader.readAsText(this.file)
-  // reader.onload = async () => {
-  //   try {
-  //     const response = await this.$axios.post('/ics-import', {
-  //       icsText: reader.result
-  //     })
+// function importICS () {
+// const reader = new FileReader()
+// reader.readAsText(this.file)
+// reader.onload = async () => {
+//   try {
+//     const response = await this.$axios.post('/ics-import', {
+//       icsText: reader.result
+//     })
 
-  //     const events = response.data.events || []
+//     const events = response.data.events || []
 
-  //     if (!events.length) {
-  //       this.error = true
-  //       this.errorMessage = this.$t('event.import_error')
-  //       return
-  //     }
-  //     // TODO: Inform the user if there are multiple events rather than just taking the first one
-  //     this.event = events[0]
-  //     // No Place object yet, so create a guess draft for the ui
-  //     this.event.place = {
-  //       name: this.event.location || 'Unknown Location'
-  //     }
+//     if (!events.length) {
+//       this.error = true
+//       this.errorMessage = this.$t('event.import_error')
+//       return
+//     }
+//     // TODO: Inform the user if there are multiple events rather than just taking the first one
+//     this.event = events[0]
+//     // No Place object yet, so create a guess draft for the ui
+//     this.event.place = {
+//       name: this.event.location || 'Unknown Location'
+//     }
 
-  //     this.$emit('imported', this.event)
-  //   } catch (e) {
-  //     this.error = true
-  //     this.errorMessage = this.$t('event.import_error') + ': ' + (e.message || e)
-  //   }
-  // }
-}
+//     this.$emit('imported', this.event)
+//   } catch (e) {
+//     this.error = true
+//     this.errorMessage = this.$t('event.import_error') + ': ' + (e.message || e)
+//   }
+// }
+// }
 
-async function importURL () {
-  // if (!this.URL) {
-  //   this.errorMessage = this.$validators.required('common.url')('')
-  //   this.error = true
-  //   return
-  // }
-  // if (!this.URL.match(/^https?:\/\//)) {
-  //   this.URL = `https://${this.URL}`
-  // }
-  // this.error = false
-  // this.errorMessage = ''
-  // this.loading = true
+// async function importURL () {
+// if (!this.URL) {
+//   this.errorMessage = this.$validators.required('common.url')('')
+//   this.error = true
+//   return
+// }
+// if (!this.URL.match(/^https?:\/\//)) {
+//   this.URL = `https://${this.URL}`
+// }
+// this.error = false
+// this.errorMessage = ''
+// this.loading = true
 
-  // try {
-  //   const ret = await this.$axios.$get('/event/import', { params: { URL: this.URL } })
-  //   this.events = ret
-  //   // check if contain an h-event
-  //   this.$emit('imported', ret[0])
-  // } catch (e) {
-  //   this.error = true
-  //   this.errorMessage = String(e)
-  // }
+// try {
+//   const ret = await this.$axios.$get('/event/import', { params: { URL: this.URL } })
+//   this.events = ret
+//   // check if contain an h-event
+//   this.$emit('imported', ret[0])
+// } catch (e) {
+//   this.error = true
+//   this.errorMessage = String(e)
+// }
 
-  // this.loading = false
-}
+// this.loading = false
+// }
 
 defineEmits(['imported', 'close'])
 </script>

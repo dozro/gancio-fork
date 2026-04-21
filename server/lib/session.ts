@@ -4,21 +4,16 @@ import { getUser } from './getUser'
 
 export type UserSession = { id: number, email: string, role: UserRole }
 
-// TODO
-export async function setSession(event: H3Event<EventHandlerRequest>, user: UserSession) {
-  if (typeof setUserSession === 'undefined') {
-    const session = await useSession(event, { password: process.env.NUXT_SESSION_PASSWORD!, name: 'nuxt-session' })
-    await session.update(user)
-    return session.data
-  }
-  const userSession = await setUserSession(event, user)
-  return userSession
+export async function setSession(event: H3Event, user: UserSession) {
+  const session = await useSession(event, { password: process.env.NUXT_SESSION_PASSWORD!, name: 'nuxt-session' })
+  await session.update(user)
+  return session.data
 }
 
 /**
  * Require an user to be authenticated (via cookie or JWT token)
  */
-export async function requireUser(event: H3Event<EventHandlerRequest>) {
+export async function requireUser(event: H3Event) {
   const user = await getUser(event)
   if (!user) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
@@ -28,7 +23,7 @@ export async function requireUser(event: H3Event<EventHandlerRequest>) {
 }
 
 // require current user role to be one of the specified
-export async function requireSessionRole(evt: H3Event<EventHandlerRequest>, roles: UserRole[] | UserRole) {
+export async function requireSessionRole(evt: H3Event, roles: UserRole[] | UserRole) {
   const user = await isSessionRole(evt, roles)
   if (!user) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
@@ -37,7 +32,7 @@ export async function requireSessionRole(evt: H3Event<EventHandlerRequest>, role
 }
 
 // check if current user role is one of specified
-export async function isSessionRole(evt: H3Event<EventHandlerRequest>, roles: UserRole[] | UserRole) {
+export async function isSessionRole(evt: H3Event, roles: UserRole[] | UserRole) {
   const user = await getUser(evt)
   if (!user) return
   if (!Array.isArray(roles)) {
@@ -49,6 +44,6 @@ export async function isSessionRole(evt: H3Event<EventHandlerRequest>, roles: Us
 /**
  * Require an admin session, throw a 401 error if the user is not logged in
  */
-export async function requireAdminSession(evt: H3Event<EventHandlerRequest>) {
+export async function requireAdminSession(evt: H3Event) {
   return requireSessionRole(evt, 'admin')
 }

@@ -5,9 +5,10 @@ import stylistic from '@stylistic/eslint-plugin'
 
 export default withNuxt([
   globalIgnores([
-    'wp-plugin/js/*',
-    'server/migrations/*',
-    'docs/assets/*'
+    'wp-plugin/js/',
+    'server/migrations/',
+    'docs/',
+    'tests/'
   ]),
   stylistic.configs.recommended,
   ...vuetify.configs['flat/base'],

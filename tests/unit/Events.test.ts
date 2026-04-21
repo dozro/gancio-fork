@@ -14,7 +14,6 @@ const { default: handleEvent } = await import('../../server/api/events/index.pos
 const { default: patchHandler } = await import('../../server/api/events/[id]/index.patch')
 const { default: toggleHandler } = await import('../../server/api/events/[id]/toggle.put')
 
-
 describe('Events', () => {
   it('should create an anon event when allowed', async () => {
     await setSetting('allow_anon_event', true)
@@ -282,5 +281,4 @@ describe('Events', () => {
 
   //     expect(response.text).toBe('start datetime is greater than end datetime')
   //   })
-
 })

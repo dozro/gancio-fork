@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = defineProps({ event: { type: Object, default: () => ({}) } })
 const { $notify } = useNuxtApp()
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'update'])
 
 const loading = ref(false)
 const selectedUser = ref()
@@ -12,6 +12,7 @@ async function assign () {
     loading.value = true
     await $fetch(`/api/events/${props.event.id}/assign_to_author`, { method: 'PUT', body: { userId: selectedUser.value } })
     loading.value = false
+    emit('update')
     emit('close')
     $notify('event.saved')
   } catch(e) {
@@ -26,7 +27,6 @@ async function assign () {
   <v-card-text>
     <p class="mb-2">{{$t('event.assign_to_user_description')}}</p>
     <v-form>
-      <span>{{ selectedUser}}</span>
       <v-autocomplete
         v-model='selectedUser'
         :items="users"

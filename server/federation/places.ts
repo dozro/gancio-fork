@@ -77,7 +77,6 @@ export async function parseAPLocation(APEvent: APEvent) {
   return { place, online_locations }
 }
 
-
 /**
  * @returns ActivityStream location representation
  * @link https://www.w3.org/TR/activitystreams-vocabulary/#places

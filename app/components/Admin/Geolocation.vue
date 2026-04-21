@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
-const settings = useState<Settings>('settings')
-const { $notify, $confirm } = useNuxtApp()
+// const settings = useState<Settings>('settings')
+const { $notify } = useNuxtApp()
 
 // import { isoCountries } from '../../server/helpers/geolocation/isoCountries'
 // import geolocation from '../../server/helpers/geolocation/index'
@@ -29,9 +29,9 @@ const mapKey = ref(0)
 const testingTilelayer = ref(false)
 const testingGeocoding = ref(false)
 
-const geocoding_provider_default = 'https://nominatim.openstreetmap.org/search'
+// const geocoding_provider_default = 'https://nominatim.openstreetmap.org/search'
 const tilelayer_provider_default = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-const tilelayer_provider_attribution_default = '<a target=\'_blank\' href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors'
+const tilelayer_provider_attribution_default = '<a target=\'_blank\' href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 
 const geocoding_provider = manageSetting('geocoding_provider')
 const geocoding_countrycodes = manageSetting('geocoding_countrycodes')
@@ -43,7 +43,7 @@ async function testGeocodingProvider() {
   testingGeocoding.value = true
   const q = Math.random().toString(36).slice(2, 7)
   try {
-    const ret = await $fetch(`/api/geocode`, { query: { q }, timeout: 3000 })
+    await $fetch(`/api/geocode`, { query: { q }, timeout: 3000 })
     $notify('admin.geocoding_test_success')
   } catch (e) {
     console.error(e)
@@ -86,7 +86,8 @@ function tilelayerTestSuccess() {
         <!-- </v-col> -->
         <!---->
         <v-col cols="12" md="5">
-          <v-text-field v-model="geocoding_provider" class="mb-4" :label="$t('admin.geocoding_provider')"
+          <v-text-field
+            v-model="geocoding_provider" class="mb-4" :label="$t('admin.geocoding_provider')"
             :hint="$t('admin.geocoding_provider_help')" persistent-hint />
           <!-- :placeholder="geocoding_provider_default" /> -->
         </v-col>
@@ -94,7 +95,7 @@ function tilelayerTestSuccess() {
         <!-- :disabled="!(geocoding_provider_type === null || geocoding_provider_type === 'Nominatim')" -->
         <v-col cols="12" md="4">
           <v-autocomplete
-            :disabled="!countries" v-model="geocoding_countrycodes" class="mb-6"
+            v-model="geocoding_countrycodes" :disabled="!countries" class="mb-6"
             :label="$t('admin.geocoding_countrycodes')" :items="countries" multiple chips persistent-hint
             item-value="code" item-title="name" :hint="$t('admin.geocoding_countrycodes_help')" />
         </v-col>
@@ -102,17 +103,20 @@ function tilelayerTestSuccess() {
 
       <v-row>
         <v-col cols="12" md="6">
-          <v-text-field v-model="tilelayer_provider" class="mb-4" :label="$t('admin.tilelayer_provider')"
+          <v-text-field
+            v-model="tilelayer_provider" class="mb-4" :label="$t('admin.tilelayer_provider')"
             :hint="$t('admin.tilelayer_provider_help')" persistent-hint :placeholder="tilelayer_provider_default" />
         </v-col>
 
         <v-col cols="12" md="6">
-          <v-text-field v-model="tilelayer_provider_attribution" :label="$t('admin.tilelayer_provider_attribution')"
+          <v-text-field
+            v-model="tilelayer_provider_attribution" :label="$t('admin.tilelayer_provider_attribution')"
             :placeholder="tilelayer_provider_attribution_default" />
         </v-col>
       </v-row>
 
-      <Map v-if="mapPreview" :key="mapKey" :LMapStyles="{ height: '20rem' }" :show-marker="false"
+      <Map
+        v-if="mapPreview" :key="mapKey" :LMapStyles="{ height: '20rem' }" :show-marker="false"
         :map-center="mapCenter" :zoom="10" @tileerror="tilelayerTestError" @tileload="tilelayerTestSuccess" />
     </v-form>
   </div>

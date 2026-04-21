@@ -2,7 +2,6 @@ import { type H3Event, getHeader, clearResponseHeaders, useSession } from 'h3'
 import { verifyJwtToken } from './jwt'
 import { User } from '../services/db'
 
-
 /**
  * Get the user of the request based on `nuxt-session` cookie or JWT Bearer token
  * @todo
@@ -44,7 +43,7 @@ export async function getUser(event: H3Event) {
   // check if user exists and is enabled
   const u = await User.findByPk(user.id, { where: { is_active: true }, attributes: ['id', 'email', 'role'], raw: true })
     .then(u => u || undefined)
-    .catch(err => {
+    .catch((err) => {
       console.warn('Error finding user by id:', err)
       return undefined
     })

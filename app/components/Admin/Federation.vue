@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 
 const { $notify, $confirm } = useNuxtApp()
+const { t } = useI18n()
 
 const headers = [
   { value: 'logo', title: 'Logo', width: 60, sortable: false },
@@ -163,7 +164,7 @@ async function deleteTrustedSource (trusted_source) {
         </v-card-text>
         <v-card-actions>
           <v-spacer/>
-          <v-btn variant='outlined' color="error" @click="dialogAddTrustedSource=false">{{ $t('common.cancel') }}</v-btn>
+          <v-btn variant='outlined' color="error" @click="dialogAddTrustedSource=false">{{ t('common.cancel') }}</v-btn>
           <v-btn
             variant='outlined'
             color="primary"

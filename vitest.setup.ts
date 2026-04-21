@@ -10,7 +10,7 @@ async function waitForServer() {
     await new Promise(r => setTimeout(r, 300))
   }
 
-  throw new Error("Server not ready")
+  throw new Error('Server not ready')
 }
 
 await waitForServer()

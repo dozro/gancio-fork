@@ -7,5 +7,4 @@ export function addressToString(address: PostalAddress | string) {
 
   return [address?.streetAddress, address?.addressLocality, address?.addressRegion, address?.addressCountry]
     .filter(part => part).join(', ')
-
 }

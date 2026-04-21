@@ -11,8 +11,8 @@ const filterPlaces = ref([])
 const filterActors = ref([])
 const negateFilter = ref(false)
 const filters = ref([])
-const tagName = ref('')
-const placeName = ref('')
+// const tagName = ref('')
+// const placeName = ref('')
 const editFilterId = ref(false)
 const form = ref()
 
@@ -87,7 +87,7 @@ async function addFilter() {
   const filter = { collectionId: collection.value.id, tags, places, actors, negate: negateFilter.value }
 
   // tags and places are JSON field and there's no way to use them inside a unique constrain
-  const alreadyExists = false
+  // const alreadyExists = false
   // filters.value.find(f =>
   //   isEqual(sortBy(f.places, 'id'), sortBy(filter.places, 'id')) &&
   //   isEqual(sortBy(f.tags), sortBy(filter.tags)) &&

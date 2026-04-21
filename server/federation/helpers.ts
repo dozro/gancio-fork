@@ -77,7 +77,7 @@ export async function updateActor() {
 
   const followers = await APUser.findAll({ where: { follower: true } })
   log.debug('[FEDI] Sending to %d followers: [%s]', followers.length, followers.map(f => f.ap_id).join(', '))
-  const recipients = {}
+  const recipients: Record<string, string[]> = {}
   followers.forEach((follower) => {
     const sharedInbox = follower?.object?.endpoints?.sharedInbox ?? follower?.object?.inbox
     if (!recipients[sharedInbox]) {
@@ -87,10 +87,10 @@ export async function updateActor() {
   })
 
   for (const sharedInbox in recipients) {
-    log.debug(`Notify ${sharedInbox} with actor update cc => ${recipients[sharedInbox].length}`)
+    log.debug(`Notify ${sharedInbox} with actor update cc => ${recipients[sharedInbox]?.length}`)
     const body = {
       id: `${publicSettings.baseurl}/federation/m/actor#update-${DateTime.local().toMillis()}`,
-      type: 'Update',
+      type: 'Update' as const,
       to: ['https://www.w3.org/ns/activitystreams#Public'],
       cc: recipients[sharedInbox],
       actor: `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,

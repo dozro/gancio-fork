@@ -46,7 +46,9 @@ const footerLinks = computed(() => settings.value.footerLinks?.map((link) => {
         :prepend-avatar="instance.icon"
       >
         <v-list-item-title>{{ instance.name ?? instance.preferredUsername }}</v-list-item-title>
-        <v-list-item-subtitle v-html="instance?.summary" />
+        <v-list-item-subtitle>
+          <span v-html="instance?.summary" />
+        </v-list-item-subtitle>
       </v-list-item>
     </v-list>
   </v-menu>
