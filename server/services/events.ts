@@ -1,12 +1,11 @@
 import { DateTime } from 'luxon'
 import type { WhereOptions } from '@sequelize/core'
 import { Op, literal, col, where, fn, sql } from '@sequelize/core'
-import type { User } from '#auth-utils'
 
 import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
-import type { EventAPI } from '~~/shared/types/generic'
-import type { H3Event } from 'h3'
+import type { EventAPI, User } from '~~/shared/types/generic'
+import { type H3Event, createError } from 'h3'
 import { createHash } from 'crypto'
 import { Place, Tag, Event, Message, type EventStatus } from './db'
 import { publicSettings } from './settings'
@@ -390,22 +389,22 @@ export function eventToAP(event: Event) {
       'https://schema.org',
       'https://w3id.org/security/v1'
     ],
-    id: event.ap_id ?? `${publicSettings.baseurl}/federation/m/${event.id}`,
-    name: event.title,
-    url: event?.ap_object?.url ?? event?.ap_object?.id ?? `${publicSettings.baseurl}/event/${event.slug || event.id}`,
-    type: 'Event' as const,
-    eventStatus: event.status,
-    startTime: DateTime.fromSeconds(event.start_datetime, opt).toISO() ?? '',
+    'id': event.ap_id ?? `${publicSettings.baseurl}/federation/m/${event.id}`,
+    'name': event.title,
+    'url': event?.ap_object?.url ?? event?.ap_object?.id ?? `${publicSettings.baseurl}/event/${event.slug || event.id}`,
+    'type': 'Event' as const,
+    'eventStatus': event.status,
+    'startTime': DateTime.fromSeconds(event.start_datetime, opt).toISO() ?? '',
     ...(event.end_datetime ? { endTime: DateTime.fromSeconds(event.end_datetime, opt).toISO() } : {}),
     ...(event.ld_signature ? { signature: event.ld_signature } : {}),
     location,
     attachment,
     tag,
-    published: event.updatedAt.toISOString(),
-    updated: event.updatedAt.toISOString(),
-    attributedTo: event.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
-    to: ['https://www.w3.org/ns/activitystreams#Public'],
-    content: event.description || '',
+    'published': event.updatedAt.toISOString(),
+    'updated': event.updatedAt.toISOString(),
+    'attributedTo': event.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
+    'to': ['https://www.w3.org/ns/activitystreams#Public'],
+    'content': event.description || '',
     summary
   }
 

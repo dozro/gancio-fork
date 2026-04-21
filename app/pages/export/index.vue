@@ -13,7 +13,7 @@ const list = reactive({
   sidebar: 'true'
 })
 
-const filters = reactive({ tags: [], places: [], collection: undefined, show_recurrent: settings.recurrent_event_visible })
+const filters = reactive({ tags: [], places: [], collection: undefined, show_recurrent: settings.value.recurrent_event_visible })
 
 const code = computed(() => {
   const params = [`baseurl="${settings.value.baseurl}"`]

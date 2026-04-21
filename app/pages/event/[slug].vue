@@ -253,7 +253,7 @@ async function report() {
   <v-dialog
     v-if="isAdmin" v-model="openAssignAuthor" class='event-assign-author-dialog'
     :fullscreen="$vuetify.display?.mobile" destroy-on-close width="400">
-    <EventAssignAuthor :event="event" @close="openAssignAuthor = false" />
+    <EventAssignAuthor :event="event" @close="openAssignAuthor = false" @update='refresh' />
   </v-dialog>
 
   <v-navigation-drawer

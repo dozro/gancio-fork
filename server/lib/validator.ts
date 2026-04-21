@@ -25,22 +25,21 @@ export const focalPointSchema = z.union([
     z.number().min(-1).max(1)
   ]))
 
-
 // https://zod.dev/codecs?id=jsonschema
 export const jsonCodec = <T extends z.core.$ZodType>(schema: T) =>
   z.codec(z.string(), schema, {
     decode: (jsonString, ctx) => {
       try {
-        return JSON.parse(jsonString);
-      } catch (err: any) {
+        return JSON.parse(jsonString)
+      } catch (err) {
         ctx.issues.push({
-          code: "invalid_format",
-          format: "json",
+          code: 'invalid_format',
+          format: 'json',
           input: jsonString,
-          message: err.message
+          message: err?.message
         })
         return z.NEVER
       }
     },
-    encode: (value) => JSON.stringify(value)
+    encode: value => JSON.stringify(value)
   })

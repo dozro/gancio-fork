@@ -1,4 +1,4 @@
-import { APActor } from "../../../server/federation/types"
+import { APActor } from '../../../server/federation/types'
 
 export default {
   type: 'Person',

@@ -1,6 +1,6 @@
 import { defineEventHandler } from 'h3'
-import { col, fn } from '@sequelize/core'
-import { APUser, Instance } from '~~/server/services'
+// import { col, fn } from '@sequelize/core'
+// import { APUser, Instance } from '~~/server/services'
 import { requireAdminSession } from '~~/server/lib/session'
 
 export default defineEventHandler(async (event) => {

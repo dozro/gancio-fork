@@ -17,7 +17,6 @@ const queryParams = z.object({
 export default defineEventHandler(async (evt) => {
   const { withFilters, pin } = await getValidatedQuery(evt, queryParams.parse)
 
-
   if (withFilters) {
     return Collection.findAll({ include: [Filter], order: [['sortIndex', 'asc']] })
   } else {

@@ -1,3 +1,4 @@
+import { defineEventHandler, createError } from 'h3'
 import { Event, Message } from '~~/server/services'
 
 export default defineEventHandler(async (evt) => {

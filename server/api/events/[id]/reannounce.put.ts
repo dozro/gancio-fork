@@ -1,5 +1,7 @@
+import { defineEventHandler, getRouterParam, createError } from 'h3'
 import { sendEvent } from '~~/server/federation/events'
 import { useLogger } from '~~/server/lib/logger'
+import { requireUser } from '~~/server/lib/session'
 import { Event, Place } from '~~/server/services'
 import { canModifyEvent } from '~~/server/services/events'
 

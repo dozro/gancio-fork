@@ -53,7 +53,7 @@ function toggle(val) {
 
 </script>
 <template>
-<v-dialog :model-value='visible' @update:modelValue="toggle" max-width='550'>
+<v-dialog :model-value='visible' max-width='550' @update:model-value="toggle">
   <v-card class="border-0">
     <v-card-title :class="{ 'bg-error': type === 'confirmDialog' }">{{title || $t('common.confirm')}}</v-card-title>
     <v-card-text>

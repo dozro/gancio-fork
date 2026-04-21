@@ -2,6 +2,7 @@
 ** This is the first and only server plugin and this is where everything start
 */
 import type { NitroApp } from 'nitropack'
+import { defineNitroPlugin, useStorage } from 'nitropack/runtime'
 import pluginController from '../services/plugins'
 import fsDriver from 'unstorage/drivers/fs'
 import { get as getConfig } from '../services/config'

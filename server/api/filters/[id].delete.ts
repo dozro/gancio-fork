@@ -1,4 +1,4 @@
-import { defineEventHandler, getRouterParam } from 'h3'
+import { defineEventHandler, getRouterParam, createError } from 'h3'
 import { useLogger } from '~~/server/lib/logger'
 import { Filter } from '~~/server/services'
 import { requireAdminSession } from '~~/server/lib/session'

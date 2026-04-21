@@ -14,7 +14,7 @@ describe('Inbox', () => {
     const evt = mockH3Event({
       headers: { Accept: 'application/activity+json' },
       method: 'POST',
-      params: { name: 'relay' },
+      params: { name: 'relay' }
     })
     const ret = handler(evt)
     await expect(ret).rejects.toHaveProperty('statusCode', 400)
@@ -22,10 +22,9 @@ describe('Inbox', () => {
   })
 
   it('should reject unmatched actor\' name', async () => {
-    const evt = mockH3Event({ headers: { Accept: 'application/activity+json' }, method: 'POST', params: { name: 'non_existent'} })
+    const evt = mockH3Event({ headers: { Accept: 'application/activity+json' }, method: 'POST', params: { name: 'non_existent' } })
     const ret = handler(evt)
     await expect(ret).rejects.toHaveProperty('statusCode', 404)
     await expect(ret).rejects.toHaveProperty('message', 'No actor found for non_existent (applicationActor is relay)')
   })
-
 })

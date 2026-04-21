@@ -1,3 +1,4 @@
+import { createError } from 'h3'
 import type { WhereOptions } from '@sequelize/core'
 import { Op, col, sql } from '@sequelize/core'
 import { APUser, Event, Place, Filter, Collection, Tag } from './db'

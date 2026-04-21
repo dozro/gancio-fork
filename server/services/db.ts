@@ -182,7 +182,7 @@ export type LDSignature = {
   '@context': 'https://w3id.org/identity/v1'
   'creator': string
   'created': string
-  signatureValue: string
+  'signatureValue': string
 }
 
 @Table({

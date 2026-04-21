@@ -15,7 +15,7 @@ export default defineEventHandler(async (evt) => {
     attributes: ['name', 'address', 'latitude', 'longitude', 'id', 'ap_id',
       [fn('COUNT', col('events.placeId')), 'eventCount']],
     include: [{ model: Event, where: { is_visible: true }, required: true, attributes: [] }],
-    group: ['Place.id'],
+    group: ['Place.id']
   })
   // return places
   return places.map(placeToJSON)

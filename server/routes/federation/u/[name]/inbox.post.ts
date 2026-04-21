@@ -70,7 +70,7 @@ export default defineEventHandler(async (event) => {
   //   }
   // }
 
-  const activityActor = await verifyHTTPSignature(event, rawBody, activityData).catch(e => {
+  const activityActor = await verifyHTTPSignature(event, rawBody, activityData).catch((e) => {
     log.info(e)
     throw e
   })

@@ -11,8 +11,8 @@ export async function verify(activity: { signature: LDSignature }, publicKey: st
 
   const sigOpts = {
     '@context': 'https://w3id.org/identity/v1',
-    creator: signature.creator,
-    created: signature.created
+    'creator': signature.creator,
+    'created': signature.created
   }
 
   log.debug('sigOpts ', sigOpts)

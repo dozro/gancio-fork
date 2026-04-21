@@ -1,3 +1,4 @@
+import { getHeader } from 'h3'
 import Negotiator from 'negotiator'
 import type { H3Event } from 'h3'
 
