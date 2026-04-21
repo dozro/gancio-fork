@@ -315,6 +315,7 @@
         "default_images": "Imágenes por defecto",
         "sender_email": "Correo de remitente",
         "event_remove_ok": "Evento eliminado",
+        "page_remove_ok": "Página eliminada",
         "smtp_use_sendmail": "Usar sendmail",
         "wrong_domain_warning": "El parámetro baseurl configurado en config.json <b>({baseurl})</b> difiere del que estás visitando <b>({url})</b>",
         "new_collection": "Nueva colección",
