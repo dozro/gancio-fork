@@ -1,9 +1,11 @@
+import { defineEventHandler, createError } from 'h3'
 import { DateTime } from 'luxon'
 import { Place, Message, Event } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
+import { requireUser } from '~~/server/lib/session'
 
 export default defineEventHandler(async (event) => {
-  await requireUserSession(event)
+  await requireUser(event)
   const log = useLogger('event/unconfirmed')
   try {
     const events = await Event.findAll({

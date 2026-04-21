@@ -1,5 +1,6 @@
-import { queryNominatim } from '~~/server/services/geocode'
+import { defineEventHandler, createError, getValidatedQuery } from 'h3'
 import { z } from 'zod'
+import { queryNominatim } from '~~/server/services/geocode'
 import { publicSettings } from '~~/server/services'
 
 const schema = z.object({

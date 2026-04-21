@@ -1,3 +1,4 @@
+import { createError } from 'h3'
 import { handleFollow, handleUnfollow } from './follows'
 import {
   type APActivityDelete, type APActivityCreate, type APActivityUndo,
@@ -11,9 +12,9 @@ import { handleCreateEvent, handleUpdateEvent } from './events'
 import { APUser, Event, Resource } from '../services/db'
 import { handleCreateNote } from './resources'
 import { handleLike, handleUnlike } from './ego'
-import { createError } from 'h3'
 import { _signAndSend } from './sign_and_send'
-import { secretSettings } from '../services'
+import { secretSettings } from '../services/settings'
+
 import { verify } from './ldsignature'
 import { getActor } from './lookup'
 

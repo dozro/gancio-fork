@@ -8,10 +8,10 @@ import { z } from 'zod'
 import type { EventAPI } from '~~/shared/types/generic'
 import type { H3Event } from 'h3'
 import { createHash } from 'crypto'
-import { Place, Tag, Event, Message, type EventStatus, EventStatusEnum } from './db'
+import { Place, Tag, Event, Message, type EventStatus } from './db'
 import { publicSettings } from './settings'
-import type { UserSession } from '../utils/session'
-import { PostalAddressSchema, type APAttachment, type APEvent, type APLocation, type APTag } from '../federation/types'
+import type { UserSession } from '../lib/session'
+import { EventStatusEnum, PostalAddressSchema, type APAttachment, type APEvent, type APLocation, type APTag } from '../federation/types'
 import { PlaceToAP } from '../federation/places'
 import { handleCache } from '../lib/API'
 import { placeToJSON } from './places'
@@ -307,7 +307,7 @@ export function mapEvents(events: Event[]): EventAPI[] {
 */
 export function calculateEtag(items: readonly { id: number | string, updatedAt: Date, status?: EventStatus }[]): string {
   const base = items
-    .map(e => `${e.id}:${e?.status ?? ''}:${e.updatedAt.toISOString()}`)
+    .map(e => `${e.id}:${e?.status ?? ''}:${e.updatedAt?.toISOString()}`)
     .join('|')
 
   return createHash('sha1').update(base).digest('hex')

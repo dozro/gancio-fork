@@ -1,7 +1,8 @@
 import type { CreationAttributes } from '@sequelize/core'
 import { useLogger } from '../lib/logger'
 import type { APEvent, APLocation } from './types'
-import { publicSettings } from '../services'
+import { publicSettings } from '../services/settings'
+import type { Place } from '../services/db'
 
 /**
   * Parses the location of an ActivityPub Event to extract physical and online locations.

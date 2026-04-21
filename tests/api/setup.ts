@@ -28,12 +28,25 @@ export async function cleanDatabase(register = false) {
     console.error(e)
   }
   if (register) {
-    await User.create({
+    const adminUser = await User.create({
       email: 'admin',
       password: 'password',
       role: 'admin',
       is_active: true
     })
+    const editorUser = await User.create({
+      email: 'editor',
+      password: 'password',
+      role: 'editor',
+      is_active: true
+    })
+    const userUser = await User.create({
+      email: 'user',
+      password: 'password',
+      role: 'user',
+      is_active: true
+    })
+    return { adminUser, editorUser, userUser }
   }
 }
 

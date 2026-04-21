@@ -1,5 +1,7 @@
+import { defineEventHandler } from 'h3'
 import { Event, Tag } from '~~/server/services'
 import { fn, col } from '@sequelize/core'
+import { requireAdminSession } from '~~/server/lib/session'
 
 export default defineEventHandler(async (evt) => {
   await requireAdminSession(evt)

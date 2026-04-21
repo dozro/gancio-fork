@@ -1,4 +1,5 @@
-import { publicSettings } from '../services'
+import { createError } from 'h3'
+import { publicSettings } from '../services/settings'
 import { useLogger } from '../lib/logger'
 import { signAndSend } from './sign_and_send'
 import crypto from 'crypto'
@@ -24,7 +25,7 @@ export async function handleFollow(ap_message: APActivityFollow, actor: APUser) 
   const message = {
     '@context': 'https://www.w3.org/ns/activitystreams',
     'id': `${publicSettings.baseurl}/federation/${guid}`,
-    'type': 'Accept',
+    'type': 'Accept' as const,
     'actor': `${publicSettings.baseurl}/federation/u/${username}`,
     'object': ap_message
   }

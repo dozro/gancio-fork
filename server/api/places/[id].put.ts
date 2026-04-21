@@ -1,5 +1,7 @@
+import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
 import { Place } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
+import { requireAdminSession } from '~~/server/lib/session'
 
 /**
  * Update a place or merge it with another one.

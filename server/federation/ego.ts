@@ -1,5 +1,6 @@
 import { useLogger } from '../lib/logger'
-import { type APUser, Event, publicSettings, Resource } from '../services'
+import { publicSettings } from '~~/server/services/settings'
+import { type APUser, Event } from '~~/server/services/db'
 import type { APActivityLike, APActivityUndo } from './types'
 const log = useLogger('federation:ego')
 

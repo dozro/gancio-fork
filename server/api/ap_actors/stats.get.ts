@@ -1,3 +1,4 @@
+import { defineEventHandler } from 'h3'
 import { Op } from '@sequelize/core'
 import { APUser, Event, Resource, Instance } from '~~/server/services'
 

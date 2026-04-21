@@ -1,5 +1,9 @@
+import { defineEventHandler } from 'h3'
+import { isSessionRole } from '~~/server/lib/session'
 import { handleCache } from '~~/server/lib/API'
 import { publicSettings, publicSettingsLastModified } from '~~/server/services'
+import type { Settings } from '~~/shared/types/settings'
+
 export default defineEventHandler(async (evt) => {
   if (await isSessionRole(evt, 'admin')) {
     return publicSettings

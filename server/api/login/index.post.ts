@@ -1,7 +1,9 @@
 import { z } from 'zod'
+import { readValidatedBody, defineEventHandler } from 'h3'
 import bcrypt from 'bcryptjs'
 import { useLogger } from '~~/server/lib/logger'
 import { User } from '~~/server/services'
+import { setSession } from '~~/server/lib/session'
 
 const bodySchema = z.object({
   email: z.string(), // TODO: .email(), // or admin

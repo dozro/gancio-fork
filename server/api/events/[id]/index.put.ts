@@ -1,14 +1,16 @@
+import { defineEventHandler, getRouterParam, createError, readBody } from 'h3'
 import type { CreationAttributes } from '@sequelize/core'
 import { parseMultipartFormData } from '~~/server/lib/parseMultipartForm'
 import { useLogger } from '~~/server/lib/logger'
 import { findOrCreatePlace } from '~~/server/services/places'
 import { findOrCreateTags } from '~~/server/services/tags'
-import type { Tag } from '~~/server/services'
+import type { Place, Tag } from '~~/server/services/db'
 import { Event, mapEvent, publicSettings, secretSettings } from '~~/server/services'
 import { notifyEvent } from '~~/server/services/notifier'
 import { eventToAP, setEventMedia, validateEvent } from '~~/server/services/events'
 import { z } from 'zod'
 import { sign } from '~~/server/federation/ldsignature'
+import { getUser } from '~~/server/lib/getUser'
 
 /**
  * Update an event

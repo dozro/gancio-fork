@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { _signAndSend, signAndSend } from './sign_and_send'
 import { useLogger } from '../lib/logger'
-import { publicSettings, secretSettings } from '../services'
+import { publicSettings, secretSettings } from '~~/server/services/settings'
 import { APUser } from '../services/db'
 import { APActivityTypeSchema } from './types'
 import { handleActivity } from './handlers'

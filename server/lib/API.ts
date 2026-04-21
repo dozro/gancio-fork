@@ -2,8 +2,7 @@ import { type H3Event, setHeader, handleCacheHeaders } from 'h3'
 import type { Model, ModelStatic } from '@sequelize/core'
 import { Stats } from 'node:fs'
 
-
-export function enableCors(evt: H3Event<EventHandlerRequest>) {
+export function enableCors(evt: H3Event) {
   setHeader(evt, 'Access-Control-Allow-Origin', '*')
 }
 
@@ -13,7 +12,7 @@ export function enableCors(evt: H3Event<EventHandlerRequest>) {
  * - when Stats from a file, it will use the file's mtimeMs as the etag
  * @link https://www.compilenrun.com/docs/middleware/nginx/nginx-caching/nginx-microcaching/
  */
-export async function handleCache(evt: H3Event<EventHandlerRequest>, etagSource: Stats | Date | string | ModelStatic<Model> = '') {
+export async function handleCache(evt: H3Event, etagSource: Stats | Date | string | ModelStatic<Model> = '') {
   let etag
   if (etagSource instanceof Stats) {
     etag = `"${etagSource.size}-${Number(etagSource.mtimeMs).toString(16)}"`

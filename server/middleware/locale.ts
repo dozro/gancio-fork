@@ -1,3 +1,4 @@
+import { defineEventHandler, getCookie, getHeader } from 'h3'
 import { publicSettings } from '../services'
 
 export default defineEventHandler(async (event) => {

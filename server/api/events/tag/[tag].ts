@@ -1,3 +1,4 @@
+import { defineEventHandler, getRouterParam, createError } from 'h3'
 import { handleCache } from '~~/server/lib/API'
 import { useLogger } from '~~/server/lib/logger'
 import { Tag, calculateEtag, getEvents, mapEvents } from '~~/server/services'

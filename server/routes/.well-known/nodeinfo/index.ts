@@ -1,3 +1,4 @@
+import { defineEventHandler } from 'h3'
 import { handleCache } from '~~/server/lib/API'
 import { getMaxLastModifieds, publicSettings, publicSettingsLastModified } from '~~/server/services'
 

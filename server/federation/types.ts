@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { EventStatusEnum } from '../services/db'
 import { DateTime } from 'luxon'
 
 export const APActivityTypeSchema = z.enum(['Follow', 'Undo', 'Like', 'Announce', 'Create', 'Delete', 'Update', 'Accept', 'EchoRequest'])
@@ -145,6 +144,9 @@ export const APLocationSchema = z.object({
   address: z.union([PostalAddressSchema, z.string()]).optional()
 })
 export type APLocation = z.infer<typeof APLocationSchema>
+
+// https://fediverse.codeberg.page/fep/fep/8a8e/#event-status
+export const EventStatusEnum = ['EventCancelled', 'EventScheduled', 'EventTentative', 'EventMovedOnline', 'EventPostponed', 'EventRescheduled'] as const
 
 // https://fediverse.codeberg.page/fep/fep/8a8e/
 export const APEventSchema = z.object({

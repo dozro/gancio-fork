@@ -1,9 +1,12 @@
+import { defineEventHandler, readValidatedBody, createError } from 'h3'
 import { z } from 'zod'
+import { requireAdminSession } from '~~/server/lib/session'
 import { followActor } from '~~/server/federation/helpers'
 import { getInstance, getActor } from '~~/server/federation/lookup'
 import { get as getConfig } from '../../services/config'
 import { isHiddenService } from '../../helpers'
 import { useLogger } from '~~/server/lib/logger'
+import type { Instance } from '~~/server/services'
 
 const schema = z.object({
   url: z.string()

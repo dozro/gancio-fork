@@ -1,3 +1,4 @@
+import { defineEventHandler, setHeader } from 'h3'
 import { publicSettings } from '~~/server/services'
 
 export default defineEventHandler(async (event) => {

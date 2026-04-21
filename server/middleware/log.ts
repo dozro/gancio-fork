@@ -1,3 +1,4 @@
+import { defineEventHandler } from 'h3'
 import { useLogger } from '../lib/logger'
 
 export default defineEventHandler(async (event) => {

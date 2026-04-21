@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import ics from 'ics'
-import type { H3Event } from 'h3'
+import { type H3Event, setHeader, createError } from 'h3'
 import type { Event, EventStatus } from './db'
 import { htmlToText } from 'html-to-text'
 import { publicSettings } from './settings'

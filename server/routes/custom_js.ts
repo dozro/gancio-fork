@@ -1,3 +1,4 @@
+import { defineEventHandler, setHeader } from 'h3'
 import fs from 'fs/promises'
 import path from 'path'
 import { publicSettings, publicSettingsLastModified } from '../services/settings'

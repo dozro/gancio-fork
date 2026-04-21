@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { publicSettings } from '../services'
+import { publicSettings } from '../services/settings'
 import { type H3Event, getHeader, createError } from 'h3'
 import type { APActivityBase } from './types'
 import { useLogger } from '../lib/logger'

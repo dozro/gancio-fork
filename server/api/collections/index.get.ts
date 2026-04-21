@@ -1,3 +1,4 @@
+import { defineEventHandler, getValidatedQuery } from 'h3'
 import z from 'zod'
 import { handleCache } from '~~/server/lib/API'
 import { Collection, Filter } from '~~/server/services'

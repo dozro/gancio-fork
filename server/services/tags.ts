@@ -1,7 +1,6 @@
 import { Op, col, where, fn } from '@sequelize/core'
 import { useLogger } from '../lib/logger'
 import { Tag, Event } from './db'
-import { getEvents } from './events'
 import { publicSettings } from './settings'
 import slugify from 'slugify'
 const log = useLogger('tags')
@@ -47,13 +46,6 @@ export async function cleanOrphanTags() {
   await Tag.destroy({
     where: { tag: { [Op.in]: tags.map(p => p.tag) } }
   })
-}
-
-export async function getTagEvents(tag: string | undefined) {
-  if (!tag) {
-    throw createError({ status: 404, message: 'Tag not specified' })
-  }
-  return getEvents({ tags: [tag] })
 }
 
 // normalize tags for consistent case/accent-insensitive matching (optional)

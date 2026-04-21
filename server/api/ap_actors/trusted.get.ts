@@ -1,3 +1,4 @@
+import { defineEventHandler } from 'h3'
 import { APUser, Instance } from '~~/server/services'
 import { handleCache } from '~~/server/lib/API'
 
