@@ -12,8 +12,7 @@ export async function findOrCreateTags(tags: string[]) {
   }
 
   tags = tags
-    .filter(tag => typeof tag === 'string')
-    .map(tag => tag.trim())
+    .map(normalizeTagName)
     .filter(tag => tag.length > 0)
     .filter((tag, idx, arr) => arr.indexOf(tag) === idx)
 
@@ -67,4 +66,8 @@ export function normalizeTag(tag: string) {
     lower: true,
     locale: publicSettings.instance_locale
   })
+}
+
+export function normalizeTagName(tag: unknown): string {
+  return typeof tag === 'string' ? tag.trim().replace(/#/g, '') : ''
 }
