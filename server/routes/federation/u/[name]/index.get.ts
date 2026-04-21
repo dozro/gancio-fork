@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
         // A property-value pair, e.g. representing a feature of a product or place. We use this to publish this very same instance
         // https://docs.joinmastodon.org/spec/activitypub/#PropertyValue
         schema: 'http://schema.org#',
-        ProperyValue: 'schema:PropertyValue',
+        PropertyValue: 'schema:PropertyValue',
         value: 'schema:value',
 
         // https://docs.joinmastodon.org/spec/activitypub/#discoverable
