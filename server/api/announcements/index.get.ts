@@ -1,3 +1,4 @@
+import { defineEventHandler } from 'h3'
 import { enableCors, handleCache } from '~~/server/lib/API'
 import { Announcement } from '~~/server/services'
 

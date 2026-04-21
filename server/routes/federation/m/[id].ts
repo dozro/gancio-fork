@@ -1,3 +1,4 @@
+import { defineEventHandler, getRouterParam, createError, setHeader } from 'h3'
 import { useLogger } from '~~/server/lib/logger'
 import { Event, Place, Tag } from '~~/server/services'
 import { eventToAP } from '~~/server/services/events'
@@ -19,7 +20,7 @@ export default defineEventHandler(async (evt) => {
   const event = await Event.findByPk(id, { include: [Place, Tag] })
   if (!event) {
     log.warn(`[FEDI] Place ${id} not found`)
-    return sendError(evt, createError({ statusCode: 404, statusMessage: 'Not found.' }))
+    throw createError({ statusCode: 404 })
   }
 
   setHeader(evt, 'Content-Type', 'application/activity+json; charset=utf-8')

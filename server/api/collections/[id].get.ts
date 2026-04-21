@@ -1,3 +1,4 @@
+import { defineEventHandler, getRouterParam } from 'h3'
 import { sendEvents } from '~~/server/services'
 import { getCollectionEvents } from '~~/server/services/collections'
 

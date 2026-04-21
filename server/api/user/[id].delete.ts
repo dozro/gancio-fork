@@ -1,5 +1,8 @@
+import { defineEventHandler, getRouterParam, createError } from 'h3'
 import { Event, User } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
+import { requireAdminSession } from '~~/server/lib/session'
+
 /**
  * Delete a user by id and disassociate all events created by this user
  * @auth admin

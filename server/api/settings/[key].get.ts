@@ -1,5 +1,7 @@
+import { defineEventHandler, getRouterParam, createError } from 'h3'
 import { handleCache } from '~~/server/lib/API'
 import { publicSettings, publicSettingsLastModified } from '~~/server/services'
+import type { Settings } from '~~/shared/types/settings'
 
 export default defineEventHandler(async (evt) => {
   const allowed_settings: Array<keyof Settings> = ['title', 'description', 'logo', 'baseurl', 'instance_name', 'hostname', 'about',

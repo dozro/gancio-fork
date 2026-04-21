@@ -1,6 +1,8 @@
+import { defineEventHandler, readValidatedBody, createError } from 'h3'
+import z from 'zod'
 import { Resource } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
-import z from 'zod'
+import { requireAdminSession } from '~~/server/lib/session'
 
 const schema = z.object({
   id: z.string(),

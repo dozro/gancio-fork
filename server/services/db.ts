@@ -49,6 +49,8 @@ import {
 
 import { get as getConfig, isBuild } from '../services/config'
 import type { APActor, APEvent, APNote, PostalAddress } from '../federation/types'
+import { EventStatusEnum } from '../federation/types'
+import type { SecretSettings, Settings } from '~~/shared/types/settings'
 const config = getConfig()
 const log = useLogger('sequelize')
 
@@ -174,8 +176,6 @@ export interface Media {
   focalpoint?: [number, number]
 }
 
-// https://fediverse.codeberg.page/fep/fep/8a8e/#event-status
-export const EventStatusEnum = ['EventCancelled', 'EventScheduled', 'EventTentative', 'EventMovedOnline', 'EventPostponed', 'EventRescheduled'] as const
 export type EventStatus = typeof EventStatusEnum[number]
 
 export type LDSignature = {
@@ -492,7 +492,7 @@ export class User extends Model<
   }
 
   @BeforeSave
-  static async hashPassword(instance: User) {
+  static hashPassword(instance: User) {
     if (instance.changed('password')) {
       const password = instance.getDataValue('password')
       if (password) {

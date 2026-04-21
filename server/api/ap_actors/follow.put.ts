@@ -1,3 +1,5 @@
+import { readValidatedBody, defineEventHandler, createError } from 'h3'
+import { requireAdminSession } from '~~/server/lib/session'
 import { z } from 'zod'
 import { followActor, unfollowActor } from '~~/server/federation/helpers'
 import { useLogger } from '~~/server/lib/logger'

@@ -1,5 +1,7 @@
-import { Event, Place } from '~~/server/services'
+import { defineEventHandler } from 'h3'
+import { requireAdminSession } from '~~/server/lib/session'
 import { fn, col, literal } from '@sequelize/core'
+import { Event, Place } from '~~/server/services'
 import { placeToJSON } from '~~/server/services/places'
 
 /**

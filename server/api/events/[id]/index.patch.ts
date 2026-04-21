@@ -1,8 +1,11 @@
+import { defineEventHandler, getRouterParam, createError, readValidatedBody } from 'h3'
+import { getUser } from '~~/server/lib/getUser'
 import { z } from 'zod'
 import { useLogger } from '~~/server/lib/logger'
-import { EventStatusEnum, Event, Place } from '~~/server/services/db'
+import { Event, Place } from '~~/server/services/db'
 import { notifyEvent } from '~~/server/services/notifier'
 import { canModifyEvent, mapEvent } from '~~/server/services/events'
+import { EventStatusEnum } from '~~/server/federation/types'
 
 const schema = z.object({
   status: z.enum(EventStatusEnum).optional()
@@ -16,7 +19,7 @@ export default defineEventHandler(async (evt) => {
   const user = await getUser(evt)
   if (!user) {
     log.warn('Anonymous user cannot patch events')
-    throw createError({ statusCode: 403, statusMessage: 'Anonymous user cannot patch events' })
+    throw createError({ statusCode: 401, statusMessage: 'Anonymous user cannot patch events' })
   }
 
   if (!id || !Number(id)) {

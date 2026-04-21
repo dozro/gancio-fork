@@ -1,3 +1,4 @@
+import { defineEventHandler, createError } from 'h3'
 import { handleCache } from '~~/server/lib/API'
 import { useLogger } from '~~/server/lib/logger'
 import { getMaxLastModifieds } from '~~/server/services'

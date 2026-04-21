@@ -6,7 +6,7 @@ import { createEvent } from 'h3'
 import type { IncomingHttpHeaders } from 'node:http2'
 
 type MockH3EventOptions = {
-  method?: 'GET' | 'POST'
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   body?: unknown
   url?: string
   query?: string | Record<string, string> | URLSearchParams | string[][] | undefined

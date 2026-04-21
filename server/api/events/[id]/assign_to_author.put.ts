@@ -1,4 +1,6 @@
+import { defineEventHandler, createError, getRouterParam, readBody } from 'h3'
 import { useLogger } from '~~/server/lib/logger'
+import { requireSessionRole } from '~~/server/lib/session'
 import { Event } from '~~/server/services'
 
 /**

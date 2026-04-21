@@ -1,7 +1,8 @@
-import { Place, Event, publicSettings } from '~~/server/services'
-import { Op, fn, col, where } from '@sequelize/core'
-
+import { getValidatedQuery, defineEventHandler } from 'h3'
 import { z } from 'zod'
+import { Op, fn, col, where } from '@sequelize/core'
+import { Place, Event, publicSettings } from '~~/server/services'
+
 import { placeToJSON } from '~~/server/services/places'
 const schema = z.object({
   query: z.string().optional().transform(q => q?.toLocaleLowerCase(publicSettings.instance_locale)),

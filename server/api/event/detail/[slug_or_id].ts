@@ -1,4 +1,7 @@
-import { Event, Place, Tag, User, Resource, mapEvent, Message, APUser } from '~~/server/services'
+import { defineEventHandler, getRouterParam, getValidatedQuery, createError, setHeader } from 'h3'
+import { getUser } from '~~/server/lib/getUser'
+
+import { Event, Place, Tag, User, mapEvent, Message } from '~~/server/services'
 import type { WhereOptions } from '@sequelize/core'
 import { Op } from '@sequelize/core'
 import { formatSchema } from '~~/server/types/validator'
@@ -46,11 +49,12 @@ export default defineEventHandler(async (evt) => {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 
+  // TODO
   // admin, editors and event's owner gets the number of moderation messages (could open moderation)
-  let n_messages = 0
-  if (isAdminOrEditor || event.userId !== user?.id) {
-    n_messages = await Message.count({ where: { eventId: event.id, ...(!isAdminOrEditor && { is_author_visible: true }) } }).catch(() => 0)
-  }
+  // let n_messages = 0
+  // if (isAdminOrEditor || event.userId !== user?.id) {
+  //   n_messages = await Message.count({ where: { eventId: event.id, ...(!isAdminOrEditor && { is_author_visible: true }) } }).catch(() => 0)
+  // }
 
   if (!event.is_visible && !canModifyEvent(event, user)) {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })

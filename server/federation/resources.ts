@@ -1,10 +1,10 @@
 import linkifyHtml from 'linkify-html'
 import { sanitizeHTML } from '../helpers'
 import { useLogger } from '../lib/logger'
-import { Event, publicSettings, Resource } from '../services'
+import { Event, Resource, type APUser } from '../services/db'
 import type { APNote } from './types'
 import { _signAndSend } from './sign_and_send'
-import { getSetting } from '../services/settings'
+import { publicSettings } from '../services/settings'
 
 const log = useLogger('federation:notes')
 

@@ -1,3 +1,4 @@
+import { defineEventHandler, createError, getRouterParam } from 'h3'
 import { Event, Place, Tag } from '~~/server/services'
 import { Op, type WhereOptions } from '@sequelize/core'
 

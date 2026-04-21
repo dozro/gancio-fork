@@ -1,3 +1,4 @@
+import { defineEventHandler } from 'h3'
 import { Event, publicSettings, Resource, User } from '~~/server/services'
 
 export default defineEventHandler(async (event) => {

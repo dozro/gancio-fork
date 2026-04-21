@@ -1,3 +1,4 @@
+import { defineEventHandler } from 'h3'
 import path from 'path'
 import { get as getConfig } from '../services/config'
 import { serveFile } from '../helpers'

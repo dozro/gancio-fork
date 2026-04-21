@@ -1,3 +1,4 @@
+import { defineEventHandler } from 'h3'
 import { Place } from '~~/server/services'
 
 export default defineEventHandler(async () => {

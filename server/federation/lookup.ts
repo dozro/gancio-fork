@@ -2,7 +2,7 @@ import { ofetch } from 'ofetch'
 import { sanitizeHTML } from '../helpers'
 import { _signAndSend } from './sign_and_send'
 import { useLogger } from '../lib/logger'
-import { secretSettings } from '../services'
+import { secretSettings } from '../services/settings'
 import { Instance, APUser } from '../services/db'
 import type { APActor } from './types'
 

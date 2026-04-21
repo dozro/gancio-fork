@@ -1,3 +1,4 @@
+import { defineEventHandler, createError, setHeader } from 'h3'
 import path from 'path'
 import fs from 'fs'
 import pug from 'pug'

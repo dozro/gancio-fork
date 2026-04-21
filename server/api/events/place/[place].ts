@@ -1,3 +1,4 @@
+import { createError, defineEventHandler, getRouterParam } from 'h3'
 import { handleCache } from '~~/server/lib/API'
 import { useLogger } from '~~/server/lib/logger'
 import { Place, calculateEtag, getEvents, mapEvents } from '~~/server/services'
@@ -8,6 +9,9 @@ import { Place, calculateEtag, getEvents, mapEvents } from '~~/server/services'
 const log = useLogger('events/place')
 export default defineEventHandler(async (evt) => {
   const nameOrId = getRouterParam(evt, 'place')
+  if (!nameOrId) {
+    throw createError({ statusCode: 400, message: `Invalid place parameter` })
+  }
   const id = Number(nameOrId)
   const place = !isNaN(id) && Number.isInteger(id)
     ? await Place.findByPk(id)

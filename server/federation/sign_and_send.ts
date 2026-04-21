@@ -1,5 +1,5 @@
 import { useLogger } from '../lib/logger'
-import { secretSettings } from '../services'
+import { secretSettings } from '../services/settings'
 import { useTaskManager } from '../services/taskManager'
 import { prepareHTTPSignature } from './httpsignature'
 import type { APActivityBase } from './types'

@@ -1,3 +1,5 @@
+import { defineEventHandler, getRouterParam, createError } from 'h3'
+import { requireUser } from '~~/server/lib/session'
 import { useLogger } from '~~/server/lib/logger'
 import { Event } from '~~/server/services'
 import { canModifyEvent } from '~~/server/services/events'
@@ -21,7 +23,7 @@ export default defineEventHandler(async (evt) => {
 
   if (!canModifyEvent(event, user)) {
     log.warn(`Someone not allowed is trying to ${event.is_visible ? 'unconfirm' : 'confirm'} -> "${event.title}`)
-    throw createError({ statusCode: 403 })
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
   return event.update({ is_visible: !event.is_visible })

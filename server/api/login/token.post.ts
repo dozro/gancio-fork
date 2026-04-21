@@ -1,3 +1,4 @@
+import { defineEventHandler, readValidatedBody, createError } from 'h3'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { signJwt } from '~~/server/lib/jwt'

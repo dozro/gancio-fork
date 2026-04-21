@@ -1,3 +1,5 @@
+import { defineEventHandler, getRouterParam } from 'h3'
+import { getUser } from '~~/server/lib/getUser'
 import { Resource } from '~~/server/services'
 
 /**

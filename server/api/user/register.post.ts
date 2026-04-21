@@ -1,4 +1,4 @@
-// import { z } from 'zod'
+import { defineEventHandler, createError, readBody } from 'h3'
 import * as linkify from 'linkifyjs'
 import { useLogger } from '~~/server/lib/logger'
 import { enqueueMail, publicSettings, User, notifyAdmins } from '~~/server/services'
@@ -52,10 +52,8 @@ export default defineEventHandler(async (event) => {
     log.info('Register user', user.email)
     const userInstance = await User.create(user)
     log.info(`Sending registration email to ${user.email} and registration confirmation to admins`)
-    const config = useRuntimeConfig()
-    enqueueMail(user.email, 'register', { user, config }) // , TODO publicSettings.locals.locale)
-
-    notifyAdmins('admin_register', { user, config })
+    enqueueMail(user.email, 'register', { user, config: publicSettings }) // , TODO publicSettings.locals.locale)
+    notifyAdmins('admin_register', { user, config: publicSettings })
     return userInstance
   } catch (e) {
     log.error(String(e))

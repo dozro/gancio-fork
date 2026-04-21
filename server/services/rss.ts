@@ -1,4 +1,4 @@
-import type { H3Event } from 'h3'
+import { type H3Event, setHeader } from 'h3'
 import { DateTime } from 'luxon'
 import path from 'path'
 import fs from 'fs'

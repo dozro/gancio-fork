@@ -2,6 +2,7 @@ import type { PostalAddress } from '../federation/types'
 import { useLogger } from '../lib/logger'
 import { publicSettings } from './settings'
 import { addressToString } from '../../shared/utils/addressToString'
+import { $fetch } from 'ofetch'
 
 const log = useLogger('geocode:nominatim')
 
@@ -97,8 +98,6 @@ export async function queryNominatim(q: string) {
     params,
     headers: { 'User-Agent': `gancio` }
   })
-
-  log.info('Fetched details for', addressList)
 
   return addressList?.map((v) => {
     const name = v?.namedetails?.alt_name ?? v?.namedetails?.name

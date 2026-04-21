@@ -1,3 +1,6 @@
+import { defineEventHandler } from 'h3'
+import { requireUser } from '~~/server/lib/session'
+
 /**
  * Get current authenticated user
  * @auth
