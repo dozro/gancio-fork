@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+const time = useTime()
 const { event, lazy = false, hideThumbs = false } = defineProps<{
   event: EventAPI
   lazy?: boolean

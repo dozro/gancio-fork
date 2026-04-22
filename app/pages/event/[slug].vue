@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import time from '~/utils/time'
-
 const settings = useState<Settings>('settings')
 const { $notify, $prompt } = useNuxtApp()
 const { t } = useI18n()
+const time = useTime()
 const { user } = useUserSession()
 const route = useRoute()
 const { isAdmin } = useAuth()

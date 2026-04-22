@@ -1,6 +1,5 @@
 <script setup>
-import time from '~/utils/time'
-
+const time = useTime()
 const selectedDate = useState('selectedDate')
 const { attributes, params } = useEvents()
 

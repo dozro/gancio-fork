@@ -4,8 +4,8 @@ The homepage shows future events by default.
 -->
 <script setup lang="ts">
 import { DateTime } from 'luxon'
-import time from '~/utils/time'
 
+const time = useTime()
 // middleware setup!
 
 const settings = useState<Settings>('settings')
