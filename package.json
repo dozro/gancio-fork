@@ -67,7 +67,11 @@
     "migrate": "NODE_ENV=production sequelize db:migrate",
     "migrate:dev": "sequelize db:migrate",
     "analyze": "nuxt build --analyze",
-    "circular": "madge --circular --extensions ts,js,vue --ts-config server/tsconfig.madge.json server"
+    "circular": "madge --circular --extensions ts,js,vue --ts-config server/tsconfig.madge.json server",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": "eslint --max-warnings=0"
   },
   "dependencies": {
     "@babel/preset-typescript": "^7.28.5",
@@ -140,11 +144,13 @@
     "h3": "^1.15.4",
     "happy-dom": "^20.9.0",
     "html-to-text": "^9.0.5",
+    "husky": "^9.1.7",
     "ics": "^3.8.1",
     "jsdom": "^29.0.2",
     "jsonld": "^9.0.0",
     "linkify-html": "^4.3.2",
     "linkifyjs": "^4.3.2",
+    "lint-staged": "^16.4.0",
     "madge": "^8.0.0",
     "material-design-icons-iconfont": "^6.7.0",
     "mitt": "^3.0.1",
