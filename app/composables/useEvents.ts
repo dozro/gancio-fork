@@ -1,4 +1,5 @@
 export const useEvents = () => {
+  const time = useTime()
   const settings = useState<Settings>('settings')
   const route = useRoute()
   const params = useState<Record<string, unknown>>('params', () => ({

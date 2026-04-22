@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps({ event: { type: Object, default: () => ({}) } })
-// const { time } = useTime()
+const time = useTime()
 </script>
 
 <template>

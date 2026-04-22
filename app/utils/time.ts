@@ -1,90 +1,72 @@
-import { DateTime } from 'luxon'
+// import { DateTime } from 'luxon'
 
-function currentMonth () {
-  // return DateTime.local({ zone }).month
-  return DateTime.local().month
-}
+// function timeToISO (time: number) {
+//   return DateTime.local(time).toISO()
+// }
 
-function currentYear () {
-  return DateTime.local().year
-}
+// function time (datetime: number) {
+//   return DateTime.local(datetime).toString()
+// }
 
-function startMonth (year?: number, month?: number) {
-  if (year && month) {
-    return DateTime.local(year, month).startOf('month').toUnixInteger()
-  } else {
-    return DateTime.local().startOf('month').toUnixInteger()
-  }
-}
+// function when(event: EventAPI) {
+//   const settings = useState<Settings>('settings')
+//   const { locale } = useI18n()
 
-function nowUnix () {
-  return DateTime.local().toUnixInteger()
-}
+//   const cy = 10 // currentYear()
+//   const addTimezone = event?.ap_id || event?.place?.name === 'online'
 
-function timeToISO (time: number) {
-  return DateTime.local(time).toISO()
-}
+//   const opt = {
+//     zone: settings.value.instance_timezone,
+//     locale: locale.value || settings.value.instance_locale
+//   }
 
-function time (datetime: number) {
-  return DateTime.local(datetime).toString()
-}
+//   const start = DateTime.fromSeconds(event?.start_datetime ?? 0, opt)
+//   let time = start.toLocaleString({ weekday: 'long', ...(cy !== start.year && { year: 'numeric' }), month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', ...(addTimezone && { timeZoneName: 'short' }) })
+//   const end = event?.end_datetime && DateTime.fromSeconds(event?.end_datetime ?? 0, opt)
+//   if (end) {
+//     const isMultiDate = !end.hasSame(start, 'day')
+//     if (isMultiDate) {
+//       time += ` → ${end.toLocaleString({ weekday: 'long', ...(cy !== end.year && { year: 'numeric' }), month: 'short', day: '2-digit' })}`
+//     } else if (end.diff(start, 'minutes').minutes > 0) {
+//       time += `-${end.toLocaleString({ hour: '2-digit', minute: '2-digit' })}`
+//     }
+//   }
 
-function when(event: EventAPI) {
-  const settings = useState<Settings>('settings')
-  const { locale } = useI18n()
+//   return time
+// }
 
-  const cy = currentYear()
-  const addTimezone = event?.ap_id || event?.place?.name === 'online'
+// function unixFormat(timestamp: number, format = 'EEEE d MMMM HH:mm') {
+//   const settings = useState<Settings>('settings')
+//   const { locale } = useI18n()
 
-  const opt = {
-    zone: settings.value.instance_timezone,
-    locale: locale.value || settings.value.instance_locale
-  }
+//   const opt = {
+//     zone: settings.value.instance_timezone,
+//     locale: locale.value || settings.value.instance_locale
+//   }
+//   return DateTime.fromSeconds(timestamp, opt).toFormat(format)
+// }
 
-  const start = DateTime.fromSeconds(event?.start_datetime ?? 0, opt)
-  let time = start.toLocaleString({ weekday: 'long', ...(cy !== start.year && { year: 'numeric' }), month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', ...(addTimezone && { timeZoneName: 'short' }) })
-  const end = event?.end_datetime && DateTime.fromSeconds(event?.end_datetime ?? 0, opt)
-  if (end) {
-    const isMultiDate = !end.hasSame(start, 'day')
-    if (isMultiDate) {
-      time += ` → ${end.toLocaleString({ weekday: 'long', ...(cy !== end.year && { year: 'numeric' }), month: 'short', day: '2-digit' })}`
-    } else if (end.diff(start, 'minutes').minutes > 0) {
-      time += `-${end.toLocaleString({ hour: '2-digit', minute: '2-digit' })}`
-    }
-  }
+// function format (date, format = 'EEEE d MMMM HH:mm') {
+//   return DateTime.fromISO(date
+//   //   {
+//   //   zone: store.state.settings.instance_timezone,
+//   //   locale: app.i18n.locale || store.state.settings.instance_locale
+//   // }
+//   ).toFormat(format || '')
+// }
 
-  return time
-}
+// function from (timestamp) {
+//   const settings = useState<Settings>('settings')
+//   const { locale } = useI18n()
 
-function unixFormat (timestamp, format = 'EEEE d MMMM HH:mm') {
-  // , {
-  //   zone: store.state.settings.instance_timezone,
-  //   locale: app.i18n.locale || store.state.settings.instance_locale
-  // }
-  return DateTime.fromSeconds(timestamp).toFormat(format)
-}
+//   const opt = {
+//     zone: settings.value.instance_timezone,
+//     locale: locale.value || settings.value.instance_locale
+//   }
+//   return DateTime.fromSeconds(timestamp, opt).toRelative()
+// }
 
-function format (date, format = 'EEEE d MMMM HH:mm') {
-  return DateTime.fromISO(date
-  //   {
-  //   zone: store.state.settings.instance_timezone,
-  //   locale: app.i18n.locale || store.state.settings.instance_locale
-  // }
-  ).toFormat(format || '')
-}
-
-function from (timestamp) {
-  const settings = useState<Settings>('settings')
-  const { locale } = useI18n()
-
-  const opt = {
-    zone: settings.value.instance_timezone,
-    locale: locale.value || settings.value.instance_locale
-  }
-  return DateTime.fromSeconds(timestamp, opt).toRelative()
-}
-
-export default { when, currentYear, currentMonth, startMonth, nowUnix, time, timeToISO, unixFormat, format, from }
+// export default { }
 
 // timeFormat () {
 //   const time = DateTime.fromObject({ hour: 14 }, {
