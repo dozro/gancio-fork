@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 ## [2.0.0-alpha.3](https://framagit.org/les/gancio/compare/v2.0.0-alpha.2...v2.0.0-alpha.3) (2026-04-21)
-
+okay it's another alpha, there are many changes that haven't been documented yet, so please be patient :D
+feel free to test (docker image is `cisti/gancio:2.0-alpha.3`), open issues but please do not update from 1.x, also expect frequent updates.
 
 ### Features
 
