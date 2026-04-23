@@ -1,8 +1,9 @@
 <script setup lang='ts'>
-
+const { t } = useI18n()
 const route = useRoute()
 const settings = useState<Settings>('settings')
-useHead({ title: `${settings.value.title} - ${$t('common.recover_password')}` })
+
+useHead({ title: `${settings.value.title} - ${t('common.recover_password')}` })
 
 const recoverCode = route.params.code
 const newPassword = ref('')

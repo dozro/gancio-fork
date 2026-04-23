@@ -17,12 +17,8 @@ export default withNuxt([
       '@stylistic': stylistic
     },
     rules: {
-      '@stylistic/semi': ['error', 'never'],
-      '@stylistic/brace-style': 'off',
-      '@stylistic/space-before-function-paren': 'off',
-      '@stylistic/eol-last': 'off',
-      '@stylistic/comma-dangle': ['error', 'never'],
-      '@stylistic/operator-linebreak': 'off',
+      'no-undef': 'error',
+      'vue/no-undef-properties': ['error'],
       // do not enforce v-slot style
       'vue/v-slot-style': 'off',
       'vue/html-indent': ['error', 2, {
@@ -31,7 +27,13 @@ export default withNuxt([
         closeBracket: 0,
         alignAttributesVertically: false,
         ignores: []
-      }]
+      }],
+      '@stylistic/semi': ['error', 'never'],
+      '@stylistic/brace-style': 'off',
+      '@stylistic/space-before-function-paren': 'off',
+      '@stylistic/eol-last': 'off',
+      '@stylistic/comma-dangle': ['error', 'never'],
+      '@stylistic/operator-linebreak': 'off',
     }
   }
 

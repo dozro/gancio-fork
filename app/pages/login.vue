@@ -1,11 +1,11 @@
 <script setup lang="ts">
-
+const { t } = useI18n()
 const { fetch: refreshSession } = useUserSession()
 const settings = useState<Settings>('settings')
 const { $notify } = useNuxtApp()
 
 useHead({
-  title: () => `${settings.value.title} - ${$t('common.login')}`
+  title: () => `${settings.value.title} - ${t('common.login')}`
 })
 
 const credentials = reactive({
@@ -55,7 +55,10 @@ async function forgot () {
       <v-form ref='form' v-model='valid' validate-on='lazy' @submit.prevent='login'>
         <v-card>
           <v-card-title>{{$t('common.login')}}</v-card-title>
-          <v-card-subtitle v-html="$t('login.description')" />
+          <v-card-subtitle>
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <span v-html="t('login.description')" />
+          </v-card-subtitle>
           <v-card-text>
             <v-text-field
               ref="emailInput"

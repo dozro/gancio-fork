@@ -172,9 +172,7 @@ async function removeFilter(filter) {
     await $fetch(`/api/filters/${filter.id}`, { method: 'DELETE' })
     filters.value = filters.value.filter(f => f.id !== filter.id)
   } catch (e) {
-    const err = get(e, 'response.data.errors[0].message', e)
-    this.$root.$message(this.$t(err), { color: 'error' })
-    $notify(t(err?.response?.data?.errors?.[0]?.message), Status.ERROR)
+    $notify(t(e?.response?.data?.errors?.[0]?.message), Statuses.ERROR)
   }
   loading.value = false
 }

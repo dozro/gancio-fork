@@ -1,4 +1,5 @@
 <script setup>
+const time = useTime()
 const props = defineProps({ event: { type: Object, default: () => ({}) } })
 defineEmits(['close'])
 const { isAdmin } = useAuth()
