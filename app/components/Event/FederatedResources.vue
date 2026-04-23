@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import time from '~/utils/time'
-
 const props = defineProps<{
   eventId: EventAPI['id']
   canModerate: boolean
 }>()
 
 const { $confirm, $notify } = useNuxtApp()
+const time = useTime()
 
 const { data: resources, refresh } = useFetch<Resource[]>(() => `/api/resources/list/${props.eventId}`)
 

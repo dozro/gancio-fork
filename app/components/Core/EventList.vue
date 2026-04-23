@@ -5,6 +5,8 @@ const props = defineProps<{
   maxEvents?: number
 }>()
 
+const time = useTime()
+
 const computedEvents = computed(() => {
   if (!props.maxEvents) return props.events
   return props.events.slice(0, props.maxEvents)

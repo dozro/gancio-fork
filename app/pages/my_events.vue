@@ -3,6 +3,7 @@ definePageMeta({ middleware: ['authenticated'] })
 const { t } = useI18n()
 const { data: events, refresh } = await useFetch('/api/events/mine')
 const { $confirm, $notify } = useNuxtApp()
+const time = useTime()
 
 const search = ref('')
 
