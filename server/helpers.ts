@@ -65,7 +65,7 @@ async function readableWebToNodeStream(webStream) {
   })
 }
 
-export async function getImageFromURL(url: string, name: string, focalpoint: [number, number]) {
+export async function getImageFromURL(url: string, name: string, focalpoint?: [number, number]) {
   log.debug(`getImageFromURL ${url}`)
 
   const filename = crypto.randomBytes(16).toString('hex')
