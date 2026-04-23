@@ -13,6 +13,7 @@ const { t } = useI18n()
 
 const openModeration = ref($route?.query?.moderation ? true : false)
 const selectedEvent = ref()
+const time = useTime()
 
 const headers = [
   { value: 'title', title: t('common.title') },
