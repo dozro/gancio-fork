@@ -1,5 +1,6 @@
 <script setup>
 const { $notify, $confirm } = useNuxtApp()
+const { user: loggedUser } = useUserSession()
 const { t } = useI18n()
 
 const { data: users, refresh } = await useFetch('/api/users')
@@ -32,7 +33,7 @@ async function deleteUser (user) {
 const editUserDialog = ref(false)
 const selectedUser = ref()
 async function editUser (user) {
-  selectedUser.value = user
+  selectedUser.value = structuredClone(toRaw(user))
   editUserDialog.value = true
 }
 
@@ -51,7 +52,7 @@ async function createUser () {
     <CoreSearchInput v-model="search" class="w-100 w-sm-auto" />
   </div>
 
-  <AdminUserEdit v-model="editUserDialog" :user="selectedUser" @refresh='refresh'/>
+  <AdminUserEdit :key="selectedUser?.id ?? 'new'" v-model="editUserDialog" :user="selectedUser" @refresh='refresh' />
 
   <div>
     <!-- USERS LIST -->
@@ -79,6 +80,7 @@ async function createUser () {
           @click="editUser(item)"
         />
         <t-btn
+          v-if="item.id !== loggedUser.id"
           color="error"
           :tooltip="$t('admin.delete_user')"
           icon='mdi-delete-forever'
