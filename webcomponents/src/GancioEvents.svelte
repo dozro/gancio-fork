@@ -16,37 +16,70 @@
   export let external_style = ''
 
   let mounted = false
+  let loading = false
+  let page = 0
+  let hasMore = true
   let events = []
 
-  function update(v) {
-    if (!mounted) return
-    const params = []
-    if (maxlength) {
-      params.push(`max=${maxlength}`)
+  async function loadEvents() {
+    if (!mounted || !hasMore) return
+    loading = true
+
+    const url = new URL('/api/events', baseurl)
+
+    if (page > 0) {
+      url.searchParams.set('page', page)
     }
 
-    let api = '/api/events'
+    if (maxlength) {
+      url.searchParams.set('max', maxlength)
+    }
+
     if (collection) {
-      api = `/feed/json/collection/${collection}`
+      url.pathname = `/feed/json/collection/${collection}`
     } else {
       if (tags) {
-        params.push(`tags=${tags}`)
+        url.searchParams.set('tags', tags)
       }
 
       if (places) {
-        params.push(`places=${places}`)
+        url.searchParams.set('places', places)
       }
     }
-    params.push(`show_recurrent=${show_recurrent ? 'true' : 'false'}`)
 
-    fetch(`${baseurl}${api}?${params.join('&')}`)
-      .then((res) => res.json())
-      .then((e) => {
-        events = e.events || e
-      })
-      .catch((e) => {
-        console.error('Error loading Gancio API -> ', e)
-      })
+    url.searchParams.set(
+      'show_recurrent',
+      // If attribute is present but doesn't have a value
+      ((show_recurrent === '') ? true
+       // If attribute is not present
+       : !show_recurrent ? false
+       // Else parse given string
+       : show_recurrent))
+
+    try {
+      const resp = await fetch(url)
+      if (!resp.ok) {
+        throw Error(`Request failed with ${response.status}`)
+      }
+      const json = await resp.json()
+      const fetched = json.events || json
+      if (!maxlength || fetched.length < Number(maxlength)) {
+        hasMore = false
+      }
+      page++
+      events = events.concat(fetched)
+    } catch (e) {
+      console.error('Error loading Gancio API -> ', e)
+    }
+    loading = false
+  }
+
+  function update(v) {
+    if (!mounted) return
+    page = 0
+    hasMore = true
+    events = []
+    loadEvents()
   }
 
   function position(event) {
@@ -130,6 +163,20 @@
         </div>
       </a>
     {/each}
+    {#if hasMore}
+      <button title="More" id="footer" on:click={loadEvents} disabled={loading}>
+        <div class="content">
+          <svg class="icon"
+               viewBox="0 0 32 32"
+               xmlns="http://www.w3.org/2000/svg"
+               xmlns:svg="http://www.w3.org/2000/svg"
+               style="fill-opacity:0;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;">
+            <path d="M 2,16 16,28 30,16"/>
+            <path d="M 2,4 16,16 30,4"/>
+          </svg>
+        </div>
+      </button>
+    {/if}
   </div>
 {/if}
 
@@ -291,5 +338,36 @@
   .tag {
     margin-right: 10px;
     display: inline-block;
+  }
+
+  #footer {
+    display: flex;
+    border: none;
+    width: 100%;
+    padding: 1.2rem 1rem;
+    background-color: var(--bg-odd-color);
+    color: var(--title-color);
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  #footer:hover,
+  #footer:focus,
+  #footer:active {
+    text-decoration: underline;
+    background-color: var(--bg-hover-color);
+  }
+
+  #footer .content {
+    margin: auto;
+  }
+
+  .nosidebar #footer {
+    border-radius: 15px;
+  }
+  #footer .icon {
+    height: 1.1rem;
+    stroke: var(--title-color);
   }
 </style>
