@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import type { CreationAttributes } from '@sequelize/core'
 import { useLogger } from '../lib/logger'
 import { publicSettings } from '~~/server/services/settings'
-import { type APUser, Event } from '~~/server/services/db'
+import { type APUser, type Media, Event } from '~~/server/services/db'
 import { eventToAP } from '../services/events'
 import { APContext, getFollowersInbox } from './helpers'
 import { signAndSend } from './sign_and_send'
@@ -48,11 +48,20 @@ export async function APEventToEvent(APEvent: APEvent, actor: APUser) {
   const { place, online_locations } = await parseAPLocation(APEvent).catch(_e => ({ place: undefined, online_locations: undefined }))
 
   let media: Media[] = []
-  const image_url = APEvent?.attachment?.find(a => a?.mediaType?.includes('image') && a.url)?.url
-  if (image_url) {
-    log.debug('[FEDI] Download attachment for event %s', image_url)
-    const image = await getImageFromURL(image_url, APEvent.attachment?.[0]?.name || APEvent.name.trim() || '', APEvent.attachment?.[0]?.focalPoint)
-    media = [image]
+  if (Array.isArray(APEvent.attachment)) {
+    media = await Promise.all(APEvent.attachment.filter((att) => {
+      return typeof att?.url === 'string' &&
+        ['Image', 'Document'].includes(att?.type) &&
+        att.mediaType?.startsWith?.('image/')
+    }).map((att) => {
+      log.debug('[FEDI] Download attachment for event %s', att.url)
+      const focalPoint = att.focalPoint?.length === 2 ? att.focalPoint as [number, number] : undefined
+      return getImageFromURL(
+        att.url as string,
+        (att.name || APEvent.name).trim() || '',
+        focalPoint
+      )
+    }))
   }
 
   const event: CreationAttributes<Event> = {
