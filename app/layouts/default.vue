@@ -2,8 +2,6 @@
 const settings = useState<Settings>('settings')
 const { locale } = useI18n()
 
-const { autoDetectTheme } = useAppTheme()
-
 useHead ({
   htmlAttrs: {
     lang: locale.value
@@ -16,10 +14,6 @@ useHead ({
     { src: '/gancio-events.es.js', async: true, defer: true, tagPosition: 'bodyClose' },
     { type: 'application/javascript', async: true, src: '/custom_js', defer: true, tagPosition: 'bodyClose' }
   ]
-})
-
-onMounted(() => {
-  autoDetectTheme()
 })
 
 </script>
