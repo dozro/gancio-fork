@@ -41,7 +41,7 @@ export const publicSettings: Settings = {
   'geocoding_provider_type': 'Nominatim',
   'geocoding_provider': 'https://nominatim.openstreetmap.org/search',
   'geocoding_countrycodes': [],
-  'tilelayer_provider': 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  'tilelayer_provider': 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   'tilelayer_provider_attribution': '<a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
   'enable_federation': true,
   'federated_events_in_home': true,
