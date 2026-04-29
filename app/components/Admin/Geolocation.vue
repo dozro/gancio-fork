@@ -30,7 +30,7 @@ const testingTilelayer = ref(false)
 const testingGeocoding = ref(false)
 
 // const geocoding_provider_default = 'https://nominatim.openstreetmap.org/search'
-const tilelayer_provider_default = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+const tilelayer_provider_default = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
 const tilelayer_provider_attribution_default = '<a target=\'_blank\' href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 
 const geocoding_provider = manageSetting('geocoding_provider')

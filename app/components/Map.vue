@@ -5,7 +5,7 @@ import { LMap, LTileLayer, LMarker, LControlAttribution } from '@vue-leaflet/vue
 // import { Icon } from 'leaflet'
 
 const settings = useState<Settings>('settings')
-const url = settings.value.tilelayer_provider || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+const url = settings.value.tilelayer_provider || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
 const attribution = settings.value.tilelayer_provider_attribution || '<a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 
 const props = defineProps({
