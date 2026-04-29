@@ -41,7 +41,7 @@ export class Task {
     this.repeat = repeat
     this.repeatDelay = repeatDelay
     this.processInNTick = callAtStart ? 1 : repeatDelay
-    // retries on non-repeatable task only
+    // retries on repeatable task only
     this.retries = repeat ? retries : []
   }
 
@@ -163,6 +163,11 @@ export class TaskManager {
     this.tasks.push(task)
   }
 
+  remove(name: string) {
+    log.info(`[TASK] Remove ${name}`)
+    this.tasks = this.tasks.filter(task => task.name !== name)
+  }
+
   process() {
     if (!this.tasks.length) {
       return
@@ -173,7 +178,7 @@ export class TaskManager {
 
     // only keep tasks that are either repeating or have retries left
     // completed tasks are removed from the queue
-    this.tasks = this.tasks.filter(t => t.repeat || (t.retries && t.processInNTick))
+    this.tasks = this.tasks.filter(t => t.repeat || (t.retries?.length && t.processInNTick > 0))
 
     return Promise.allSettled(tasks)
   }

@@ -5,6 +5,8 @@ import { Event, Notification, Place, Tag, User } from './db'
 import intersection from 'lodash.intersection'
 import { publicSettings } from './settings'
 import { enqueueMail } from './sendMail'
+import emitter from '../lib/emitter'
+import { mapEvent, mapEvents } from './events'
 
 const log = useLogger('notifier')
 
@@ -115,7 +117,7 @@ export async function notifyEvent(action: NotificationAction, eventId: number) {
   }
 
   // emit this notification to plugins
-  // notifier.emitter.emit(action, event.get({ plain: true, raw: true }))
+  emitter.emit(`event:${action}`, mapEvent(event))
   log.debug('[NOTIFY] %s, %s [%d]', action, event.title, event.id)
 
   // select valid notification for this event

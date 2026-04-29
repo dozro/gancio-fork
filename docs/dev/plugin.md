@@ -7,32 +7,39 @@ parent: Hacking
 ---
 
 ## Plugins
-Since **v.1.2.2** you can write your own plugin that react to event related action (create,update,delete).
+Plugins allow you to extend Gancio features and integrate it with other services.
+With plugins you can:
+- react to events related actions (create, update, delete) for example to send a notification to another service.
+- expose your own API endpoints to be used by other services or your own frontend.
+- create your own database tables and use them to store custom data.
+- add your own settings to the admin panel and use them in your plugin
+- expose a CLI command to be used in the terminal
 
-> info "What this is useful for?"
-> - Do you want to create a post in your wordpress website each time an event is published? [hint](http://wp-api.org/node-wpapi/using-the-client/#creating-posts)
-> - Do you want to send a summary notification of daily events via mail?
-> - Notify a telegram group or share via twitter?  
->  
-> [**<u>Please share your plugins or your needs</u>**](/contacts)
+> warning "Warning"
+> With v2 we are introducing a new plugin system that is not compatible with the old one, so if you have an old plugin you will need to rewrite it (the basic syntax is pretty the same).
 
 
-## Example
-Here is a complete example of plugins feature: [https://framagit.org/les/gancio/-/blob/master/plugins/gancioPluginExample.js](https://framagit.org/les/gancio/-/blob/master/plugins/gancioPluginExample.js) .
+## Basics
+To start developing a plugin you can copy the [example plugin](https://framagit.org/les/gancio/plugins/example) and modify it as you need.
 
-## Basic plugin syntax
+A plugin is essentially an `index.ts` file inside its own path in `./plugins`, e.g. `./plugins/my-example-plugin/index.ts`
 
-A plugin is essentially an `index.js` file inside its own path in `./plugins`, e.g. `./plugins/my-example-plugin/index.js`
-```javascript
-module.exports = {
-  
-}
+```typescript
+import type { GancioContext, GancioPlugin } from '../server/services/plugins'
+export default ({ log, db, publicSettings, services }: GancioContext): GancioPlugin => ({
+  manifest: {
+    name: 'An example plugin',
+    author: 'lesion',
+    url: 'https://framagit.org/les/gancio',
+    description: 'An example plugin to show how to create a plugin for Gancio',
+  }
+})
 ```
 
 Plugins should be inside `./plugins` directory but you can specify another location using [`plugins_path`](https://gancio.org/install/config#plugins-path) configuration.
 
 ## Plugin details
-A plugins **MUST** expose a `configuration` key where to specify its details:
+A plugins **MUST** expose a `manifest` key where to specify its details:
 
 ```js
 module.exports = {

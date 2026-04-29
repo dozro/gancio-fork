@@ -7,6 +7,10 @@ export enum Statuses {
   ERROR = 'error'
 }
 
+export type PluginSettings = {
+  enable?: boolean
+} & Record<string, unknown>
+
 export type Settings = {
   'title': string
   'description': string
@@ -57,7 +61,7 @@ export type Settings = {
   'about'?: string
   'trusted_sources_label'?: string
   'status': 'loading' | 'ready'
-}
+} & PluginSettings
 
 // { primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00' },
 export type ThemeColorPalette = { [key: string]: string }

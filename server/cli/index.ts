@@ -4,6 +4,7 @@ import { hideBin } from 'yargs/helpers'
 import { connect, runMigrations } from '../services/db'
 import usersCLI from './users'
 import settingsCLI from './settings'
+// import pluginsCLI from './plugins'
 import { fileURLToPath } from 'url'
 import { spawn } from 'child_process'
 import { isBuild } from '../services/config'
@@ -14,7 +15,7 @@ const require = createRequire(import.meta.url)
 const { version } = isBuild ? require('./package.json') : require('../../package.json')
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
-const serverEntry = path.resolve(__dirname, 'index.mjs')
+const serverEntry = path.resolve(__dirname, 'nuxt/server/index.mjs')
 const nodeArgs = [serverEntry]
 
 /**
@@ -47,6 +48,7 @@ yarg
   })
   .command(['users'], 'Manage users', usersCLI)
   .command(['settings'], 'Manage settings', settingsCLI)
+  // .command(['plugins'], 'Manage plugins', pluginsCLI)
   .help('h')
   .alias('h', 'help')
   .epilog('Made with ❤ by underscore hacklab - https://gancio.org')

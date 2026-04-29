@@ -1,5 +1,5 @@
 /**
-** This is the first and only server plugin and this is where everything start
+* This is the first and only server plugin and this is where everything start
 */
 import type { NitroApp } from 'nitropack'
 import { defineNitroPlugin, useStorage } from 'nitropack/runtime'
@@ -32,7 +32,7 @@ export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
       useTaskManager().start()
 
       log.info('Loading plugins')
-      pluginController._load()
+      pluginController.initialize()
     }
 
     const storage = useStorage()

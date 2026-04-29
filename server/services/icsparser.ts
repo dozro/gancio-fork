@@ -1,5 +1,13 @@
 import ical from 'ical.js'
 import { useLogger } from '../lib/logger'
+import { EventStatus } from './db'
+import type { EventStatus as IcsEventStatus } from 'ics'
+
+const statusMap: Record<IcsEventStatus, EventStatus> = {
+  'CANCELLED': "EventCancelled",
+  'TENTATIVE': "EventTentative",
+  'CONFIRMED': "EventScheduled"
+}
 
 export function parseIcsData(icsText: string, includePastEvents = true) {
   const log = useLogger('ICS Parser')
@@ -9,7 +17,7 @@ export function parseIcsData(icsText: string, includePastEvents = true) {
 
   // TODO: Handle received not ics Text
 
-  log.debug(`[ICS-PARSER] Found ${events.length} event(s)`)
+  log.debug(`Found ${events.length} event(s)`)
 
   const now = Math.floor(Date.now() / 1000)
 
@@ -42,7 +50,7 @@ export function parseIcsData(icsText: string, includePastEvents = true) {
         title: event.summary || '',
         description: event.description || '',
         organizer, // contains { name, email } or null
-        status: event?.status ?? 'CONFIRMED',
+        status: statusMap[event?.status ?? 'CONFIRMED'],
         uid: event.uid || '',
         location: event.location || '',
         start_datetime,

@@ -1,201 +1,250 @@
-/**
-* TODO:
-*/
-
-/* eslint-disable */
-
 import path from 'path'
 import fs from 'fs/promises'
 import { existsSync } from 'fs'
-import { fileURLToPath } from 'url'
 import { get as getConfig } from '../services/config'
-import { sequelize } from './db'
+import * as db from './db'
 import { useLogger } from '../lib/logger'
-
-import { createRequire } from 'module'
+import { type H3Event, createError, getRouterParam } from 'h3'
 import { publicSettings, setSetting } from './settings'
-const require = createRequire(import.meta.url)
-
-// import settingsController from './settingsController'
-// import notifier from '../notifier'
-// import { logger } from '../log'
-// import db from '../models'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+import { parseIcsData } from './icsparser'
+import { type TaskManager, useTaskManager } from './taskManager'
+import type { EventAPI } from '~~/shared/types/generic'
+import type { PluginSettings, Settings } from '~~/shared/types/settings'
+import { findOrCreateTags } from './tags'
+import emitter from '../lib/emitter'
 
 const log = useLogger('plugins')
 
-interface Plugin {
-  configuration: {
-    name: string
-    [key: string]: unknown
+export type GancioPluginManifest = {
+  /** name of plugin, this is a key and must be unique */
+  name: string
+  author?: string
+  version?: string
+  url?: string
+  /** a small plugin description, support html */
+  description?: string
+  settings?: {
+    [key: string]: {
+      type?: 'NUMBER' | 'TEXT' | 'CHECK' | 'LIST'
+      items?: string[] // for type LIST, the possible values
+      description?: string
+      required?: boolean
+      hint?: string
+      default?: string | number | boolean
+    }
   }
-  load?: (ctx: any, settings: any) => void
-  unload?: () => void
-  routeAPI?: (req: any, res: any, next?: any) => void
-  onTest?: () => Promise<void>
-  onEventCreate?: (...args: any[]) => void
-  onEventDelete?: (...args: any[]) => void
-  onEventUpdate?: (...args: any[]) => void
 }
 
-const pluginController = {
-  plugins: [] as Plugin[],
+type LogType = 'silent' | 'fatal' | 'error' | 'warn' | 'log' | 'info' | 'success' | 'fail' | 'ready' | 'start' | 'box' | 'debug' | 'trace' | 'verbose'
+interface LogFn {
+  (message: unknown, ...args: unknown[]): void
+}
 
-  getAll() {
-    return pluginController.plugins.map(({ configuration }) => {
-      const settingKey = `plugin_${configuration.name}`
-      const pluginSetting = publicSettings[settingKey]
-      if (pluginSetting) {
-        configuration.settingsValue = pluginSetting
-      }
-      return configuration
-    })
-  },
+export interface GancioContext {
+  log: Record<LogType, LogFn>
+  db: typeof db
+  publicSettings: Settings
+  services: {
+    parseIcsData: typeof parseIcsData
+    TaskManager: TaskManager
+    findOrCreateTags: typeof findOrCreateTags
+  }
+}
+
+export type GancioPlugin = {
+  settings?: PluginSettings
+  manifest: GancioPluginManifest
+  load: (settings?: unknown) => Promise<void> | void
+  unload?: () => Promise<void> | void
+  onTest?: (settings: PluginSettings) => Promise<void> | void
+  routeAPI?: (event: H3Event) => unknown
+
+  onCLI?: (args: string[]) => Promise<void> | void
+  onEventCreate?: (event: EventAPI) => Promise<void> | void
+  onEventDelete?: (event: EventAPI) => Promise<void> | void
+  onEventUpdate?: (event: EventAPI) => Promise<void> | void
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+} & Record<string, any> // allow plugins to have custom properties/methods
+
+const pluginController = {
+  plugins: [] as GancioPlugin[],
 
   async togglePlugin(name: string) {
-    const settingKey = `plugin_${name}`
-    const pluginSettings = publicSettings[settingKey]
-    if (!pluginSettings) throw createError({ statusCode: 404, message: 'Plugin not found' })
+    const plugin = pluginController.getPlugin(name)
+    if (!plugin) throw createError({ statusCode: 404, message: 'Plugin not found' })
 
-    if (!pluginSettings.enable) {
-      await pluginController.loadPlugin(name)
+    const settingKey = `plugin_${name}`
+    const pluginSettings = publicSettings[settingKey] as PluginSettings
+    log.info(`Settings for plugin ${plugin.manifest.name}:`, pluginSettings)
+
+    if (!pluginSettings?.enable) {
+      log.info(`Loading plugin ${plugin.manifest.name}`)
+      await plugin.load()
     } else {
-      await pluginController.unloadPlugin(name)
+      await plugin.unload?.()
     }
 
     await setSetting(settingKey, {
       ...pluginSettings,
-      enable: !pluginSettings.enable
+      enable: !pluginSettings?.enable
     })
   },
 
-  async routeAPI(req: any, res: any, next?: any) {
-    const pluginName = req.params.plugin
-    const plugin = pluginController.plugins.find(p => p.configuration.name === pluginName)
-
-    if (!plugin || typeof plugin.routeAPI !== 'function') {
-      log.warn(`Plugin ${pluginName} routeAPI not found`)
-      res.statusCode = 404
-      return res.end()
+  async runCLI(name: string, args: string[]) {
+    const plugin = pluginController.getPlugin(name)
+    if (!plugin || typeof plugin.onCLI !== 'function') {
+      log.warn(`Plugin ${name} not found or onCLI not found`)
+      return
     }
 
-    return plugin.routeAPI(req, res, next)
+    return plugin.onCLI(args)
   },
 
-  async testPlugin(name: string) {
-    const plugin = pluginController.plugins.find(p => p.configuration.name === name)
+  async routeAPI(evt: H3Event) {
+    const pluginName = getRouterParam(evt, 'name')
+
+    if (!pluginName) {
+      throw createError({ statusCode: 400, statusMessage: 'Plugin name is required' })
+    }
+
+    const plugin = pluginController.getPlugin(pluginName)
+    if (!plugin || typeof plugin.routeAPI !== 'function') {
+      log.warn(`Plugin ${pluginName} not found or routeAPI not found`)
+      throw createError({ statusCode: 404, message: 'Plugin or routeAPI method not found' })
+    }
+
+    // is plugin enabled?
+    if (!plugin.settings?.enable) {
+      log.warn(`Plugin ${pluginName} is not enabled`)
+      throw createError({ statusCode: 403, message: 'Plugin is not enabled' })
+    }
+
+    return plugin.routeAPI(evt)
+  },
+
+  async testPlugin(name: string, settings = publicSettings?.[`plugin_${name}`] as PluginSettings) {
+    const plugin = pluginController.getPlugin(name)
 
     if (!plugin || typeof plugin.onTest !== 'function') {
       throw createError({ statusCode: 404, message: 'Plugin or test method not found' })
     }
 
-    if (plugin.unload) {
-      plugin.unload()
-    }
-
-    if (plugin.load) {
-      const settings = publicSettings[`plugin_${name}`]
-      await plugin.load({
-        // helpers: await import('../helpers'),
-        log,
-        settings: publicSettings,
-        db: sequelize
-      }, settings)
-    }
-    await plugin.onTest()
-    if (plugin.unload) {
-      plugin.unload()
-    }
+    return plugin.onTest(settings)
   },
 
   async unloadPlugin(name: string) {
-    const plugin = pluginController.plugins.find(p => p.configuration.name === name)
+    const plugin = pluginController.getPlugin(name)
     if (!plugin) return
 
     log.info(`Unloading plugin ${name}`)
 
-    // notifier.emitter.off('Create', plugin.onEventCreate)
-    // notifier.emitter.off('Delete', plugin.onEventDelete)
-    // notifier.emitter.off('Update', plugin.onEventUpdate)
+    emitter.off('event:Create', plugin.onEventCreate)
+    emitter.off('event:Delete', plugin.onEventDelete)
+    emitter.off('event:Update', plugin.onEventUpdate)
 
     try {
-      plugin.unload?.()
+      plugin?.unload?.()
     } catch (err) {
       log.error(`Error during unload of ${name}:`, err)
     }
   },
 
-  async loadPlugin(name: string) {
-    const plugin = pluginController.plugins.find(p => p.configuration.name === name)
-    const settings = publicSettings[`plugin_${name}`]
-    if (!plugin || !plugin.load) return
-
-    log.info(`Loading plugin ${name}`)
-
-    // notifier.emitter.on('Create', plugin.onEventCreate)
-    // notifier.emitter.on('Delete', plugin.onEventDelete)
-    // notifier.emitter.on('Update', plugin.onEventUpdate)
-
-    plugin.load({
-      // helpers: await import('../helpers'),
-      log,
-      settings: publicSettings,
-      db: sequelize
-    }, settings)
-  },
-
-  async _loadPlugin(filePath: string) {
+  /**
+   * import specified plugin, get its manifest and load it if enabled
+   */
+  async initPlugin(pluginPath: string, loadIfEnabled = true) {
     try {
-      log.info(`Loading plugin ${filePath}`)
+      log.debug(`Initializing plugin in ${pluginPath}`)
 
-      // const plugin: Plugin = await import(filePath)
-      const plugin: Plugin = require(filePath)
-      const { name } = plugin.configuration
+      // import module
+      const rawPlugin = await import(pluginPath)
+      if (!rawPlugin?.default || typeof rawPlugin.default !== 'function') {
+        log.warn(`Plugin at ${pluginPath} does not export a default function`)
+        throw new Error(`Plugin at ${pluginPath} does not export a default function`)
+      }
+      const plugin: GancioPlugin = rawPlugin.default({
+        log,
+        publicSettings,
+        db,
+        services: {
+          parseIcsData,
+          TaskManager: useTaskManager(),
+          findOrCreateTags
+        }
+      })
+      log.debug(`Imported plugin ${pluginPath}`)
+      const pluginName = plugin?.manifest?.name
+      if (!pluginName) {
+        log.warn(`Plugin at ${pluginPath} has no name; skipping load`)
+        throw new Error(`Plugin at ${pluginPath} has no name`)
+      }
 
-      log.info(`Discovered plugin '${name}' at ${filePath}`)
+      // is this plugin already loaded?
+      if (pluginController.getPlugin(pluginName)) {
+        log.warn(`Plugin ${pluginName} already loaded`)
+        throw new Error(`Plugin ${pluginName} already loaded`)
+      }
 
-      if (pluginController.plugins.some(p => p.configuration.name === name)) {
-        log.warn(`Plugin ${name} already loaded`)
-        return
+      const pluginSettings = publicSettings?.[`plugin_${pluginName}`] as PluginSettings
+      if (loadIfEnabled && pluginSettings?.enable && typeof plugin.load === 'function') {
+        plugin.settings = pluginSettings // make settings available to plugin instance
+        if (plugin.onEventCreate) emitter.on('event:Create', plugin.onEventCreate)
+        if (plugin.onEventDelete) emitter.on('event:Delete', plugin.onEventDelete)
+        if (plugin.onEventUpdate) emitter.on('event:Update', plugin.onEventUpdate)
+
+        await plugin.load(pluginSettings)
+      } else {
+        setSetting(`plugin_${pluginName}`, {
+          ...pluginSettings,
+          enable: false
+        })
+        plugin.settings = { ...pluginSettings, enable: false }
       }
 
       pluginController.plugins.push(plugin)
 
-      const settingKey = `plugin_${name}`
-      const pluginSettings = publicSettings[settingKey]
-
-      if (pluginSettings?.enable) {
-        await pluginController.loadPlugin(name)
-      } else {
-        log.info(`Plugin ${name} not enabled; skipping load`)
-        await setSetting(settingKey, { enable: false })
-      }
+      return plugin
     } catch (err) {
-      log.warn(`Failed to load plugin at ${filePath}: ${String(err)}`)
+      log.warn(`Failed to load plugin at ${pluginPath}: ${String(err)}`)
+      throw err
     }
   },
 
-  async _load() {
+  getPlugin(name: string): GancioPlugin | undefined {
+    return pluginController.plugins.find(p => p.manifest.name === name)
+  },
+
+  /**
+  * search for all installed plugins, load enabled ones
+  */
+  async initialize(loadIfEnabled = true) {
     const config = getConfig()
-    const defaultPath = path.resolve(__dirname, '../../gancio_plugins')
-    const customPath = path.resolve(config.plugins_path) || path.resolve(process.cwd(), 'plugins')
-    const paths = customPath === defaultPath ? [customPath] : [customPath, defaultPath]
+    const pluginsPath = path.resolve(config.plugins_path) || path.resolve(process.cwd(), 'plugins')
 
-    log.info(`Loading plugins from: ${paths.join(', ')}`)
+    log.debug(`Initializing plugins from: ${pluginsPath}`)
 
-    for (const dir of paths) {
-      if (!existsSync(dir)) continue
-      const dirs = await fs.readdir(dir)
+    const dirs = await fs.readdir(pluginsPath).catch(() => {
+      log.warn(`Plugins path does not exist: ${pluginsPath}`)
+      return []
+    })
 
-      for (const d of dirs) {
-        const pluginEntry = path.join(dir, d, 'index.js')
-        if (existsSync(pluginEntry)) {
-          await pluginController._loadPlugin(pluginEntry)
-        }
+    return Promise.allSettled(dirs.map(async (d) => {
+      const pluginPath = path.join(pluginsPath, d)
+
+      // search for index.ts or index.js first to allow both file-based and folder-based plugins
+      const indexTsPath = path.join(pluginPath, 'index.ts')
+      const indexJsPath = path.join(pluginPath, 'index.js')
+      if (existsSync(indexTsPath)) {
+        return pluginController.initPlugin(indexTsPath, loadIfEnabled)
+      } else if (existsSync(indexJsPath)) {
+        return pluginController.initPlugin(indexJsPath, loadIfEnabled)
+      } else if (existsSync(pluginPath) && (pluginPath.endsWith('.js') || pluginPath.endsWith('.ts'))) {
+        return pluginController.initPlugin(pluginPath, loadIfEnabled)
+      } else {
+        log.warn(`No valid entry point found for plugin in ${pluginPath}, skipping`)
+        return Promise.reject(new Error(`No valid entry point found for plugin in ${pluginPath}`))
       }
-    }
+    }))
   }
 }
 
