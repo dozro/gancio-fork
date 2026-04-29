@@ -1,11 +1,12 @@
 import { DateTime } from 'luxon'
 import { _signAndSend, signAndSend } from './sign_and_send'
 import { useLogger } from '../lib/logger'
-import { publicSettings, secretSettings } from '~~/server/services/settings'
+import { publicSettings, publicSettingsLastModified, secretSettings } from '~~/server/services/settings'
 import { APUser } from '../services/db'
 import { APActivityTypeSchema } from './types'
 import { handleActivity } from './handlers'
 import emitter from '../lib/emitter'
+import type { Settings } from '~~/shared/types/settings'
 
 const log = useLogger('federation')
 
@@ -51,7 +52,7 @@ function _getUser() {
     'icon': {
       type: 'Image',
       mediaType: 'image/png',
-      url: baseurl + '/logo.png'
+      url: `${baseurl}/logo.png?last_update=${publicSettingsLastModified.logo?.getTime() ?? 0}`
     },
     'summary': publicSettings.description,
     'publicKey': {
@@ -65,7 +66,7 @@ function _getUser() {
 
 emitter.on('settings:updated', ({ key }: { key: keyof Settings }) => {
   // when changing this we have to update the actor
-  if (['description', 'logo'].includes(key)) {
+  if (['description', 'logo', 'title'].includes(key)) {
     updateActor()
   }
 })

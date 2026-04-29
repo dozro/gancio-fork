@@ -1,5 +1,6 @@
 import { defineEventHandler } from 'h3'
 import { Event, publicSettings, Resource, User } from '~~/server/services'
+import { useRuntimeConfig } from 'nitropack/runtime'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
