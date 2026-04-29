@@ -5,6 +5,12 @@ import { publicSettings } from './settings'
 import slugify from 'slugify'
 const log = useLogger('tags')
 
+/**
+ * Finds existing tags or creates new ones based on the provided list of tag strings.
+ * It normalizes the tags for consistent matching and ensures no duplicates are created. 
+ * @param tags {string[]} An array of tag strings to find or create.
+ * @returns Tag[] An array of Tag instances
+ */
 export async function findOrCreateTags(tags: string[]) {
   if (!Array.isArray(tags) || tags.length === 0) {
     return []

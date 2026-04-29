@@ -217,6 +217,13 @@ enqueueMail(
 This will add a mail-sending task to the [[Task Manager]] queue. The actual sending is handled asynchronously, and you can customize the template and variables as needed.
 Email templates are located in the `/server/emails/` directory. The content of these emails is localized, with translations and language-specific strings stored in `i18n/locales/email`.
 
+
+### Plugin controller
+
+The plugin controller is responsible for managing and loading plugins. It holds a list of loaded plugins and provides methods for interacting with them.
+Plugins are loaded from the `PLUGINS_PATH` directory and are automatically discovered and initialized by the controller.
+
+
 ---
 
 ## FrontEnd

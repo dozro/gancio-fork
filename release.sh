@@ -88,9 +88,9 @@ cp -ra .output/ "${PKG_MAIN}/nuxt/"
 cp -ra ./server/migrations "${PKG_MAIN}/nuxt/server/migrations/"
 
 # small cli utility
-# cp -ra cli "${PKG_MAIN}/.output/server/cli/"
-cp .cli/index.js "${PKG_MAIN}/nuxt/server/gancio"
-ln -s "${PKG_MAIN}/nuxt/server/gancio" "${PKG_MAIN}/gancio"
+cp .cli/index.js "${PKG_MAIN}/gancio"
+ln -s "nuxt/server/node_modules" "${PKG_MAIN}/node_modules"
+ln -s "nuxt/server/package.json" "${PKG_MAIN}/package.json"
 
 ## note that this is in an internal folder as users should not access it directly as it would be overwritten by the next build
 # all locales (UI and mails)
@@ -98,12 +98,8 @@ cp -ra i18n "${PKG_MAIN}/nuxt/server/i18n/"
 
 # pug rss template / mail template
 cp -ra ./server/emails "${PKG_MAIN}/nuxt/server/emails/"
-
 cp -ra ./server/services/rss.pug "${PKG_MAIN}/nuxt/server/rss.pug"
 cp -ra ./server/services/opensearch.pug "${PKG_MAIN}/nuxt/server/opensearch.pug"
-
-# default db
-# cp gancio.sqlite.rel "${PKG_MAIN}/gancio.sqlite"
 
 # example env
 cp .env.example "${PKG_MAIN}/.env"
@@ -114,7 +110,7 @@ cp ./uploads/fallbackimage.svg "${PKG_MAIN}/uploads/"
 cp ./uploads/headerimage.svg "${PKG_MAIN}/uploads/"
 
 # plugins
-cp -ra ./gancio_plugins "${PKG_MAIN}/plugins/"
+cp -ra ./plugins "${PKG_MAIN}/plugins/"
 
 # cp package.json bun.lock yarn.lock .env.example "${PKG_MAIN}/"
 # cp gancio.service "${PKG_MAIN}/"

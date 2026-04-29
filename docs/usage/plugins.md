@@ -9,7 +9,8 @@ has_toc: true
 
 # Plugins
 {: .no_toc }
-
+## Plugins
+Plugins allow you to extend Gancio features and integrate it with other services.
 This page is a guide to install plugins, if you want to develop one instead look [here](/dev/plugins).  
 __Please note that some plugins are officially supported and distributed along with the release__
 
@@ -50,11 +51,14 @@ docker-compose restart
 
 # List of embedded plugins
 
-## __Telegram__
+## Feed
+Import events from a specified ICS/iCal feed with a custom frequency.
+
+<!--## __Telegram__
 
 This plugin republishes events to Telegram channels or groups. 
 The goal is to spread the info of our networks to the capitalist cyberspace, and pull otherwise isolated people to our radical and free part of the internet.
 
 - **Website**: [https://framagit.org/bcn.convocala/gancio-plugin-telegram-bridge](https://framagit.org/bcn.convocala/gancio-plugin-telegram-bridge)
 - **Release**: https://framagit.org/bcn.convocala/gancio-plugin-telegram-bridge/-/commit/af0eed7b42242ba484d9828157f1be0355bba69b
-
+-->
