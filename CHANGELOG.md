@@ -1,6 +1,17 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+
+## [2.0.0-alpha.4](https://framagit.org/les/gancio/compare/v2.0.0-alpha.3...v2.0.0-alpha.4) (2026-04-29)
+
+
+### Bug Fixes
+
+* **AP:** improve update Actor with logo, title ([bb59d68](https://framagit.org/les/gancio/commit/bb59d68dcdf3e4583f31a353a1debe4fda8667e6))
+* current user could not self-disable or remove ([bf9c748](https://framagit.org/les/gancio/commit/bf9c748d18c832d24badff963e9d4bd3a1f6cd02))
+* hydration issue with datetime, fix [#687](https://framagit.org/les/gancio/issues/687) ([9c06f32](https://framagit.org/les/gancio/commit/9c06f3251b5227fb8fe006911e9588f57702c189))
+* media attachement attributes not stored correctly ([0510ed0](https://framagit.org/les/gancio/commit/0510ed0e9387a6429e45ee6ba530dc80436fd0ae))
+* time is not defined ([b6b24cd](https://framagit.org/les/gancio/commit/b6b24cda84d3873e9e01316f507e75aebb31bb77))
 
 ## [2.0.0-alpha.3](https://framagit.org/les/gancio/compare/v2.0.0-alpha.2...v2.0.0-alpha.3) (2026-04-21)
 okay it's another alpha, there are many changes that haven't been documented yet, so please be patient :D

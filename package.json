@@ -1,6 +1,6 @@
 {
   "name": "gancio",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0-alpha.4",
   "description": "A shared agenda for local communities",
   "author": "lesion",
   "bugs": {
@@ -137,6 +137,7 @@
     "@vue/devtools-kit": "^8.0.7",
     "@vue/test-utils": "^2.4.6",
     "bcryptjs": "^3.0.3",
+    "commit-and-tag-version": "^12.7.1",
     "consola": "^3.4.2",
     "email-templates": "^13.0.1",
     "eslint": "^10.2.1",
