@@ -70,6 +70,11 @@ export default defineEventHandler(async (event) => {
       mediaType: 'image/png',
       url: publicSettings.baseurl + '/logo.png'
     },
+    'image': {
+      type: 'Image',
+      mediaType: 'image/png',
+      url: publicSettings.baseurl + '/headerimage.png'
+    },
     'publicKey': {
       id: `${publicSettings.baseurl}/federation/u/${name}#main-key`,
       owner: `${publicSettings.baseurl}/federation/u/${name}`,

@@ -6,7 +6,7 @@ import { requireAdminSession } from '~~/server/lib/session'
 export default defineEventHandler(async (evt) => {
   await requireAdminSession(evt)
   const body = await parseMultipartFormData(evt)
-  console.error(body)
+
   if (!body || !body?.header_image) {
     setSetting('header_image', undefined)
     throw createError({ statusCode: 200 })
