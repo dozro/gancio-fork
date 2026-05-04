@@ -1,38 +1,39 @@
 <svelte:options customElement="gancio-events" />
 
-<script>
-  import { onMount } from 'svelte'
-  import { when } from './helpers'
+ <script>
+  import { onMount, tick } from 'svelte'
+  import { when, toBoolean } from './helpers.js'
   export let baseurl = ''
   export let title = ''
-  export let maxlength = false
+  export let maxlength
   export let collection = ''
   export let tags = ''
   export let places = ''
   export let theme = 'light'
-  export let show_recurrent = false
+  export let show_recurrent = 'false'
   export let sidebar = 'true'
-
+  export let show_more = 'false'
+  export let max_height = ''
   export let external_style = ''
 
   let mounted = false
   let loading = false
   let page = 0
-  let hasMore = true
+  let hasMore = toBoolean(show_more)
   let events = []
 
   async function loadEvents() {
-    if (!mounted || !hasMore) return
+    if (!mounted || loading) return
     loading = true
 
     const url = new URL('/api/events', baseurl)
 
     if (page > 0) {
-      url.searchParams.set('page', page)
+      url.searchParams.set('page', String(page))
     }
 
     if (maxlength) {
-      url.searchParams.set('max', maxlength)
+      url.searchParams.set('max', String(maxlength))
     }
 
     if (collection) {
@@ -47,27 +48,30 @@
       }
     }
 
-    url.searchParams.set(
-      'show_recurrent',
-      // If attribute is present but doesn't have a value
-      ((show_recurrent === '') ? true
-       // If attribute is not present
-       : !show_recurrent ? false
-       // Else parse given string
-       : show_recurrent))
+    url.searchParams.set('show_recurrent', String(toBoolean(show_recurrent)))
 
     try {
       const resp = await fetch(url)
       if (!resp.ok) {
-        throw Error(`Request failed with ${response.status}`)
+        throw Error(`Request failed with ${resp.status}`)
       }
       const json = await resp.json()
       const fetched = json.events || json
       if (!maxlength || fetched.length < Number(maxlength)) {
         hasMore = false
       }
+      if (page === 0) {
+        events = fetched
+      } else {
+        events = events.concat(fetched)
+      }
       page++
-      events = events.concat(fetched)
+      if (max_height && eventsEl) {
+        await tick()
+        if (eventsEl?.scrollHeight) {
+          eventsEl.scrollTop = eventsEl.scrollHeight
+        }
+      }
     } catch (e) {
       console.error('Error loading Gancio API -> ', e)
     }
@@ -94,9 +98,15 @@
     mounted = true
     update()
   })
-  $: update(
-    maxlength && title && places && tags && theme && show_recurrent && sidebar && baseurl && collection
-  )
+
+  $: if (baseurl || collection || tags || places || maxlength || show_recurrent) {
+    update()
+  }
+
+  $: if (show_more) {
+    hasMore = toBoolean(show_more)
+  }
+
 </script>
 
 {#if external_style}<link rel="stylesheet" href={external_style} />{/if}
@@ -116,7 +126,8 @@
         </div>
       </a>
     {/if}
-    {#each events as event}
+    <main id='events' bind:this={eventsEl} style={max_height ? `max-height: ${max_height};` : ''}>
+    {#each events as event (event.id)}
       <a
         href="{baseurl}/event/{event.slug || event.id}"
         class="event"
@@ -163,6 +174,7 @@
         </div>
       </a>
     {/each}
+    </main>
     {#if hasMore}
       <button title="More" id="footer" on:click={loadEvents} disabled={loading}>
         <div class="content">
@@ -198,6 +210,11 @@
     max-width: 1200px;
   }
 
+  #events { 
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+  
   #header {
     padding: 1.2rem 1rem;
     background-color: var(--bg-odd-color);
