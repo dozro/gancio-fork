@@ -23,3 +23,15 @@ export function when(event) {
     formatDatetime(event.start_datetime, 'long', addTimezone)
   )
 }
+
+/**
+ * Converts html attributes to boolean values.
+ */
+export function toBoolean(value) {
+  if (value === '' || value === true) return true
+  if (value === false || value == null) return false
+  if (typeof value === 'string') {
+    return value !== 'false'
+  }
+  return Boolean(value)
+}
