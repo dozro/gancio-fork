@@ -21,6 +21,7 @@
   let page = 0
   let hasMore = toBoolean(show_more)
   let events = []
+  let eventsEl
 
   async function loadEvents() {
     if (!mounted || loading) return
