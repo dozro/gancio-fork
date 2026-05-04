@@ -78,12 +78,9 @@
     }
     loading = false
   }
-
   function update(v) {
     if (!mounted) return
     page = 0
-    hasMore = true
-    events = []
     loadEvents()
   }
 
@@ -111,7 +108,6 @@
 </script>
 
 {#if external_style}<link rel="stylesheet" href={external_style} />{/if}
-{#if events.length}
   <div
     id="gancioEvents"
     class:dark={theme === 'dark'}
@@ -137,7 +133,7 @@
       >
         {#if sidebar !== 'true'}
           <div class="img">
-            {#if event.media.length}
+            {#if event.media?.length}
               <img
                 style="object-position: {position(event)}; aspect-ratio=1.7778;"
                 alt={event.media[0].name}
