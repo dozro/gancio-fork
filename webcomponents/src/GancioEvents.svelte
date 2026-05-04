@@ -178,7 +178,6 @@
           <svg class="icon"
                viewBox="0 0 32 32"
                xmlns="http://www.w3.org/2000/svg"
-               xmlns:svg="http://www.w3.org/2000/svg"
                style="fill-opacity:0;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;">
             <path d="M 2,16 16,28 30,16"/>
             <path d="M 2,4 16,16 30,4"/>
@@ -187,7 +186,6 @@
       </button>
     {/if}
   </div>
-{/if}
 
 <style>
   #gancioEvents {
