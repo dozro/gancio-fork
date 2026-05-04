@@ -6,7 +6,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: './src/main.js',
-      name: 'GancioEvents'
+      formats: ['es', 'umd'],
+      name: 'GancioEvents',
+      fileName: format => `gancio-events.${format}.js`
     }
   },
   plugins: [svelte({ compilerOptions: { customElement: true } })]

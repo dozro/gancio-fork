@@ -54,7 +54,7 @@
     "build": "nuxi build",
     "build:cli": "tsup",
     "build:doc": "cd docs && bundle exec jekyll b",
-    "build:wc": "cd webcomponents; pnpm run build:lib; cp dist/gancio-events.umd.cjs ../wp-plugin/js/gancio-events.es.js; cp dist/gancio-events.umd.cjs ../public/gancio-events.es.js; cp dist/gancio-events.umd.cjs ../docs/assets/js/gancio-events.es.js;",
+    "build:wc": "cd webcomponents; pnpm run build:lib; cp dist/* ../wp-plugin/js/; cp dist/* ../public/; cp dist/* ../docs/assets/js/;",
     "dev": "NODE_OPTIONS='--trace-warnings' nuxi dev",
     "postinstall": "nuxi prepare",
     "start": "NODE_ENV=production node .output/server/index.mjs",
