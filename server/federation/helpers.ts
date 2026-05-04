@@ -54,6 +54,11 @@ function _getUser() {
       mediaType: 'image/png',
       url: `${baseurl}/logo.png?last_update=${publicSettingsLastModified.logo?.getTime() ?? 0}`
     },
+    'image': {
+      type: 'Image',
+      mediaType: 'image/png',
+      url: `${baseurl}/headerimage.png?last_update=${publicSettingsLastModified.header_image?.getTime() ?? 0}`
+    },
     'summary': publicSettings.description,
     'publicKey': {
       id: `${baseurl}/federation/u/${name}#main-key`,
@@ -66,7 +71,7 @@ function _getUser() {
 
 emitter.on('settings:updated', ({ key }: { key: keyof Settings }) => {
   // when changing this we have to update the actor
-  if (['description', 'logo', 'title'].includes(key)) {
+  if (['description', 'logo', 'header_image', 'title'].includes(key)) {
     updateActor()
   }
 })
@@ -99,7 +104,6 @@ export async function updateActor() {
     }
 
     body['@context'] = body['object']['@context']
-
     signAndSend(body, sharedInbox)
   }
 }
