@@ -29,7 +29,7 @@ To embed an event in webpages you use `<gancio-event>` custom element, you can c
 <gancio-event id=17 baseurl='https://demo.gancio.org'></gancio-event>
 ```
 
-<script src='/assets/js/gancio-events.es.js'></script>
+<script src='/v2/assets/js/gancio-events.es.js'></script>
 <gancio-event id=17 baseurl='https://demo.gancio.org'></gancio-event>  
 
 
@@ -46,6 +46,8 @@ You can also embed a list of events using `<gancio-events>` custom element, you 
 <script>
   var theme = 'light';
   var sidebar = 'true';
+  var show_more = 'true';
+  
   function toggleDark() {
     var items = document.getElementsByTagName('gancio-events');
     theme = theme === 'dark' ? 'light' : 'dark';
@@ -64,10 +66,32 @@ You can also embed a list of events using `<gancio-events>` custom element, you 
     items[0].setAttribute('maxlength', value);
   }
 
+  function changeHeight(value) {
+    var items = document.getElementsByTagName('gancio-events');
+    items[0].setAttribute('max_height', value);
+  }
+
   function changeTitle (title) {
     var items = document.getElementsByTagName('gancio-events');
     items[0].setAttribute('title', title)
   }
+  function toggleShowMore() {
+    var items = document.getElementsByTagName('gancio-events');
+    show_more = show_more === 'true' ? 'false' : 'true';
+    items[0].setAttribute('show_more', show_more );
+  }
+
+  function changeDefaultURL(value) {
+    var baseurl = document.getElementById('baseurl');
+    changeBaseURL(value);
+    baseurl.value = value;
+  }
+  
+  function changeBaseURL(value) {
+    var items = document.getElementsByTagName('gancio-events');
+    items[0].setAttribute('baseurl', value);
+    console.error('Changing base URL to ' + value);
+  }  
 </script>
 
 <style>
@@ -77,11 +101,32 @@ You can also embed a list of events using `<gancio-events>` custom element, you 
     padding: 10px;
   }
 </style>
-<label><input type='checkbox' onchange="toggleDark()"/> Dark</label>
-<label><input type='checkbox' checked onchange="toggleSidebar()"/> Sidebar</label>
-<label>Max items <input value=4 type='number' label='Max items' onchange="changeMax(this.value)"/></label>
-<label>Title <input value='Gancio' type='text' onkeyup="changeTitle(this.value)"/></label>
-<gancio-events sidebar='true' title='Gancio' theme='light' maxlength=4 baseurl='https://gancio.cisti.org'><a href='https://gancio.cisti.org'>Gancio Events</a></gancio-events>  
+<div style='display: flex; gap: 20px;'>
+<aside>
+  <label>Title <input value='Gancio' type='text' onkeyup="changeTitle(this.value)"/></label>
+  <label><input type='checkbox' onchange="toggleDark()"/> Dark</label>
+  <label><input type='checkbox' checked onchange="toggleSidebar()"/> Sidebar</label>
+  <label><input type='checkbox' checked onchange="toggleShowMore()"/> Show More</label>
+  <label>Max items <input value=4 type='number' label='Max items' onchange="changeMax(this.value)"/></label>
+  <label>Max inner height <input value="50vh" label='Max inner height' onchange="changeHeight(this.value)"/></label>
+  <select onchange="changeDefaultURL(this.value)">
+    <option value="https://gancio.cisti.org">Gancio</option>
+    <option value="https://lapunta.org">LaPunta</option>
+    <option value="https://demo.gancio.org">Demo</option>
+  </select>
+  <label>Instance <input id='baseurl' value="https://gancio.cisti.org" label="Instance" oninput="changeBaseURL(value)"/></label>
+</aside>
+
+<gancio-events
+  title='Gancio'
+  sidebar='true'
+  theme='light'
+  show_more='true'
+  max_height='50vh'
+  maxlength=4
+  baseurl='https://gancio.cisti.org'
+/>
+</div>
 
 > info "Customize"
 > Note that you can modify the title (or completely remove it using an empty `title` param),
