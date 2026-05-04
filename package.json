@@ -71,7 +71,7 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "*.{js,ts,vue}": "eslint --max-warnings=0"
+    "*.{js,ts,vue}": "eslint --max-warnings=0 --no-warn-ignored"
   },
   "dependencies": {
     "@babel/preset-typescript": "^7.28.5",
