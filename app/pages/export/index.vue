@@ -8,9 +8,11 @@ useHead({
 const type = ref(route?.hash || 'feed')
 const list = reactive({
   title: settings.value.title,
-  maxEvents: null,
+  maxEvents: 3,
   theme: 'dark',
-  sidebar: 'true'
+  sidebar: 'true',
+  show_more: 'true',
+  max_height: '500px'
 })
 
 const filters = reactive({ tags: [], places: [], collection: undefined, show_recurrent: settings.value.recurrent_event_visible })
@@ -45,6 +47,7 @@ const code = computed(() => {
   params.push('sidebar="' + list.sidebar + '"')
   params.push(`theme="${list.theme}"`)
 
+  // eslint-disable-next-line no-useless-escape
   return `<script src="${settings.value.baseurl}/gancio-events.es.js"><\/script>\n<gancio-events ${params.join(' ')}></gancio-events>\n\n`
 })
 
@@ -120,6 +123,7 @@ const link = computed(() => {
 
         <v-tabs-window-item id='ical' value='ical'>
           <v-card-text>
+            <!-- eslint-disable-next-line vue/no-v-html -->
             <section v-html='$t(`export.ical_description`)' />
             <v-text-field v-model="link">
               <template #prepend>
@@ -134,6 +138,7 @@ const link = computed(() => {
         <!-- <v-tab> {{$t('export.list_title')}}</v-tab> -->
         <v-tabs-window-item id='list' value='list'>
           <v-card-text>
+            <!-- eslint-disable-next-line vue/no-v-html -->
             <p v-html='$t(`export.list_description`)' />
 
             <v-row>
@@ -141,7 +146,9 @@ const link = computed(() => {
                 <v-text-field v-model="list.title" :label="$t('common.title')"/>
                 <v-text-field v-model="list.maxEvents" type="number" min="1" :label="$t('common.max_events')"/>
                 <v-switch v-model="list.theme" hide-details :true-value="'dark'" :false-value="'light'" :label="$t('admin.is_dark')"/>
-                <v-switch v-model="list.sidebar" :true-value="'true'" :false-value="'false'" :label="$t('admin.widget')"/>
+                <v-switch v-model="list.sidebar" hide-details :true-value="'true'" :false-value="'false'" :label="$t('admin.widget')"/>
+                <v-switch v-model="list.show_more" hide-details :true-value="'true'" :false-value="'false'" :label="$t('export.show_more')"/>
+                <v-text-field v-model="list.max_height" :label="$t('export.max_height')"/>
               </v-col>
               <v-col class='col-12.col-lg-8'>
                 <gancio-events
@@ -153,6 +160,8 @@ const link = computed(() => {
                   :places='filters.places.join(",")'
                   :tags='filters.tags.join(",")'
                   :show_recurrent='filters.show_recurrent'
+                  :show_more="list.show_more"
+                  :max_height="list.max_height"
                   :sidebar="list.sidebar" />
               </v-col>
             </v-row>
