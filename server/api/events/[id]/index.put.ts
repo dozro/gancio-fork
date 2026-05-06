@@ -106,5 +106,5 @@ export default defineEventHandler(async (evt) => {
     notifyEvent('Update', event.id)
   }
 
-  return mapEvent(event, place, tags, user)
+  return mapEvent(event, { place, tags, user })
 })

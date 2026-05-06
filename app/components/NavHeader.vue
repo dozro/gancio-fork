@@ -42,9 +42,9 @@ const in_home = computed(() => route.name === 'index')
     />
 
     <!-- TODO <t-btn icon='mdi-magnify' to='/search' tooltip='common.search' /> -->
-    <LazyTBtn icon="mdi-information" to='/about' tooltip='common.about' :aria-label='t("common.about")' />
+    <t-btn icon="mdi-information" to='/about' tooltip='common.about' :aria-label='t("common.about")' />
 
-    <LazyTBtn :icon="theme?.theme.current?.value?.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'" tooltip='common.dark_mode' @click='theme.toggleTheme()' />
+    <t-btn :icon="theme?.theme.current?.value?.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'" tooltip='common.dark_mode' @click='theme.toggleTheme()' />
 
     <!-- language selection menu -->
     <v-menu transition="slide-y-transition">

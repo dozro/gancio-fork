@@ -60,7 +60,7 @@ export default defineEventHandler(async (evt) => {
   }
 
   if (format === 'json') {
-    return mapEvent(event, undefined, undefined, user)
+    return mapEvent(event, { user })
   } else if (format === 'json-ld') {
     setHeader(evt, 'Content-Type', 'application/activity+json')
     return eventToAP(event)

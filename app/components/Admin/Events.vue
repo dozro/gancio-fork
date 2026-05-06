@@ -98,7 +98,7 @@ async function remove (event) {
     width="400"
     temporary
   >
-    <EventModeration
+    <LazyEventModeration
       v-if="openModeration"
       :event="selectedEvent"
       @close="openModeration=false"

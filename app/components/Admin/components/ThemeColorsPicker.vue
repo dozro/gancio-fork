@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import debounce from 'lodash/debounce'
 import { useDisplay, useTheme } from 'vuetify'
+import { VDialog, VMenu } from 'vuetify/components'
 
 const vTheme = useTheme()
 const currentTheme = vTheme.name
@@ -38,7 +39,7 @@ const menusOpen = reactive<{ [key: string ]: boolean }>({})
     <v-card-text class="d-flex flex-wrap ga-2">
       <template v-for='colorValue, colorName in colors' :key='colorName'>
         <component
-          :is="isMobile ? 'v-dialog' : 'v-menu'"
+          :is="isMobile ? VDialog : VMenu"
           v-model='menusOpen[colorName]'
           :close-on-content-click="false"
           transition="slide-y-transition"

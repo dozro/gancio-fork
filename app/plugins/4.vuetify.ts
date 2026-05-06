@@ -1,6 +1,4 @@
 import { createVuetify, type LocaleMessages, type LocaleOptions } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 // import { ca, cs, de, en, es, fr, it, nl, pl, pt, tr, sk, sv, ro, ru, zhHans } from 'vuetify/lib/locale/index.mjs'
 
@@ -74,8 +72,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   const vuetify = createVuetify({
-    components,
-    directives,
     locale: {
       adapter: {
         name: 'nuxt-vue-i18n',

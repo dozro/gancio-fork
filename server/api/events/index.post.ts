@@ -99,5 +99,5 @@ export default defineEventHandler(async (evt) => {
     notifyEvent('Create', event.id)
   }
 
-  return mapEvent(event, place, tags, user)
+  return mapEvent(event, { place, tags, user })
 })

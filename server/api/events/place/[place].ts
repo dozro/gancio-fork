@@ -26,5 +26,9 @@ export default defineEventHandler(async (evt) => {
   const pastEvents = await getEvents({ places: [place.id], older: true, reverse: true, show_federated: true })
   const etag = calculateEtag([...events, ...pastEvents, place])
   if (await handleCache(evt, etag)) return
-  return { events: mapEvents(events), pastEvents: mapEvents(pastEvents), place }
+  return {
+    events: mapEvents(events),
+    pastEvents: mapEvents(pastEvents),
+    place
+  }
 })
