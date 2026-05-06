@@ -131,6 +131,6 @@ if [ "$releaseType" = stable ]; then
 		cp "${destArchive}" "${destDir}/gancio-latest.tgz"
 	fi
 
-	pnpm run docs:build
+	pnpm run build:doc
 	# rsync -vr docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2
 fi

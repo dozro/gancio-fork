@@ -19,7 +19,7 @@ A shared agenda for local communities.
 [Usage]({% link usage/usage.md %}){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
 [Demo](https://demo.gancio.org){: .btn .btn-green .fs-5 .mb-4 .mb-md-0 .mr-2 }
 
-Last release: **[2.0.0-alpha.2 - 20 Aug 2025]({% link changelog.md %})**
+Last release: **[2.0.0-alpha.5 - 6 May 2026]({% link changelog.md %})**
 
 {: .warning-title }
 > ALPHA RELEASE
