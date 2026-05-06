@@ -7,6 +7,20 @@ nav_order: 10
 
 All notable changes to this project will be documented in this file.
 
+
+## [2.0.0-alpha.5](https://framagit.org/les/gancio/compare/v2.0.0-alpha.4...v2.0.0-alpha.5) (2026-05-06)
+
+
+### Features
+
+* send the header image in the ActivityPub user ([6d8e8b6](https://framagit.org/les/gancio/commit/6d8e8b64622becd07d96c1a978f733d8e26fc741))
+* various performance improvements ([d237e7e](https://framagit.org/les/gancio/commit/d237e7ea869cd180be86c7b5c2304b27925a183c))
+
+
+### Bug Fixes
+
+* remove user theme detection ([4e938cb](https://framagit.org/les/gancio/commit/4e938cbbe56f4289b995d4ad89d30071b2c8c5b7))
+
 ## [2.0.0-alpha.4](https://framagit.org/les/gancio/compare/v2.0.0-alpha.3...v2.0.0-alpha.4) (2026-04-29)
 
 
