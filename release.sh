@@ -52,7 +52,7 @@ if [ "$releaseType" = dev ]; then
 	destDir="$gitRepo"
 else
 	version=$(npm pkg get version | xargs echo)
-	destDir=$(realpath ./docs/public/releases)
+	destDir=$(realpath ./docs/releases)
 fi
 destArchive="${destDir}/gancio-${version}.${output}"
 echo $destArchive
