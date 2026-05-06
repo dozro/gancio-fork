@@ -19,6 +19,9 @@ const canonicalUrl = computed(() => `${settings.value.baseurl}/event/${event.val
 
 useHead({
   title: `${settings.value.title} - ${event.value.title}`,
+  script: [
+    { src: '/gancio-events.es.js', type: 'application/javascript', defer: true }
+  ],
   meta: [
     { property: 'og:title', content: event.value.title },
     { property: 'og:description', content: event.value?.plain_description ?? '' },
@@ -238,28 +241,30 @@ async function report() {
     hydrate-on-visible
   />
 
-  <v-dialog v-model="showEmbed" class='event-embed-dialog' width="700px" :fullscreen="$vuetify.display?.mobile">
-    <EventEmbed :event="event" @close="showEmbed = false" />
-  </v-dialog>
+  <client-only>
+    <v-dialog v-model="showEmbed" class='event-embed-dialog' width="700px" :fullscreen="$vuetify.display?.mobile">
+      <LazyEventEmbed :event="event" @close="showEmbed = false" />
+    </v-dialog>
 
-  <v-dialog
-    v-if="settings.allow_geolocation && event?.place?.latitude && event.place?.longitude"
-    v-model="mapModal" class='event-map-dialog'
-    :fullscreen="$vuetify.display?.mobile" destroy-on-close>
-    <EventMapDialog :place="event?.place" @close="mapModal = false" />
-  </v-dialog>
+    <v-dialog
+      v-if="settings.allow_geolocation && event?.place?.latitude && event.place?.longitude"
+      v-model="mapModal" class='event-map-dialog'
+      :fullscreen="$vuetify.display?.mobile" destroy-on-close>
+      <LazyEventMapDialog :place="event?.place" @close="mapModal = false" />
+    </v-dialog>
 
-  <v-dialog
-    v-if="isAdmin" v-model="openAssignAuthor" class='event-assign-author-dialog'
-    :fullscreen="$vuetify.display?.mobile" destroy-on-close width="400">
-    <EventAssignAuthor :event="event" @close="openAssignAuthor = false" @update='refresh' />
-  </v-dialog>
+    <v-dialog
+      v-if="isAdmin" v-model="openAssignAuthor" class='event-assign-author-dialog'
+      :fullscreen="$vuetify.display?.mobile" destroy-on-close width="400">
+      <LazyEventAssignAuthor :event="event" @close="openAssignAuthor = false" @update='refresh' />
+    </v-dialog>
 
-  <v-navigation-drawer
-    v-model="openModeration" :fullscreen="$vuetify.display?.mobile" location='right' width="400"
-    temporary>
-    <EventModeration v-if="openModeration" :event="event" @close="openModeration = false" />
-  </v-navigation-drawer>
+    <v-navigation-drawer
+      v-model="openModeration" :fullscreen="$vuetify.display?.mobile" location='right' width="400"
+      temporary>
+      <LazyEventModeration v-if="openModeration" :event="event" @close="openModeration = false" />
+    </v-navigation-drawer>
+  </client-only>
 </v-container>
 </template>
 

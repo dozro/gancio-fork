@@ -8,7 +8,7 @@ export const useEvents = () => {
     query: route.query?.query
   }))
 
-  const { data: events, pending, refresh } = useFetch('/api/events', { query: params.value })
+  const { data: events, pending, refresh } = useFetch('/api/events', { query: params, dedupe: 'defer' })
 
   const attributes = computed(() => useAttributesFromEvents(events?.value ?? []))
 

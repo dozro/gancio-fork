@@ -25,5 +25,8 @@ export default defineEventHandler(async (evt) => {
 
   const etag = calculateEtag([...events, ...pastEvents])
   if (await handleCache(evt, etag)) return
-  return { events: mapEvents(events), pastEvents: mapEvents(pastEvents) }
+  return {
+    events: mapEvents(events),
+    pastEvents: mapEvents(pastEvents)
+  }
 })

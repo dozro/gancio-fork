@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import type { WhereOptions } from '@sequelize/core'
+import type { InferAttributes, WhereOptions } from '@sequelize/core'
 import { Op, literal, col, where, fn, sql } from '@sequelize/core'
 
 import { htmlToText } from 'html-to-text'
@@ -122,7 +122,9 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
     where: andConditions,
     attributes: {
       exclude: [
-        'likes', 'boost', 'userId', 'createdAt', 'placeId', 'ap_object', 'ap_id'
+        'likes', 'boost', 'userId', 'createdAt',
+        'placeId', 'ap_object', 'ap_id',
+        ...(!opts?.include_description ? ['description'] : [])
       ]
     },
     order: [['start_datetime', args.reverse ? 'DESC' : 'ASC']],
@@ -250,32 +252,48 @@ export function getMaxLastModifieds(lastModifieds: Array<Date | undefined>) {
   }, undefined)
 }
 
-export function mapEvent(event: Event, place?: Place | null, tags?: Tag[], user?: User): EventAPI {
+/**
+ * Map an Event model instance to the EventAPI type
+ * @param event the Event model instance to map
+ * @param options.place the Place associated with the event, if not already included in the event (optional)
+ * @param options.tags the Tags associated with the event, if not already included in the event (optional)
+ * @param options.user the User for which we want to know if the event is_mine or not (optional)
+ */
+export function mapEvent(event: Event,
+  options?: {
+    place?: Place
+    tags?: Tag[]
+    user?: InferAttributes<User>
+  }): EventAPI {
   const response: EventAPI = {
     id: event.id,
     slug: event.slug,
     status: event.status,
 
     title: event.title,
-    description: event.description,
+
     media: event.media,
 
     start_datetime: event.start_datetime,
     end_datetime: event.end_datetime,
-    plain_description: htmlToText(event.description),
+    place: placeToJSON(event?.place ?? options?.place),
 
-    place: placeToJSON(event?.place ?? place),
-    online_locations: event.online_locations,
-    tags: (event.tags ?? tags)?.map(t => t.tag),
-    is_mine: event.userId ? event.userId === user?.id : false,
+    is_mine: event.userId ? event.userId === options?.user?.id : false,
     is_anon: typeof event.userId === 'undefined' || event.userId === null,
     is_visible: event.is_visible,
     original_url: event?.ap_object?.url ?? event?.ap_id ?? undefined,
 
+    online_locations: event.online_locations,
+    tags: (event.tags ?? options?.tags)?.map(t => t.tag),
     boost: event.boost,
     likes: event.likes
     // TODO
     // n_msgs: event?.,
+  }
+
+  if (event.description) {
+    response.description = event.description
+    response.plain_description = htmlToText(event.description)
   }
 
   // remove undefined or empty fields from response
@@ -287,6 +305,7 @@ export function mapEvent(event: Event, place?: Place | null, tags?: Tag[], user?
     }
   }
 
+  // add the original AP user if present and not excluded
   if (event?.APUser?.object) {
     response.ap_user = {
       image: event.APUser.object.icon?.url ?? `${event.APUser.object.url}/favicon.ico`,

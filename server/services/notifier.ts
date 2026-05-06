@@ -6,7 +6,7 @@ import intersection from 'lodash.intersection'
 import { publicSettings } from './settings'
 import { enqueueMail } from './sendMail'
 import emitter from '../lib/emitter'
-import { mapEvent, mapEvents } from './events'
+import { mapEvent } from './events'
 
 const log = useLogger('notifier')
 

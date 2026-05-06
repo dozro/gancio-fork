@@ -1,6 +1,7 @@
 import { defineNuxtConfig } from 'nuxt/config'
 import { version } from './package.json'
 import locales from './server/i18n/locales'
+import vitePluginVuetify from 'vite-plugin-vuetify'
 
 const isBuild = process.env.NODE_ENV === 'production'
 const isTest = process.env.VITEST == 'true'
@@ -113,9 +114,13 @@ export default defineNuxtConfig({
     build: {
       sourcemap: !isBuild,
       target: 'esnext'
-    }
+    },
+    plugins: [
+      vitePluginVuetify()
+    ]
   },
   nitro: {
+    compressPublicAssets: true,
     imports: {
       autoImport: false
     },
