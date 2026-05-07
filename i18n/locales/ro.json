@@ -163,7 +163,8 @@
         "add_trusted_source_help": "",
         "enable_report": "",
         "default_fedi_hashtags": "",
-        "custom_css_help": ""
+        "custom_css_help": "",
+        "plugins_description": ""
     },
     "common": {
         "related": "Asocierea",
