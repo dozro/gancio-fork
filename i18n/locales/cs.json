@@ -162,7 +162,10 @@
         "page_is_disabled": "Tato stránka není viditelná veřejnosti",
         "receive_confirm_notification_hint": "Odeslat oznámení tomuto účtu vždy, když registrovaný uživatel nebo anonymní události vyžadují potvrzení",
         "notify": "Oznámení",
-        "merge_place_help": "Slučujete místo <strong>{place}</strong> se zvoleným místem. Bude také změněno {n} souvisejících událostí."
+        "merge_place_help": "Slučujete místo <strong>{place}</strong> se zvoleným místem. Bude také změněno {n} souvisejících událostí.",
+        "page_remove_ok": "",
+        "unblock_user": "",
+        "hidden": ""
     },
     "common": {
         "related": "Příbuzné",
@@ -286,7 +289,13 @@
         "sent": "Odesláno",
         "go_back": "Přejít zpět",
         "no_events_found": "Nenalezeny žádné události",
-        "no_events_found_hint": "Vyberte jiná data nebo podmínky"
+        "no_events_found_hint": "Vyberte jiná data nebo podmínky",
+        "save_draft": "",
+        "create_draft": "",
+        "convert_draft": "",
+        "publish": "",
+        "draft": "",
+        "dark_mode": ""
     },
     "export": {
         "email_description": "Můžeš dostávat události které tě zajímají na e-mail.",
@@ -298,7 +307,9 @@
         "list_title": "Seznam",
         "filter_title": "Filtr",
         "ical_title": "ics/ical",
-        "filter_description": "Zde můžete filtrovat svůj export pomocí štítků a místa nebo podle předvolené sbírky"
+        "filter_description": "Zde můžete filtrovat svůj export pomocí štítků a místa nebo podle předvolené sbírky",
+        "show_more": "",
+        "max_height": ""
     },
     "event": {
         "added_anon": "Událost přidána, ještě ale musí být schválena.",
@@ -377,7 +388,10 @@
         "postponed": "Odloženo",
         "moved_onlined": "Přesunuto online",
         "rescheduled": "Přesunuto",
-        "tentative": "Předběžné"
+        "tentative": "Předběžné",
+        "reannounce": "",
+        "reannounce_description": "",
+        "cancel_description": ""
     },
     "validators": {
         "latitude": "Zadejte platnou zeměpisnou šířku (-90 < šířka < 90)",
