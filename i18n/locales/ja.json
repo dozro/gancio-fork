@@ -208,7 +208,8 @@
         "each_month": "",
         "remove_confirmation": "",
         "saved": "",
-        "multidate": ""
+        "multidate": "",
+        "assign_to_user_description": ""
     },
     "admin": {
         "is_dark": "ダークテーマ",
