@@ -124,7 +124,13 @@
         "pages": "Páxinas",
         "go_back": "Volver",
         "no_events_found": "Non hai eventos",
-        "no_events_found_hint": "Elixe outras datas ou criterio"
+        "no_events_found_hint": "Elixe outras datas ou criterio",
+        "save_draft": "",
+        "create_draft": "",
+        "convert_draft": "",
+        "publish": "",
+        "draft": "",
+        "dark_mode": ""
     },
     "recover": {
         "not_valid_code": "Algo fallou."
@@ -139,7 +145,9 @@
         "filter_description": "Podes filtrar a exportación usando etiquetas e lugares ou por unha colección prestablecida",
         "ical_title": "ics/ical",
         "list_title": "Lista",
-        "filter_title": "Filtro"
+        "filter_title": "Filtro",
+        "show_more": "",
+        "max_height": ""
     },
     "register": {
         "complete": "É preciso confirmar o rexistro.",
@@ -226,7 +234,10 @@
         "postponed": "Adiado",
         "moved_onlined": "Pasou a en liña",
         "rescheduled": "Reprogramado",
-        "tentative": "Proposta"
+        "tentative": "Proposta",
+        "reannounce": "",
+        "reannounce_description": "",
+        "cancel_description": ""
     },
     "admin": {
         "place_description": "Se escribiches mal o lugar ou enderezo, podes cambialo.<br/>Cambiará o enderezo de tódolos eventos actuais e pasados asociados a este lugar.",
@@ -396,7 +407,10 @@
         "page_is_disabled": "Es páxina no é visible de xeito público",
         "receive_confirm_notification_hint": "Enviar unha notificación a esta conta se algunha conta creada ou evento anónimo require confirmación",
         "notify": "Notificar",
-        "merge_place_help": "Estás fusionando <strong>{place}</strong> co lugar seleccionado. Os {n} eventos asociados tamén se van cambiar."
+        "merge_place_help": "Estás fusionando <strong>{place}</strong> co lugar seleccionado. Os {n} eventos asociados tamén se van cambiar.",
+        "page_remove_ok": "",
+        "unblock_user": "",
+        "hidden": ""
     },
     "auth": {
         "not_confirmed": "Aínda non foi confirmado…",
