@@ -217,7 +217,8 @@
         "moved_onlined": "",
         "message_author_hint": "",
         "rescheduled": "",
-        "anon_description_without_registration": ""
+        "anon_description_without_registration": "",
+        "assign_to_user_description": ""
     },
     "admin": {
         "delete_resource_confirm": "Вы уверены, что хотите удалить этот ресурс?",
