@@ -152,7 +152,8 @@
         "enable_federation": "",
         "wrong_domain_warning": "",
         "description_description": "",
-        "user_block_confirm": ""
+        "user_block_confirm": "",
+        "plugins_description": ""
     },
     "common": {
         "related": "",
