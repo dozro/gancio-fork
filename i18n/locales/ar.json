@@ -153,7 +153,8 @@
         "wrong_domain_warning": "",
         "description_description": "",
         "user_block_confirm": "",
-        "plugins_description": ""
+        "plugins_description": "",
+        "enable_admin_user_confirm": ""
     },
     "common": {
         "related": "",
