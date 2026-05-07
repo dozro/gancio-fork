@@ -52,7 +52,7 @@ async function forgot () {
 <v-container class='pa-0 pa-md-3'>
   <v-row class="mt-md-5 ma-0" justify='center'>
     <v-col class='pa-0 pa-md-3' cols='12' md="6" lg="5" xl="4">
-      <v-form ref='form' v-model='valid' validate-on='lazy' @submit.prevent='login'>
+      <v-form ref='form' v-model='valid' @submit.prevent='login'>
         <v-card>
           <v-card-title>{{$t('common.login')}}</v-card-title>
           <v-card-subtitle>

@@ -24,9 +24,10 @@ export default defineEventHandler(async (event) => {
   try {
     newUser.recover_code = crypto.randomUUID()
     newUser.is_active = true
-    const user = await User.withScope('withRecoverCode').create(newUser)
+    const user = await User.create(newUser)
     enqueueMail(user.email, 'user_confirm', { user, config: publicSettings })
-    return user
+    // refetch user with the default scope (without password or recover code)
+    return User.findByPk(user.id)
   } catch (e) {
     log.error('User creation error:', e)
     throw createError({ status: 400, message: String(e) })

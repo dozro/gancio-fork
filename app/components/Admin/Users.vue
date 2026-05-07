@@ -38,7 +38,7 @@ async function editUser (user) {
 }
 
 async function createUser () {
-  selectedUser.value = {}
+  selectedUser.value = undefined
   editUserDialog.value = true
 }
 </script>

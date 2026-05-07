@@ -459,7 +459,7 @@ export class User extends Model<
   declare email: string
 
   @Attribute(DataTypes.STRING)
-  declare password: string
+  declare password: CreationOptional<string>
 
   @Attribute(DataTypes.STRING)
   declare recover_code: CreationOptional<string>

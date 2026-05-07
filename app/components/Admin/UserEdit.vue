@@ -12,7 +12,6 @@ const { user: loggedUser } = useUserSession()
 
 const emptyUser: CreationAttributes<User> = {
   email: '',
-  password: '',
   role: 'user',
   is_active: true,
   to_notify: false,
@@ -25,8 +24,8 @@ const emit = defineEmits<{
   'update:modelValue': [boolean]
 }>()
 
-const isNew = computed(() => typeof user.id !== 'number')
-const isCurrentUser = computed(() => user.id === loggedUser.value?.id)
+const isNew = computed(() => typeof user?.id !== 'number')
+const isCurrentUser = computed(() => user?.id === loggedUser.value?.id)
 
 async function save () {
   const { valid } = await userForm.value.validate()
@@ -43,6 +42,7 @@ async function save () {
     $notify('admin.user_update_ok', Statuses.SUCCESS)
     emit('refresh')
     loading.value = false
+    userForm.value.reset()
     emit('update:modelValue', false)
   } catch (e) {
     $notify(e, Statuses.ERROR)
