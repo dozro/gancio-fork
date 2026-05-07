@@ -228,7 +228,8 @@
         "message_author_hint": "",
         "rescheduled": "",
         "address_description_osm": "",
-        "anon_description_without_registration": ""
+        "anon_description_without_registration": "",
+        "assign_to_user_description": ""
     },
     "login": {
         "check_email": "检查你的电子邮箱收件箱和垃圾邮件箱。",
