@@ -284,7 +284,8 @@
         "instance_place": "",
         "geocoding_countrycodes": "",
         "delete_resource": "",
-        "wrong_domain_warning": ""
+        "wrong_domain_warning": "",
+        "description_description": ""
     },
     "auth": {
         "not_confirmed": "Vēl nav apstiprināts…",
