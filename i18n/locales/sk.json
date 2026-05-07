@@ -394,7 +394,8 @@
         "delete_resource": "",
         "enable_federation": "",
         "wrong_domain_warning": "",
-        "description_description": ""
+        "description_description": "",
+        "plugins_description": ""
     },
     "validators": {
         "latitude": "",
