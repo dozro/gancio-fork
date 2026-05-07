@@ -126,7 +126,8 @@
         "draft": "",
         "dark_mode": "",
         "test": "",
-        "enabled": ""
+        "enabled": "",
+        "online": ""
     },
     "export": {
         "list_description": "如果你有一个网站并希望展示一个事件列表，使用以下代码",
