@@ -9,7 +9,7 @@
   },
   "user_confirm":{
     "subject":"Ja pots publicar activitats",
-    "content":"Hola, que has creat un compte a <a href='{{{config.baseurl}}}'>{{config.title}}</a>? Si és així, <a href='{{{config.baseurl}}}/user_confirm/{{user.recover_code}}'>confirma-ho i tria una contrasenya</a>, si us plau."
+    "content":"Hola, s'ha creat el teu compte a <a href='{{{config.baseurl}}}'>{{config.title}}</a>. <a href='{{{config.baseurl}}}/user_confirm/{{user.recover_code}}'>Confirma-ho i tria una contrasenya</a>."
   },
   "recover":{
     "subject":"Recupera la contrasenya",
