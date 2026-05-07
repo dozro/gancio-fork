@@ -116,14 +116,15 @@ async function report() {
 
   <v-row>
     <v-col cols='12' md='8'>
-      <!-- <MyPicture v-if="hasMedia" :event="event" /> -->
       <CoreImg v-if="hasMedia" :event="event" />
+      <!-- eslint-disable vue/no-v-html -->
       <div
         v-if="event?.description"
         class="p-description text-body-1 my-4"
         itemprop="description"
         v-html="event?.description"
       />
+      <!-- eslint-enable vue/no-v-html -->
 
     </v-col>
 
@@ -132,15 +133,18 @@ async function report() {
         <EventStatus :event="event" />
         <v-container class="eventDetails">
           <v-icon v-if="event?.parentId" class="float-right" color="success" icon="mdi-repeat" />
-          <!-- :datetime="$time.unixFormat(event.start_datetime, 'yyyy-MM-dd HH:mm')" -->
-          <!-- :content="$time.unixFormat(event.start_datetime, 'yyyy-MM-dd\'T\'HH:mm')" -->
-          <time class="dt-start" itemprop="startDate">
+          <time
+            class="dt-start" itemprop="startDate"
+            :datetime="time.unixFormat(event.start_datetime, 'yyyy-MM-dd HH:mm')"
+            :content="time.unixFormat(event.start_datetime, 'yyyy-MM-dd\'T\'HH:mm')"
+          >
             <v-icon icon="mdi-calendar" />
             <span class="ml-2 text-uppercase">{{ time.when(event) }}</span>
-            <div v-if="event?.end_datetime" class="d-none dt-end" itemprop="endDate">
-              <!-- :content="$time.unixFormat(event.end_datetime,'yyyy-MM-dd\'T\'HH:mm')" -->
-              <!-- {{$time.unixFormat(event.end_datetime,"yyyy-MM-dd'T'HH:mm")}} -->
-            </div>
+            <div
+              v-if="event?.end_datetime" class="d-none dt-end" itemprop="endDate"
+              :content="time.unixFormat(event.end_datetime,'yyyy-MM-dd\'T\'HH:mm')"
+              :datetime="time.unixFormat(event.end_datetime, 'yyyy-MM-dd HH:mm')"
+            />
           </time>
           <div class="font-weight-light mb-3">
             {{ time.from(event.start_datetime) }}
