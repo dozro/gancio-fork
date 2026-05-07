@@ -390,7 +390,8 @@
         "moved_onlined": "",
         "message_author_hint": "",
         "rescheduled": "",
-        "anon_description_without_registration": ""
+        "anon_description_without_registration": "",
+        "assign_to_user_description": ""
     },
     "validators": {
         "latitude": "Introduceți o latitudine validă (-90 < latitudine < 90)",
