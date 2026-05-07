@@ -428,7 +428,8 @@
         "email": "Skriv inn en gyldig e-postadresse",
         "required": "{fieldName} kreves",
         "latitude": "",
-        "url": ""
+        "url": "",
+        "longitude": ""
     },
     "ordinal": {
         "1": "første",
