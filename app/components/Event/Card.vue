@@ -33,7 +33,6 @@ const isCancelled = computed(() => event.status === 'EventCancelled')
   </v-avatar>
 
   <v-card-text class='pt-0 pb-3'>
-    <!-- <span>{{event.start_datetime}} - {{time.when(event)}}</span> -->
 
     <div class="d-flex ga-2 align-center mb-1">
       <v-icon icon='mdi-calendar' />
