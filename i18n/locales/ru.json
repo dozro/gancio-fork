@@ -382,7 +382,8 @@
         "tilelayer_provider_help": "",
         "enable_report": "",
         "default_fedi_hashtags": "",
-        "custom_css_help": ""
+        "custom_css_help": "",
+        "plugins_description": ""
     },
     "recover": {
         "not_valid_code": "Что-то пошло не так."
