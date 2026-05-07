@@ -127,7 +127,10 @@
         "convert_draft": "",
         "publish": "",
         "draft": "",
-        "dark_mode": ""
+        "dark_mode": "",
+        "go_back": "Torna enrere",
+        "no_events_found_hint": "Tria dates o filtres diferents",
+        "no_events_found": "No hi ha activitats"
     },
     "login": {
         "description": "Amb la sessió iniciada pots afegir activitats noves.",
@@ -156,7 +159,7 @@
         "max_height": ""
     },
     "register": {
-        "description": "Els moviments socials necessitem organitzar-nos i auto-finançar-nos.<br/>\n<br/>Abans que puguis publicar, <strong> hem d'aprovar el teu compte </strong>, tingues en compte que <strong> darrere d'aquesta web hi ha persones </strong> de carn i ossos, així que escriviu dues línies per fer-nos saber quins esdeveniments voleu publicar.",
+        "description": "Els moviments socials necessitem organitzar-nos i auto-finançar-nos.<br/>\n<br/>Abans que puguis publicar, <strong> hem d'aprovar el teu compte </strong>, tingues en compte que <strong> darrere d'aquesta web hi ha persones</strong> de carn i ossos, així que escriviu dues línies per fer-nos saber quins esdeveniments voleu publicar.",
         "error": "Error: ",
         "complete": "El registre ha de ser confirmat.",
         "first_user": "S'ha creat i activat un compte administrador"
@@ -176,7 +179,7 @@
         "coordinates_search_description": "Podeu cercar el lloc pel nom o enganxar el parell de coordenades",
         "confirmed": "S'ha confirmat l'activitat",
         "not_found": "No s'ha trobat l'activitat",
-        "remove_confirmation": "Segur que vols esborrar l'activitat  \"<strong>{event}</strong>\"?",
+        "remove_confirmation": "Segur que vols esborrar l'activitat \"<strong>{event}</strong>\"?",
         "recurrent": "Periòdica",
         "show_recurrent": "també les periòdiques",
         "show_past": "també les passades",
@@ -238,7 +241,12 @@
         "recurrent_1y_ordinal": "El {n} {days} de {months} de cada any",
         "reannounce": "",
         "reannounce_description": "",
-        "cancel_description": ""
+        "cancel_description": "",
+        "tentative": "Provisional",
+        "postponed": "Postposada",
+        "cancelled": "Aquesta activitat s'ha canceŀlat",
+        "moved_onlined": "Moguda a online",
+        "rescheduled": "Replanificada"
     },
     "admin": {
         "place_description": "En el cas que un lloc és incorrecte o l'adreça ha de canviar, pots arreglar-ho.<br/>Tingues en compte que totes les activitats passades i futures associades amb aquest lloc també canviaran d'adreça.",
@@ -403,7 +411,15 @@
         "calendar_first_day_of_week_default": "Per defecte (configuració regional de cada navegador)",
         "page_remove_ok": "",
         "unblock_user": "",
-        "hidden": ""
+        "hidden": "",
+        "page_is_disabled": "Aquesta pàgina està oculta al públic",
+        "smtp_from_address_help": "El nom que apareixerà al remitent del correu electrònic enviat pel sistema",
+        "user_update_ok": "S'ha modificat l'usuàriï",
+        "receive_confirm_notification_hint": "Envia una notificació a aquest compte quan calgui confirmar una activitat anònima o una soŀlicitud de registre",
+        "merge_place_help": "Ets a punt de fusionar <strong>{place}</strong> amb la ubicació seleccionada. Es modificaran també les {n} activitats associades a {place}.",
+        "edit_user": "Modifica l'usuàriï",
+        "notify": "Notifica",
+        "smtp_from_address": "Nom de remitent"
     },
     "auth": {
         "not_confirmed": "Encara no s'ha confirmat…",
@@ -455,5 +471,9 @@
         "start": "Comença",
         "copy_password_dialog": "Sí, has de copiar la contrasenya!",
         "https_warning": "Esteu visitant des d'HTTP, recordeu canviar baseurl a config.json si canvieu a HTTPS!"
+    },
+    "activitypub": {
+        "n_boosts": "{n} impulsos|{n} impuls|{n} impulsos",
+        "n_favorites": "{n} estrelles/cors|{n} estrella/cor|{n} estrelles/cors"
     }
 }
