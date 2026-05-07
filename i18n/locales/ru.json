@@ -440,7 +440,8 @@
         "required": "{fieldName} заполните",
         "email": "Доб. действующий адрес электронной почты",
         "latitude": "",
-        "url": ""
+        "url": "",
+        "longitude": ""
     },
     "oauth": {
         "authorization_request": "Приложение <code>{app}</code> запрашивает следующую авторизацию на <code>{instance_name}</code>:",
