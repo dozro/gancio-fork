@@ -393,7 +393,8 @@
         "geocoding_countrycodes": "",
         "delete_resource": "",
         "enable_federation": "",
-        "wrong_domain_warning": ""
+        "wrong_domain_warning": "",
+        "description_description": ""
     },
     "recover": {
         "not_valid_code": "Diçka shkoi keq."
