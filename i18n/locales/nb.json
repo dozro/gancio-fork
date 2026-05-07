@@ -273,7 +273,8 @@
         "address_description_osm": "",
         "anon_description_without_registration": "",
         "remove_media_confirmation": "",
-        "saved": ""
+        "saved": "",
+        "assign_to_user_description": ""
     },
     "register": {
         "first_user": "Administrator opprettet",
