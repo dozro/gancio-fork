@@ -283,7 +283,8 @@
         "what": "",
         "test": "",
         "close": "",
-        "enabled": ""
+        "enabled": "",
+        "online": ""
     },
     "export": {
         "email_description": "",
