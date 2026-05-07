@@ -309,7 +309,8 @@
         "geocoding_countrycodes": "",
         "delete_resource": "",
         "enable_federation": "",
-        "wrong_domain_warning": ""
+        "wrong_domain_warning": "",
+        "description_description": ""
     },
     "event": {
         "added_anon": "",
@@ -389,7 +390,8 @@
         "each_month": "",
         "remove_confirmation": "",
         "tag_description": "",
-        "saved": ""
+        "saved": "",
+        "multidate": ""
     },
     "validators": {
         "latitude": "",
