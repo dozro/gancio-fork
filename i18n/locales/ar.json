@@ -393,7 +393,8 @@
         "description": "",
         "ok": "",
         "forgot_password": "",
-        "check_email": ""
+        "check_email": "",
+        "error": ""
     },
     "activitypub": {
         "n_boosts": "",
