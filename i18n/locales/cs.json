@@ -161,7 +161,8 @@
         "smtp_from_address_help": "Jméno, které se zobrazí v adrese odesílatele u e-mailů odeslaných systémem",
         "page_is_disabled": "Tato stránka není viditelná veřejnosti",
         "receive_confirm_notification_hint": "Odeslat oznámení tomuto účtu vždy, když registrovaný uživatel nebo anonymní události vyžadují potvrzení",
-        "notify": "Oznámení"
+        "notify": "Oznámení",
+        "merge_place_help": "Slučujete místo <strong>{place}</strong> se zvoleným místem. Bude také změněno {n} souvisejících událostí."
     },
     "common": {
         "related": "Příbuzné",
@@ -438,7 +439,7 @@
     },
     "register": {
         "error": "Chyba: ",
-        "description": "Sociální hnutí by se měla organizovat a samofinancovat.<br/>\n<br/>Než budete moci zveřejňovat události, <strong> musí být váš účet schválen</strong>. Mějte na paměti, že <strong>za tento web provozují skuteční lidé</strong>, takže nám prosím napište pár vět o tom, jaké akce budete chtít zveřejňovat.",
+        "description": "Sociální hnutí by se měla organizovat a samofinancovat.<br/>\n<br/>Než budete moci zveřejňovat události, <strong>musí být váš účet schválen</strong>. Mějte na paměti, že <strong>za tímto webem stojí skuteční lidé</strong>, takže nám prosím napište pár vět o tom, jaké akce budete chtít zveřejňovat.",
         "complete": "Registrace byla potvrzena.",
         "first_user": "Admin vytvořen"
     },
@@ -446,5 +447,9 @@
         "fail": "Přihlášení se nezdařilo. Opravdu jste zadali správné heslo?",
         "not_confirmed": "Zatím nepotvrzeno…"
     },
-    "about": "\n  <p><a href='https://gancio.org'>Gancio</a> je sdílená nástěnka pro místní komunity.</p>\n  "
+    "about": "\n  <p><a href='https://gancio.org'>Gancio</a> je sdílená nástěnka pro místní komunity.</p>\n  ",
+    "activitypub": {
+        "n_boosts": "{n} boostů|{n} boost|{n} boosty",
+        "n_favorites": "{n} oblíbení|{n} oblíbení|{n} oblíbení"
+    }
 }
