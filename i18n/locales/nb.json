@@ -188,7 +188,8 @@
         "default_fedi_hashtags": "",
         "custom_css_help": "",
         "geocoding_countrycodes": "",
-        "wrong_domain_warning": ""
+        "wrong_domain_warning": "",
+        "plugins_description": ""
     },
     "event": {
         "interact_with_me": "Følg meg",
