@@ -384,7 +384,8 @@
         "latitude": "",
         "email": "",
         "url": "",
-        "required": ""
+        "required": "",
+        "longitude": ""
     },
     "login": {
         "insert_email": "",
