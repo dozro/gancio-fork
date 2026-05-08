@@ -379,7 +379,8 @@
         "remove_confirmation": "",
         "tag_description": "",
         "saved": "",
-        "multidate": ""
+        "multidate": "",
+        "assign_to_user_description": ""
     },
     "validators": {
         "latitude": "",
