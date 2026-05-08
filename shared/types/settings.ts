@@ -41,6 +41,7 @@ export type Settings = {
   'tilelayer_provider_attribution': string
   'enable_federation': boolean
   'federated_events_in_home': boolean
+  'enable_federation_quoting': boolean
   'enable_resources': boolean
   'hide_boosts': boolean
   'theme.is_dark': boolean
