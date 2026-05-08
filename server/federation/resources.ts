@@ -2,8 +2,8 @@ import linkifyHtml from 'linkify-html'
 import { sanitizeHTML } from '../helpers'
 import { useLogger } from '../lib/logger'
 import { Event, Resource, type APUser } from '../services/db'
-import type { APNote } from './types'
-import { _signAndSend } from './sign_and_send'
+import type { APActivityQuoteRequest, APNote } from './types'
+import { _signAndSend, signAndSend } from './sign_and_send'
 import { publicSettings } from '../services/settings'
 
 const log = useLogger('federation:notes')
@@ -22,8 +22,8 @@ export async function handleCreateNote(message: APNote, actor: APUser) {
   // search for related event
   let event
 
-  // it's an answer
-  const inReplyTo = message?.inReplyTo
+  // it's a reply or a quote
+  const inReplyTo = message?.inReplyTo ?? message?.quote ?? message?.quoteUri ?? message?._misskey_quote
   if (inReplyTo) {
     // .. to an event ?
     const match = inReplyTo && inReplyTo.match(`^${publicSettings.baseurl}/federation/m/(.*)`)
@@ -58,6 +58,44 @@ export async function handleCreateNote(message: APNote, actor: APUser) {
     data: message,
     eventId: event && event.id
   })
+}
+
+// https://fediverse.codeberg.page/fep/fep/044f/
+// https://shkspr.mobi/blog/2025/10/getting-started-with-mastodons-quote-posts-technical-implementation-details-for-servers
+export async function handleQuoteRequest(message: APActivityQuoteRequest, actor: APUser) {
+  const quoter_post_id = typeof message.instrument === 'string' ? message.instrument : message.instrument.id
+  log.debug(`Quote request from ${actor.ap_id} to ${quoter_post_id}`)
+
+  // calculate base64 from quoter_post_id, message.id
+  const stamp = Buffer
+    .from(JSON.stringify({
+      eventId: message.object,
+      quoterPostId: quoter_post_id
+    }))
+    .toString('base64url')
+
+  log.debug(`Stamp: ${stamp}`)
+  // send Accept
+  const accept = {
+    '@context': [
+      'https://www.w3.org/ns/activitystreams',
+      { QuoteRequest: 'https://w3id.org/fep/044f#QuoteRequest' }
+    ],
+    'id': `${publicSettings.baseurl}/federation/activity/${crypto.randomUUID()}`,
+    'type': 'Accept' as const,
+    'actor': `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
+    'object': {
+      id: message.id,
+      type: 'QuoteRequest' as const,
+      actor: actor.ap_id,
+      object: message.object,
+      instrument: quoter_post_id
+    },
+    'result': `${publicSettings.baseurl}/federation/q/${stamp}`
+  }
+  log.debug(`Accept quote request: ${JSON.stringify(accept)}`)
+
+  await signAndSend(accept, actor.object.inbox)
 }
 
 /**

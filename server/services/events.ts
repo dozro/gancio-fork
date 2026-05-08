@@ -424,6 +424,9 @@ export function eventToAP(event: Event) {
     'attributedTo': event.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
     'to': ['https://www.w3.org/ns/activitystreams#Public'],
     'content': event.description || '',
+    // https://fediverse.codeberg.page/fep/fep/044f/
+    ...(publicSettings.enable_federation_quoting &&
+      { interactionPolicy: { canQuote: { automaticApproval: 'https://www.w3.org/ns/activitystreams#Public' } } }),
     summary
   }
 
