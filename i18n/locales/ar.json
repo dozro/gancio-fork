@@ -151,7 +151,8 @@
         "delete_resource": "",
         "enable_federation": "",
         "wrong_domain_warning": "",
-        "description_description": ""
+        "description_description": "",
+        "user_block_confirm": ""
     },
     "common": {
         "related": "",
@@ -279,7 +280,9 @@
         "what": "",
         "test": "",
         "close": "",
-        "enabled": ""
+        "enabled": "",
+        "feed": "",
+        "online": ""
     },
     "export": {
         "email_description": "",
