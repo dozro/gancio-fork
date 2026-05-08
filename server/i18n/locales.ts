@@ -33,5 +33,6 @@ export default {
   'sv': 'Swedish, Svenska',
   'ta': 'Tamil, தமிழ்',
   'tr': 'Turkish, Türkçe',
+  'uk': 'Ukrainian, Українська',
   'zh': 'Chinese, 中国'
 }
