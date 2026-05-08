@@ -414,7 +414,8 @@
         "geolocation_description": "",
         "stats": "",
         "add_trusted_source_help": "",
-        "custom_css_help": ""
+        "custom_css_help": "",
+        "plugins_description": ""
     },
     "auth": {
         "not_confirmed": "Oraindik ez da berretsi…",
