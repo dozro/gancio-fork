@@ -115,20 +115,7 @@
         "editor": "Рэдактар",
         "contact_user": "Звязацца з карыстальнікам",
         "report": "Паскардзіцца на падзею",
-        "collection_in_home": "Паказаць калекцыю на галоўнай",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "pages": "",
-        "trusted_sources": "",
-        "past_events": "",
-        "draft": "",
-        "dark_mode": "",
-        "enabled": ""
+        "collection_in_home": "Паказаць калекцыю на галоўнай"
     },
     "login": {
         "not_registered": "Не зарэгістраваны?",
@@ -146,12 +133,7 @@
         "email_description": "Вы можаце атрымліваць падзеі, якія вас цікавяць, па электроннай пошце.",
         "feed_description": "Каб сачыць за абнаўленнямі з камп’ютара або смартфона без неабходнасці перыядычна адкрываць гэты сайт, выкарыстоўвайце RSS-каналы. </p>\n\n<p> З RSS-каналамі вы карыстаецеся спецыяльным дадаткам для атрымання абнаўленняў з сайтаў, якія вас цікавяць. Гэта добры спосаб хутка сачыць за многімі сайтамі без неабходнасці стварэння ўліковага запісу або іншых ўскладненняў. </p>\n\n<li> Калі ў вас Android, мы рэкамендуем <a href=\"https://f-droid.org/en/packages/net.frju.flym/\">Flym</a> або Feeder </li>\n<li> Для iPhone / iPad вы можаце выкарыстоўваць <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\"> Feed4U </a> </li>\n<li> Для настольных ПК / ноўтбукаў мы рэкамендуем Feedbro, які трэба ўсталяваць на <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\"> Firefox </a> або <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\"> Chrome </a>. </li>\n<br/>\nДаданне гэтай спасылкі ў ваш чытальнік RSS-каналаў дазволіць вам быць у курсе падзей.",
         "filter_description": "Вы можаце адфільтраваць свой экспарт тут па тэгах і месцы або па прадусталяванай калекцыі",
-        "ical_description": "Камп’ютары і смартфоны звычайна маюць праграму календара, якая можа імпартаваць аддалены каляндар.",
-        "filter_title": "",
-        "show_more": "",
-        "ical_title": "",
-        "max_height": "",
-        "list_title": ""
+        "ical_description": "Камп’ютары і смартфоны звычайна маюць праграму календара, якая можа імпартаваць аддалены каляндар."
     },
     "register": {
         "error": "Памылка: ",
@@ -227,19 +209,7 @@
         "message_hint": "Вы можаце адправіць паведамленне іншым адміністратарам і, магчыма, чалавеку, які быў аўтарам падзеі.",
         "send_to_author_too": "Адправіць адміністратарам і аўтару",
         "disable_author_confirm": "Вы ўпэўнены, што хочаце адключыць аўтара гэтай падзеі?",
-        "disable_author": "Адключыць аўтара",
-        "tentative": "",
-        "recurrent_1y_days": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "each_year": "",
-        "cancelled": "",
-        "recurrent_1y_ordinal": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": "",
-        "anon_description_without_registration": ""
+        "disable_author": "Адключыць аўтара"
     },
     "admin": {
         "place_description": "Калі вы памыліліся з месцам або адрасам, вы можаце змяніць іх.<br/>Усе дзейныя і мінулыя падзеі, звязаныя з гэтым месцам, зменяць адрас.",
@@ -374,39 +344,7 @@
         "geolocation": "Геалакацыя",
         "show_download_media_hint": "Паказаць кнопку загрузкі мультымедыя на старонцы падзеі",
         "custom_js_help": "Вы можаце інтэграваць код javascript, які будзе загружацца для кожнага карыстальніка, напісаўшы ў гэтым тэкставым полі ніжэй. Магчыма, вы хочаце спачатку прачытаць <a href='https://gancio.org/usage/custom_js'>дакументацыю</a>.",
-        "custom_css_help": "Вы таксама можаце наладзіць некаторыя табліцы стыляў, прачытайце некаторыя прыклады <a href='https://gancio.org/usage/custom_css'>тут</a>.",
-        "trusted_sources_label": "",
-        "page_is_disabled": "",
-        "federated_events_in_home": "",
-        "page_remove_ok": "",
-        "past_unconfirmed_events": "",
-        "unblock_user": "",
-        "smtp_password_description": "",
-        "smtp_from_address_help": "",
-        "trusted_sources_label_help": "",
-        "unconfirmed_events": "",
-        "trusted_source_removed": "",
-        "calendar_first_day_of_week": "",
-        "add_source": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "page_description": "",
-        "edit_user": "",
-        "default_fedi_hashtags_help": "",
-        "trusted_sources_label_default": "",
-        "calendar_first_day_of_week_default": "",
-        "delete_page_confirm": "",
-        "notify": "",
-        "new_page": "",
-        "smtp_from_address": "",
-        "delete_trusted_source_confirm": "",
-        "calendar_first_day_of_week_description": "",
-        "federated_events_in_home_help": "",
-        "add_trusted_source": "",
-        "add_trusted_source_help": "",
-        "default_fedi_hashtags": ""
+        "custom_css_help": "Вы таксама можаце наладзіць некаторыя табліцы стыляў, прачытайце некаторыя прыклады <a href='https://gancio.org/usage/custom_css'>тут</a>."
     },
     "settings": {
         "update_confirm": "Хочаце захаваць змяненне?",
@@ -432,8 +370,7 @@
         "required": "{fieldName} абавязковы",
         "email": "Увядзіце сапраўдны адрас электроннай пошты",
         "longitude": "Устаўце сапраўдную даўгату (-180 < даўгата < 180)",
-        "latitude": "Устаўце сапраўдную шырату (-90 < шырата < 90)",
-        "url": ""
+        "latitude": "Устаўце сапраўдную шырату (-90 < шырата < 90)"
     },
     "about": "\n  <p><a href='https://gancio.org'>Gancio</a> гэта павестка дня для мясцовых суполак.</p>\n  ",
     "oauth": {
@@ -461,9 +398,5 @@
     "auth": {
         "fail": "Не атрымалася ўвайсці. Вы ўпэўненыя, што пароль правільны?",
         "not_confirmed": "Пакуль не пацверджана…"
-    },
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
     }
 }

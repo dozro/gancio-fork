@@ -120,16 +120,7 @@
         "trusted_sources": "Vertrauenswürdige Quellen",
         "past_events": "Vergangene Veranstaltungen",
         "enabled": "Aktiviert",
-        "pages": "Seiten",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "pages": "Seiten"
     },
     "admin": {
         "delete_footer_link_confirm": "Möchtest du diesen Link löschen?",
@@ -288,18 +279,7 @@
         "calendar_first_day_of_week": "Erster Tag der Kalenderwoche",
         "calendar_first_day_of_week_description": "Wähle den Wochentag aus, den die Kalender als ersten Tag der Woche anzeigen sollen. Die Standardeinstellung richtet sich nach dem Gebietsschema des Benutzers.",
         "receive_confirm_notification": "E-Mail-Bestätigung für Benutzer/Veranstaltung abrufen",
-        "smtp_password_description": "Lasse dieses Feld leer, wenn das Passwort nicht geändert werden soll",
-        "page_is_disabled": "",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "smtp_from_address_help": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "edit_user": "",
-        "notify": "",
-        "smtp_from_address": ""
+        "smtp_password_description": "Lasse dieses Feld leer, wenn das Passwort nicht geändert werden soll"
     },
     "settings": {
         "update_confirm": "Willst du deine Änderung speichern?",
@@ -418,15 +398,7 @@
         "assign_to_user": "Jemandem zuweisen",
         "assign_to_user_description": "Du kannst einen anonym eingetragene Veranstaltung ein:e Benuter:in zuweisen. Dies erlaubt ihm/ihr, diese Veranstaltung zu ändern.",
         "address_geocoded_disclaimer": "Falls du die <strong>Adresse</strong> oder die <strong>Hausnummer</strong> nicht in den Ergebnissen des Geo-Codings finden kannst, kannst du sie manuell in das Feld \"Adresse\" eintragen ohne die Koordinaten zu verlieren. Bedenke, dass das <a target=\"_blank\" href=\"https://www.openstreetmap.org/\">OpenStreetMap</a>-Projekt offen für Mitwirkung ist. Falls du Android nutzt, empfehlen wir <a target=\"_blank\" href=\"https://f-droid.org/en/packages/de.westnordost.streetcomplete/\">StreetComplete</a> ",
-        "anon_description_without_registration": "Hier kann eine Veranstaltung hinzugefügt werden. Es ist erforderlich, dass wir sie anschauen und prüfen, um eventuell nicht passende Veranstaltungen auszusortieren..\nEs wird nicht möglich sein, die Veranstaltung im Nachhinein zu ändern.<br/><br/>\nFahre fort, um die Veranstaltung einzutragen. Wir werden sie uns so bald wie möglich ansehen..",
-        "tentative": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "cancelled": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": ""
+        "anon_description_without_registration": "Hier kann eine Veranstaltung hinzugefügt werden. Es ist erforderlich, dass wir sie anschauen und prüfen, um eventuell nicht passende Veranstaltungen auszusortieren..\nEs wird nicht möglich sein, die Veranstaltung im Nachhinein zu ändern.<br/><br/>\nFahre fort, um die Veranstaltung einzutragen. Wir werden sie uns so bald wie möglich ansehen.."
     },
     "register": {
         "first_user": "Admin erstellt",
@@ -444,9 +416,7 @@
         "filter_description": "Du kannst deinen Export hier nach Schlagwort und Ort oder nach einer voreingestellten Sammlung filtern",
         "list_title": "Liste",
         "filter_title": "Filter",
-        "ical_title": "ics/ical",
-        "show_more": "",
-        "max_height": ""
+        "ical_title": "ics/ical"
     },
     "recover": {
         "not_valid_code": "Etwas ist schief gelaufen."
@@ -467,9 +437,5 @@
         "copy_password_dialog": "Ja, du musst das Passwort kopieren!",
         "start": "Start"
     },
-    "about": "\n  <p><a href='https://gancio.org'>Gancio</a> ist ein gemeinsamer Veranstaltungskalender für lokale und regionale Gemeinschaften.</p>\n  ",
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
-    }
+    "about": "\n  <p><a href='https://gancio.org'>Gancio</a> ist ein gemeinsamer Veranstaltungskalender für lokale und regionale Gemeinschaften.</p>\n  "
 }

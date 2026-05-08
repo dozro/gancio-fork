@@ -122,12 +122,6 @@
         "past_events": "Activitats passades",
         "enabled": "Habilitat",
         "pages": "Pàgines",
-        "save_draft": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": "",
         "go_back": "Torna enrere",
         "no_events_found_hint": "Tria dates o filtres diferents",
         "no_events_found": "No hi ha activitats"
@@ -154,9 +148,7 @@
         "filter_description": "Pots filtrar les activitats a exportar segons etiquetes, lloc o coŀleccions existents",
         "filter_title": "Filtre",
         "ical_title": "ics/ical",
-        "list_title": "Llista",
-        "show_more": "",
-        "max_height": ""
+        "list_title": "Llista"
     },
     "register": {
         "description": "Els moviments socials necessitem organitzar-nos i auto-finançar-nos.<br/>\n<br/>Abans que puguis publicar, <strong> hem d'aprovar el teu compte </strong>, tingues en compte que <strong> darrere d'aquesta web hi ha persones</strong> de carn i ossos, així que escriviu dues línies per fer-nos saber quins esdeveniments voleu publicar.",
@@ -239,9 +231,6 @@
         "recurrent_1y_days": "Cada {days} de {months} de cada any",
         "each_year": "Cada any",
         "recurrent_1y_ordinal": "El {n} {days} de {months} de cada any",
-        "reannounce": "",
-        "reannounce_description": "",
-        "cancel_description": "",
         "tentative": "Provisional",
         "postponed": "Postposada",
         "cancelled": "Aquesta activitat s'ha canceŀlat",
@@ -409,9 +398,6 @@
         "calendar_first_day_of_week": "Primer dia de la setmana del calendari",
         "calendar_first_day_of_week_description": "Tria el dia de la setmana que els calendaris han de mostrar com a primer dia. Per defecte, es segueix la configuració regional del navegador.",
         "calendar_first_day_of_week_default": "Per defecte (configuració regional de cada navegador)",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "hidden": "",
         "page_is_disabled": "Aquesta pàgina està oculta al públic",
         "smtp_from_address_help": "El nom que apareixerà al remitent del correu electrònic enviat pel sistema",
         "user_update_ok": "S'ha modificat l'usuàriï",

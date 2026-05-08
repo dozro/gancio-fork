@@ -119,16 +119,7 @@
         "trusted_sources": "Fontes federadas confiáveis",
         "past_events": "Eventos Passados",
         "enabled": "Habilitado",
-        "pages": "Páginas",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "pages": "Páginas"
     },
     "admin": {
         "user_block_confirm": "Tem certeza que quer bloquear o utilizador {user}?",
@@ -286,19 +277,7 @@
         "page_description": "Nesta seção, você poderá gerenciar páginas customizadas (e.g. termos de uso, howtos). Estas páginas não irão aparecer automaticamente em nenhum lugar, mas você pode referenciá-las no rodapé, a partir da página sobre ou de qualquer outro lugar através do link de pré-visualização.",
         "calendar_first_day_of_week": "Primeiro dia da semana",
         "calendar_first_day_of_week_description": "Selecione o dia da semana que os calendários devem exibir como o primeiro dia da semana. O valor padrão é definido de acordo com a localização do cliente.",
-        "calendar_first_day_of_week_default": "Padrão (localização do cliente)",
-        "page_is_disabled": "",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "smtp_password_description": "",
-        "smtp_from_address_help": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "edit_user": "",
-        "notify": "",
-        "smtp_from_address": ""
+        "calendar_first_day_of_week_default": "Padrão (localização do cliente)"
     },
     "event": {
         "follow_me_description": "Uma das maneiras de se manter atualizado com os eventos publicados aqui em {title},\né seguir a conta <u>{account}</u> no Fediverso, por exemplo, via Mastodon, e possivelmente adicionar recursos para um evento a partir de lá.<br/><br/>\nSe nunca ouviu falar sobre Mastodon ou no Fediverso nós recomendamos ler <a href='https://www.savjee.be/videos/simply-explained/mastodon-and-fediverse-explained/'>este artigo</a>.<br/><br/>Entre com o seu domínio abaixo (e.g. mastodon.social)",
@@ -371,16 +350,7 @@
         "assign_to_user_description": "Você pode atribuir um evento anônimo para uma usuária. Isso permitirá que a usuária selecionada possa modificar o evento.",
         "recurrent_1y_days": "{months} {days} anualmente",
         "recurrent_1y_ordinal": "O {n} {days} em {months} anualmente",
-        "each_year": "Cada ano",
-        "tentative": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "cancelled": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": "",
-        "anon_description_without_registration": ""
+        "each_year": "Cada ano"
     },
     "confirm": {
         "not_valid": "Algo deu errado.",
@@ -397,9 +367,7 @@
         "filter_description": "Você pode filtrar sua exportação aqui por tags e local ou por uma coleção predefinida",
         "filter_title": "Filtrar",
         "ical_title": "ics/ical",
-        "list_title": "Lista",
-        "show_more": "",
-        "max_height": ""
+        "list_title": "Lista"
     },
     "oauth": {
         "authorization_request": "A aplicação <code>{app}</code> solicita autorização em <code>{instance_name}</code>:",
@@ -464,9 +432,5 @@
     "auth": {
         "fail": "Autenticação não efetuada. Tem certeza que a sua senha está correta?",
         "not_confirmed": "Não confirmado ainda…"
-    },
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
     }
 }

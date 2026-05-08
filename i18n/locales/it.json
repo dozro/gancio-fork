@@ -119,16 +119,7 @@
         "pages": "Pagine",
         "pin": "Fissa",
         "contact_user": "Contatta utente",
-        "trusted_sources": "Fonti federate attendibili",
-        "save_draft": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": "",
-        "go_back": "",
-        "no_events_found": ""
+        "trusted_sources": "Fonti federate attendibili"
     },
     "login": {
         "description": "Entrando puoi pubblicare nuovi eventi.",
@@ -152,9 +143,7 @@
         "filter_description": "Puoi filtrare gli eventi per tag, luoghi o per una collezione predefinita",
         "filter_title": "Filtra",
         "ical_title": "ics/ical",
-        "list_title": "Elenco",
-        "show_more": "",
-        "max_height": ""
+        "list_title": "Elenco"
     },
     "register": {
         "description": "I movimenti hanno bisogno di organizzarsi e autofinanziarsi. <br/>\nUsatelo solo per eventi non commerciali, antifascisti, antisessisti, antirazzisti. <br/>Prima di poter pubblicare <strong>dobbiamo approvare l'account</strong>, considera che <strong>dietro questo sito ci sono delle persone</strong> di carne e sangue, scrivici quindi due righe per farci capire che eventi vorresti pubblicare.",
@@ -235,15 +224,7 @@
         "recurrent_1y_days": "{months} {days} ogni anno",
         "recurrent_1y_ordinal": "I {n} {days} in {months} ogni anno",
         "each_year": "Ogni anno",
-        "online_locations_fallback_urls": "Link di fallback",
-        "tentative": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "cancel_description": "",
-        "rescheduled": "",
-        "postponed": "",
-        "cancelled": "",
-        "moved_onlined": ""
+        "online_locations_fallback_urls": "Link di fallback"
     },
     "admin": {
         "place_description": "Nel caso in cui un luogo sia errato o cambi indirizzo, puoi modificarlo.<br/>Considera che tutti gli eventi associati a questo luogo cambieranno indirizzo (anche quelli passati).",
@@ -399,18 +380,7 @@
         "receive_confirm_notification": "Ottieni l'email di conferma dell'utente/evento",
         "calendar_first_day_of_week": "Primo giorno della settimana",
         "calendar_first_day_of_week_description": "Selezionare il giorno della settimana che i calendari devono visualizzare per primo. Le selezioni predefinite sono basate sulle impostazioni del locale del client.",
-        "calendar_first_day_of_week_default": "Predefinito (locale del client)",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "smtp_from_address_help": "",
-        "hidden": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "smtp_from_address": "",
-        "page_is_disabled": "",
-        "user_update_ok": "",
-        "edit_user": "",
-        "notify": ""
+        "calendar_first_day_of_week_default": "Predefinito (locale del client)"
     },
     "auth": {
         "not_confirmed": "Non ancora confermato…",
@@ -462,9 +432,5 @@
         "copy_password_dialog": "Sì, bisogna copiare la password!",
         "start": "Inizia",
         "https_warning": "Stai visitando il setup da HTTP, ricorda di cambiare il baseurl nel config.json quando passerai ad HTTPS!"
-    },
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
     }
 }

@@ -118,16 +118,7 @@
         "authorize": "Autoriser",
         "moderation": "Moderering",
         "filter": "Filter",
-        "title": "Titel",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "title": "Titel"
     },
     "login": {
         "description": "Når du logger ind, kan du publicere nye begivenheder.",
@@ -148,9 +139,7 @@
         "email_description": "Du kan få begivenheder der interesserer dig tilsendt via e-mail.",
         "insert_your_address": "Indtast din e-mailadresse",
         "ical_description": "Computere og smartphones er normalt udstyret med en kalender app der kan importere andre kalendere.",
-        "list_description": "Hvis du har en webside og gerne vil dele en liste over begivenheder, kan du bruge denne kode",
-        "show_more": "",
-        "max_height": ""
+        "list_description": "Hvis du har en webside og gerne vil dele en liste over begivenheder, kan du bruge denne kode"
     },
     "recover": {
         "not_valid_code": "Hmm... Noget er gået galt."
@@ -232,16 +221,7 @@
         "report_message_confirmation": "Synes du denne begivenhed ikke bør være her? Skriv til os hvorfor",
         "recurrent_1y_ordinal": "På {n} {days} i {months} hvert år",
         "recurrent_1y_days": "{months} {days} hvert år",
-        "each_year": "Hvert år",
-        "tentative": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "cancelled": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": "",
-        "anon_description_without_registration": ""
+        "each_year": "Hvert år"
     },
     "admin": {
         "delete_user": "Fjern",
@@ -387,19 +367,7 @@
         "receive_confirm_notification": "Få e-mail med bekræftelse af bruger/event",
         "federated_events_in_home_help": "Indgående events fra betroede fødererede kilder vises som standard på startsiden. For kun at vise nogle events kan du bruge collections",
         "calendar_first_day_of_week_description": "Vælg den ugedag, som kalenderen skal vise som den første dag i ugen. Standard vælger i henhold til klientens lokalitet.",
-        "page_description": "I dette afsnit kan du administrere brugerdefinerede sider (f.eks. politikker, vejledninger). Disse sider vises ikke automatisk nogen steder, men du kan henvise til dem i sidefoden, fra om-siden eller hvor som helst via linket til forhåndsvisning.",
-        "page_is_disabled": "",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "smtp_password_description": "",
-        "smtp_from_address_help": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "edit_user": "",
-        "notify": "",
-        "smtp_from_address": ""
+        "page_description": "I dette afsnit kan du administrere brugerdefinerede sider (f.eks. politikker, vejledninger). Disse sider vises ikke automatisk nogen steder, men du kan henvise til dem i sidefoden, fra om-siden eller hvor som helst via linket til forhåndsvisning."
     },
     "confirm": {
         "title": "Brugerbekræftelse",
@@ -451,9 +419,5 @@
         "latitude": "Indsæt en gyldig breddegrad (-90 < breddegrad < 90)",
         "longitude": "Indsæt en gyldig længdegrad (-180 < længdegrad < 180)"
     },
-    "about": "\n  <p><a href='https://gancio.org'>Gancio</a> er en fælles dagsorden for lokalsamfundene.</p>\n  ",
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
-    }
+    "about": "\n  <p><a href='https://gancio.org'>Gancio</a> er en fælles dagsorden for lokalsamfundene.</p>\n  "
 }
