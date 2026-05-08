@@ -126,7 +126,9 @@
         "no_events_found_hint": "",
         "publish": "",
         "draft": "",
-        "dark_mode": ""
+        "dark_mode": "",
+        "go_back": "",
+        "no_events_found": ""
     },
     "login": {
         "description": "Entrando puoi pubblicare nuovi eventi.",
@@ -238,7 +240,10 @@
         "reannounce": "",
         "reannounce_description": "",
         "cancel_description": "",
-        "rescheduled": ""
+        "rescheduled": "",
+        "postponed": "",
+        "cancelled": "",
+        "moved_onlined": ""
     },
     "admin": {
         "place_description": "Nel caso in cui un luogo sia errato o cambi indirizzo, puoi modificarlo.<br/>Considera che tutti gli eventi associati a questo luogo cambieranno indirizzo (anche quelli passati).",
@@ -401,7 +406,11 @@
         "hidden": "",
         "receive_confirm_notification_hint": "",
         "merge_place_help": "",
-        "smtp_from_address": ""
+        "smtp_from_address": "",
+        "page_is_disabled": "",
+        "user_update_ok": "",
+        "edit_user": "",
+        "notify": ""
     },
     "auth": {
         "not_confirmed": "Non ancora confermato…",
