@@ -180,6 +180,11 @@ describe('AP Activity handler', () => {
     expect(event).toBeNull()
   })
 
+  it('should handle a QuoteRequest', async () => {
+    const { default: activity } = await import('../fixtures/APActivities/11-QuoteRequest')
+    await handleActivity(activity, actor)
+  })
+
   it('should handle a Delete > Event with non existing event (adversarial)', async () => {
     const { default: activity } = await import('../fixtures/APActivities/10-DeleteEvent')
     const ret = handleActivity({ ...activity, object: 'non_existing_event' }, actor)

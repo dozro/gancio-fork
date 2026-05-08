@@ -8,6 +8,11 @@ useHead({
   title: settings.value.title + ' - ' + t('common.admin')
 })
 
+// refresh all settings
+onMounted(async () => {
+  settings.value = await $fetch('/api/settings')
+})
+
 const { isAdmin } = useAuth()
 
 const { data: unconfirmedEvents, refresh } = await useFetch('/api/events/unconfirmed')

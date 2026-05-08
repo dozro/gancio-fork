@@ -24,12 +24,13 @@ const valid = ref(false)
 
 const enable_resources = manageSetting('enable_resources')
 const enable_federation = manageSetting('enable_federation')
+const enable_federation_quoting = manageSetting('enable_federation_quoting')
 const federated_events_in_home = manageSetting('federated_events_in_home')
 const default_fedi_hashtags = manageSetting('default_fedi_hashtags')
 const hide_boosts = manageSetting('hide_boosts')
 const trusted_sources_label = manageSetting('trusted_sources_label')
 
-async function toggleFollowing (trusted_source) {
+async function toggleFollowing (trusted_source: APUser) {
   try {
     trusted_source.loading = true
     await $fetch('/api/ap_actors/follow', { method: 'PUT', body: { ap_id: trusted_source.ap_id } })
@@ -59,7 +60,7 @@ async function createTrustedInstance () {
   loading.value = false
 }
 
-async function deleteTrustedSource (trusted_source) {
+async function deleteTrustedSource (trusted_source: APUser) {
   const ret = await $confirm('admin.delete_trusted_source_confirm')
   if (!ret) {
     return
@@ -91,6 +92,14 @@ async function deleteTrustedSource (trusted_source) {
         class="mt-4"
         :label="$t('admin.federated_events_in_home')"
         :hint="$t('admin.federated_events_in_home_help')"
+        persistent-hint
+      />
+
+      <v-switch
+        v-model="enable_federation_quoting"
+        class="mt-4"
+        :label="$t('admin.enable_federation_quoting')"
+        :hint="$t('admin.enable_federation_quoting_help')"
         persistent-hint
       />
 
@@ -148,6 +157,7 @@ async function deleteTrustedSource (trusted_source) {
     <v-dialog v-model="dialogAddTrustedSource" width="500px" :fullscreen="$vuetify.display?.mobile">
       <v-card>
         <v-card-title>{{ $t('admin.add_trusted_source') }}</v-card-title>
+        <!-- eslint-disable-next-line -->
         <v-card-subtitle class="mt-2 text-wrap" v-html="$t('admin.add_trusted_source_help')"/>
         <v-card-text>
           <v-form ref="form" v-model="valid" @submit.prevent="createTrustedInstance">
@@ -198,6 +208,7 @@ async function deleteTrustedSource (trusted_source) {
         </span>
       </template>
       <template v-slot:item.info="{ item }">
+        <!-- eslint-disable-next-line -->
         <small v-html="item.summary" />
       </template>
       <template v-slot:item.following="{ item }">

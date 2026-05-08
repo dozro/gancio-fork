@@ -10,7 +10,7 @@ import { useLogger } from '../lib/logger'
 import { handleCreateEvent, handleUpdateEvent } from './events'
 
 import { APUser, Event, Resource } from '../services/db'
-import { handleCreateNote } from './resources'
+import { handleCreateNote, handleQuoteRequest } from './resources'
 import { handleLike, handleUnlike } from './ego'
 import { _signAndSend } from './sign_and_send'
 import { secretSettings } from '../services/settings'
@@ -27,7 +27,9 @@ export const APHandlers: APHandlerMap = {
   Delete: handleDelete,
   Follow: handleFollow,
   Announce: handleAnnounce,
+  QuoteRequest: handleQuoteRequest,
   Like: handleLike,
+  EchoRequest: async () => { },
   Accept: async () => { }
 }
 
@@ -96,7 +98,8 @@ async function handleAnnounce(message: APActivityAnnounce, activityActor: APUser
 
   if (isAPActivity(obj)) {
     log.debug(`Ignoring Announce wrapping ${obj.type}`)
-    return handleActivity(obj, activityActor)
+    await handleActivity(obj, activityActor)
+    return
     // throw createError({ status: 200, message: `Announce wrapping ${obj.type} is not supported` })
   }
 

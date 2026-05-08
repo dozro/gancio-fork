@@ -1,7 +1,11 @@
 import { z } from 'zod'
 import { DateTime } from 'luxon'
 
-export const APActivityTypeSchema = z.enum(['Follow', 'Undo', 'Like', 'Announce', 'Create', 'Delete', 'Update', 'Accept', 'EchoRequest'])
+export const APActivityTypeSchema = z.enum([
+  'Follow', 'Undo', 'Like', 'Announce',
+  'Create', 'Delete', 'Update', 'Accept',
+  'EchoRequest', 'QuoteRequest'
+])
 export type APActivityType = z.infer<typeof APActivityTypeSchema>
 
 export const APActivityBaseSchema = z.object({
@@ -69,7 +73,12 @@ export interface APActivityUndo extends APActivityBase {
   object: APActivityFollow | APActivityLike | APActivityAnnounce
 }
 
-// https://fediverse.codeberg.page/fep/fep/8a8e/
+export interface APActivityQuoteRequest extends APActivityBase {
+  type: 'QuoteRequest'
+  object: string
+  instrument: string | { id: string }
+}
+
 export const APNoteSchema = z.object({
   type: z.literal('Note').default('Note'),
   id: z.string(),
@@ -78,7 +87,10 @@ export const APNoteSchema = z.object({
   url: z.url().optional(),
   content: z.string().optional(),
   summary: z.string().optional(),
-  published: z.iso.date().optional()
+  published: z.iso.date().optional(),
+  quote: z.string().optional(),
+  quoteUri: z.string().optional(),
+  _misskey_quote: z.string().optional()
 })
 export type APNote = z.infer<typeof APNoteSchema>
 
@@ -167,7 +179,13 @@ export const APEventSchema = z.object({
   tag: z.array(APTagSchema).optional(),
   published: z.iso.datetime().optional(),
   signature: z.object().optional().nullable(),
-  updated: z.iso.datetime().optional()
+  updated: z.iso.datetime().optional(),
+  interactionPolicy: z.object({
+    canQuote: z.object({
+      automaticApproval: z.string().optional(),
+      manualApproval: z.string().optional()
+    }).optional()
+  }).optional()
 }).transform(event => ({
   ...event,
   endTime: event.endTime ?? DateTime.fromISO(event.startTime, { setZone: true })
@@ -187,6 +205,7 @@ export interface APActivityMap {
   Like: APActivityLike
   Accept: APActivityAccept
   Update: APActivityUpdate
+  QuoteRequest: APActivityQuoteRequest
 }
 
 export type APActivity = APActivityMap[keyof APActivityMap]

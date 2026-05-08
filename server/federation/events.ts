@@ -69,7 +69,7 @@ export async function APEventToEvent(APEvent: APEvent, actor: APUser) {
     start_datetime: DateTime.fromISO(APEvent.startTime).toUnixInteger(),
     end_datetime: APEvent.endTime ? DateTime.fromISO(APEvent.endTime).toUnixInteger() : undefined,
     is_visible: true,
-    ...(online_locations ? { online_locations } : {}),
+    ...(online_locations && { online_locations }),
     // tag: APEvent.tag?.filter(t => t?.type === 'Hashtag').map(t => t.name) ?? [],
     ap_id: APEvent.id,
     media,
