@@ -121,7 +121,16 @@
         "trusted_sources": "Sources fédérées de confiance",
         "past_events": "Événements passés",
         "enabled": "Activé",
-        "pages": "Pages"
+        "pages": "Pages",
+        "save_draft": "",
+        "go_back": "",
+        "create_draft": "",
+        "convert_draft": "",
+        "no_events_found_hint": "",
+        "no_events_found": "",
+        "publish": "",
+        "draft": "",
+        "dark_mode": ""
     },
     "event": {
         "follow_me_description": "Une des manières de rester informé sur les évènements publiés ici sur {title}\nest de suivre le compte <u>{account}</u> sur le fediverse, par exemple via Mastodon, et pourquoi pas d'ajouter des ressources à un évènement à partir de là.<br/><br/>\nSi vous n'avez jamais entendu parler de Mastodon and du fediverse, nous vous recommandons de lire <a href='https://www.savjee.be/videos/simply-explained/mastodon-and-fediverse-explained/'>cet article (en anglais)</a>.<br/><br/>Saisissez votre nom d'instance ci-dessous (par ex. mastodon.social)",
@@ -197,7 +206,15 @@
         "anon_description_without_registration": "Vous pouvez ajouter un évènement, mais il devra être vérifié afin de s'assurer de sa conformité. \nUne fois envoyé, vous ne pourrez plus modifier votre évènement.<br/><br/> \nAllez-y et envoyez votre évènement, nous le traiterons au plus vite.",
         "recurrent_1y_days": "Tous les ans, le {days} {months}",
         "recurrent_1y_ordinal": "Tous les ans, le {n} {days} de {months}",
-        "each_year": "Chaque année"
+        "each_year": "Chaque année",
+        "tentative": "",
+        "reannounce": "",
+        "reannounce_description": "",
+        "postponed": "",
+        "cancelled": "",
+        "cancel_description": "",
+        "moved_onlined": "",
+        "rescheduled": ""
     },
     "register": {
         "description": "Les mouvements sociaux doivent s'organiser et s'autofinancer.<br/>\n<br/>Avant de pouvoir publier, <strong> le compte doit être approuvé</strong>, considérez que <strong> derrière ce site vous trouverez de vraies personnes</strong>, à qui vous pouvez écrire en deux lignes pour exprimer les évènements que vous souhaiteriez publier.",
@@ -215,7 +232,9 @@
         "filter_description": "Vous pouvez filtrer vos exports ici par étiquettes et lieu ou avec une collection préétablie",
         "filter_title": "Filtre",
         "ical_title": "ics/ical",
-        "list_title": "Liste"
+        "list_title": "Liste",
+        "show_more": "",
+        "max_height": ""
     },
     "admin": {
         "federation": "Fédération / ActivityPub",
@@ -377,7 +396,18 @@
         "receive_confirm_notification": "Reçoit les demandes de confirmation d'utilisateur/évènement",
         "calendar_first_day_of_week_description": "Sélectionnez le jour à afficher comme premier jour de la semaine dans les calendriers. Par défaut, la choix est fait en fonction des paramètres régionaux (locale) de l'utilisateur.",
         "calendar_first_day_of_week_default": "Par défaut (locale utilisateur)",
-        "smtp_password_description": "Laissez ce champ vide si vous ne souhaitez pas modifier le mot de passe"
+        "smtp_password_description": "Laissez ce champ vide si vous ne souhaitez pas modifier le mot de passe",
+        "page_is_disabled": "",
+        "page_remove_ok": "",
+        "unblock_user": "",
+        "smtp_from_address_help": "",
+        "hidden": "",
+        "user_update_ok": "",
+        "receive_confirm_notification_hint": "",
+        "merge_place_help": "",
+        "edit_user": "",
+        "notify": "",
+        "smtp_from_address": ""
     },
     "oauth": {
         "scopes": {
@@ -442,5 +472,9 @@
         "start": "Commencer",
         "copy_password_dialog": "Oui, vous devez copier le mot de passe !",
         "https_warning": "Vous consultez le site en HTTP, n'oubliez pas de modifier la valeur de baseurl dans config.json si vous passez en HTTPS !"
+    },
+    "activitypub": {
+        "n_boosts": "",
+        "n_favorites": ""
     }
 }
