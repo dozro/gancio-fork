@@ -124,13 +124,7 @@
         "pages": "Pàgines",
         "go_back": "Torna enrere",
         "no_events_found_hint": "Tria dates o filtres diferents",
-        "no_events_found": "No hi ha activitats",
-        "save_draft": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "no_events_found": "No hi ha activitats"
     },
     "login": {
         "description": "Amb la sessió iniciada pots afegir activitats noves.",
@@ -154,9 +148,7 @@
         "filter_description": "Pots filtrar les activitats a exportar segons etiquetes, lloc o coŀleccions existents",
         "filter_title": "Filtre",
         "ical_title": "ics/ical",
-        "list_title": "Llista",
-        "show_more": "",
-        "max_height": ""
+        "list_title": "Llista"
     },
     "register": {
         "description": "Els moviments socials necessitem organitzar-nos i auto-finançar-nos.<br/>\n<br/>Abans que puguis publicar, <strong> hem d'aprovar el teu compte </strong>, tingues en compte que <strong> darrere d'aquesta web hi ha persones</strong> de carn i ossos, així que escriviu dues línies per fer-nos saber quins esdeveniments voleu publicar.",
@@ -243,10 +235,7 @@
         "postponed": "Postposada",
         "cancelled": "Aquesta activitat s'ha canceŀlat",
         "moved_onlined": "Moguda a online",
-        "rescheduled": "Replanificada",
-        "reannounce": "",
-        "reannounce_description": "",
-        "cancel_description": ""
+        "rescheduled": "Replanificada"
     },
     "admin": {
         "place_description": "En el cas que un lloc és incorrecte o l'adreça ha de canviar, pots arreglar-ho.<br/>Tingues en compte que totes les activitats passades i futures associades amb aquest lloc també canviaran d'adreça.",
@@ -416,10 +405,7 @@
         "merge_place_help": "Ets a punt de fusionar <strong>{place}</strong> amb la ubicació seleccionada. Es modificaran també les {n} activitats associades a {place}.",
         "edit_user": "Modifica l'usuàriï",
         "notify": "Notifica",
-        "smtp_from_address": "Nom de remitent",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "hidden": ""
+        "smtp_from_address": "Nom de remitent"
     },
     "auth": {
         "not_confirmed": "Encara no s'ha confirmat…",

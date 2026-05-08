@@ -110,60 +110,7 @@
         "admin_email_help": "Het afzender e-mailadres. Naar dit adres worden ook de admin mails verstuurd",
         "show_download_media_hint": "Toon een download media knop in de evenementpagina",
         "allow_event_without_end_time": "Sta evenementen zonder eindtijd toe",
-        "show_download_media": "Toon download media actie",
-        "instance_locale_description": "",
-        "trusted_sources_label": "",
-        "page_is_disabled": "",
-        "hide_boost_bookmark_help": "",
-        "federated_events_in_home": "",
-        "instance_timezone_description": "",
-        "page_remove_ok": "",
-        "past_unconfirmed_events": "",
-        "custom_js": "",
-        "unblock_user": "",
-        "smtp_password_description": "",
-        "title_description": "",
-        "smtp_from_address_help": "",
-        "trusted_sources_label_help": "",
-        "edit_tag_help": "",
-        "unconfirmed_events": "",
-        "trusted_source_removed": "",
-        "calendar_first_day_of_week": "",
-        "add_source": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "custom_js_help": "",
-        "page_description": "",
-        "edit_user": "",
-        "default_fedi_hashtags_help": "",
-        "smtp_description": "",
-        "trusted_sources_label_default": "",
-        "calendar_first_day_of_week_default": "",
-        "change_role_confirm": "",
-        "enable_moderation_hint": "",
-        "delete_page_confirm": "",
-        "enable_moderation": "",
-        "not_reachable_warning": "",
-        "notify": "",
-        "new_page": "",
-        "smtp_from_address": "",
-        "delete_trusted_source_confirm": "",
-        "calendar_first_day_of_week_description": "",
-        "custom_css": "",
-        "allow_geolocation_hint": "",
-        "federated_events_in_home_help": "",
-        "geolocation_description": "",
-        "add_trusted_source": "",
-        "stats": "",
-        "add_trusted_source_help": "",
-        "enable_report": "",
-        "default_fedi_hashtags": "",
-        "place_description": "",
-        "custom_css_help": "",
-        "wrong_domain_warning": "",
-        "plugins_description": ""
+        "show_download_media": "Toon download media actie"
     },
     "ordinal": {
         "1": "eerste",
@@ -289,20 +236,7 @@
         "report": "Meld evenement",
         "role": "Rol",
         "show_preview": "Toon voorbeeld",
-        "test": "Test",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "pages": "",
-        "trusted_sources": "",
-        "past_events": "",
-        "draft": "",
-        "dark_mode": "",
-        "enabled": ""
+        "test": "Test"
     },
     "login": {
         "not_registered": "Niet geregistreerd?",
@@ -323,12 +257,7 @@
         "feed_description": "Om updates te volgen met een computer of smartphone, zonder regelmatig deze website te hoeven bezoeken, kun je RSS-feeds gebruiken.</p>\n\n<p> Om RSS-feeds te kunnen bekijken gebruik je een speciale app om updates te ontvangen van websites die jou interesseren. Het is een goede manier om veel websites snel te kunnen volgen, zonder een account aan te hoeven maken of andere tijdrovende dingen te hoeven doen. </p>\n\n<li> Wanneer je Android gebruikt raden wij <a href=\"https://f-droid.org/en/packages/net.frju.flym/\">Flym</a> of Feeder aan</li>\n<li> Voor iPhone / iPad kun je <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\"> Feed4U </a> gebruiken </li>\n<li> Voor een desktop / laptop raden wij Feedbro aan, die je dient toe te voegen aan <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\"> Firefox </a> of <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\"> Chrome </a>. </li>\n<br/>\nDoor het toevoegen van deze link aan jouw RSS-feedreader blijf je up-to-date.",
         "ical_description": "Computers en smartphones hebben meestal een agenda-applicatie die in staat is om een externe agenda te importeren.",
         "list_description": "Wanneer je een website hebt en je wilt een lijst met evenementen tonen, gebruik dan de volgende code",
-        "filter_description": "Je kunt je export hier filteren op tags en plaats of op een voorgedefinieerde collectie",
-        "filter_title": "",
-        "show_more": "",
-        "ical_title": "",
-        "max_height": "",
-        "list_title": ""
+        "filter_description": "Je kunt je export hier filteren op tags en plaats of op een voorgedefinieerde collectie"
     },
     "event": {
         "recurrent": "Herhalend",
@@ -396,21 +325,7 @@
         "report_message_confirmation": "Vind jij dat dit evenement hier niet zou moeten staan? Stuur ons de reden",
         "send_to_admins": "Stuur naar admins",
         "disable_author": "Auteur uitschakelen",
-        "disable_author_confirm": "Weet je zeker dat je de maker van dit evenement wilt uitschakelen?",
-        "tentative": "",
-        "recurrent_1y_days": "",
-        "follow_me_description": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "address_geocoded_disclaimer": "",
-        "each_year": "",
-        "cancelled": "",
-        "recurrent_1y_ordinal": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": "",
-        "anon_description_without_registration": ""
+        "disable_author_confirm": "Weet je zeker dat je de maker van dit evenement wilt uitschakelen?"
     },
     "confirm": {
         "title": "Gebruiker beoordelen",
@@ -421,8 +336,7 @@
         "completed": "Instellen compleet",
         "start": "Start",
         "completed_description": "<p>Je kunt nu met de volgende gegevens inloggen:<br/><br/>Gebruiker: <b>{email}</b><br/>Wachtwoord: <b>{password}<b/></p>",
-        "copy_password_dialog": "Ja, je moet het wachtwoord kopiëren!",
-        "https_warning": ""
+        "copy_password_dialog": "Ja, je moet het wachtwoord kopiëren!"
     },
     "register": {
         "complete": "Registraties moeten worden beoordeeld.",
@@ -435,8 +349,7 @@
         "password_updated": "Wachtwoord veranderd.",
         "remove_account_confirm": "Je staat op het punt om je account permanent te verwijderen",
         "update_confirm": "Wil je jouw wijziging opslaan?",
-        "change_password": "Jouw wachtwoord veranderen",
-        "remove_account": ""
+        "change_password": "Jouw wachtwoord veranderen"
     },
     "auth": {
         "fail": "Je kon niet inloggen. Weet je zeker dat je wachtwoord klopt?",
@@ -444,10 +357,7 @@
     },
     "validators": {
         "required": "{fieldName} is vereist",
-        "email": "Een geldig e-mailadres invullen",
-        "latitude": "",
-        "url": "",
-        "longitude": ""
+        "email": "Een geldig e-mailadres invullen"
     },
     "about": "\n  <p><a href='https://gancio.org'>Gancio</a> is een gedeelde agenda voor lokale community's.</p>\n  ",
     "oauth": {
@@ -460,9 +370,5 @@
     "error": {
         "nick_taken": "Deze gebruikersnaam is al in gebruik.",
         "email_taken": "Dit e-mailadres is al in gebruik."
-    },
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
     }
 }

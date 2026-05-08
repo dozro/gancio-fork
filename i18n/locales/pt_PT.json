@@ -119,16 +119,7 @@
         "enabled": "Ativado",
         "trusted_sources": "Fontes federadas confiáveis",
         "pages": "Páginas",
-        "past_events": "Eventos Passados",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "past_events": "Eventos Passados"
     },
     "login": {
         "forgot_password": "Esqueceu sua palavra-passe?",
@@ -216,16 +207,7 @@
         "online_locations_help": "URL de uma sala de videoconferência ou URL para confirmação de presença (máx. 3)",
         "each_year": "Anualmente",
         "recurrent_1y_days": "{months} {days} anualmente",
-        "recurrent_1y_ordinal": "O {n} {days} em {months} anualmente",
-        "tentative": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "cancelled": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": "",
-        "anon_description_without_registration": ""
+        "recurrent_1y_ordinal": "O {n} {days} em {months} anualmente"
     },
     "admin": {
         "user_create_ok": "Utilizador criado",
@@ -382,18 +364,7 @@
         "page_description": "Nesta secção, você poderá gerir páginas personalizadas (e.g. termos de uso, howtos). Estas páginas não irão aparecer automaticamente em nenhum lugar, mas pode referenciá-las no rodapé, a partir da página de sobre ou de qualquer outro lugar através da ligação de pré-visualização.",
         "calendar_first_day_of_week": "Primeiro dia da semana",
         "calendar_first_day_of_week_description": "Escolha o dia da semana que os calendários devem exibir como o primeiro dia da semana. O valor padrão é definido conforme a localização do cliente.",
-        "calendar_first_day_of_week_default": "Padrão (localização do cliente)",
-        "page_is_disabled": "",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "smtp_from_address_help": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "edit_user": "",
-        "notify": "",
-        "smtp_from_address": ""
+        "calendar_first_day_of_week_default": "Padrão (localização do cliente)"
     },
     "settings": {
         "password_updated": "Palavra-passe alterada.",
@@ -435,9 +406,7 @@
         "ical_description": "Computadores e smartphones normalmente possuem aplicações de calendário capazes de importar um calendário remoto.",
         "filter_title": "Filtro",
         "ical_title": "ics/ical",
-        "list_title": "Lista",
-        "show_more": "",
-        "max_height": ""
+        "list_title": "Lista"
     },
     "confirm": {
         "title": "Confirmação de utilizador",
@@ -462,9 +431,5 @@
         "nick_taken": "Este nome de utilizador já está em uso.",
         "email_taken": "Este e-mail já está em uso."
     },
-    "about": "\n  <p><a href='https://gancio.org'>Gancio</a> é uma agenda partilhada para comunidades locais.</p>\n  ",
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
-    }
+    "about": "\n  <p><a href='https://gancio.org'>Gancio</a> é uma agenda partilhada para comunidades locais.</p>\n  "
 }

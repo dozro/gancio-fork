@@ -118,16 +118,7 @@
         "cancel": "Otkaži",
         "login": "Prijava",
         "pages": "Stranice",
-        "enabled": "Omogućeno",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "enabled": "Omogućeno"
     },
     "login": {
         "description": "Prijavljivanjem možete objavljivati nove događaje.",
@@ -151,9 +142,7 @@
         "feed_description": "Da biste pratili ažuriranja sa računara ili pametnog telefona bez potrebe da periodično otvarate ovaj sajt, koristite RSS kanale.\n\nUz RSS kanale koristite posebnu aplikaciju za primanje ažuriranja sa sajtova koji vas interesuju. To je dobar način da brzo pratite mnoge sajtove, bez potrebe za kreiranjem naloga ili drugih komplikacija.\n\n<li> Ako imate Android, preporučujemo <a href=\"https://f-droid.org/en/packages/net.frju.flym/\">Flym</a> ili Feeder </li>\n<li> Za iPhone / iPad možete koristiti <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\">Feed4U</a> </li>\n<li> Za desktop / laptop preporučujemo Feedbro, koji se instalira na <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\">Firefox</a> ili <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\">Chrome</a>. </li>\n<br/>\nDodavanje ovog linka u vaš RSS čitač održaće vas u toku.",
         "list_title": "Lista",
         "ical_title": "ics/ical",
-        "filter_title": "Filter",
-        "show_more": "",
-        "max_height": ""
+        "filter_title": "Filter"
     },
     "event": {
         "where_description": "Gde je događaj? Ako mesto nije prisutno, možete ga kreirati.",
@@ -223,19 +212,7 @@
         "send_to_author_too": "Pošalji administratorima i autoru",
         "disable_author": "Onemogući autora",
         "disable_author_confirm": "Da li ste sigurni da želite onemogućiti autora ovog događaja?",
-        "recurrent_2m_ordinal": "Each {n} {days} a month every other",
-        "tentative": "",
-        "recurrent_1y_days": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "each_year": "",
-        "cancelled": "",
-        "recurrent_1y_ordinal": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": "",
-        "anon_description_without_registration": ""
+        "recurrent_2m_ordinal": "Each {n} {days} a month every other"
     },
     "register": {
         "description": "Socijalni pokreti treba da se organizuju i samofinansiraju.<br/>\n<br/>Pre nego što objavite, <strong>nalog mora biti odobren</strong>, imajte na umu da <strong>iza ovog sajta stoje stvarni ljudi</strong>, pa napišite nekoliko rečenica kako bismo znali koje događaje bi želeli da objavite.",
@@ -383,22 +360,7 @@
         "past_unconfirmed_events": "Prošli nepotvrđeni događaji",
         "new_page": "Dodajte novu prilagođenu stranicu",
         "delete_page_confirm": "Da li ste sigurni da želite da uklonite stranicu „<strong>{title}</strong>“?",
-        "page_description": "U ovom odeljku možete upravljati prilagođenim stranicama (npr. pravilima, uputstvima)",
-        "page_is_disabled": "",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "smtp_password_description": "",
-        "smtp_from_address_help": "",
-        "calendar_first_day_of_week": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "edit_user": "",
-        "calendar_first_day_of_week_default": "",
-        "notify": "",
-        "smtp_from_address": "",
-        "calendar_first_day_of_week_description": ""
+        "page_description": "U ovom odeljku možete upravljati prilagođenim stranicama (npr. pravilima, uputstvima)"
     },
     "ordinal": {
         "3": "treći",
@@ -433,8 +395,7 @@
         "required": "Polje {fieldName} je obavezno",
         "email": "Unesite važeću e-mail adresu",
         "latitude": "Unesite važeću latitudu (-90 < latituda < 90)",
-        "longitude": "Unesite važeću longtitudu (-180 < longtitude < 180)",
-        "url": ""
+        "longitude": "Unesite važeću longtitudu (-180 < longtitude < 180)"
     },
     "about": "\n  <p><a href='https://gancio.org'>Gancio</a> je zajednička agenda za lokalne zajednice.</p>\n  ",
     "oauth": {
@@ -450,9 +411,5 @@
         "copy_password_dialog": "Da, morate kopirati lozinku!",
         "start": "Početak",
         "https_warning": "Pristupate stranici putem HTTP-a, zapamtite da morate promeniti baseurl u config.json ako pređete na HTTPS!"
-    },
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
     }
 }

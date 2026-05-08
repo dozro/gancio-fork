@@ -118,16 +118,7 @@
         "report": "گزارش رویداد",
         "role": "نقش",
         "past_events": "رویدادهای گذشته",
-        "pages": "صفحات",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "pages": "صفحات"
     },
     "login": {
         "description": "با ورود به حساب‌کاربری می‌توانید رویدادهای جدید را منتشر کنید.",
@@ -151,9 +142,7 @@
         "filter_description": "شما می‌توانید در اینجا برون‌ریزی خود را بر اساس برچسب‌ها و مکان یا یک مجموعه از پیش تعیین‌شده پالایش کنید",
         "ical_description": "کامپیوترها و گوشی‌های هوشمند معمولاً با یک برنامه تقویم مجهز هستند که قادر به وارد کردن یک تقویم از راه دور است.",
         "ical_title": "فایل ics/ical",
-        "feed_description": "برای دریافت به‌روزرسانی‌ها از طریق کامپیوتر یا گوشی هوشمند، بدون نیاز به باز کردن دوره‌ای این وبگاه، ازخوراک وب استفاده کنید\n\n<p>با استفاده ازخوراک وب می‌توانید با کمک یک کارهٔ خاص، به‌روزرسانی‌های وبگاه‌های مورد علاقه خود را دریافت کنید؛ این روشی عالی برای پی‌گرفتنه سریع چندین وبگاه است، بدون نیاز به ایجاد حساب کاربری یا سایر پیچیدگی‌ها.</p>\n\n<li>اگر دستگاه شما اندروید است، ما <a href=\"https://f-droid.org/en/packages/net.frju.flym/\">Flym</a> یا Feeder را پیشنهاد می‌کنیم</li>\n<li>برای آیفون/آیپد می‌توانید از <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\">Feed4U</a> استفاده کنید</li>\n<li>برای کامپیوترهای دسکتاپ/لپ‌تاپ، نصب Feedbro روی <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\">Firefox</a> یا <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\">Chrome</a> را توصیه می‌کنیم</li>\n<br/>\nبا افزودن این پیوند‌ها، درکارهً خوراک‌خوان خود، همیشه به‌روز خواهید ماند.",
-        "show_more": "",
-        "max_height": ""
+        "feed_description": "برای دریافت به‌روزرسانی‌ها از طریق کامپیوتر یا گوشی هوشمند، بدون نیاز به باز کردن دوره‌ای این وبگاه، ازخوراک وب استفاده کنید\n\n<p>با استفاده ازخوراک وب می‌توانید با کمک یک کارهٔ خاص، به‌روزرسانی‌های وبگاه‌های مورد علاقه خود را دریافت کنید؛ این روشی عالی برای پی‌گرفتنه سریع چندین وبگاه است، بدون نیاز به ایجاد حساب کاربری یا سایر پیچیدگی‌ها.</p>\n\n<li>اگر دستگاه شما اندروید است، ما <a href=\"https://f-droid.org/en/packages/net.frju.flym/\">Flym</a> یا Feeder را پیشنهاد می‌کنیم</li>\n<li>برای آیفون/آیپد می‌توانید از <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\">Feed4U</a> استفاده کنید</li>\n<li>برای کامپیوترهای دسکتاپ/لپ‌تاپ، نصب Feedbro روی <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\">Firefox</a> یا <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\">Chrome</a> را توصیه می‌کنیم</li>\n<br/>\nبا افزودن این پیوند‌ها، درکارهً خوراک‌خوان خود، همیشه به‌روز خواهید ماند."
     },
     "register": {
         "description": "جنبش‌های اجتماعی باید سازماندهی و خودگردان باشند.<br/>\n<br/>قبل از انتشار، <strong>حساب‌کاربری باید تأیید شود</strong>، در نظر داشته باشید که <strong>در پشت این وبگاه افراد واقعی را خواهید یافت</strong>، بنابراین دو خط بنویسید تا به ما اطلاع دهید که چه رویدادهایی را می‌خواهید منتشر کنید.",
@@ -233,15 +222,7 @@
         "image_too_big": "عکس اپلودشده بسیار بزرگ است. تنضیمات سرورتان رو چک کنید.",
         "recurrent_2m_days": "هر {days} یک ماه در میان",
         "import_description": "شما می توانید رویداد را از سیستم عامل های دیگر و موارد دیگر از طریق فرمت های استاندارد (ics و h-event) وارد کنید",
-        "recurrent_1m_days": "{روزهای} هر ماه",
-        "tentative": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "cancelled": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": ""
+        "recurrent_1m_days": "{روزهای} هر ماه"
     },
     "setup": {
         "https_warning": "شما با HTTP بازدید می‌کنید، به یاد داشته باشید که اگر به HTTPS تغییر دهید، باید baseurl را در config.json تغییر دهید!",
@@ -395,18 +376,7 @@
         "custom_css_help": "شمامیتوانید فایل سبک رو شخصی سازی کنید , برای خواندن بعضی از مثال ها <a href='https://gancio.org/usage/custom_css'>اینجاکلیک کنید</a>.",
         "geolocation_description": "<b>۱. یک ارائه‌دهنده برای سرویس جغرافیایی تعریف کنید</b>.<br>در حال حاضر، از بین گزینه‌های فهرست شده در <a href=\"https://wiki.openstreetmap.org/wiki/Nominatim#Alternatives_.2F_Third-party_providers\">ویکی OpenStreetMap</a>، نرم‌افزارهای <a href=\"https://github.com/osm-search/Nominatim\">Nominatim</a> و <a href=\"https://github.com/komoot/photon\">Photon</a> پشتیبانی می‌شوند.<br>می‌توانید از یکی از دموهای رسمی مرتبط با کپی کردن لینک در فیلد 'ارائه‌دهنده جغرافیایی' استفاده کنید:<ul><li>https://nominatim.openstreetmap.org/search (<a href=\"https://operations.osmfoundation.org/policies/nominatim/\">شرایط استفاده</a>)</li><li>https://photon.komoot.io/api/ (<a href=\"https://photon.komoot.io/\">شرایط استفاده</a>)</li></ul><br><b>۲. یک ارائه‌دهنده برای لایه‌های نقشه تعریف کنید.</b><br>می‌توانید فهرستی از آنها را اینجا بیابید: <a href=\"https://leaflet-extras.github.io/leaflet-providers/preview/\">https://leaflet-extras.github.io/leaflet-providers/preview/</a>",
         "custom_js_help": "شما می‌توانید با نوشتن در کادر متنی زیر، کد جاوااسکریپتی را اضافه کنید که برای هر کاربر بارگذاری خواهد شد. احتمالاً بهتر است ابتدا <a href='https://gancio.org/usage/custom_js'>مستندات</a> را مطالعه کنید.",
-        "default_fedi_hashtags_help": "برچسب‌های مشخص شده به رویدادهای ارسال شده به فدیورس اضافه خواهند شد",
-        "page_is_disabled": "",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "smtp_from_address_help": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "edit_user": "",
-        "notify": "",
-        "smtp_from_address": ""
+        "default_fedi_hashtags_help": "برچسب‌های مشخص شده به رویدادهای ارسال شده به فدیورس اضافه خواهند شد"
     },
     "settings": {
         "remove_account": "با فشردن دکمه‌ی زیر، حساب کاربری شما حذف خواهد شد. رویدادهایی که منتشر کرده‌اید، برداشته نخواهند شد.",
@@ -451,9 +421,5 @@
     "error": {
         "nick_taken": "این نام‌نمایشی قبلاً استفاده شده است.",
         "email_taken": "این رایانامه قبلاً استفاده شده است."
-    },
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
     }
 }

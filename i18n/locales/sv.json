@@ -67,19 +67,7 @@
         "anon_description": "Du kan lägga till ett evenemang utan att registrera dig eller logga in, men du måste vänta på att någon läser det\noch bekräftar att det är ett lämpligt evenemang. Det kommer inte att vara möjligt att ändra det.<br/><br/>\nDu kan istället <a href='/login'>logga in</a> eller <a href='/register'>registrera dig</a>. Annars, gå vidare och få ett svar så snart som möjligt. ",
         "recurrent_2w_days": "En {days} varannan",
         "recurrent_2m_days": "Den {days} varannan månad",
-        "recurrent_2m_ordinal": "Varje {n} {days} i månaden varannan",
-        "tentative": "",
-        "recurrent_1y_days": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "each_year": "",
-        "cancelled": "",
-        "recurrent_1y_ordinal": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": "",
-        "anon_description_without_registration": ""
+        "recurrent_2m_ordinal": "Varje {n} {days} i månaden varannan"
     },
     "admin": {
         "enable_resources": "Aktivera resurser",
@@ -216,44 +204,13 @@
         "show_download_media": "Visa \"ladda ner media\"",
         "show_download_media_hint": "Visa en \"ladda ner media\" knapp i eventsidan",
         "default_fedi_hashtags": "Standard hashtags för fediverse",
-        "default_fedi_hashtags_help": "De angivna taggarna kommer att läggas till i händelser som skickas till Fediverse",
-        "trusted_sources_label": "",
-        "page_is_disabled": "",
-        "federated_events_in_home": "",
-        "page_remove_ok": "",
-        "past_unconfirmed_events": "",
-        "unblock_user": "",
-        "smtp_password_description": "",
-        "smtp_from_address_help": "",
-        "trusted_sources_label_help": "",
-        "unconfirmed_events": "",
-        "trusted_source_removed": "",
-        "calendar_first_day_of_week": "",
-        "add_source": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "page_description": "",
-        "edit_user": "",
-        "trusted_sources_label_default": "",
-        "calendar_first_day_of_week_default": "",
-        "delete_page_confirm": "",
-        "notify": "",
-        "new_page": "",
-        "smtp_from_address": "",
-        "delete_trusted_source_confirm": "",
-        "calendar_first_day_of_week_description": "",
-        "federated_events_in_home_help": "",
-        "add_trusted_source": "",
-        "add_trusted_source_help": ""
+        "default_fedi_hashtags_help": "De angivna taggarna kommer att läggas till i händelser som skickas till Fediverse"
     },
     "validators": {
         "latitude": "Skriv en valid latitud (-90 < latitud < 90)",
         "email": "Skriv en valid mejladress",
         "longitude": "Skriv en valid longitud (-180 < longitud < 180)",
-        "required": "{fieldName} krävs",
-        "url": ""
+        "required": "{fieldName} krävs"
     },
     "about": "\n  <p><a href='https://gancio.org'>Gancio</a> är en delad agenda för lokala samhällen.</p>\n  ",
     "oauth": {
@@ -306,12 +263,7 @@
         "ical_description": "Datorer och smartphones är vanligtvis utrustade med en kalenderapp som kan importera en webkalender.",
         "list_description": "Ifall du har en hemsida och vill visa en lista av evenemang, använd följande kod",
         "filter_description": "Du kan filtrera din export här efter taggar och platser eller med en förskapad samling",
-        "email_description": "Du kan få evenemang som intresserar dig skickat via e-post.",
-        "filter_title": "",
-        "show_more": "",
-        "ical_title": "",
-        "max_height": "",
-        "list_title": ""
+        "email_description": "Du kan få evenemang som intresserar dig skickat via e-post."
     },
     "register": {
         "description": "Sociala rörelser bör organisera sig och självfinansiera.<br/> \n<br/>Innan du kan publicera måste <strong>kontot godkännas</strong>; tänk på att <strong>bakom denna webbplats finns riktiga människor</strong>, så skriv ett par rader för att låta oss veta vilka evenemang du vill publicera.",
@@ -435,20 +387,7 @@
         "my_events": "Mina Evenemang",
         "contact_user": "Kontakta användare",
         "report": "Anmäl evenemang",
-        "role": "Roll",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "pages": "",
-        "trusted_sources": "",
-        "past_events": "",
-        "draft": "",
-        "dark_mode": "",
-        "enabled": ""
+        "role": "Roll"
     },
     "login": {
         "description": "Genom att logga in kan du publicera nya evenemang.",
@@ -461,9 +400,5 @@
     },
     "recover": {
         "not_valid_code": "Något gick fel."
-    },
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
     }
 }

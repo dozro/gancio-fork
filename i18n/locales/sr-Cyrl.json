@@ -139,22 +139,7 @@
         "unconfirmed_events": "Непотврђени догађаји",
         "new_page": "Додајте нову прилагођену страницу",
         "delete_page_confirm": "Да ли сте сигурни да желите да уклоните страницу „<strong>{title}</strong>“?",
-        "page_description": "У овом одељку можете управљати прилагођеним страницама (нпр. правилима, упутствима)",
-        "page_is_disabled": "",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "smtp_password_description": "",
-        "smtp_from_address_help": "",
-        "calendar_first_day_of_week": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "edit_user": "",
-        "calendar_first_day_of_week_default": "",
-        "notify": "",
-        "smtp_from_address": "",
-        "calendar_first_day_of_week_description": ""
+        "page_description": "У овом одељку можете управљати прилагођеним страницама (нпр. правилима, упутствима)"
     },
     "confirm": {
         "not_valid": "Нешто је пошло наопако.",
@@ -295,16 +280,7 @@
         "email": "Имејл",
         "feed_url_copied": "Отворите копирани RSS канал у вашем RSS читачу",
         "pages": "Странице",
-        "enabled": "Омогућено",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "enabled": "Омогућено"
     },
     "login": {
         "not_registered": "Нисте регистровани?",
@@ -389,19 +365,7 @@
         "ics": "ICS",
         "online_locations_help": "URL видео конференцијске собе или RSVP URL (макс. 3)",
         "follow_me_description": "Један од начина да останете у току са догађајима објављеним овде на {title}\nје праћење налога <u>{account}</u> са федиверзума, на пример путем Мастодона, и евентуално додавање ресурса догађају одатле.<br/><br/>\nАко никада нисте чули за Мастодон и федиверзум, препоручујемо да прочитате <a href='https://www.savjee.be/videos/simply-explained/mastodon-and-fediverse-explained/'>овај чланак </a>.<br/><br/>Унесите своју инстанцу испод (нпр. mastodon.social)",
-        "recurrent_2w_days": "Сваки други {days}",
-        "tentative": "",
-        "recurrent_1y_days": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "each_year": "",
-        "cancelled": "",
-        "recurrent_1y_ordinal": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": "",
-        "anon_description_without_registration": ""
+        "recurrent_2w_days": "Сваки други {days}"
     },
     "export": {
         "ical_description": "Рачунари и паметни телефони обично су опремљени апликацијом за календар која може увозити удаљени календар.",
@@ -413,9 +377,7 @@
         "feed_description": "Да бисте пратили ажурирања са рачунара или паметног телефона без потребе да периодично отварате овај сајт, користите RSS канале.\n\nУз RSS канале користите посебну апликацију за примање ажурирања са сајтова који вас интересују. То је добар начин да брзо пратите многе сајтове, без потребе за креирањем налога или других компликација.\n\n<li> Ако имате Андроид, препоручујемо <a href=\"https://f-droid.org/en/packages/net.frju.flym/\">Flym</a> или Feeder </li>\n<li> За iPhone / iPad можете користити <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\"> Feed4U </a> </li>\n<li> За десктоп / лаптоп препоручујемо Feedbro, који се инсталира на <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\"> Firefox </a> или <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\"> Chrome </a>. </li>\n<br/>\nДодавање овог линка у ваш RSS читач одржаће вас у току.",
         "list_title": "Листа",
         "filter_title": "Филтер",
-        "ical_title": "ics/ical",
-        "show_more": "",
-        "max_height": ""
+        "ical_title": "ics/ical"
     },
     "recover": {
         "not_valid_code": "Нешто је пошло наопако."
@@ -440,8 +402,7 @@
         "email": "Унесите важећу имејл адресу",
         "latitude": "Унесите важећу латитуду (-90 < латитуда < 90)",
         "longitude": "Унесите важећу лонгтитуду (-180 < лонгтитуда < 180)",
-        "required": "Поље {fieldName} је обавезно",
-        "url": ""
+        "required": "Поље {fieldName} је обавезно"
     },
     "setup": {
         "completed": "Подешавање завршено",
@@ -450,9 +411,5 @@
         "completed_description": "<p>Сада се можете пријавити са следећим корисником:<br/><br/>Корисник: <b>{email}</b><br/>Лозинка: <b>{password}</b></p>",
         "https_warning": "Приступате страници путем HTTP-а, запамтите да морате променити baseurl у config.json-у ако пређете на HTTPS!"
     },
-    "about": "\n  <p><a href='https://gancio.org'>Ганцио</a> је заједничка агенда за локалне заједнице.</p>\n  ",
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
-    }
+    "about": "\n  <p><a href='https://gancio.org'>Ганцио</a> је заједничка агенда за локалне заједнице.</p>\n  "
 }

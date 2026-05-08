@@ -123,14 +123,7 @@
         "trusted_sources": "Fuentes federadas de confianza",
         "past_events": "Eventos pasados",
         "no_events_found": "No hay eventos",
-        "no_events_found_hint": "Selecciona fechas o filtros diferentes",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "no_events_found_hint": "Selecciona fechas o filtros diferentes"
     },
     "login": {
         "description": "Entrando podrás publicar nuevos eventos.",
@@ -154,9 +147,7 @@
         "filter_description": "Aquí puede filtrar su exportación por etiquetas y lugar o por una colección preestablecida",
         "filter_title": "Filtro",
         "ical_title": "ics/ical",
-        "list_title": "Lista",
-        "show_more": "",
-        "max_height": ""
+        "list_title": "Lista"
     },
     "register": {
         "description": "Los movimientos sociales necesitan organizarse y autofinanciarse. <br/>\n<br/>Antes de que puedas publicar, <strong> debemos aprobar la cuenta </strong>. Como imaginarás, <strong> detrás de este sitio hay personas de carne y hueso</strong>, por esto te pedimos escribir algo para hacernos saber que tipos de eventos te gustaría publicar.",
@@ -238,15 +229,7 @@
         "recurrent_1y_days": "{days} de {months} de cada año",
         "recurrent_1y_ordinal": "Los {n} {days} en {months} cada año",
         "each_year": "Cada año",
-        "anon_description_without_registration": "Puedes añadir un evento, pero tendrá que ser revisado para confirmar que es adecuado.\nNo será posible modificarlo una vez enviado.<br/><br/>\nContinua y sube tu evento, lo revisaremos lo antes posible.",
-        "tentative": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "cancelled": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": ""
+        "anon_description_without_registration": "Puedes añadir un evento, pero tendrá que ser revisado para confirmar que es adecuado.\nNo será posible modificarlo una vez enviado.<br/><br/>\nContinua y sube tu evento, lo revisaremos lo antes posible."
     },
     "admin": {
         "place_description": "En el caso de que un lugar sea incorrecto o cambie de dirección, puedes cambiarlo. <br/> Todos los eventos presentes y pasados asociados con este lugar cambiarán de dirección.",
@@ -408,16 +391,7 @@
         "receive_confirm_notification": "Obtener e-mail de confirmación de usuario/evento",
         "smtp_password_description": "Déjalo en blanco si no quieres cambiar la contraseña",
         "calendar_first_day_of_week_description": "Selecciona el día de la semana que los calendarios deben mostrar como el primer día de la semana. La configuración predeterminada se basa en la configuración regional del cliente.",
-        "calendar_first_day_of_week_default": "Predeterminado (configuración regional del cliente)",
-        "unblock_user": "",
-        "smtp_from_address_help": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "edit_user": "",
-        "notify": "",
-        "smtp_from_address": ""
+        "calendar_first_day_of_week_default": "Predeterminado (configuración regional del cliente)"
     },
     "auth": {
         "not_confirmed": "Todavía no hemos confirmado este email…",

@@ -73,19 +73,7 @@
         "send_to_author_too": "Lähetä admineille ja tapahtuman luojalle",
         "disable_author": "Poista luoja käytöstä",
         "disable_author_confirm": "Oletko varma, että haluat poistaa käytöstä luojan roolin tälle tapahtumalle?",
-        "ics": "ICS",
-        "tentative": "",
-        "recurrent_1y_days": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "each_year": "",
-        "cancelled": "",
-        "recurrent_1y_ordinal": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": "",
-        "anon_description_without_registration": ""
+        "ics": "ICS"
     },
     "common": {
         "home": "Koti",
@@ -207,16 +195,7 @@
         "enabled": "Käytössä",
         "trusted_sources": "Luotettavat federoidut lähteet",
         "pages": "Sivut",
-        "past_events": "Aiemmat tapahtumat",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "past_events": "Aiemmat tapahtumat"
     },
     "export": {
         "email_description": "Voit saada tietoa sinua kiinnostavista tapahtumista sähköpostiisi.",
@@ -228,9 +207,7 @@
         "insert_your_address": "Syötä sähköpostiosoitteesi",
         "filter_title": "Suodata",
         "ical_title": "ics/ical",
-        "list_title": "Luettelo",
-        "show_more": "",
-        "max_height": ""
+        "list_title": "Luettelo"
     },
     "login": {
         "description": "Kirjautumalla sisään voit julkaista uusia tapahtumia.",
@@ -384,22 +361,7 @@
         "custom_js_help": "Voit alla olevaan tekstikenttään kirjoittaa JavaScript-koodia, joka ladataan jokaiselle käyttäjälle. Haluat luultavasti lukea <a href='https://gancio.org/usage/custom_js'>dokumentaation</a> ensin.",
         "custom_css_help": "Voit myös muokata joitain tyylejä, katso esimerkkejä <a href='https://gancio.org/usage/custom_css'>täältä</a>.",
         "delete_announcement_confirm": "Oletko varma, että haluat poistaa ilmoituksen?",
-        "user_blocked": "Käyttäjä {user} estetty",
-        "page_is_disabled": "",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "smtp_password_description": "",
-        "smtp_from_address_help": "",
-        "calendar_first_day_of_week": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "edit_user": "",
-        "calendar_first_day_of_week_default": "",
-        "notify": "",
-        "smtp_from_address": "",
-        "calendar_first_day_of_week_description": ""
+        "user_blocked": "Käyttäjä {user} estetty"
     },
     "settings": {
         "update_confirm": "Haluatko tallentaa muutoksesi?",
@@ -437,8 +399,7 @@
         "email": "Syötä korrekti sähköpostiosoite",
         "required": "{fieldName} on pakollinen",
         "longitude": "Syötä korrekti pituusaste (välillä -180 ja 180)",
-        "latitude": "Syötä korrekti leveysaste (välillä -90 ja 90)",
-        "url": ""
+        "latitude": "Syötä korrekti leveysaste (välillä -90 ja 90)"
     },
     "about": "\n  <p><a href='https://gancio.org'>Gancio </a> on paikallisyhteisöille suunnattu jaettu tapahtumakalenteri.</p>\n  ",
     "setup": {
@@ -451,9 +412,5 @@
     "error": {
         "nick_taken": "Tämä käyttäjänimi on jo käytössä.",
         "email_taken": "Tämä sähköposti on jo käytössä."
-    },
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
     }
 }

@@ -115,20 +115,7 @@
         "user": "Użytkownik",
         "title": "Tytuł",
         "admin_actions": "Akcje admina",
-        "pin": "Pinezka",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "pages": "",
-        "trusted_sources": "",
-        "past_events": "",
-        "draft": "",
-        "dark_mode": "",
-        "enabled": ""
+        "pin": "Pinezka"
     },
     "settings": {
         "change_password": "Zmień swoje hasło",
@@ -155,8 +142,7 @@
         "required": "Pole {fieldName} jest wymagane",
         "email": "Podaj właściwy adres e-mail",
         "latitude": "Wstaw prawidłową szerokość geograficzną (-90 < szerokość geograficzna < 90)",
-        "longitude": "Wstaw prawidłową długość geograficzną (-180 < długość geograficzna < 180)",
-        "url": ""
+        "longitude": "Wstaw prawidłową długość geograficzną (-180 < długość geograficzna < 180)"
     },
     "error": {
         "nick_taken": "Ta nazwa użytkownika jest już zarejestrowana.",
@@ -306,43 +292,7 @@
         "tilelayer_test_success": "Usługa tilelayer pod adresem {service_name} działa",
         "stats": "{n_followers} \"actors\" podążają za tą instancją, istnieją {n_events} zdarzenia z fediverse i {n_resources} komentarze",
         "show_download_media": "Pokaż akcję pobierania multimediów",
-        "show_download_media_hint": "Wyświetlanie przycisku pobierania multimediów na stronie wydarzenia",
-        "trusted_sources_label": "",
-        "page_is_disabled": "",
-        "federated_events_in_home": "",
-        "page_remove_ok": "",
-        "past_unconfirmed_events": "",
-        "custom_js": "",
-        "unblock_user": "",
-        "smtp_password_description": "",
-        "smtp_from_address_help": "",
-        "trusted_sources_label_help": "",
-        "unconfirmed_events": "",
-        "trusted_source_removed": "",
-        "calendar_first_day_of_week": "",
-        "add_source": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "custom_js_help": "",
-        "page_description": "",
-        "edit_user": "",
-        "default_fedi_hashtags_help": "",
-        "trusted_sources_label_default": "",
-        "calendar_first_day_of_week_default": "",
-        "delete_page_confirm": "",
-        "notify": "",
-        "new_page": "",
-        "smtp_from_address": "",
-        "delete_trusted_source_confirm": "",
-        "calendar_first_day_of_week_description": "",
-        "custom_css": "",
-        "federated_events_in_home_help": "",
-        "add_trusted_source": "",
-        "add_trusted_source_help": "",
-        "default_fedi_hashtags": "",
-        "custom_css_help": ""
+        "show_download_media_hint": "Wyświetlanie przycisku pobierania multimediów na stronie wydarzenia"
     },
     "login": {
         "description": "Po zalogowaniu można publikować wydarzenia.",
@@ -360,12 +310,7 @@
         "insert_your_address": "Wprowadź swój adres e-mail",
         "intro": "W przeciwieństwie do platform społecznościowych, które robią wszystko, aby zatrzymać użytkowników i dane na ich temat, wierzymy, że informacje, podobnie jak ludzie, muszą być wolne. W tym celu możesz być na bieżąco z wydarzeniami, które chcesz, bez konieczności przechodzenia przez tę stronę.",
         "feed_description": "Aby śledzić aktualizacje z komputera lub smartfona bez konieczności okresowego otwierania tej witryny, użyj kanałów RSS. </p>\n\n<p> W przypadku kanałów RSS użytkownik korzysta ze specjalnej aplikacji, aby otrzymywać aktualizacje z interesujących go witryn. Jest to dobry sposób na szybkie śledzenie wielu witryn, bez konieczności tworzenia konta lub innych komplikacji. </p>\n\n<li> Jeśli masz Androida, polecamy <a href=\"https://f-droid.org/en/packages/net.frju.flym/\">Flym</a> lub Feeder </li>.\n<li> W przypadku iPhone'a / iPada można użyć <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\"> Feed4U </a> </li>.\n<li> Dla komputerów stacjonarnych / laptopów polecamy Feedbro, do zainstalowania na <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\"> Firefox </a> lub <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\"> Chrome </a>. </li>\n<br/>\nDodanie tego linku do czytnika kanałów RSS sprawi, że będziesz na bieżąco.",
-        "list_description": "Jeśli masz stronę internetową i chcesz wyświetlić na niej listę wydarzeń, użyj następującego kodu",
-        "filter_title": "",
-        "show_more": "",
-        "ical_title": "",
-        "max_height": "",
-        "list_title": ""
+        "list_description": "Jeśli masz stronę internetową i chcesz wyświetlić na niej listę wydarzeń, użyj następującego kodu"
     },
     "register": {
         "error": "Błąd ",
@@ -441,19 +386,7 @@
         "import_URL": "Import z adresu URL",
         "import_description": "Zdarzenia można importować z innych platform i instancji za pomocą standardowych formatów (ics i h-event)",
         "online_locations": "Lokalizacje online",
-        "address_geocoded_disclaimer": "Jeśli nie możesz znaleźć <strong>adresu ulicy</strong> lub <strong>numeru domu</strong>, którego szukasz w wynikach geokodowania, możesz ręcznie wstawić je w polu \"Adres\" bez utraty współrzędnych. Weź również pod uwagę, że projekt <a target=\"_blank\" href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> jest otwarty na wkład. Jeśli masz Androida, polecamy <a target=\"_blank\" href=\"https://f-droid.org/en/packages/de.westnordost.streetcomplete/\">StreetComplete</a>. ",
-        "tentative": "",
-        "recurrent_1y_days": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "each_year": "",
-        "cancelled": "",
-        "recurrent_1y_ordinal": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": "",
-        "anon_description_without_registration": ""
+        "address_geocoded_disclaimer": "Jeśli nie możesz znaleźć <strong>adresu ulicy</strong> lub <strong>numeru domu</strong>, którego szukasz w wynikach geokodowania, możesz ręcznie wstawić je w polu \"Adres\" bez utraty współrzędnych. Weź również pod uwagę, że projekt <a target=\"_blank\" href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> jest otwarty na wkład. Jeśli masz Androida, polecamy <a target=\"_blank\" href=\"https://f-droid.org/en/packages/de.westnordost.streetcomplete/\">StreetComplete</a>. "
     },
     "recover": {
         "not_valid_code": "Coś poszło nie tak."
@@ -461,9 +394,5 @@
     "auth": {
         "not_confirmed": "Jeszcze nie zatwierdzone…",
         "fail": "Nie można się zalogować. Czy hasło jest na pewno poprawne ?"
-    },
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
     }
 }

@@ -115,20 +115,7 @@
         "my_events": "Etkinliklerim",
         "contact_user": "Kullanıcıya ulaş",
         "report": "Etkinliği şikayet et",
-        "role": "Görev",
-        "save_draft": "",
-        "go_back": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "no_events_found_hint": "",
-        "no_events_found": "",
-        "publish": "",
-        "pages": "",
-        "trusted_sources": "",
-        "past_events": "",
-        "draft": "",
-        "dark_mode": "",
-        "enabled": ""
+        "role": "Görev"
     },
     "export": {
         "email_description": "İstersen ilginç etkinlerden e-posta yoluyla haberdar olabilirsin.",
@@ -137,12 +124,7 @@
         "list_description": "Sitende etkinliklerin listesini göstermek istiyorsan, bu kod parçasını kullan",
         "ical_description": "Telefonlardaki ve bilgisayarlardaki takvim programları, bir bağlantı üzerinden internetteki takvimleri takip edebilirler.",
         "filter_description": "Dışarı aktaracaklarını burada etiketleri, mekanları ya da dahil olduğu koleksiyonu aracılığıyla filtreleyebilirsin",
-        "insert_your_address": "E-posta adresini gir",
-        "filter_title": "",
-        "show_more": "",
-        "ical_title": "",
-        "max_height": "",
-        "list_title": ""
+        "insert_your_address": "E-posta adresini gir"
     },
     "event": {
         "added_anon": "Etkinlik eklendi ama henüz onaylanmadı.",
@@ -212,19 +194,7 @@
         "assign_to_user_description": "Anonim bir etkinliği bir kullanıcıya atayabilirsin. Böyle o kullanıcı bu etkinliği düzenleyebilir.",
         "disable_author": "Yazarı kapat",
         "send_to_author_too": "Yöneticilere ve etkinliğin yazarına yolla",
-        "assign_to_user": "Kullanıcıya ata",
-        "tentative": "",
-        "recurrent_1y_days": "",
-        "reannounce": "",
-        "reannounce_description": "",
-        "postponed": "",
-        "each_year": "",
-        "cancelled": "",
-        "recurrent_1y_ordinal": "",
-        "cancel_description": "",
-        "moved_onlined": "",
-        "rescheduled": "",
-        "anon_description_without_registration": ""
+        "assign_to_user": "Kullanıcıya ata"
     },
     "admin": {
         "user_add_help": "Kullanıcıya, aboneliğini bildiren ve parola ayarlamasına yardımcı olacak bir eposta yollanacak",
@@ -356,43 +326,7 @@
         "plugins_description": "Eklentiler, bu uygulamaya yeni özellikler katan kısa kod parçalarıdır. Bunlar genelde projeye hariçten, <a href=\"https://gancio.org/dev/plugins\">eklenti sistemini</a> kullanarak eklenen ve diğer platformlarla entegrasyon için kullanılan araçlardır. Örneğin; ilgili eklentiyi kullanarak, etkinlikleri farklı sosyal platformlarda duyurabilirsiniz.",
         "show_download_media": "Medya dosyasını indirme seçeneğini sun",
         "show_download_media_hint": "Etkinliğin sayfasında medya dosyasını indirme butonu göster",
-        "instance_removed": "Sunucu kaldırıldı",
-        "trusted_sources_label": "",
-        "page_is_disabled": "",
-        "federated_events_in_home": "",
-        "page_remove_ok": "",
-        "past_unconfirmed_events": "",
-        "custom_js": "",
-        "unblock_user": "",
-        "smtp_password_description": "",
-        "smtp_from_address_help": "",
-        "trusted_sources_label_help": "",
-        "unconfirmed_events": "",
-        "trusted_source_removed": "",
-        "calendar_first_day_of_week": "",
-        "add_source": "",
-        "hidden": "",
-        "user_update_ok": "",
-        "receive_confirm_notification_hint": "",
-        "merge_place_help": "",
-        "custom_js_help": "",
-        "page_description": "",
-        "edit_user": "",
-        "default_fedi_hashtags_help": "",
-        "trusted_sources_label_default": "",
-        "calendar_first_day_of_week_default": "",
-        "delete_page_confirm": "",
-        "notify": "",
-        "new_page": "",
-        "smtp_from_address": "",
-        "delete_trusted_source_confirm": "",
-        "calendar_first_day_of_week_description": "",
-        "custom_css": "",
-        "federated_events_in_home_help": "",
-        "add_trusted_source": "",
-        "add_trusted_source_help": "",
-        "default_fedi_hashtags": "",
-        "custom_css_help": ""
+        "instance_removed": "Sunucu kaldırıldı"
     },
     "login": {
         "insert_email": "E-posta adresini gir",
@@ -416,8 +350,7 @@
         "latitude": "Geçerli bir enlem girin (-90 < enlem < 90)",
         "email": "Geçerli bir eposta adresi girin",
         "longitude": "Geçerli bir boylam girin (-180 < boylam < 180)",
-        "required": "{fieldName} zorunludur",
-        "url": ""
+        "required": "{fieldName} zorunludur"
     },
     "ordinal": {
         "-1": "son",
@@ -462,9 +395,5 @@
         "fail": "Giriş yapılamadı. Şifrenin doğru olduğuna emin misin?",
         "not_confirmed": "Henüz onaylanmadı…"
     },
-    "about": "\n  <p><a href='https://gancio.org'>Gancio</a> yerel topluluklar için paylaşılan bir takvimdir.</p>\n  ",
-    "activitypub": {
-        "n_boosts": "",
-        "n_favorites": ""
-    }
+    "about": "\n  <p><a href='https://gancio.org'>Gancio</a> yerel topluluklar için paylaşılan bir takvimdir.</p>\n  "
 }
