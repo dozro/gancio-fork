@@ -119,7 +119,16 @@
         "pages": "Páginas",
         "enabled": "Ativado",
         "trusted_sources": "Fontes federadas confiáveis",
-        "past_events": "Eventos Passados"
+        "past_events": "Eventos Passados",
+        "save_draft": "",
+        "go_back": "",
+        "create_draft": "",
+        "convert_draft": "",
+        "no_events_found_hint": "",
+        "no_events_found": "",
+        "publish": "",
+        "draft": "",
+        "dark_mode": ""
     },
     "admin": {
         "user_block_confirm": "Têm a certeza que quer bloquear o utilizador {user}?",
@@ -273,7 +282,23 @@
         "custom_css": "Estilo CSS customizado",
         "custom_js_help": "Pode integrar algum código Javascript que será carregado para cada usuária, preenchendo a área de texto abaixo. Provavelmente deveria ler a <a href='https://gancio.org/usage/custom_js'>documentação</a> primeiro.",
         "custom_css_help": "Pode customizar alguns estilos também, veja alguns exemplos <a href='https://gancio.org/usage/custom_css'>aqui</a>.",
-        "default_fedi_hashtags": "Hashtags padrão do Fediverso"
+        "default_fedi_hashtags": "Hashtags padrão do Fediverso",
+        "page_is_disabled": "",
+        "page_remove_ok": "",
+        "unblock_user": "",
+        "smtp_password_description": "",
+        "smtp_from_address_help": "",
+        "calendar_first_day_of_week": "",
+        "hidden": "",
+        "user_update_ok": "",
+        "receive_confirm_notification_hint": "",
+        "merge_place_help": "",
+        "page_description": "",
+        "edit_user": "",
+        "calendar_first_day_of_week_default": "",
+        "notify": "",
+        "smtp_from_address": "",
+        "calendar_first_day_of_week_description": ""
     },
     "event": {
         "follow_me_description": "Uma das maneiras de se manter atualizado com os eventos publicados aqui em {title},\né seguir a conta <u>{account}</u> no Fediverso, por exemplo, via Mastodon, e possivelmente adicionar recursos para um evento a partir de lá.<br/><br/>\nSe nunca ouviu falar sobre Mastodon ou no Fediverso nós recomendamos ler <a href='https://www.savjee.be/videos/simply-explained/mastodon-and-fediverse-explained/'>este artigo</a>.<br/><br/>Entre com o seu domínio abaixo (e.g. mastodon.social)",
@@ -343,7 +368,19 @@
         "disable_author": "Desativar autor",
         "disable_author_confirm": "Tem certeza que quer desativar o autor deste evento?",
         "send_to_admins": "Enviar para admins",
-        "send_to_author_too": "Enviar para admins e autor"
+        "send_to_author_too": "Enviar para admins e autor",
+        "tentative": "",
+        "recurrent_1y_days": "",
+        "reannounce": "",
+        "reannounce_description": "",
+        "postponed": "",
+        "each_year": "",
+        "cancelled": "",
+        "recurrent_1y_ordinal": "",
+        "cancel_description": "",
+        "moved_onlined": "",
+        "rescheduled": "",
+        "anon_description_without_registration": ""
     },
     "confirm": {
         "not_valid": "Algo deu errado.",
@@ -360,7 +397,9 @@
         "filter_description": "Pode filtrar a sua exportação aqui por tags e local ou por uma coleção predefinida",
         "filter_title": "Filtro",
         "ical_title": "ics/ical",
-        "list_title": "Lista"
+        "list_title": "Lista",
+        "show_more": "",
+        "max_height": ""
     },
     "oauth": {
         "authorization_request": "A aplicação <code>{app}</code> solicita autorização em <code>{instance_name}</code>:",
@@ -400,7 +439,8 @@
         "email": "Insira um e-mail válido",
         "required": "{fieldName} é obrigatório",
         "longitude": "Insira uma longitude válida (-180 < longitude < 180)",
-        "latitude": "Insira uma latitude válida (90 < latitude < 90)"
+        "latitude": "Insira uma latitude válida (90 < latitude < 90)",
+        "url": ""
     },
     "about": "\n  <p><a href='https://gancio.org'>Gancio</a> é uma agenda partilhada para comunidades locais.</p>\n  ",
     "login": {
@@ -424,5 +464,9 @@
     "auth": {
         "fail": "Autenticação não efetuada. Têm a certeza que a sua palavra-passe está correta?",
         "not_confirmed": "Não confirmado ainda…"
+    },
+    "activitypub": {
+        "n_boosts": "",
+        "n_favorites": ""
     }
 }
