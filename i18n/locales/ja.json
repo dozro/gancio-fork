@@ -207,7 +207,8 @@
         "remove_media_confirmation": "",
         "each_month": "",
         "remove_confirmation": "",
-        "saved": ""
+        "saved": "",
+        "multidate": ""
     },
     "admin": {
         "is_dark": "ダークテーマ",
