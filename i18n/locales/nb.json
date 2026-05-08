@@ -189,7 +189,8 @@
         "custom_css_help": "",
         "geocoding_countrycodes": "",
         "wrong_domain_warning": "",
-        "plugins_description": ""
+        "plugins_description": "",
+        "enable_admin_user_confirm": ""
     },
     "event": {
         "interact_with_me": "Følg meg",
