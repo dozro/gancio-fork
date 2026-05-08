@@ -240,7 +240,8 @@
         "anon_description_without_registration": "",
         "remove_media_confirmation": "",
         "each_month": "",
-        "multidate": ""
+        "multidate": "",
+        "assign_to_user_description": ""
     },
     "admin": {
         "announcement_remove_ok": "",
