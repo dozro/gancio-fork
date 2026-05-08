@@ -446,7 +446,8 @@
         "required": "{fieldName} is vereist",
         "email": "Een geldig e-mailadres invullen",
         "latitude": "",
-        "url": ""
+        "url": "",
+        "longitude": ""
     },
     "about": "\n  <p><a href='https://gancio.org'>Gancio</a> is een gedeelde agenda voor lokale community's.</p>\n  ",
     "oauth": {
