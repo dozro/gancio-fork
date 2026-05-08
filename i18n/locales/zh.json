@@ -438,7 +438,8 @@
         "required": "{fieldName} 是必填项",
         "email": "输入有效的电子邮箱地址",
         "latitude": "",
-        "url": ""
+        "url": "",
+        "longitude": ""
     },
     "oauth": {
         "authorization_request": "应用 <code>{app}</code> 申请在 <code>{instance_name}</code> 上获得以下权限：",
