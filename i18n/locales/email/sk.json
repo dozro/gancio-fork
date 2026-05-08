@@ -25,11 +25,5 @@
     "test": {
         "subject": "Vaša SMTP konfigurácia funguje",
         "content": "Toto je testovací e-mail, ak toto čítate, tak vaša konfigurácia funguje."
-    },
-    "report": {
-        "subject": "",
-        "content_AUTHOR": "",
-        "content_ANON": "",
-        "content_ADMIN": ""
     }
 }

@@ -25,11 +25,5 @@
     "test": {
         "content": "Acesta este un e-mail de testare, dacă citiți acest lucru, configurația dvs. funcționează.",
         "subject": "Configurația dvs. SMTP funcționează"
-    },
-    "report": {
-        "subject": "",
-        "content_AUTHOR": "",
-        "content_ANON": "",
-        "content_ADMIN": ""
     }
 }

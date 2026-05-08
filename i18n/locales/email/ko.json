@@ -4,32 +4,9 @@
         "content": "등록 요청을 받았습니다. 가능한 한 빨리 확인하겠습니다."
     },
     "confirm": {
-        "subject": "이제 이벤트를 게시할 수 있습니다",
-        "content": ""
+        "subject": "이제 이벤트를 게시할 수 있습니다"
     },
     "user_confirm": {
-        "subject": "이제 이벤트를 게시할 수 있습니다",
-        "content": ""
-    },
-    "event_confirm": {
-        "content": ""
-    },
-    "report": {
-        "subject": "",
-        "content_AUTHOR": "",
-        "content_ANON": "",
-        "content_ADMIN": ""
-    },
-    "admin_register": {
-        "subject": "",
-        "content": ""
-    },
-    "recover": {
-        "subject": "",
-        "content": ""
-    },
-    "test": {
-        "content": "",
-        "subject": ""
+        "subject": "이제 이벤트를 게시할 수 있습니다"
     }
 }

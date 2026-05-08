@@ -25,11 +25,5 @@
     },
     "event_confirm": {
         "content": "Bu etkinliği <a href='{{{url}}}'>bu sayfada</a> onaylayabilirsin"
-    },
-    "report": {
-        "subject": "",
-        "content_AUTHOR": "",
-        "content_ANON": "",
-        "content_ADMIN": ""
     }
 }
