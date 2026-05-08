@@ -115,7 +115,7 @@
         "geocoding_countrycodes": "PSČ",
         "delete_resource": "Smazat reakci",
         "enable_federation": "Povolit federování",
-        "wrong_domain_warning": "Adresa v souboru config.json <b>({baseurl})</b> je jiná, než ta, na kterou jste připojeni <b>({url})</b>",
+        "wrong_domain_warning": "Nastavená hodnota baseurl <b>({baseurl})</b> je jiná, než ta, na kterou jste připojeni <b>({url})</b>",
         "enable_moderation_hint": "Administrátoři se mohou navzájem kontaktovat ohledně událostí, volitelně i autora události",
         "trusted_sources_label": "Navigační štítek pro důvěryhodné federované zdroje",
         "trusted_sources_label_help": "Výchozí štítek je „Jiná umístění“",
@@ -163,9 +163,9 @@
         "receive_confirm_notification_hint": "Odeslat oznámení tomuto účtu vždy, když registrovaný uživatel nebo anonymní události vyžadují potvrzení",
         "notify": "Oznámení",
         "merge_place_help": "Slučujete místo <strong>{place}</strong> se zvoleným místem. Bude také změněno {n} souvisejících událostí.",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "hidden": ""
+        "page_remove_ok": "Stránka odstraněna",
+        "unblock_user": "Odblokovat uživatele",
+        "hidden": "Skryté"
     },
     "common": {
         "related": "Příbuzné",
@@ -290,16 +290,16 @@
         "go_back": "Přejít zpět",
         "no_events_found": "Nenalezeny žádné události",
         "no_events_found_hint": "Vyberte jiná data nebo podmínky",
-        "save_draft": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "save_draft": "Uložit koncept",
+        "create_draft": "Vytvořit jako koncept",
+        "convert_draft": "Převést na koncept",
+        "publish": "Zveřejnit",
+        "draft": "Koncept",
+        "dark_mode": "Tmavý režim"
     },
     "export": {
         "email_description": "Můžeš dostávat události které tě zajímají na e-mail.",
-        "feed_description": "Chcete-li sledovat nové události z počítače nebo mobilního telefonu bez nutnosti pravidelně chodit na tento web, použijte RSS. </p>\n\n<p> Se službou RSS můžete použávat speciální aplikaci pro příjem novinek z webů, které vás zajímají. Jedná se o skvělý způsob, jak rychle sledovat mnoho stránek bez nutnosti vytvářet si na nich účet </p>\n\n<li> Pokud máte Android, doporučujeme <a href=\"https://f-droid.org/cs/packages/net.frju.flym/\">Flym</a> nebo Feeder </li>\n<li> Pro iPhone / iPad můžete použít <a href=\"https://itunes.apple.com/cz/app/feeds4u/id1038456442442?mt=8\">Feed4U</a> </li> </li>\n<li> Pro počítač / notebook doporučujeme Feedbro, dá se nainstalovat do <a href=\"https://addons.mozilla.org/cs/firefox/addon/feedbroreader/\">Firefoxu</a> nebo <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnmdfa\">Chromu</a>. </li>\n<br/>\nPřidejte si tento odkaz do své RSS čtečky a zůstaňte v obraze.",
+        "feed_description": "Chcete-li sledovat nové události z počítače nebo mobilního telefonu bez nutnosti pravidelně chodit na tento web, použijte RSS.\n\n<p> Se službou RSS můžete použávat speciální aplikaci pro příjem novinek z webů, které vás zajímají. Jedná se o skvělý způsob, jak rychle sledovat mnoho stránek bez nutnosti vytvářet si na nich účet. </p>\n\n<li> Pokud máte Android, doporučujeme <a href=\"https://f-droid.org/cs/packages/net.frju.flym/\">Flym</a> nebo Feeder </li>\n<li> Pro iPhone / iPad můžete použít <a href=\"https://itunes.apple.com/cz/app/feeds4u/id1038456442?mt=8\">Feed4U</a> </li>\n<li> Pro počítač / notebook doporučujeme Feedbro, dá se nainstalovat do <a href=\"https://addons.mozilla.org/cs/firefox/addon/feedbroreader/\">Firefoxu</a> nebo <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\">Chromu</a>. </li>\n<br/>\nPřidejte si tento odkaz do své RSS čtečky a zůstaňte v obraze.",
         "intro": "Na rozdíl od asociálních platforem, které dělají vše pro to, aby si udržely uživatele a jejich data, my věříme, že informace musejí být svobodné, stejně jako lidé. Proto můžete být informováni o událostech i bez nutnosti chodit na tuto stránku.",
         "list_description": "Pokud máte vlastní webovou stránku a chcete sdílet seznam událostí, použijte tento kód",
         "ical_description": "Počítače a telefony jsou obvykle vybaveny aplikací kalendáře, která umožňuje připojení vzdáleného kalendáře.",
@@ -308,8 +308,8 @@
         "filter_title": "Filtr",
         "ical_title": "ics/ical",
         "filter_description": "Zde můžete filtrovat svůj export pomocí štítků a místa nebo podle předvolené sbírky",
-        "show_more": "",
-        "max_height": ""
+        "show_more": "Zobrazit více",
+        "max_height": "Maximální výška"
     },
     "event": {
         "added_anon": "Událost přidána, ještě ale musí být schválena.",
@@ -362,7 +362,7 @@
         "remove_recurrent_confirmation": "Přejete si odstranit tuto pravidelnou událost?\nMinulé události budou zachovány, nebudou ale vytvořeny žádné budoucí.",
         "where_description": "Kde se událost nachází? Pokud místo ještě neexistuje, můžete jej vytvořit.",
         "address_description_osm": "Vyhledat souřadnice podle adresy. (Přispěvatelé <a href='http://osm.org/copyright'>OpenStreetMap</a>)",
-        "same_day": "ve stejný den",
+        "same_day": "Události ve zvoleném datu",
         "recurrent_description": "Vybrat frekvenci a dny",
         "import_URL": "Importovat z URL",
         "remove_media_confirmation": "Chceš opravdu odstranit obrázek?",
@@ -389,9 +389,9 @@
         "moved_onlined": "Přesunuto online",
         "rescheduled": "Přesunuto",
         "tentative": "Předběžné",
-        "reannounce": "",
-        "reannounce_description": "",
-        "cancel_description": ""
+        "reannounce": "Znovu oznámit",
+        "reannounce_description": "Máme znovu oznámit (boostnout) tuto událost do federace?",
+        "cancel_description": "Tato událost bude veřejně označena jako zrušená."
     },
     "validators": {
         "latitude": "Zadejte platnou zeměpisnou šířku (-90 < šířka < 90)",
@@ -448,7 +448,7 @@
         "start": "Začít",
         "completed_description": "<p>Nyní se můžete přihlásit jako následující uživatel:<br/><br/>Uživatel: <b>{email}</b><br/>Heslo: <b>{password}<b/></p>",
         "copy_password_dialog": "Ano, heslo je opravdu třeba si zkopírovat!",
-        "https_warning": "Přístupuješ na web skrz HTTP, nezapomeň změnit baseurl v config.json pokud budeš nastavovat HTTPS!",
+        "https_warning": "Přistupujete přes HTTP. Nezapomeňte změnit hodnotu baseurl ve své konfiguraci, pokud přejdete na HTTPS!",
         "completed": "Nastavení dokončeno"
     },
     "register": {
