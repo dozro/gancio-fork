@@ -401,7 +401,8 @@
         "latitude": "",
         "email": "",
         "url": "",
-        "required": ""
+        "required": "",
+        "longitude": ""
     },
     "activitypub": {
         "n_boosts": "",
