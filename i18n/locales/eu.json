@@ -120,7 +120,16 @@
         "trusted_sources": "Iturri federatu fidagarriak",
         "role": "Rola",
         "past_events": "Iraganeko Ekitaldiak",
-        "pages": "Orriak"
+        "pages": "Orriak",
+        "save_draft": "",
+        "go_back": "",
+        "create_draft": "",
+        "convert_draft": "",
+        "no_events_found_hint": "",
+        "no_events_found": "",
+        "publish": "",
+        "draft": "",
+        "dark_mode": ""
     },
     "login": {
         "description": "Saioa hasten baduzu ekitaldi berriak sortu ahal izango dituzu.",
@@ -144,7 +153,9 @@
         "filter_description": "Esportazioa etiketen, lekuaren edo aurrez ezarritako bilduma baten arabera iragaz dezakezu hemen",
         "filter_title": "Iragazkia",
         "ical_title": "ics/ical",
-        "list_title": "Zerrenda"
+        "list_title": "Zerrenda",
+        "show_more": "",
+        "max_height": ""
     },
     "register": {
         "description": "Gizarte mugimenduak beraien kabuz antolatu behar dira.<br/>\n<br/>Argitaratzen hasi baino lehen <strong>zure kontu berria onartua izan behar da</strong>, beraz, <strong>webgune honen atzean hezur-haragizko pertsonak</strong> gaudela kontuan izanik, azal iezaguzu mesedez pare bat lerrotan zer nolako ekitaldiak argitaratu nahi dituzun.",
@@ -220,7 +231,19 @@
         "message": "Mezua",
         "recurrent_1y_days": "{months} {days} urtero",
         "recurrent_1y_ordinal": "Urtero {n} {egun} {months}-etan",
-        "assign_to_user_description": "Ekitaldi anonimo bat eslei diezaiokezu erabiltzaile bati. Honek ahalbidetuko du hautatutako erabiltzaileak ekitaldia aldatzea."
+        "assign_to_user_description": "Ekitaldi anonimo bat eslei diezaiokezu erabiltzaile bati. Honek ahalbidetuko du hautatutako erabiltzaileak ekitaldia aldatzea.",
+        "tentative": "",
+        "reannounce": "",
+        "report_message_confirmation": "",
+        "reannounce_description": "",
+        "postponed": "",
+        "address_geocoded_disclaimer": "",
+        "cancelled": "",
+        "disable_author_confirm": "",
+        "cancel_description": "",
+        "message_hint": "",
+        "moved_onlined": "",
+        "rescheduled": ""
     },
     "admin": {
         "place_description": "Lekua edo helbidea oker badago, alda dezakezu.<br/>Leku honekin lotutako iraganeko eta etorkizuneko ekitaldien helbidea aldatuko da.",
@@ -356,7 +379,42 @@
         "custom_js": "Javascript kode pertsonalizatua",
         "custom_css": "CSS estilo pertsonalizatua",
         "default_fedi_hashtags": "Fediverse hashtag lehenetsiak",
-        "past_unconfirmed_events": "Iraganeko baieztatu gabeko gertaerak"
+        "past_unconfirmed_events": "Iraganeko baieztatu gabeko gertaerak",
+        "allow_event_without_end_time": "",
+        "page_is_disabled": "",
+        "show_download_media": "",
+        "federated_events_in_home": "",
+        "page_remove_ok": "",
+        "unblock_user": "",
+        "smtp_password_description": "",
+        "smtp_from_address_help": "",
+        "calendar_first_day_of_week": "",
+        "add_source": "",
+        "hidden": "",
+        "user_update_ok": "",
+        "receive_confirm_notification_hint": "",
+        "merge_place_help": "",
+        "custom_js_help": "",
+        "page_description": "",
+        "edit_user": "",
+        "default_fedi_hashtags_help": "",
+        "show_download_media_hint": "",
+        "calendar_first_day_of_week_default": "",
+        "change_role_confirm": "",
+        "enable_moderation_hint": "",
+        "enable_report_hint": "",
+        "delete_page_confirm": "",
+        "not_reachable_warning": "",
+        "notify": "",
+        "new_page": "",
+        "smtp_from_address": "",
+        "calendar_first_day_of_week_description": "",
+        "allow_geolocation_hint": "",
+        "federated_events_in_home_help": "",
+        "geolocation_description": "",
+        "stats": "",
+        "add_trusted_source_help": "",
+        "custom_css_help": ""
     },
     "auth": {
         "not_confirmed": "Oraindik ez da berretsi…",
@@ -408,5 +466,9 @@
         "completed_description": "<p>Erabiltzaile honekin saioa has dezakezu orain:<br/><br/>Erabiltzailea: <b>{email}</b><br/>Pasahitza: <b>{password}<b/></p>",
         "copy_password_dialog": "Bai, pasahitza kopiatu behar duzu!",
         "https_warning": "HTTP bidez ari zarela kontuan izan. HTTPSra pasatzen bazara gogoratu config.json-en baseurl aldatzeaz!"
+    },
+    "activitypub": {
+        "n_boosts": "",
+        "n_favorites": ""
     }
 }
