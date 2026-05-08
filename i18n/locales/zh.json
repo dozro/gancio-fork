@@ -402,7 +402,8 @@
         "enable_report": "",
         "default_fedi_hashtags": "",
         "custom_css_help": "",
-        "geocoding_countrycodes": ""
+        "geocoding_countrycodes": "",
+        "plugins_description": ""
     },
     "auth": {
         "fail": "无法登录。你确定密码正确吗？",
