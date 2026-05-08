@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-alpha.6](https://framagit.org/les/gancio/compare/v2.0.0-alpha.5...v2.0.0-alpha.6) (2026-05-08)
+
+
+### Features
+
+* new locale Ukrainian ([72c4d1d](https://framagit.org/les/gancio/commit/72c4d1ddd29b7c1e610d5a0cbc94025820083ea6))
+
+
+### Bug Fixes
+
+* **AP:** events could be quoted, FEP-044f ([b290b92](https://framagit.org/les/gancio/commit/b290b92a212b85fb2687934f4d440ee861149038)), closes [#657](https://framagit.org/les/gancio/issues/657)
+* use default user scope while creating user and reset user form, fix ([627f9e4](https://framagit.org/les/gancio/commit/627f9e407c2586da2b4b9d56de86f687a2634e9e))
+* valid microdata start/end date ([60f7eb3](https://framagit.org/les/gancio/commit/60f7eb384160b1e0f61e2d2acce9d593e1595d0f))
+
 ## [2.0.0-alpha.5](https://framagit.org/les/gancio/compare/v2.0.0-alpha.4...v2.0.0-alpha.5) (2026-05-06)
 
 
