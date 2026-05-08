@@ -126,7 +126,8 @@
         "draft": "",
         "dark_mode": "",
         "test": "",
-        "enabled": ""
+        "enabled": "",
+        "online": ""
     },
     "login": {
         "description": "Po prihlásení sa môžete publikovat nové podujatia.",
