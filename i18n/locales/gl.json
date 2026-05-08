@@ -125,12 +125,12 @@
         "go_back": "Volver",
         "no_events_found": "Non hai eventos",
         "no_events_found_hint": "Elixe outras datas ou criterio",
-        "save_draft": "",
-        "create_draft": "",
-        "convert_draft": "",
-        "publish": "",
-        "draft": "",
-        "dark_mode": ""
+        "save_draft": "Gardar borrador",
+        "create_draft": "Crear borrador",
+        "convert_draft": "Convertir en borrador",
+        "publish": "Publicar",
+        "draft": "Borrador",
+        "dark_mode": "Modo escuro"
     },
     "recover": {
         "not_valid_code": "Algo fallou."
@@ -141,13 +141,13 @@
         "ical_description": "As computadoras e teléfonos traen normalmente instalada unha aplicación de calendario que pode importar un calendario remoto.",
         "list_description": "Se tes un sitio web e queres mostrar unha lista de eventos, usa o seguinte código",
         "intro": "Ao contrario que nas plataformas asociais que fan todo o posible para obter e gardar datos das persoas usuarias, cremos que esta información, como as persoas, deben ser libres. Por isto, podes recibir actualizacións dos eventos que elixas, sen precisar vir a esta web.",
-        "feed_description": "Para ter actualizacións usando unha computadora ou un teléfono intelixente sen ter que vir a esta web, usa fontes RSS. </p>\n\n<p> Coas fontes RSS usas unha app especial para recibir información das webs que che interesan. É un bo xeito de seguir moitas webs de xeito rápido, se ter que crear unha conta ou outras complicacións. </p>\n\n<li> Se usas Android, recomendámosche <a href=\"https://f-droid.org/en/packages/net.frju.flym/\">Flym</a> ou Feeder </li>\n<li> Para iPhone / iPad podes usar <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\"> Feed4U </a> </li>\n<li> Na computadora recomendamos Feedbro, que se pode instalar en <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\"> Firefox </a> ou en <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\"> Chrome </a>. </li>\n<br/>\nSe engades esta ligazón ao teu lector de RSS poderás recibir as actualizacións.",
+        "feed_description": "Para ter actualizacións usando unha computadora ou un teléfono intelixente sen ter que vir a esta web, usa canles RSS.\n\n<p> Coas canles RSS usas unha app dedicada para recibir información das webs que che interesan. É un bo xeito de seguir moitas webs de xeito rápido, sen ter que crear unha conta ou outras complicacións. </p>\n\n<li> Se usas Android, recomendámosche <a href=\"https://f-droid.org/en/packages/net.frju.flym/\">Flym</a> ou Feeder </li>\n<li> Para iPhone / iPad podes usar <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\"> Feed4U </a> </li>\n<li> Na computadora recomendamos Feedbro, que se pode instalar en <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\"> Firefox </a> ou en <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\"> Chrome </a>. </li>\n<br/>\nSe engades esta ligazón ao teu lector de RSS poderás recibir as actualizacións.",
         "filter_description": "Podes filtrar a exportación usando etiquetas e lugares ou por unha colección prestablecida",
         "ical_title": "ics/ical",
         "list_title": "Lista",
         "filter_title": "Filtro",
-        "show_more": "",
-        "max_height": ""
+        "show_more": "Mostrar máis",
+        "max_height": "Altura máxima"
     },
     "register": {
         "complete": "É preciso confirmar o rexistro.",
@@ -179,7 +179,7 @@
         "import_URL": "Importar desde URL",
         "anon": "Anónimo",
         "anon_description": "Podes engadir un evento sen rexistrarte nen acceder, pero deberás agardar a que alguén o lea e\nconfirme que é un evento axeitado. Non será posible modificalo.<br/><br/>\nPodes tamén <a href='/login'>acceder</a> ou <a href='/register'>crear unha conta</a>, pero se non, continúa e revisaremos o envío o máis axiña posible. ",
-        "same_day": "no mesmo día",
+        "same_day": "Eventos para a mesma data",
         "tag_description": "Cancelo",
         "description_description": "Descrición",
         "what_description": "Título",
@@ -235,9 +235,9 @@
         "moved_onlined": "Pasou a en liña",
         "rescheduled": "Reprogramado",
         "tentative": "Proposta",
-        "reannounce": "",
-        "reannounce_description": "",
-        "cancel_description": ""
+        "reannounce": "Volver a anunciar",
+        "reannounce_description": "Deberiamos volver a anunciar (promover) este evento na federación?",
+        "cancel_description": "Este evento vaise marcar como cancelado."
     },
     "admin": {
         "place_description": "Se escribiches mal o lugar ou enderezo, podes cambialo.<br/>Cambiará o enderezo de tódolos eventos actuais e pasados asociados a este lugar.",
@@ -309,7 +309,7 @@
         "smtp_hostname": "Servidor SMTP",
         "new_announcement": "Novo anuncio",
         "smtp_description": "<ul><li>Admin debería recibir un correo cando se engade un evento anónimo (se está activo)</li><li>Admin debería recibir un correo coas solicitudes de rexistro (se activo).</li><li>A usuaria debería recibir un correo coa solicitude de rexistro.</li><li>A usuaria debería recibir un correo confirmando o rexistro.</li><li>A usuaria debería recibir un correo de confirmación cando fose subscrita directamente por Admin.</li><li>As usuarias deberían recibir un correo para restablecer o contrasinal se o esquecen</li></ul>",
-        "wrong_domain_warning": "O url base configurado en config.json <b>({baseurl)</b> é diferente ao que estás a visitar <b>({url})</b>",
+        "wrong_domain_warning": "O URL-base configurado <b>({baseurl})</b> é diferente ao que estás a visitar <b>({url})</b>",
         "event_remove_ok": "Evento eliminado",
         "edit_blob": "Editar Blob",
         "new_blob": "Novo blob",
@@ -408,9 +408,9 @@
         "receive_confirm_notification_hint": "Enviar unha notificación a esta conta se algunha conta creada ou evento anónimo require confirmación",
         "notify": "Notificar",
         "merge_place_help": "Estás fusionando <strong>{place}</strong> co lugar seleccionado. Os {n} eventos asociados tamén se van cambiar.",
-        "page_remove_ok": "",
-        "unblock_user": "",
-        "hidden": ""
+        "page_remove_ok": "Páxina eliminada",
+        "unblock_user": "Desbloquear usuaria",
+        "hidden": "Oculto"
     },
     "auth": {
         "not_confirmed": "Aínda non foi confirmado…",
@@ -460,7 +460,7 @@
         "completed": "Configuración completada",
         "completed_description": "<p>Xa podes acceder con estas credenciais:<br/><br/>Identificador: <b>{email}</b><br/>Contrasinal: <b>{password}</b></p>",
         "start": "Comezar",
-        "https_warning": "Estás entrando con HTTP, lembra cambiar baseurl no config.json se cambias a HTTPS!",
+        "https_warning": "Estás entrando con HTTP, lembra cambiar o URL-base na túa configuración se cambias a HTTPS!",
         "copy_password_dialog": "Si, tes que copiar o contrasinal!"
     },
     "login": {
