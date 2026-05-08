@@ -162,7 +162,8 @@
         "default_fedi_hashtags": "",
         "place_description": "",
         "custom_css_help": "",
-        "wrong_domain_warning": ""
+        "wrong_domain_warning": "",
+        "plugins_description": ""
     },
     "ordinal": {
         "1": "eerste",
