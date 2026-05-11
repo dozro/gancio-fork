@@ -36,6 +36,7 @@ nav_order: 7
 - [zgz.convoca.la](https://zgz.convoca.la/) (Zaragoza, Spain)
 - [agenda.henares.org](https://agenda.henares.org/) (Valle del Henares, Spain)
 - [eventosmurcia.org](https://eventosmurcia.org/) (Murcia, Spain)
+- [enredad.es](https://enredad.es/) (Queer/Feminist/Racialized-Events, Spain)
 - [www.aleale.org](https://www.aleale.org/) (Montpellier)
 - [agenda.arree.bzh](https://agenda.arree.bzh/) (Monts d'Arrée, Bretagne)
 - [lamanifestive.fr](https://lamanifestive.fr/) (Social and cultural events of south-alsace, France)
