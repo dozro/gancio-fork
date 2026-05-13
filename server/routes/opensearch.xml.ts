@@ -1,10 +1,9 @@
 import { defineEventHandler, createError, setHeader } from 'h3'
-import path from 'path'
 import fs from 'fs'
 import pug from 'pug'
 import { publicSettings } from '../services'
 import { useLogger } from '../lib/logger'
-import { isBuild } from '../services/config'
+import { runtimeResolve } from '../services/config'
 
 const log = useLogger('Open Search')
 
@@ -30,9 +29,8 @@ export default defineEventHandler(async (event) => {
 })
 
 function loadOpenSearchTemplate() {
-  const templatePath = isBuild ? './nuxt/server/opensearch.pug' : './server/services/opensearch.pug'
   try {
-    const templateStr = fs.readFileSync(path.resolve(templatePath), 'utf-8')
+    const templateStr = fs.readFileSync(runtimeResolve('./static/opensearch.pug'), 'utf-8')
     return pug.compile(templateStr)
   } catch (err) {
     log.error('Unable to load opensearch template.', err)

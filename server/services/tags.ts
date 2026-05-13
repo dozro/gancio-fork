@@ -7,7 +7,7 @@ const log = useLogger('tags')
 
 /**
  * Finds existing tags or creates new ones based on the provided list of tag strings.
- * It normalizes the tags for consistent matching and ensures no duplicates are created. 
+ * It normalizes the tags for consistent matching and ensures no duplicates are created.
  * @param tags {string[]} An array of tag strings to find or create.
  * @returns Tag[] An array of Tag instances
  */

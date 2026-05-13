@@ -61,8 +61,8 @@ export const publicSettings: Settings = {
   'default_fedi_hashtags': [],
   'custom_js': '',
   'custom_css': '',
-  'admin_email': '',
-  'smtp': {},
+  'admin_email': config.admin_email ?? '',
+  'smtp': config.smtp ?? {},
   'status': 'loading'
 }
 

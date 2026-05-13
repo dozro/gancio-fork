@@ -2,10 +2,8 @@
 * This is the first and only server plugin and this is where everything start
 */
 import type { NitroApp } from 'nitropack'
-import { defineNitroPlugin, useStorage } from 'nitropack/runtime'
+import { defineNitroPlugin } from 'nitropack/runtime'
 import pluginController from '../services/plugins'
-import fsDriver from 'unstorage/drivers/fs'
-import { get as getConfig } from '../services/config'
 import { useLogger } from '../lib/logger'
 import { loadSettings, publicSettings } from '../services/settings'
 import { useTaskManager } from '../services/taskManager'
@@ -16,7 +14,6 @@ export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
   const isTest = process.env.VITEST === 'true'
 
   const log = useLogger('init')
-  const config = getConfig()
   try {
     log.info('Connecting to database')
     await connect()
@@ -34,10 +31,6 @@ export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
       log.info('Loading plugins')
       pluginController.initialize()
     }
-
-    const storage = useStorage()
-    const driver = fsDriver({ base: config.user_locale })
-    storage.mount('custom_user_locale', driver)
 
     publicSettings.status = 'ready'
     return true

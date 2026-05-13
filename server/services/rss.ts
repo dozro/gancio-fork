@@ -1,16 +1,12 @@
 import { type H3Event, setHeader } from 'h3'
 import { DateTime } from 'luxon'
-import path from 'path'
 import fs from 'fs'
 import pug from 'pug'
 import type { InferAttributes } from '@sequelize/core'
 import { publicSettings, type Event } from '../services'
-import { isBuild } from './config'
+import { runtimeResolve } from './config'
 
-const rssTemplateStr = fs.readFileSync(
-  path.resolve(isBuild ? './nuxt/server/rss.pug' : './server/services/rss.pug'),
-  'utf-8'
-)
+const rssTemplateStr = fs.readFileSync(runtimeResolve('./static/rss.pug'), 'utf-8')
 export const rssTemplate = pug.compile(rssTemplateStr)
 
 export function exportFeed(evt: H3Event, events: InferAttributes<Event, { omit: never }>[], title = publicSettings.title, link = `${publicSettings.baseurl}/feed/rss`) {

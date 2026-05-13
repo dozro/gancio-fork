@@ -23,8 +23,8 @@ export function up ({ context: queryInterface }) {
         type: DataTypes.DATE
       }
     })
-  }
+}
 
-  export function down ({ context: queryInterface }) {
-    return queryInterface.dropTable('tags')
-  }
+export function down ({ context: queryInterface }) {
+  return queryInterface.dropTable('tags')
+}

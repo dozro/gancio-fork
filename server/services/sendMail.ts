@@ -1,10 +1,10 @@
 import Email from 'email-templates'
-import path from 'path'
 import { DateTime } from 'luxon'
 import locales from '../i18n/locales'
 import { useLogger } from '../lib/logger'
 import { publicSettings } from './settings'
 import { useTaskManager } from './taskManager'
+import { runtimeResolve } from './config'
 const log = useLogger('mail')
 
 /**
@@ -47,7 +47,7 @@ export async function sendMail(addresses: string | string[], template: emailTemp
   const from = `"${settings?.smtp?.from || '📅 ' + settings.title}" <${settings.admin_email}>`
   const email = new Email({
     views: {
-      root: path.join(process.cwd(), 'server/emails')
+      root: runtimeResolve('./static/emails')
     },
     preview: true,
     htmlToText: {},
@@ -55,7 +55,7 @@ export async function sendMail(addresses: string | string[], template: emailTemp
     juiceResources: {
       preserveImportant: true,
       webResources: {
-        relativeTo: path.join(process.cwd(), 'server/emails')
+        relativeTo: runtimeResolve('./static/emails')
       }
     },
     message: {
@@ -64,7 +64,7 @@ export async function sendMail(addresses: string | string[], template: emailTemp
     send: true,
     i18n: {
       // TODO: support custom locale (ref: https://github.com/mashpie/i18n-node/issues/423 )
-      directory: path.join(process.cwd(), 'i18n', 'locales', 'email'),
+      directory: runtimeResolve('../i18n/locales/email'),
       objectNotation: true,
       syncFiles: false,
       retryInDefaultLocale: true,
