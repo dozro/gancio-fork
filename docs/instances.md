@@ -51,6 +51,8 @@ nav_order: 7
 - [gancio.graz.events](https://gancio.graz.events/) (Verein zur Förderung ethischer Digitalkultur)
 - [quest.livellosegreto.it](https://quest.livellosegreto.it/)
 - [agenda.lanbroa.eus](https://agenda.lanbroa.eus/) (Lanbroa)
+- [mallorca.convoca.la](https://mallorca.convoca.la/) (Mallorca)
+- [burgos.convoca.la](https://burgos.convoca.la/) (Burgos, Castilla y León, Spain)
 - [ezkerraldea.euskaragendak.eus](https://ezkerraldea.euskaragendak.eus/)
 - [www.bilbi.info](https://www.bilbi.info/) (barrio Bilbao La Vieja, San Francisco y Zabala, Spain)
 - [calendari.cc](https://calendari.cc) (Valencia, Spain)
