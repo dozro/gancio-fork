@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-alpha.7](https://framagit.org/les/gancio/compare/v2.0.0-alpha.6...v2.0.0-alpha.7) (2026-05-13)
+
+
+### Bug Fixes
+
+* admins are allowed to get every settings key ([c6f8115](https://framagit.org/les/gancio/commit/c6f81159c137477628b59a6c37332d49b577a98e))
+
 ## [2.0.0-alpha.6](https://framagit.org/les/gancio/compare/v2.0.0-alpha.5...v2.0.0-alpha.6) (2026-05-08)
 
 
