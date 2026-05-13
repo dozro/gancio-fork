@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# should build the package
+
 set -eu
 
 usage() {
@@ -48,17 +50,17 @@ gitRepo=$(realpath .)
 # npx standard-version
 # git push --follow-tags
 if [ "$releaseType" = dev ]; then
-	version="dev-$(date +%F)-$(git describe --always)"
+	VERSION="dev-$(date +%F)-$(git describe --always)"
 	destDir="$gitRepo"
 else
-	version=$(npm pkg get version | xargs echo)
+	VERSION=$(npm pkg get version | xargs echo)
 	destDir=$(realpath ./docs/releases)
 fi
-destArchive="${destDir}/gancio-${version}.${output}"
+destArchive="${destDir}/gancio-${VERSION}.${output}"
 echo $destArchive
 
 PKG_BASE=$(mktemp --tmpdir -d gancio_build.XXXXXX)
-PKG_MAIN="${PKG_BASE}/${version}"
+PKG_MAIN="${PKG_BASE}/${VERSION}"
 if [ "$output" = dir ]; then
 	trap 'echo Your output dir is at ${PKG_BASE}' EXIT
 else
@@ -70,67 +72,57 @@ mkdir "${PKG_MAIN}"
 rm -fr node_modules
 pnpm install
 
+PKG_MAIN="./.publish"
+rm -rf "${PKG_MAIN}"
+mkdir -p "${PKG_MAIN}"
+
 # clean past artifacts
 npx nuxi cleanup
 
 # build web UI
 npx nuxi build
+rsync -aL .output/ "${PKG_MAIN}/"
 
 # build CLI
 pnpm build:cli
 
-mkdir -p "${PKG_MAIN}/uploads"
+# static resources
+echo "Copying static resources...(mail templates, rss template, opensearch template, i18n email locales)"
+cp -raL ./server/static "${PKG_MAIN}/server/static/"
+cp -ra ./server/migrations "${PKG_MAIN}/server/migrations/"
+cp -ra ./plugins "${PKG_MAIN}/plugins/"
+cp -ra ./i18n "${PKG_MAIN}/i18n/"
 
-# nuxt built app
-cp -ra .output/ "${PKG_MAIN}/nuxt/"
+# CLI
+cp .cli/index.js "${PKG_MAIN}/server/gancio"
 
-# db migrations
-cp -ra ./server/migrations "${PKG_MAIN}/nuxt/server/migrations/"
-
-# small cli utility
-cp .cli/index.js "${PKG_MAIN}/gancio"
-ln -s "nuxt/server/node_modules" "${PKG_MAIN}/node_modules"
-ln -s "nuxt/server/package.json" "${PKG_MAIN}/package.json"
-
-## note that this is in an internal folder as users should not access it directly as it would be overwritten by the next build
-# all locales (UI and mails)
-cp -ra i18n "${PKG_MAIN}/nuxt/server/i18n/"
-
-# pug rss template / mail template
-cp -ra ./server/emails "${PKG_MAIN}/nuxt/server/emails/"
-cp -ra ./server/services/rss.pug "${PKG_MAIN}/nuxt/server/rss.pug"
-cp -ra ./server/services/opensearch.pug "${PKG_MAIN}/nuxt/server/opensearch.pug"
+# a package.json specific for release is needed (without deps)
+jq --arg v "$VERSION" '.version = $v' package.publish.json > "${PKG_MAIN}/package.json"
+# ln -s "nuxt/server/package.json" "${PKG_MAIN}/package.json"
 
 # example env
 cp .env.example "${PKG_MAIN}/.env"
+cp config.example.json "${PKG_MAIN}/config.example.json"
+cp docs/gancio.service "${PKG_MAIN}/"
 
-# default resources
-cp ./uploads/logo.png "${PKG_MAIN}/uploads/"
-cp ./uploads/fallbackimage.svg "${PKG_MAIN}/uploads/"
-cp ./uploads/headerimage.svg "${PKG_MAIN}/uploads/"
+npm pack "${PKG_MAIN}"
 
-# plugins
-cp -ra ./plugins "${PKG_MAIN}/plugins/"
+# if [ "$output" = tgz ]; then
+# 	mkdir -p "$destDir"
+# 	tar -cvzf "${destArchive}" -C "${PKG_BASE}" .
+# elif [ "$output" = 7z ]; then
+# 	mkdir -p "$destDir"
+# 	pushd "${PKG_BASE}"
+# 	7z a "${destArchive}" .
+# 	popd
+# fi
 
-# cp package.json bun.lock yarn.lock .env.example "${PKG_MAIN}/"
-# cp gancio.service "${PKG_MAIN}/"
+# if [ "$releaseType" = stable ]; then
+# 	if [ "$output" = tgz ]; then
+# 		rm -f "${destDir}/gancio-latest.tgz"
+# 		cp "${destArchive}" "${destDir}/gancio-latest.tgz"
+# 	fi
 
-if [ "$output" = tgz ]; then
-	mkdir -p "$destDir"
-	tar -cvzf "${destArchive}" -C "${PKG_BASE}" .
-elif [ "$output" = 7z ]; then
-	mkdir -p "$destDir"
-	pushd "${PKG_BASE}"
-	7z a "${destArchive}" .
-	popd
-fi
-
-if [ "$releaseType" = stable ]; then
-	if [ "$output" = tgz ]; then
-		rm -f "${destDir}/gancio-latest.tgz"
-		cp "${destArchive}" "${destDir}/gancio-latest.tgz"
-	fi
-
-	pnpm run build:doc
-	# rsync -vr docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2
-fi
+# 	pnpm run build:doc
+# 	# rsync -vr docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2
+# fi

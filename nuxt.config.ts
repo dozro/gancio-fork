@@ -120,15 +120,10 @@ export default defineNuxtConfig({
     ]
   },
   nitro: {
+    preset: 'node-server',
     compressPublicAssets: true,
     imports: {
       autoImport: false
-    },
-    storage: {
-      locale_storage: {
-        driver: 'fs',
-        base: isBuild ? './nuxt/server/i18n/locales' : './i18n/locales'
-      }
     },
     esbuild: {
       options: {

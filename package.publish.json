@@ -1,0 +1,6 @@
+{
+  "name": "gancio",
+  "version": "",
+  "description": "A shared agenda for local communities",
+  "bin": "./server/gancio"
+}

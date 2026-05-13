@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs/promises'
 import { existsSync } from 'fs'
-import { get as getConfig } from '../services/config'
+import { runtimeResolve } from '../services/config'
 import * as db from './db'
 import { useLogger } from '../lib/logger'
 import { type H3Event, createError, getRouterParam } from 'h3'
@@ -218,8 +218,8 @@ const pluginController = {
   * search for all installed plugins, load enabled ones
   */
   async initialize(loadIfEnabled = true) {
-    const config = getConfig()
-    const pluginsPath = path.resolve(config.plugins_path) || path.resolve(process.cwd(), 'plugins')
+    // const config = getConfig()
+    const pluginsPath = runtimeResolve('../plugins')
 
     log.debug(`Initializing plugins from: ${pluginsPath}`)
 
@@ -234,10 +234,10 @@ const pluginController = {
       // search for index.ts or index.js first to allow both file-based and folder-based plugins
       const indexTsPath = path.join(pluginPath, 'index.ts')
       const indexJsPath = path.join(pluginPath, 'index.js')
-      if (existsSync(indexTsPath)) {
-        return pluginController.initPlugin(indexTsPath, loadIfEnabled)
-      } else if (existsSync(indexJsPath)) {
+      if (existsSync(indexJsPath)) {
         return pluginController.initPlugin(indexJsPath, loadIfEnabled)
+      } else if (existsSync(indexTsPath)) {
+        return pluginController.initPlugin(indexTsPath, loadIfEnabled)
       } else if (existsSync(pluginPath) && (pluginPath.endsWith('.js') || pluginPath.endsWith('.ts'))) {
         return pluginController.initPlugin(pluginPath, loadIfEnabled)
       } else {

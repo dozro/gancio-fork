@@ -47,7 +47,7 @@ import {
   BeforeDestroy
 } from '@sequelize/core/decorators-legacy'
 
-import { get as getConfig, isBuild } from '../services/config'
+import { get as getConfig, runtimeResolve } from '../services/config'
 import type { APActor, APEvent, APNote, PostalAddress } from '../federation/types'
 import { EventStatusEnum } from '../federation/types'
 import type { SecretSettings, Settings } from '~~/shared/types/settings'
@@ -84,10 +84,11 @@ export async function connect() {
 }
 
 export async function runMigrations() {
+  const migrationsPath = runtimeResolve('./migrations')
   if (!sequelize) return
   const umzug = new Umzug({
     storage: new SequelizeStorage({ sequelize }),
-    migrations: { glob: isBuild ? './nuxt/server/migrations/*.js' : './server/migrations/*.js' },
+    migrations: { glob: `${migrationsPath}/*.js` },
     context: sequelize.queryInterface,
     logger: console
   })

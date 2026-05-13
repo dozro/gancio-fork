@@ -1,12 +1,12 @@
 import ical from 'ical.js'
 import { useLogger } from '../lib/logger'
-import { EventStatus } from './db'
+import type { EventStatus } from './db'
 import type { EventStatus as IcsEventStatus } from 'ics'
 
 const statusMap: Record<IcsEventStatus, EventStatus> = {
-  'CANCELLED': "EventCancelled",
-  'TENTATIVE': "EventTentative",
-  'CONFIRMED': "EventScheduled"
+  CANCELLED: 'EventCancelled',
+  TENTATIVE: 'EventTentative',
+  CONFIRMED: 'EventScheduled'
 }
 
 export function parseIcsData(icsText: string, includePastEvents = true) {
