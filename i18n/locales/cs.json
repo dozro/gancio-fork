@@ -59,7 +59,7 @@
         "fallback_image": "Záložní obrázek",
         "disable_user_confirm": "Opravdu chcete deaktivovat uživatele <strong>{user}</strong>?",
         "delete_resource_confirm": "Opravdu chcete odstranit tento zdroj?",
-        "enable_federation_help": "Bude možné sledovat tuto instanci z Fediverse",
+        "enable_federation_help": "Uživatelé budou moci citovat události z této instance napříč fediverse",
         "user_blocked": "Uživatel {user} zablokován",
         "smtp_test_button": "Odeslat testovací email",
         "event_remove_ok": "Událost odstraněna",
@@ -165,7 +165,9 @@
         "merge_place_help": "Slučujete místo <strong>{place}</strong> se zvoleným místem. Bude také změněno {n} souvisejících událostí.",
         "page_remove_ok": "Stránka odstraněna",
         "unblock_user": "Odblokovat uživatele",
-        "hidden": "Skryté"
+        "hidden": "Skryté",
+        "enable_federation_quoting": "Povolit citování událostí z fediverse",
+        "enable_federation_quoting_help": "Uživatelé budou moci citovat události z tého instance na fediverse"
     },
     "common": {
         "related": "Příbuzné",

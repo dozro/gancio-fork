@@ -123,14 +123,20 @@
         "trusted_sources": "Fuentes federadas de confianza",
         "past_events": "Eventos pasados",
         "no_events_found": "No hay eventos",
-        "no_events_found_hint": "Selecciona fechas o filtros diferentes"
+        "no_events_found_hint": "Selecciona fechas o filtros diferentes",
+        "dark_mode": "Modo oscuro",
+        "publish": "Publicar",
+        "convert_draft": "Convertir a borrador",
+        "create_draft": "Crear como borrador",
+        "save_draft": "Guardar borrador",
+        "draft": "Borrador"
     },
     "login": {
         "description": "Entrando podrás publicar nuevos eventos.",
         "check_email": "Revisa tu casilla de correo (también el spam o correo no deseado).",
         "not_registered": "¿No estás registrado/a?",
         "forgot_password": "¿Olvidaste la contraseña?",
-        "error": "Error durante el login, comprueba los datos.",
+        "error": "Error durante el login, revisa los datos.",
         "insert_email": "Ingresa tu email",
         "ok": "Todo bien"
     },
@@ -234,8 +240,8 @@
     "admin": {
         "place_description": "En el caso de que un lugar sea incorrecto o cambie de dirección, puedes cambiarlo. <br/> Todos los eventos presentes y pasados asociados con este lugar cambiarán de dirección.",
         "event_confirm_description": "Puedes confirmar aquí los eventos agregados por usuarios anónimos",
-        "delete_user": "Elimina",
-        "remove_admin": "Borra admin",
+        "delete_user": "Eliminar",
+        "remove_admin": "Eliminar admin",
         "delete_user_confirm": "¿Estás seguro de que quieres eliminar <strong>{user}</strong>?",
         "user_remove_ok": "Usuario eliminado",
         "user_create_ok": "Usuario creado",

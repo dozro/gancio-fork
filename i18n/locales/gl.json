@@ -279,7 +279,7 @@
         "user_remove_ok": "Usuaria eliminada",
         "allow_recurrent_event": "Permitir eventos recurrentes",
         "recurrent_event_visible": "Mostrar por defecto os eventos recurrentes",
-        "enable_federation_help": "Vai ser posible seguir esta instancia desde o fediverso",
+        "enable_federation_help": "As usuarias van poder citar eventos desta instancia en todo o fediverso",
         "block": "Bloquear",
         "block_user": "Bloquear usuaria",
         "user_blocked": "Usuaria {user} bloqueada",
@@ -410,7 +410,9 @@
         "merge_place_help": "Estás fusionando <strong>{place}</strong> co lugar seleccionado. Os {n} eventos asociados tamén se van cambiar.",
         "page_remove_ok": "Páxina eliminada",
         "unblock_user": "Desbloquear usuaria",
-        "hidden": "Oculto"
+        "hidden": "Oculto",
+        "enable_federation_quoting": "Permitir que se citen os eventos desde o fediverso",
+        "enable_federation_quoting_help": "As usuarias van poder citar eventos desta instancia no fediverso"
     },
     "auth": {
         "not_confirmed": "Aínda non foi confirmado…",
