@@ -1,5 +1,6 @@
 import { defineEventHandler, getRouterParam, createError } from 'h3'
 import { handleCache } from '~~/server/lib/API'
+import { isSessionRole } from '~~/server/lib/session'
 import { publicSettings, publicSettingsLastModified } from '~~/server/services'
 import type { Settings } from '~~/shared/types/settings'
 
@@ -10,7 +11,7 @@ export default defineEventHandler(async (evt) => {
     'enable_resources', 'recurrent_event_visible', 'hide_calendar', 'allow_geolocation', 'hide_thumbs', 'hide_boosts']
 
   const key = getRouterParam(evt, 'key') as keyof Settings
-  if (key && typeof publicSettings[key] != 'undefined' && allowed_settings.includes(key)) {
+  if (key && typeof publicSettings[key] != 'undefined' && (allowed_settings.includes(key) || await isSessionRole(evt, 'admin'))) {
     if (await handleCache(evt, publicSettingsLastModified[key])) return
     return publicSettings[key]
   } else {
