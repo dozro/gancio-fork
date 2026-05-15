@@ -124,7 +124,13 @@
         "pages": "Pàgines",
         "go_back": "Torna enrere",
         "no_events_found_hint": "Tria dates o filtres diferents",
-        "no_events_found": "No hi ha activitats"
+        "no_events_found": "No hi ha activitats",
+        "dark_mode": "Mode fosc",
+        "publish": "Publica",
+        "convert_draft": "Passa-la a esborrany",
+        "create_draft": "Crea com a esborrany",
+        "save_draft": "Desa l'esborrany",
+        "draft": "Esborrany"
     },
     "login": {
         "description": "Amb la sessió iniciada pots afegir activitats noves.",
@@ -142,13 +148,15 @@
         "intro": "A diferència de les plataformes capitalistes, que recopilen informació de tot el que hi fem les usuàries, nosaltres creiem que la informació, tal com les persones, ha de ser lliure. Per això, pots estar al corrent de les activitats que vols sense necessitat de passar per aquest web.",
         "email_description": "Pots rebre correus sobre les activitats que t'interessin.",
         "insert_your_address": "Introdueix la teva adreça de mail",
-        "feed_description": "Per tal de seguir les actualitzacions sense haver d'entrar periòdicament aquí, et recomanem fer servir el flux RSS</p>\n\n<p>Hi ha aplicacions que agrupen i llegeixen fluxos RSS de diverses webs, blogs i aplicacions web. És una bona manera de mantenir-te informada sense haver de crear comptes a tot arreu.</p>\n\n<li>Per a Android recomanem <a href=\"https://play.google.com/store/apps/details?id=net.frju.flym\"> Flym </a> o Feeder</li>\n<li>Per a iPhone / iPad pots fer servir <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\"> Feed4U </a></li>\n<li>Per a l'ordinador recomanem Feedbro, que és una extensió de navegador disponible per a <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\"> Firefox </a> i per a <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\"> Chrome i Chromium</a>. Funciona en els principals sistemes operatius.</li>\n<br/>\nAfegeix aquest enllaç al teu lector de fluxos per mantenir-te al dia sense esforç.",
+        "feed_description": "Per tal de seguir les actualitzacions sense haver d'entrar periòdicament aquí, et recomanem fer servir el flux RSS\n\n<p>Hi ha aplicacions que agrupen i llegeixen fluxos RSS de diverses webs, blogs i aplicacions web. És una bona manera de mantenir-te informada sense haver de crear comptes a tot arreu.</p>\n\n<li>Per a Android recomanem <a href=\"https://play.google.com/store/apps/details?id=net.frju.flym\"> Flym </a> o Feeder</li>\n<li>Per a iPhone / iPad pots fer servir <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\"> Feed4U </a></li>\n<li>Per a l'ordinador recomanem Feedbro, que és una extensió de navegador disponible per a <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\"> Firefox </a> i per a <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\"> Chrome i Chromium</a>. Funciona en els principals sistemes operatius.</li>\n<br/>\nAfegeix aquest enllaç al teu lector de fluxos per mantenir-te al dia sense esforç.",
         "ical_description": "Els sistemes operatius d'ordinadors i mòbils solen oferir aplicacions de calendari. Algunes permeten importar calendaris remots, que van comprovant periòdicament.",
         "list_description": "Si tens una web i vols encastar una llista d'activitats, pots fer servir el codi de sota",
         "filter_description": "Pots filtrar les activitats a exportar segons etiquetes, lloc o coŀleccions existents",
         "filter_title": "Filtre",
         "ical_title": "ics/ical",
-        "list_title": "Llista"
+        "list_title": "Llista",
+        "max_height": "Alçada màxima",
+        "show_more": "Mostra'n més"
     },
     "register": {
         "description": "Els moviments socials necessitem organitzar-nos i auto-finançar-nos.<br/>\n<br/>Abans que puguis publicar, <strong> hem d'aprovar el teu compte </strong>, tingues en compte que <strong> darrere d'aquesta web hi ha persones</strong> de carn i ossos, així que escriviu dues línies per fer-nos saber quins esdeveniments voleu publicar.",
@@ -159,7 +167,7 @@
     "event": {
         "anon": "Anònim",
         "anon_description": "Pots afegir activitats sense haver de crear un compte o iniciar sessió, però a canvi hauràs d'esperar que algun/a admin la llegeixi i l'aprovi,\nconfirmant que és adequada. Demana més feina humana i no podrà ser modificada.<br/><br/>\nTambé pots <a href='/login'>iniciar sessió</a> o <a href='/register'>soŀlicitar un compte</a>. Altrament, publica-ho de forma anònima, procurarem trigar poc en revisar-lo. ",
-        "same_day": "al mateix dia",
+        "same_day": "Activitats a la data seleccionada",
         "what_description": "Títol",
         "description_description": "Descripció",
         "tag_description": "Etiqueta",
@@ -235,7 +243,10 @@
         "postponed": "Postposada",
         "cancelled": "Aquesta activitat s'ha canceŀlat",
         "moved_onlined": "Moguda a online",
-        "rescheduled": "Replanificada"
+        "rescheduled": "Replanificada",
+        "cancel_description": "Es marcarà públicament aquesta activitat com a canceŀlada.",
+        "reannounce": "Torna a anunciar",
+        "reannounce_description": "Vols tornar a anunciar (impulsar) aquesta activitat al fedivers?"
     },
     "admin": {
         "place_description": "En el cas que un lloc és incorrecte o l'adreça ha de canviar, pots arreglar-ho.<br/>Tingues en compte que totes les activitats passades i futures associades amb aquest lloc també canviaran d'adreça.",
@@ -252,7 +263,7 @@
         "recurrent_event_visible": "Mostra per defecte les activitats periòdiques",
         "federation": "Federació / ActivityPub",
         "enable_federation": "Activa la federació",
-        "enable_federation_help": "Aquesta instància es podrà seguir des del Fedivers",
+        "enable_federation_help": "Les usuàries d'arreu del fedivers podran citar activitats d'aquesta instància",
         "select_instance_timezone": "Fus horari",
         "enable_resources": "Habilita els recursos",
         "enable_resources_help": "Et permet afegir a l'activitat comentaris, àudios i imatges des del Fedivers",
@@ -307,7 +318,7 @@
         "smtp_description": "<ul><li>L'admin hauria de rebre un correu cada cop que es pengi alguna una activitat anònima (si estan activades).</li><li>L'admin hauria de rebre un correu per cada soŀlicitud de registre (si estan actives).</li><li>La usuària hauria de rebre un correu després de soŀlicitar registrar-se.</li><li>La usuària hauria de rebre un correu quan se li hagi confirmat el registre.</li><li>La usuària hauria de rebre un correu si l'admin la registra directament.</li><li>La usuària hauria de rebre un correu de restabliment de contrasenya si ho demana</li></ul>",
         "smtp_test_button": "Envia un correu de prova",
         "widget": "Giny",
-        "wrong_domain_warning": "La url base configurada a config.json <b>({baseurl})</b> difereix de la que esteu visitant <b>({url})</b>",
+        "wrong_domain_warning": "La url base configurada <b>({baseurl})</b> difereix de la que esteu visitant <b>({url})</b>",
         "event_remove_ok": "S'ha suprimit l'esdeveniment",
         "new_blob": "Nou blob",
         "blobs_description": "Els blobs són agrupacions d'activitats per etiquetes i llocs. Es mostren a la pàgina principal",
@@ -405,7 +416,12 @@
         "merge_place_help": "Ets a punt de fusionar <strong>{place}</strong> amb la ubicació seleccionada. Es modificaran també les {n} activitats associades a {place}.",
         "edit_user": "Modifica l'usuàriï",
         "notify": "Notifica",
-        "smtp_from_address": "Nom de remitent"
+        "smtp_from_address": "Nom de remitent",
+        "page_remove_ok": "S'ha esborrat la pàgina",
+        "enable_federation_quoting": "Permet citar les activitats des del fedivers",
+        "enable_federation_quoting_help": "Les usuàries del fedivers podran citar activitats d'aquesta instància",
+        "unblock_user": "Desbloca usuària",
+        "hidden": "Amagades"
     },
     "auth": {
         "not_confirmed": "Encara no s'ha confirmat…",
@@ -456,7 +472,7 @@
         "completed_description": "<p>Ara ja pots entrar amb aquesta usuària:<br/><br/>Nom: <b>{email}</b><br/>Contrasenya: <b>{password}<b/></p>",
         "start": "Comença",
         "copy_password_dialog": "Sí, has de copiar la contrasenya!",
-        "https_warning": "Esteu visitant des d'HTTP, recordeu canviar baseurl a config.json si canvieu a HTTPS!"
+        "https_warning": "Esteu visitant des d'HTTP, recordeu canviar la URL base a la configuració si canvieu a HTTPS!"
     },
     "activitypub": {
         "n_boosts": "{n} impulsos|{n} impuls|{n} impulsos",
