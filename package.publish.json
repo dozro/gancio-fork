@@ -1,6 +1,7 @@
 {
   "name": "gancio",
   "version": "",
+  "type": "module",
   "description": "A shared agenda for local communities",
   "bin": "./server/gancio"
 }

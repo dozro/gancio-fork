@@ -19,12 +19,6 @@
     "self-host",
     "app"
   ],
-  "files": [
-    ".output",
-    "i18n",
-    "server",
-    "gancio_plugins"
-  ],
   "tsup": {
     "entry": [
       "server/cli/index.ts"
@@ -72,7 +66,11 @@
     "prepare": "husky",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "build:dev": "./scripts/build.sh -d",
+    "build:prod": "./scripts/build.sh -p",
+    "pack:dev": "npm run build:dev && npm pack .pack",
+    "pack:prod": "npm run build:prod  && npm pack"
   },
   "lint-staged": {
     "*.{js,ts,vue}": "eslint --max-warnings=0 --no-warn-ignored"
