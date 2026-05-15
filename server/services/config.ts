@@ -169,7 +169,6 @@ export function get(): Config {
     if (!config.session_password) {
       console.warn('No session password set, generating a random one and saving it to config.json')
       config.session_password = randomBytes(32).toString('hex')
-      const config_path = process.env.config_path || './config.json'
       fs.writeFileSync(config_path, JSON.stringify(config, null, 2))
       return config
     }
