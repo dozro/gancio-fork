@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import type { Paginated } from '~~/server/types/pagination'
 import SearchInput from '../Core/SearchInput.vue'
+import { useDisplay } from 'vuetify'
 
 const { t } = useI18n()
 const { $confirm } = useNuxtApp()
+
+const { smAndDown: isMobile } = useDisplay()
 
 const instancesHeader = computed(() => [
   { value: 'name', title: t('common.name'), sortable: true },
@@ -16,7 +20,6 @@ const selectedInstance = ref<string | undefined>()
 function onInstanceRowClick (_, row) {
   const domain = row.item.domain
   selectedInstance.value = selectedInstance.value === domain ? undefined : domain
-  console.log('usersTable', usersTable.value.$el)
   usersTable.value?.$el.scrollIntoView({ behavior: 'smooth' })
 }
 
@@ -28,24 +31,19 @@ const usersHeader = computed(() => [
 const usersFilter = ref<string>('')
 const usersTable = ref()
 
-const resourcesHeader = computed(() => [
-  { value: 'created', text: t('admin.created_at') },
-  { value: 'event', text: t('common.event') },
-  { value: 'user', text: t('common.user') },
-  { value: 'content', text: t('common.content') },
-  { value: 'actions', text: t('common.actions') }
-])
-
 const { data: instances = [], refresh: refreshInstances } = await useFetch('/api/instances')
 const { data: users = [], refresh: refreshUsers } = await useFetch(`/api/ap_actors`, {
   query: { instance: selectedInstance }
 })
-const { data: resources = [] } = await useFetch('/api/resources')
 
-async function hideResource (resource, hidden) {
-  await $fetch(`/resources/${resource.id}`, { method: 'POST', body: hidden })
-  resource.hidden = hidden
-}
+const searchResources = ref('')
+const resourcesPage = ref(1)
+const { data: resourcesData, refresh: refreshResources } = await useFetch<Paginated<Resource>>('/api/resources/list', {
+  query: { page: resourcesPage, pageSize: 10, query: searchResources }
+})
+watch(searchResources, () => {
+  resourcesPage.value = 1
+}, { immediate: true })
 
 async function toggleUserBlock (ap_user) {
   if (!ap_user.blocked) {
@@ -56,16 +54,6 @@ async function toggleUserBlock (ap_user) {
   }
   await $fetch('/api/ap_actors/toggle_block', { method: 'PUT', body: { ap_id: ap_user.ap_id } })
   refreshUsers()
-}
-
-async function deleteResource (resource) {
-  const ret = await $confirm('admin.delete_resource_confirm')
-  if (!ret) {
-    return
-  }
-
-  await $fetch(`/resources/${resource.id}`, { method: 'DELETE' })
-  resources = resources.filter(r => r.id !== resource.id)
 }
 
 async function toggleInstanceBlock (instance) {
@@ -151,64 +139,37 @@ async function toggleInstanceBlock (instance) {
   <v-divider class="my-8"/>
 
   <div>
-    <div class="text-h5 mb-4">{{ $t('common.resources') }}</div>
-    To be implemented...
-    <!-- <v-data-table
-      :items="resources"
-      density="compact"
-      :headers="resourcesHeader"
-      :hide-default-footer="resources.length<10"
-      :items-per-page="10"
-    >
-      <template v-slot:item.content="{ item }">
-        <span v-html="item.data.content" />
+    <div class="d-flex align-center justify-space-between flex-wrap ga-4 mb-4">
+      <div class="text-h5">{{ $t('common.resources') }}</div>
+      <CoreSearchInput v-model.debounce="searchResources" class="w-100 w-sm-auto" />
+    </div>
+
+    <div v-if="resourcesData?.data" class="d-flex flex-column ga-2 mb-4">
+      <template v-for="resource, idx of resourcesData?.data" :key="resource.activitypub_id">
+        <div>
+          <nuxt-link
+            class="text-subtitle-1 font-weight-semibold text-decoration-none d-inline-flex align-center ga-2"
+            :to="`/event/${resource.event!.slug || resource.event!.id}`"
+          >
+            <v-icon icon="mdi-calendar" size="xSmall" />
+            <span>{{ resource.event!.title }}</span>
+          </nuxt-link>
+          <FederationResource :resource="resource" can-moderate :event-id="resource.event!.id" @update="refreshResources()" />
+        </div>
+        <v-divider v-if="idx + 1 < resourcesData?.data.length" variant="dashed" />
       </template>
-      <template v-slot:item.created="{ item }">
-        <span>{{ $time.format(item.created, 'ff') }}</span>
-      </template>
-      <template v-slot:item.user="{ item }">
-        <a :href="item.ap_user.url || item.ap_user.ap_id" target="_blank">{{ item.ap_user.preferredUsername }}</a>
-      </template>
-      <template v-slot:item.event="{ item }">
-        <nuxt-link :to="`/event/${item.event.slug || item.event.id}`">{{ item.event.title }}</nuxt-link>
-      </template>
-      <template v-slot:item.actions="{ item }">
-        <v-menu>
-          <template v-slot:activator="{ props }">
-            <v-btn class="mr-2" v-bind="props" color="primary" size="small" icon='mdi-dots-vertical' />
-          </template>
-          <v-list>
-            <v-list-item v-if="!item.hidden" @click="hideResource(item, true)">
-              <v-list-item-title>
-                <v-icon start icon='mdi-eye-off' />
-                {{ $t('admin.hide_resource') }}
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item v-else @click="hideResource(item, false)">
-              <v-list-item-title>
-                <v-icon start icon='mdi-eye' />
-                {{ $t('admin.show_resource') }}
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="deleteResource(item)">
-              <v-list-item-title>
-                <v-icon start icon='mdi-delete' />
-                {{ $t('admin.delete_resource') }}
-              </v-list-item-title>
-            </v-list-item> -->
-    <!--
-            <v-list-item @click="toggleUserBlock(item.ap_user)">
-              <v-list-item-title>
-                <v-icon left>mdi-lock</v-icon>
-                {{ $t('admin.block_user') }}
-              </v-list-item-title>
-            </v-list-item>
-            -->
-    <!-- </v-list>
-        </v-menu>
-      </template>
-    </v-data-table> -->
+    </div>
+
+    <div v-if="resourcesData?.totalPages && resourcesData.totalPages > 1" class="mt-6">
+      <v-pagination
+        v-model="resourcesPage"
+        :length="resourcesData.totalPages"
+        :total-visible="isMobile ? 1 : 6"
+        show-first-last-page
+      />
+    </div>
   </div>
+
 </div>
 </template>
 <style lang="css" scoped>

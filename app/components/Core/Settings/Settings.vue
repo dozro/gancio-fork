@@ -7,7 +7,10 @@ const props = withDefaults(defineProps<{
   menuItems: SettingsMenuItem[]
   queryParam?: string
   title?: string
-}>(), { queryParam: 'view' })
+}>(), {
+  queryParam: 'view',
+  title: undefined
+})
 
 const { smAndDown: isMobile } = useDisplay()
 const route = useRoute()
@@ -62,8 +65,8 @@ watchEffect(() => {
 
 </script>
 <template>
-<div class="d-flex">
-  <v-scroll-x-reverse-transition>
+<div class="d-flex mx-n4 px-4 ga-4 ga-md-0 overflow-hidden">
+  <v-scroll-x-reverse-transition :disabled="!isMobile">
     <div v-show="!isMobile || !selectedViewId" class="w-md-25 w-100 flex-shrink-0 d-md-block">
       <div v-if="title" class="text-h5 pa-4">
         {{ title }}
@@ -93,7 +96,7 @@ watchEffect(() => {
 
   <v-divider vertical class="d-none d-md-block" />
 
-  <div class="flex-grow-1 overflow-x-auto px-md-12">
+  <div class="flex-grow-1 px-md-12">
     <div v-if="selectedItem" class="mb-2">
       <nuxt-link
         :to="{ query: { [queryParam]: undefined } }"

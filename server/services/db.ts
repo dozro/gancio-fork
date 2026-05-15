@@ -21,7 +21,10 @@ import {
   type NonAttribute,
   type InferAttributesOptions,
   type AbstractDialect,
-  type Options
+  type Options,
+  fn,
+  sql,
+  col
 } from '@sequelize/core'
 
 import {
@@ -43,8 +46,7 @@ import {
   // BelongsTo,
   Default,
   BeforeCreate,
-  BelongsTo,
-  BeforeDestroy
+  BelongsTo
 } from '@sequelize/core/decorators-legacy'
 
 import { get as getConfig, runtimeResolve } from '../services/config'
@@ -98,6 +100,13 @@ export async function runMigrations() {
     log.error('Error running migrations ', e)
     throw e
   }
+}
+
+export function jsonPath(expression: string, path: ReadonlyArray<string | number>) {
+  // Sequelize complains JSON access is not supported in sqlite3, but in fact it is.
+  return sequelize?.dialect.name === 'sqlite3'
+    ? fn('JSON_EXTRACT', col(expression), '$.' + path.join('.'))
+    : sql.jsonPath(expression, path)
 }
 
 @Table({
