@@ -12,7 +12,7 @@ if (props?.error?.data?.name === 'ZodError') {
 <template>
 <NuxtLayout name="default">
   <v-container>
-    <h1>{{ error?.statusMessage ?? error?.message }}</h1>
+    <h1>{{ error?.message ?? error?.statusMessage ?? error?.statusText  }}</h1>
 
     <div v-if="zodIssues">
       <ul>
