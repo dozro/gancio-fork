@@ -1,15 +1,5 @@
----
-layout: default
-title: Code
-permalink: /dev/code
-parent: Hacking
-nav_order: 2
-has_toc: true
----
-
 # Code
 
-{: .no_toc }
 This section is to support people who want to contribute to the source code.
 
 Building software means taking a stand, making decisions, choices: you can read our choices on [the homepage](https://gancio.org)
@@ -20,8 +10,6 @@ To help with issues you can check for [Contibution welcome](https://framagit.org
 Please use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) in your commit messages.  
 Please make forks you want to merge upstream public and possibly [allow commits](https://docs.gitlab.com/user/project/merge_requests/allow_collaboration/#allow-commits-from-upstream-members) from upstream members when requesting a merge request.
 
-1. TOC
-{:toc}
 
 <!--
 TODO
@@ -51,7 +39,7 @@ Server code runs only on the backend and can securely access environment variabl
 There are two main ways to create backend logic:
 
 - **API Routes:**  
-  Place files inside `/server/api/`. Each file (e.g. [server/api/utils/ping.ts]({{ site.gh_edit_repository }}/-/tree/main/server/api/utils/ping.ts) automatically becomes an endpoint (`/api/utils/ping`).
+  Place files inside `/server/api/`. Each file (e.g. [server/api/utils/ping.ts](https://framagit.org/les/gancio/-/tree/main/server/api/utils/ping.ts) automatically becomes an endpoint (`/api/utils/ping`).
   The filename and extension determine the HTTP method (`.get.ts`, `.post.ts`, etc.).
 
 - **Custom Server Routes:**  
@@ -60,8 +48,6 @@ There are two main ways to create backend logic:
 ### Access query parameters
 
 You can use `event.context.params?.query` or `getQuery(event)`
-
-[example]({{site.gh_edit_repository}}/-/tree/main/server/api)
 
 ### Access route api params
 
@@ -125,7 +111,7 @@ There are some utilities to manage authentication via cookies and via JWT token.
 
 ### Documenting API
 
-As you can see in the [API]({% link dev/api.md %}) page, there are some documented API.
+As you can see in the [API](/dev/api) page, there are some documented API.
 This is done via the `scripts/gendocs.js` (its quite an hack because of jsdoc/tsdoc) that parse some files in `server/api` to extract the documentation and use the `scripts/api_template.hbs` template to create the `docs/api.md` source that jekyll will parse.
 
 The HTTP method and the API routes are calculated from file path.

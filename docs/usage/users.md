@@ -1,11 +1,4 @@
----
-layout: default
-title: Users
-permalink: /usage/users
-nav_order: 1
-parent: Usage
-has_toc: true
----
+# Users
 
 Login is available by clicking on the top right icon of the header.  
 
@@ -26,6 +19,6 @@ Gancio allows the following types of users:
 
 <br>
 
-> info "Changelog"  
-> [#1.15.1](https://gancio.org/changelog#1151-2024-04-01)  
-> [#1.17.1](https://gancio.org/changelog#1172-2024-06-14)
+::: info Changelog
+[#1.15.1](https://gancio.org/changelog#1151-2024-04-01), [#1.17.1](https://gancio.org/changelog#1172-2024-06-14)
+:::

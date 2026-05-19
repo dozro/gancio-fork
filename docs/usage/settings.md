@@ -1,25 +1,11 @@
----
-layout: default
-title: Settings
-permalink: /usage/settings
-nav_order: 1
-parent: Usage
----
-
-
 # Settings
-{: .no_toc }
 
 Gancio is a project designed to be adopted by different communities with specific use cases, which is why we tend to make features optional when we develop them.
 
 
-> info "Note"
-> If you are searching for initial configuration (database settings, base url, http proxy, etc) take a look at [Configuration]({% link install/configuration.md %}).
->
-
-
-1. TOC
-{:toc}
+:: tip Note
+If you are searching for initial configuration (database settings, base url, http proxy, etc) take a look at [Configuration](/install/configuration).
+:::
 
 ## Options
 
@@ -75,10 +61,10 @@ In addition to requesting the name and address of the event location, it is poss
 Can visitors download event flyers?
 
 ### Enable moderation
-Enable administrators and editors to moderate events (see the [Moderation section]({% link usage/moderation.md %}) section).
+Enable administrators and editors to moderate events (see the [Moderation section](./moderation) section).
 
 ### Enable report event
-Any visitor can send the administrators a report of an event (see the [Report an Event]({% link usage/moderation.md %}) section).
+Any visitor can send the administrators a report of an event (see the [Report an Event](./moderation) section).
 
 ### E-mail settings
 These are specific settings for setting up email sending.
@@ -113,10 +99,10 @@ In the footer bar, you can add links as you wish (e.g., to external sites or int
 
 ### Custom Javascript Code
 You can integrate some javascript code that will be loaded for everyone.
-Take a look at the [custom js]({% link usage/custom_js.md %}) section.
+Take a look at the [custom js](./custom_js) section.
 
 ### Custom CSS Style
-You can customize some stylesheet too, read some example at the [custom css]({% link usage/custom_css.md %}) section.
+You can customize some stylesheet too, read some example at the [custom css](./custom_css) section.
 
 
 

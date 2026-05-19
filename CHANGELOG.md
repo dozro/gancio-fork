@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file.
 
 ## [2.0.0-alpha.7](https://framagit.org/les/gancio/compare/v2.0.0-alpha.6...v2.0.0-alpha.7) (2026-05-13)
 
@@ -293,7 +293,7 @@ With this release, version 2.0 is beginning to stabilize and become usable. Ther
 Please note that the documentation for testing is available on the website [https://gancio.org/v2](https://gancio.org/v2).
 
 
-## [2.0.0-alpha.1]((https://framagit.org/les/gancio/compare/v1.27.0...v2.0.0-alpha.1)) (2025-08-5)
+## [2.0.0-alpha.1](https://framagit.org/les/gancio/compare/v1.27.0...v2.0.0-alpha.1) (2025-08-5)
 Okay, here we are, after about 250 commits, 591 modified files, 33,566 lines added, 32,873 removed and a lot of sweat, it's time to release an alpha version of this 2.0.
 
 To be honest, there aren't any huge changes in terms of usage (well, there are a few), I tried to keep everything as backward-compatible as possible, so little has changed in terms of everyday use.
@@ -324,7 +324,7 @@ The process included:
   - Vuetify 2 ➜ Vuetify 3
 
 
-## Key Changes
+### Key Changes
 
 ### Frontend: Vue 3, Vuetify 3
 
@@ -363,14 +363,14 @@ The ORM was upgraded from Sequelize 6 ➜ Sequelize 7, which brought structural 
 - Migration tooling is no longer included, it must be handled manually.
 - Some bugs and edge cases still exist (issue https://github.com/sequelize/sequelize/issues/17818)
 
-## This is an alpha!
+### This is an alpha!
 This is an alpha release, there will still be many small bugs and there will probably be some changes to be made.
 Start experimenting, but don't use it in production yet. Some features are also missing:
 
 - Search functionality
 - Custom user localization
 
-## Breaking Changes
+### Breaking Changes
 And yes, there are also some breaking changes, which I haven't been able to get rid of yet, but we can look at them in the coming months:
 I switched to a new authentication system using `nuxt-auth-utils` and this introduces a breaking change in session handling:
 
@@ -888,7 +888,7 @@ a big thank you to those who contributed pull requests, translations, documentat
 
 ### Bug Fixes
 
-* allow <em> tag in html sanitization, fix [#343](https://framagit.org/les/gancio/issues/343) ([fb9a9fb](https://framagit.org/les/gancio/commit/fb9a9fba998953144d20db7c0e62eaa978a84557))
+* allow `<em>` tag in html sanitization, fix [#343](https://framagit.org/les/gancio/issues/343) ([fb9a9fb](https://framagit.org/les/gancio/commit/fb9a9fba998953144d20db7c0e62eaa978a84557))
 * allow default page redirection for content-type ([3a9a132](https://framagit.org/les/gancio/commit/3a9a13291067658f14ebf55d5736da4099761754))
 * minor on style ([61b796e](https://framagit.org/les/gancio/commit/61b796efd61cba49f70eaae15a68c07dfab7f0e8))
 * refactoring clean past federated events ([8910b13](https://framagit.org/les/gancio/commit/8910b1390df2db8771ba86753c30a1fc413b4480))

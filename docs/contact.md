@@ -1,11 +1,11 @@
----
-layout: default
-title: Contacts
-permalink: /contacts
-nav_order: 9
----
+<!--# ---
+# layout: default
+# title: Contacts
+# permalink: /contacts
+# nav_order: 9
+# ----->
 
-## Contacts
+# Contacts
 
 
 - :elephant: Mastodon ⇒  [@gancio@mastodon.cisti.org](https://mastodon.cisti.org/@gancio)

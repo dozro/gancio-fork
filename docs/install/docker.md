@@ -1,15 +1,12 @@
----
-layout: default
-title: Docker
-permalink: /install/docker
-parent: Install
-nav_order: 2
----
-## Docker installation
-{: .no_toc }
+<!--# ---
+# layout: default
+# title: Docker
+# permalink: /install/docker
+# parent: Install
+# nav_order: 2
+# ----->
 
-1. TOC
-{:toc}
+# Docker installation
 
 ## Setup
 
@@ -48,14 +45,14 @@ docker-compose up -d
 tail -f  data/logs/gancio.log
 ```
  -->
-You'll need to [setup nginx as a proxy]({% link install/nginx.md %}) then you can point your web browser to your domain :tada:
+You'll need to [setup nginx as a proxy](./nginx) then you can point your web browser to your domain :tada:
 
 <!-- 
 ## Upgrade
 
 > warning "Backup your data"
 > Backup your data is generally a good thing to do and this is especially true before upgrading.
-> Don't be lazy and [backup]({% link install/backup.md %}) your data!
+> Don't be lazy and [backup](./install/backup.md) your data!
 
 
 ```bash

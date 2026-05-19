@@ -1,22 +1,11 @@
----
-title: Configuration
-permalink: /install/config
-nav_order: 6
-parent: Install
----
-
-## Configuration
-{: .no_toc }
+# Configuration
 `gancio` configuration is done during installation process but you can change it editing the configuration file.
 The configuration file shoud be a `.json` or a `.js` file and could be specified using the `--config` flag.
 
 - <small>eg. `gancio start --config ./config.json`</small>
 - <small>eg. `pm2 start gancio start -- --config ~/config.json`</small>
 
-1. TOC
-{:toc}
-
-### Server
+## Server
 This probably support unix socket too
 
 ```json
@@ -26,7 +15,7 @@ This probably support unix socket too
 }
 ```
 
-### Database
+## Database
 DB configuration, look [here](https://sequelize.org/v6/class/src/sequelize.js~Sequelize.html#instance-constructor-constructor) for options.
 ```json
   "db": {
@@ -34,15 +23,15 @@ DB configuration, look [here](https://sequelize.org/v6/class/src/sequelize.js~Se
     "storage": "/tmp/db.sqlite"
   }
 ```
-### Upload path
+## Upload path
 Where to save images  
 `"upload_path": "./uploads"`
 
-### Plugins path
+## Plugins path
 Where to search for [plugins](/usage/plugins)  
 `"plugins_path": "./plugins"`
 
-### User locale
+## User locale
 Probably you want to modify some text for your specific community, that's
 why we thought the `user_locale` configuration: you can specify your version of
 each string of **gancio** making a directory with your locales inside.
@@ -68,7 +57,7 @@ list of strings you can override.
 > warning "Restart needed"
 > Note that a restart is needed when you change user_locale's content.
 
-### Proxy
+## Proxy
 Proxy outward request from gancio.
 Look [here](https://www.npmjs.com/package/https-proxy-agent) for options.
 Note: `hostname` option takes precedence over `host`.

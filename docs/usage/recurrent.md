@@ -1,10 +1,10 @@
----
-layout: default
-title: Recurrent events
-permalink: /usage/recurrent
-nav_order: 1
-parent: Usage
----
+<!--# ---
+# layout: default
+# title: Recurrent events
+# permalink: /usage/recurrent
+# nav_order: 1
+# parent: Usage
+# ----->
 
 Gancio supports recurrent events if enabled to (`Admin > Settings`,
 disabled by default).

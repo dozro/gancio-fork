@@ -1,12 +1,4 @@
----
-layout: default
-title: Custom CSS
-permalink: /usage/custom_css
-nav_order: 3
-parent: Usage
----
-
-## Custom CSS <span class='label label-yellow'>Since 1.19.0</span> <span class='label label-red'>BETA</span>
+# Custom CSS <badge type='warning'>Since 1.19.0</badge> <badge type='danger'>BETA</badge>
 
 Is it possible to modify the style by integrating some custom css in `Admin > Theme > Custom CSS`
 

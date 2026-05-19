@@ -1,25 +1,13 @@
----
-layout: default
-title: Collections
-permalink: /usage/collections
-nav_order: 2
-parent: Usage
----
-
 # Collections
-{: .no_toc }
 
 Collections are groupings of events filtered by tags, places or federated instances.  
-
-1. TOC
-{:toc}
 
 
 ## Creating Collections
 
 There is a specific section in the administration panel called "Collections" where you can create new collections and manage existing ones.
 
-[![collection-1.png](collection-1.png)](collection-1.png){: data-fancybox="group" data-caption="Collection"}
+![collection-1.png](collection-1.png)
 
 To create a collection choose a wise name and simply select the characteristics of the events you want to include in that collection.  
 The selectable characteristics are tags, locations, and federated instances.
@@ -81,8 +69,9 @@ i.e. `application/xml` or `application/rss+xml` for RSS. In this case too, some 
 
 ### Widget / WebComponent
 
-It is possible to integrate a small web component into a website that displays events from a specific collection.
-Here, for example, is the list of upcoming events from the noarmy collection!
+It is possible to integrate a small web component into an external website that displays events from a specific collection.
 
-<script src='{{ '/assets/js/gancio-events.es.js' | relative_url }}'></script>
-<gancio-events sidebar='true' title='No Army' collection='noarmy' theme='light' maxlength=4 baseurl='https://noarmy.gancio.org'><a href='https://noarmy.gancio.org'>no army</a></gancio-events>  
+<!--Here, for example, is the list of upcoming events from the noarmy collection!-->
+
+<!--<script src='{{ '/assets/js/gancio-events.es.js' | relative_url }}'></script>-->
+<!--<gancio-events sidebar='true' title='No Army' collection='noarmy' theme='light' maxlength=4 baseurl='https://noarmy.gancio.org'><a href='https://noarmy.gancio.org'>no army</a></gancio-events>  -->

@@ -1,13 +1,4 @@
----
-layout: default
-title: Add Event
-permalink: /usage/add_event
-nav_order: 2
-parent: Usage
----
-
 # Add event
-{: .no_toc }
 
 Adding events is the core function of a shared calendar.
 The preferred use case is adding events via the website, although other methods are available (e.g., importing from other websites via ics, through federation, through custom plugins, or via API).
@@ -38,7 +29,7 @@ Select the day or days if it is a multi-day event.
 You can then enter the start and end times.
 
 ## Recurring Events
-See the [specific section]({% link usage/recurrent.md %})
+See the [specific section](./recurrent)
 
 ### Description
 

@@ -1,17 +1,18 @@
----
-layout: default
-title: Backup
-permalink: /install/backup
-nav_order: 5
-parent: Install
----
+<!--# ---
+# layout: default
+# title: Backup
+# permalink: /install/backup
+# nav_order: 5
+# parent: Install
+# ----->
 
-## Backup
+# Backup
 
 The following commands should be valid for every setup if you did not changed default configuration.
 
-> error "Be careful"
-> Backup are critical, make sure to test your backup and restore process before relying on it.
+::: danger Be careful
+Backup are critical, make sure to test your backup and restore process before relying on it.
+:::
 
 
 1. Move to gancio path
@@ -35,8 +36,9 @@ sudo tar -czf gancio-$(date +%Y-%m-%d-%H%M%S)-backup.tgz  \
   $(ls -d config.json uploads user_locale gancio.sqlite db.sqlite gancio.dump postgres data db logs 2> /dev/null)
 ```
 
-> info "Automatic backup"
-> To periodically backup your data you should probably use something like [restic](https://restic.net) or [borg](https://www.borgbackup.org/)
+::: tip Automatic backup
+To periodically backup your data you should probably use something like [restic](https://restic.net) or [borg](https://www.borgbackup.org/)
+:::
 
 
 ## Restore

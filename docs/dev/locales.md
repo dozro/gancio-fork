@@ -1,12 +1,4 @@
----
-layout: default
-title: Internationalization
-permalink: /dev/locales
-parent: Hacking
-nav_order: 7
----
-
-## Internationalization 
+# Internationalization 
 
 We're using [weblate](https://hosted.weblate.org/engage/gancio/) for localization, you can use it to help us with translations.
 

@@ -1,13 +1,4 @@
----
-layout: default
-title: Nginx setup
-permalink: /install/nginx
-parent: Install
----
-
-
-
-##  Nginx proxy configuration
+#  Nginx proxy configuration
 This is the default nginx configuration for gancio, please modify at least «YOUR_DOMAIN». Note that it does not include HTTPS setup but you can easily use [certbot](https://certbot.eff.org/) for that.
 
 - __You should be in the correct directory__

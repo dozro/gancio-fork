@@ -1,14 +1,6 @@
----
-layout: default
-title: Share
-permalink: /usage/share
-nav_order: 2
-parent: Usage
----
-
 # Share
 
-We don’t care about making hits so we export events in many ways: via RSS feeds, via global or individual ics, allowing you to embed list of events or single event [via iframe or webcomponent]({% link usage/embed.md %}) on other websites, via [ActivityPub]({% link federation.md %}), [microdata](https://developer.mozilla.org/en-US/docs/Web/HTML/Microdata) and [microformat](https://developer.mozilla.org/en-US/docs/Web/HTML/microformats#h-event).  
+We don't care about making hits so we export events in many ways: via RSS feeds, via global or individual ics, allowing you to embed list of events or single event [via iframe or webcomponent](./embed) on other websites, via [ActivityPub](./federation), [microdata](https://developer.mozilla.org/en-US/docs/Web/HTML/Microdata) and [microformat](https://developer.mozilla.org/en-US/docs/Web/HTML/microformats#h-event).  
 Unlike [GAFAM](https://en.wikipedia.org/wiki/Big_Tech) that does everything to keep users and data about them, we believe that information, like people, must be free.
 People can stay updated without necessarily going through the site because we don't need your attention or to sell you anything.
 
@@ -53,4 +45,4 @@ You can add a single event to remind yourself (there is a special “Add to cale
 
 ## Embedd
 You can embed a list of filtered events or a specific event card in your webpage using a classic old-school `iframe` or a shiny new webcomponent.
-Detailed information about this into the [specific page]({% link usage/embed.md %})
+Detailed information about this into the [specific page](./embed)
