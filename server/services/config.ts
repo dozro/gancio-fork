@@ -74,7 +74,7 @@ let config: Config
  */
 export function absolutizePath(path?: string): string {
   if (!path) return ''
-  return path.startsWith('/') ? path : resolve(process.cwd(), path)
+  return path.startsWith('/') ? path : resolve(process.env.GANCIO_DATA || process.cwd(), path)
 }
 
 /**
@@ -88,17 +88,17 @@ export function runtimeResolve(path: string) {
 const isTest = !!process.env.VITEST
 dotenv.config({ quiet: true, path: isTest ? '.env.test' : '.env' })
 
-const dialect = DialectSchema.parse(process.env.DB_DIALECT || 'sqlite3')
+const dialect = DialectSchema.parse(process.env.GANCIO_DB_DIALECT || 'sqlite3')
 const isSqlite = dialect === 'sqlite3'
 const db = DbSchema.parse({
   dialect,
-  ...(isSqlite && { storage: process.env.DB_STORAGE || 'gancio.sqlite' }),
+  ...(isSqlite && { storage: process.env.GANCIO_DB_STORAGE || 'gancio.sqlite' }),
   ...(!isSqlite && {
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USERNAME || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_DATABASE || 'gancio'
+    host: process.env.GANCIO_DB_HOST || 'localhost',
+    port: process.env.GANCIO_DB_PORT || 3306,
+    user: process.env.GANCIO_DB_USERNAME || 'root',
+    password: process.env.GANCIO_DB_PASSWORD || '',
+    database: process.env.GANCIO_DB_DATABASE || 'gancio'
   })
 })
 
@@ -169,7 +169,6 @@ export function get(): Config {
     if (!config.session_password) {
       console.warn('No session password set, generating a random one and saving it to config.json')
       config.session_password = randomBytes(32).toString('hex')
-      const config_path = process.env.config_path || './config.json'
       fs.writeFileSync(config_path, JSON.stringify(config, null, 2))
       return config
     }

@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-alpha.8](https://framagit.org/les/gancio/compare/v2.0.0-alpha.7...v2.0.0-alpha.8) (2026-05-18)
+
+
+### Features
+
+* implement moderation panel for resources ([3fc94e0](https://framagit.org/les/gancio/commit/3fc94e022057d616e853f02de34dc4a8616219de))
+
+
+### Bug Fixes
+
+* wrong config_path on rewrite ([eff5261](https://framagit.org/les/gancio/commit/eff52614dd4c9f0c740d904150065941b44ccdfe))
+
 ## [2.0.0-alpha.7](https://framagit.org/les/gancio/compare/v2.0.0-alpha.6...v2.0.0-alpha.7) (2026-05-13)
 
 
