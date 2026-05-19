@@ -1,12 +1,3 @@
----
-layout: default
-title: Install
-permalink: /install
-has_children: true
-nav_order: 3
-has_toc: false
----
-
 # Install
 
 
@@ -17,9 +8,9 @@ has_toc: false
 
 ## Install
 
-- [Install on Debian]({% link install/debian.md %})
-- [Install on NixOS]({% link install/nixos.md %})
-- [Install using Docker]({% link install/docker.md %})
+- [Install on Debian](./debian)
+- [Install on NixOS](./nixos)
+- [Install using Docker](./docker)
 - [Install using YunoHost](https://apps.yunohost.org/app/gancio)
 
 ## Other methods
@@ -27,9 +18,10 @@ has_toc: false
 - [Install with fly.io](https://rennerocha.com/posts/configuring-self-hosted-calendar-for-small-community/)
 
 ### Post installation
-- [Setup a backup]({% link install/backup.md %})
+- [Setup a backup](./backup)
 
 
-> info "Info"
-> If you wanna hack or run the current development release take a look at [Hacking & contribute]({% link dev/dev.md %}).
->
+
+::: tip Hack
+To hack and run the current development release take a look at [Hacking & contribute](/dev/).
+:::

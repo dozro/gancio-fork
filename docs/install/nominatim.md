@@ -1,26 +1,10 @@
----
-layout: default
-title: Nominatim
-permalink: /install/nominatim
-parent: Install
-nav_order: 7
----
-
-## Nominatim installation
-{: .no_toc }
-
-1. TOC
-{:toc}
-
----
+# Nominatim installation
 
 ## Testing
 For testing purposes you could skip the nominatim installation and use one of these geocoding providers that run a server for free:
 
 - [https://photon.komoot.io/](https://photon.komoot.io/) [Terms of service](https://photon.komoot.io/)
 - [https://nominatim.openstreetmap.org/](https://nominatim.openstreetmap.org/) [Terms of service](https://operations.osmfoundation.org/policies/nominatim/)
-
----
 
 ## Requirements
 From [https://nominatim.org/release-docs/latest/admin/Installation/](https://nominatim.org/release-docs/latest/admin/Installation/)
@@ -43,7 +27,6 @@ Some of these mirrors provide also incremental updates via [OsmChange](https://w
 
 Do you need to host multiple areas? Checkout [Osmium](https://osmcode.org/osmium-tool/manual.html), to merge multiple PBF files into one.
 
----
 
 ## Install on Debian
 There is a [detailed documentation](https://nominatim.org/release-docs/latest/appendix/Install-on-Ubuntu-22/) for installing nominatim on `Ubuntu 22` that should be valid also to install on `Debian`.
@@ -73,8 +56,6 @@ make
 
 ### Import the database
 [https://nominatim.org/release-docs/latest/admin/Import/](https://nominatim.org/release-docs/latest/admin/Import/)
-
----
 
 ## Install using docker
 

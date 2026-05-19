@@ -1,13 +1,13 @@
----
-layout: default
-title: Moderation
-permalink: /usage/moderation
-nav_order: 1
-parent: Usage
-has_toc: true
----
+<!--# ---
+# layout: default
+# title: Moderation
+# permalink: /usage/moderation
+# nav_order: 1
+# parent: Usage
+# has_toc: true
+# ----->
 
-# Moderation <span class='label label-yellow'>since 1.15.1</span>
+# Moderation <badge>since 1.15.1</badge>
 This feature could be enabled in **Admin > Settings > Enable Moderation**.
 By default it is not enabled.
 
@@ -20,14 +20,15 @@ When this feature is enabled (**Admin > Settings > Enable Report**) every person
 All administrators will receive an e-mail notification with the report.  
 This feature is not enabled by default. Note that to enable this feature [moderation](#moderation) should be enabled too.
 
-<video src='report.webm' controls></video>
+<video src='./report.webm' controls></video>
 
 
 ## Manage a report
 Admins and editors could talk each other and take notes on events, eventually they could send some message to the author of the event too.
 
-<video src='moderation.webm' controls></video>
+<video src='./moderation.webm' controls></video>
 
 
-> info "References"
-> [#220](https://framagit.org/les/gancio/-/issues/220), [#221](https://framagit.org/les/gancio/-/issues/221), [#350](https://framagit.org/les/gancio/-/issues/350)
+::: info References
+[#220](https://framagit.org/les/gancio/-/issues/220), [#221](https://framagit.org/les/gancio/-/issues/221), [#350](https://framagit.org/les/gancio/-/issues/350)
+:::

@@ -1,11 +1,4 @@
----
-title: Debian
-permalink: /install/debian
-nav_order: 1
-parent: Install
----
-
-## Debian installation
+# Debian installation
 
 1. Install dependencies
 ```bash
@@ -57,10 +50,9 @@ sudo yarn global add --network-timeout 1000000000 --silent {{site.url}}/latest-2
 > Only `yarn` is supported as package manager
 
 > info "Install another release"
-> You can found old releases at [{{site.url}}/releases]({{site.url}}/releases)
 
 > info "Package verification"
-> Distributed packages are signed with [this key](/assets/underscore_to.hacklab.asc) you can verify the signature using:  
+<!--> Distributed packages are signed with [this key](/assets/underscore_to.hacklab.asc) you can verify the signature using:  -->
 > `gpg --verify latest-2.0-alpha.tgz.sig`
 
 <!-- 
@@ -76,7 +68,7 @@ sudo systemctl enable gancio
 sudo systemctl start gancio
 ```
 
-1. [Setup nginx as a proxy]({% link install/nginx.md %})
+1. [Setup nginx as a proxy](./install/nginx.md)
 
 1. Point your web browser to your domain :tada:
 
@@ -84,7 +76,7 @@ sudo systemctl start gancio
 
 > warning "Backup your data"
 > Backup your data is generally a good thing to do and this is especially true before upgrading.
-> Don't be lazy and [backup]({% link install/backup.md %}) your data!
+> Don't be lazy and [backup](./install/backup.md) your data!
 
 ```bash
 sudo yarn global remove gancio

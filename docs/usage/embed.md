@@ -1,21 +1,10 @@
----
-layout: default
-title: Embed events in webpages
-permalink: /usage/embed
-nav_order: 2
-parent: Usage
----
+# Embed events in webpages
 
 
-
-# Embed a single event or a list of events in your webpage
-{: .no_toc }
+## Embed a single event or a list of events in your webpage
 
 You can embed a list of filtered events or a specific event card in your webpage using a classic old-school `iframe` or a shiny new webcomponent.
-{: .fs-6 .fw-300 }
 
-1. TOC
-{:toc}
 ## Webcomponents
 [Webcomponents](https://www.webcomponents.org/introduction) usage requires a small (~5kB gzipped) js script to be loaded in your page (note that you should use your instance name):
 ```html
@@ -29,7 +18,7 @@ To embed an event in webpages you use `<gancio-event>` custom element, you can c
 <gancio-event id=17 baseurl='https://demo.gancio.org'></gancio-event>
 ```
 
-<script src='/v2/assets/js/gancio-events.es.js'></script>
+<!--<script src='/v2/assets/js/gancio-events.es.js'></script>-->
 <gancio-event id=17 baseurl='https://demo.gancio.org'></gancio-event>  
 
 
@@ -42,56 +31,27 @@ You can also embed a list of events using `<gancio-events>` custom element, you 
   <a href='https://gancio.cisti.org'>Gancio Events</a>
 </gancio-events>
 ```
-
-<script>
-  var theme = 'light';
-  var sidebar = 'true';
-  var show_more = 'true';
+<script setup>
+  import { onMounted, ref, computed } from 'vue'
   
-  function toggleDark() {
-    var items = document.getElementsByTagName('gancio-events');
-    theme = theme === 'dark' ? 'light' : 'dark';
-    items[0].setAttribute('theme', theme );
-  }
+  onMounted(() => {
+    if (!document.querySelector('#gancio-events-script')) {
+      const script = document.createElement('script')
+      script.id = 'gancio-events-script'
+      script.src = 'https://demo.gancio.org/gancio-events.es.js'
+      document.head.appendChild(script)
+    }
+  })
 
-  function toggleSidebar() {
-    var items = document.getElementsByTagName('gancio-events');
-    sidebar = sidebar === 'true' ? 'false' : 'true';
-    items[0].setAttribute('sidebar', sidebar );
-  }
-
-
-  function changeMax(value) {
-    var items = document.getElementsByTagName('gancio-events');
-    items[0].setAttribute('maxlength', value);
-  }
-
-  function changeHeight(value) {
-    var items = document.getElementsByTagName('gancio-events');
-    items[0].setAttribute('max_height', value);
-  }
-
-  function changeTitle (title) {
-    var items = document.getElementsByTagName('gancio-events');
-    items[0].setAttribute('title', title)
-  }
-  function toggleShowMore() {
-    var items = document.getElementsByTagName('gancio-events');
-    show_more = show_more === 'true' ? 'false' : 'true';
-    items[0].setAttribute('show_more', show_more );
-  }
-
-  function changeDefaultURL(value) {
-    var baseurl = document.getElementById('baseurl');
-    changeBaseURL(value);
-    baseurl.value = value;
-  }
+  const dark = ref(false)
+  const sidebar = ref(false)
+  const show_more = ref(true)
+  const max = ref(4)
+  const height = ref('50vh')
+  const title = ref('Gancio Events')
+  const instance = ref('https://gancio.cisti.org')
+  const theme = computed(() => dark.value ? 'dark' : 'light')
   
-  function changeBaseURL(value) {
-    var items = document.getElementsByTagName('gancio-events');
-    items[0].setAttribute('baseurl', value);
-    console.error('Changing base URL to ' + value);
-  }  
 </script>
 
 <style>
@@ -103,34 +63,35 @@ You can also embed a list of events using `<gancio-events>` custom element, you 
 </style>
 <div style='display: flex; gap: 20px;'>
 <aside>
-  <label>Title <input value='Gancio' type='text' onkeyup="changeTitle(this.value)"/></label>
-  <label><input type='checkbox' onchange="toggleDark()"/> Dark</label>
-  <label><input type='checkbox' checked onchange="toggleSidebar()"/> Sidebar</label>
-  <label><input type='checkbox' checked onchange="toggleShowMore()"/> Show More</label>
-  <label>Max items <input value=4 type='number' label='Max items' onchange="changeMax(this.value)"/></label>
-  <label>Max inner height <input value="50vh" label='Max inner height' onchange="changeHeight(this.value)"/></label>
-  <select onchange="changeDefaultURL(this.value)">
+  <label>Title <input type='text' v-model='title'/></label>
+  <label><input type='checkbox' v-model='dark'/> Dark</label>
+  <label><input type='checkbox' checked v-model='sidebar'/> Sidebar</label>
+  <label><input type='checkbox' checked v-model='show_more' /> Show More</label>
+  <label>Max items <input type='number' label='Max items' v-model='max'/></label>
+  <label>Max inner height <input label='Max inner height' v-model='height'/></label>
+  <select v-model='instance'>
     <option value="https://gancio.cisti.org">Gancio</option>
     <option value="https://lapunta.org">LaPunta</option>
     <option value="https://demo.gancio.org">Demo</option>
   </select>
-  <label>Instance <input id='baseurl' value="https://gancio.cisti.org" label="Instance" oninput="changeBaseURL(value)"/></label>
+  <label>Instance <input id='baseurl' label="Instance" v-model='instance'/></label>
 </aside>
 
 <gancio-events
-  title='Gancio'
-  sidebar='true'
-  theme='light'
-  show_more='true'
-  max_height='50vh'
-  maxlength=4
-  baseurl='https://gancio.cisti.org'
+  :title='title'
+  :sidebar='sidebar ? "true" : "false"'
+  :theme='theme'
+  :show_more='show_more ? "true" : "false"'
+  :max_height='height'
+  :maxlength='max'
+  :baseurl='instance'
 />
 </div>
 
-> info "Customize"
-> Note that you can modify the title (or completely remove it using an empty `title` param),
-> you can limit the list to a maximum number of events using the `maxlength` parameter and filter events by `tags` or `places` using that parameters (it's easier using **gancio** than to explain it here)
+::: info Customize
+Note that you can modify the title (or completely remove it using an empty `title` param),
+you can limit the list to a maximum number of events using the `maxlength` parameter and filter events by `tags` or `places` using that parameters (it's easier using **gancio** than to explain it here)
+:::
 
 
 ## IFrame
@@ -141,6 +102,6 @@ You can also use the old iframe method
 <iframe src='https://demo.gancio.org/embed/17' style="width: 410px; border: none; height: 210px; overflow: hidden;"></iframe>
 ```
 
-
+<!--
 ## Wordpress
-To embed an event or a list of events into a [WordPress](https://wordpress.com) website you can use the [WPGancio](https://wordpress.org/plugins/wpgancio/) plugin, this allows you to use webcomponents and shortcodes and automatically includes the needed script in each page and post.
+To embed an event or a list of events into a [WordPress](https://wordpress.com) website you can use the [WPGancio](https://wordpress.org/plugins/wpgancio/) plugin, this allows you to use webcomponents and shortcodes and automatically includes the needed script in each page and post.-->

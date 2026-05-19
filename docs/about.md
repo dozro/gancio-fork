@@ -1,10 +1,10 @@
----
-layout: default
-title: About
-permalink: /about
-nav_order: 8
----
-## About
+<!--# ---
+# layout: default
+# title: About
+# permalink: /about
+# nav_order: 8
+# ----->
+# About
 
 Gancio was born in Italy from political hacking movements, in particular from the [hacklab underscore](https://autistici.org/underscore).
 We deal not only with technology but also with politics because we believe that technology is not neutral, that the Internet can also become an instrument of oppression, that information and software must be free and that knowledge is not for sale. For us, hacking is study and sharing, it is conscious and unconventional use of tools.

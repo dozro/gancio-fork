@@ -1,18 +1,7 @@
----
-layout: default
-title: Home
-permalink: /usage/home
-nav_order: 1
-parent: Usage
----
-
 # Home page
-{: .no_toc }
 
 The homepage is all about giving you a quick look at what’s going on.
 
-1. TOC
-{:toc}
 
 ## What's in the home
 
@@ -41,7 +30,7 @@ Each card gives you a quick preview of the event, including:
 - The date and time
 - The location
 
-[![event.png](event.png)](event.png){: data-fancybox="group" data-caption="Event's card"}
+![event.png](event.png)
 
 There are also icons that indicate whether the event is recurring and whether it has already passed.
 
@@ -53,7 +42,7 @@ You can set whether recurring events are displayed by default on the home page f
 
 ### Show a subset of events on the homepage
 
-It is possible to create subsets of events (called collections in the administration interface) that can be displayed on the homepage; there is a [dedicated section](/collections) for this.
+It is possible to create subsets of events (called collections in the administration interface) that can be displayed on the homepage; there is a [dedicated section](./collection) for this.
 
 ### Is there another way I can stay updated?
 

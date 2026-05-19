@@ -1,10 +1,4 @@
----
-title: Screenshots
-nav_order: 2
-permalink: /screenshot
----
-
-## Screenshots 
+# Screenshots 
 
 <!-- [![assets/thumbs/home_desktop.png](assets/thumbs/home_desktop.png)](assets/home_desktop.png){: data-fancybox="group" data-caption="Home"}
 [![assets/thumbs/event.png](assets/thumbs/event.png)](assets/event.png){: data-fancybox="group" data-caption="Event"}

@@ -1,12 +1,4 @@
----
-layout: default
-title: Plugins
-permalink: /dev/plugins
-nav_order: 2
-parent: Hacking
----
-
-## Plugins
+# Plugins
 Plugins allow you to extend Gancio features and integrate it with other services.
 With plugins you can:
 - react to events related actions (create, update, delete) for example to send a notification to another service.
@@ -15,8 +7,10 @@ With plugins you can:
 - add your own settings to the admin panel and use them in your plugin
 - expose a CLI command to be used in the terminal
 
-> warning "Warning"
-> With v2 we are introducing a new plugin system that is not compatible with the old one, so if you have an old plugin you will need to rewrite it (the basic syntax is pretty the same).
+::: warning
+With v2 we are introducing a new plugin system that is not compatible with the old one, so if you have an old plugin you will need to update it (the basic syntax 
+is pretty the same).
+:::
 
 
 ## Basics
@@ -36,7 +30,7 @@ export default ({ log, db, publicSettings, services }: GancioContext): GancioPlu
 })
 ```
 
-Plugins should be inside `./plugins` directory but you can specify another location using [`plugins_path`](https://gancio.org/install/config#plugins-path) configuration.
+Plugins should be inside `./plugins` directory but you can specify another location using [`plugins_path`](../install/configuration#plugins-path) configuration.
 
 ## Plugin details
 A plugins **MUST** expose a `manifest` key where to specify its details:
@@ -75,7 +69,7 @@ module.exports = {
 }
 ```
 
-[![/assets/plugins/settings.png](/assets/plugins/settings.png)](/assets/plugins/settings.png){: data-fancybox="group" data-caption="Home"}
+<!-- [![/assets/plugins/settings.png](/assets/plugins/settings.png)](/assets/plugins/settings.png){: data-fancybox="group" data-caption="Home"} -->
 
 
 ## Load a plugin

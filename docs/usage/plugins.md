@@ -1,21 +1,7 @@
----
-layout: default
-title: Plugins
-permalink: /usage/plugins
-nav_order: 2
-parent: Usage
-has_toc: true
----
-
 # Plugins
-{: .no_toc }
-## Plugins
 Plugins allow you to extend Gancio features and integrate it with other services.
-This page is a guide to install plugins, if you want to develop one instead look [here](/dev/plugins).  
+This page is a guide to install plugins, if you want to develop one instead look [here](/dev/plugin).  
 __Please note that some plugins are officially supported and distributed along with the release__
-
-1. TOC
-{:toc}
 
 ## Install
 

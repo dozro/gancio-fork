@@ -1,11 +1,4 @@
----
-title: NixOS
-permalink: /install/nixos
-nav_order: 1
-parent: Install
----
-
-## Enable Gancio service on NixOS
+# NixOS
 
 Gancio is available as a nixOS service since NixOS 24.11, by default it will use sqlite and nginx (with ssl activated).
 
@@ -28,7 +21,7 @@ Gancio is available as a nixOS service since NixOS 24.11, by default it will use
   networking.firewall.allowedTCPPorts = [ 80 443 ];
 }
 ```
-The `services.gancio.settings` attribute is used to generate the configuration file, see [gancio configuration]({% link install/configuration.md %}) for available options.
+The `services.gancio.settings` attribute is used to generate the configuration file, see [gancio configuration](./configuration) for available options.
 
 Other options for the NixOS Gancio service are documented on [search.nixos.org](https://search.nixos.org/options?channel=unstable&query=services.gancio.).
 

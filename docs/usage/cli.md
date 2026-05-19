@@ -1,17 +1,13 @@
----
-layout: default
-title: CLI
-permalink: /usage/cli
-nav_order: 2
-parent: Usage
-has_toc: true
----
+<!--# ---
+# layout: default
+# title: CLI
+# permalink: /usage/cli
+# nav_order: 2
+# parent: Usage
+# has_toc: true
+# ----->
 
 # CLI - Command Line Interface
-{: .no_toc }
-
-1. TOC
-{:toc}
 
 ## Using CLI
 Gancio is distributed with an embedded CLI.  
@@ -26,7 +22,7 @@ To use the CLI in a docker installation you can execute a shell inside the conta
 `docker exec <gancio_container_name> ./gancio <your command>`
 
 
-## Users <span class='label label-yellow'>since 1.6.14</span>
+## Users <badge>since 1.6.14</badge>
 All users related sub-commands starts with `gancio users`.
 Note that most of this actions could be done from administration panel (Admin > Users).
 
@@ -101,12 +97,15 @@ Note that a restart is needed to get the new setting
 ```
 
 
-> warning "JSON"
-> Note that settings are stored in JSON format, so your value will be parsed.
 
-> warning "Restart needed"
-> A restart is needed after a setting is changed
+::: warning JSON
+Note that settings are stored in JSON format, so your value will be parsed.
+:::
 
-> info "References"
-> [#365](https://framagit.org/les/gancio/-/issues/365)
-> [!188](https://framagit.org/les/gancio/-/merge_requests/188)
+::: warning Restart needed
+A restart is needed after a setting is changed
+:::
+
+::: tip Rerefences
+[#365](https://framagit.org/les/gancio/-/issues/365)  
+[!188](https://framagit.org/les/gancio/-/merge_requests/188)
