@@ -1,6 +1,19 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [2.0.0-alpha.9](https://framagit.org/les/gancio/compare/v2.0.0-alpha.8...v2.0.0-alpha.9) (2026-05-19)
+
+
+### Features
+
+* allow date filtering when hide calendar option is set ([592bde0](https://framagit.org/les/gancio/commit/592bde0299ff92b1f052e1898854195c9357d5f9))
+* move the website from jekyll to vitepress ([1098239](https://framagit.org/les/gancio/commit/109823912aa4348bcbc4dfd172e032ff10321b1e))
+
+
+### Bug Fixes
+
+* wrong config_path on rewrite ([3d7b7cc](https://framagit.org/les/gancio/commit/3d7b7ccb3601a008edb231c50aef0b7daa82e98c))
 
 ## [2.0.0-alpha.8](https://framagit.org/les/gancio/compare/v2.0.0-alpha.7...v2.0.0-alpha.8) (2026-05-18)
 
