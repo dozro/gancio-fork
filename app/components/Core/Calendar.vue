@@ -5,7 +5,6 @@ const { attributes, params } = useEvents()
 
 const { theme } = useAppTheme()
 
-// const { startMonth } = useTime()
 function updatePages (pages) {
   const start = pages?.[0] ?? pages
   const tmpStart = time.startMonth(start.year, start.month)
@@ -23,11 +22,11 @@ const initialPage = useInitialCalendarPage()
 <!-- :columns="$vuetify.display?.smAndUp ? 2 : 1" -->
 <DatePicker
   v-model='selectedDate'
-  class='mt-2'
   :locale='$i18n.locale'
   title-position='left'
   transition='fade'
   :is-dark="theme.current?.value?.dark"
+  class="bg-transparent-semi"
   aria-label='Calendar'
   expanded
   :attributes='attributes'
@@ -42,7 +41,6 @@ const initialPage = useInitialCalendarPage()
   --vc-rounded-lg: 4px !important;
   --vc-bg: rgba(250,250,250,0.5);
   /* --vc-color: var(vc--gray-900) !important; */
-  backdrop-filter: blur(4px);
 }
 
 .v-theme--dark .vc-container {
@@ -50,7 +48,6 @@ const initialPage = useInitialCalendarPage()
   --vc-rounded-lg: 4px !important;
   --vc-bg: rgba(10,10,10,0.5);
   /* --vc-color: #999 !important; */
-  backdrop-filter: blur(4px);
 }
 
 .vc-opacity-0 {
