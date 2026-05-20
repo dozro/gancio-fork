@@ -20,6 +20,7 @@ import { multipartFileSchema, saveUploadedEventImage } from '../lib/parseMultipa
 import { focalPointSchema, jsonCodec } from '../lib/validator'
 import { addressToString } from '../../shared/utils/addressToString'
 import { normalizeTag } from './tags'
+import { RecurrentSchema } from './recurrent'
 
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
@@ -182,7 +183,8 @@ const eventAPISchema = z.object({
   place_postal_address: jsonCodec(PostalAddressSchema).optional(),
   place_address: z.string().optional(),
   place_latitude: z.coerce.number().optional(),
-  place_longitude: z.coerce.number().optional()
+  place_longitude: z.coerce.number().optional(),
+  recurrent: jsonCodec(RecurrentSchema).optional()
 })
   .refine(data => data.place_id || Boolean(data.place_name && (data.place_address || data.place_postal_address)),
     { message: 'place_id or place_name and place_address are required' })

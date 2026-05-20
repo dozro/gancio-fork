@@ -3,6 +3,17 @@ import { useLogger } from '~~/server/lib/logger'
 import { Event, Tag } from '~~/server/services/db'
 import { notifyEvent } from '~~/server/services/notifier'
 import { findOrCreateTags } from './tags'
+import { Op } from '@sequelize/core'
+import { z } from 'zod'
+
+/**
+ * this is the v1 recurrent type
+ */
+export const RecurrentSchema = z.object({
+  frequency: z.enum(['1w', '2w', '1m', '2m', '1y']),
+  type: z.enum(['ordinal', '-1', '1', '2', '3', '4']).optional()
+})
+export type Recurrent = z.infer<typeof RecurrentSchema>
 
 const log = useLogger('recurrent')
 
@@ -115,7 +126,7 @@ export async function createRecurrent(start_datetime = DateTime.local().toUnixIn
   const events = await Event.findAll({
     where: { is_visible: true, recurrent: { [Op.ne]: null } },
     include: [{ model: Tag, required: false },
-    { model: Event, as: 'child', required: false, where: { start_datetime: { [Op.gte]: start_datetime } } }],
+      { model: Event, as: 'child', required: false, where: { start_datetime: { [Op.gte]: start_datetime } } }],
     order: [['child', 'start_datetime', 'DESC']]
   })
 

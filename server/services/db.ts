@@ -53,6 +53,7 @@ import { get as getConfig, runtimeResolve } from '../services/config'
 import type { APActor, APEvent, APNote, PostalAddress } from '../federation/types'
 import { EventStatusEnum } from '../federation/types'
 import type { SecretSettings, Settings } from '~~/shared/types/settings'
+import type { Recurrent } from './recurrent'
 const config = getConfig()
 const log = useLogger('sequelize')
 
@@ -250,7 +251,7 @@ export class Event extends Model<
   declare online_locations: CreationOptional<string[]>
 
   @Attribute(DataTypes.JSON)
-  declare recurrent: CreationOptional<object | null>
+  declare recurrent: CreationOptional<Recurrent | null>
 
   @Attribute(DataTypes.JSON)
   declare ld_signature: CreationOptional<LDSignature>

@@ -12,6 +12,7 @@ import { useLogger } from '~~/server/lib/logger'
 import { notifyEvent } from '~~/server/services/notifier'
 import { z } from 'zod'
 import { sign } from '~~/server/federation/ldsignature'
+import { createRecurrent } from '~~/server/services/recurrent'
 
 /**
  * Add a new event
@@ -84,7 +85,7 @@ export default defineEventHandler(async (evt) => {
   // create recurrent instances of event if needed
   // without waiting for the task manager
   if (event?.recurrent && event.is_visible) {
-    // eventController._createRecurrent()
+    await createRecurrent()
   } else {
     // sign Event if federation is enabled
     if (publicSettings.enable_federation) {
