@@ -20,7 +20,8 @@ const event = ref<EventAPI>({
   description: '',
   media: [{}],
   place: { name: '', address: '' },
-  status: 'EventScheduled'
+  status: 'EventScheduled',
+  recurrent: { }
 })
 
 let eventId = route.params.eventId
@@ -123,6 +124,13 @@ async function done(publish) {
 
   if (evt.end_datetime) {
     formData.append('end_datetime', evt.end_datetime)
+  }
+
+  if (evt.recurrent?.frequency) {
+    formData.append('recurrent', JSON.stringify({
+      ...evt.recurrent,
+      ...(evt.recurrent.type && ({ type: String(evt.recurrent.type) }))
+    }))
   }
 
   if (normalizedTags?.value?.length) {

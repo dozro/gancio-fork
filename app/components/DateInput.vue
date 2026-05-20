@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 
 import { DateTime } from 'luxon'
-
+const time = useTime()
 const { isAdmin } = useAuth()
 const { attributes, events } = useEvents()
 const { theme } = useAppTheme()
@@ -18,60 +18,88 @@ const frequencies = [
   { value: '1y', text: t('event.each_year') }
 ]
 
-function fromDateAndTimeToDateTime(dateObj: Date, timeStr: string): number {
-  const [hours, minutes] = timeStr.split(':').map(Number)
-  return DateTime.fromJSDate(dateObj)
-    .set({ hour: hours, minute: minutes, second: 0, millisecond: 0 }).toUnixInteger()
-}
-
-function formatTime(date: number): string {
-  return DateTime.fromSeconds(date).toFormat('HH:mm')
-}
-
-const isMultiDate = (start: number, end?: number) => end && !DateTime.fromSeconds(end).hasSame(DateTime.fromSeconds(start), 'day')
-const eventIsMultidate = computed(() => isMultiDate(event.value.start_datetime, event.value.end_datetime))
-
+const eventIsMultidate = computed(() => time.isMultiDate(event.value.start_datetime, event.value.end_datetime))
 const type = ref(eventIsMultidate.value ? 'multidate' : 'normal')
-const selectedDates = ref<Date | { start: Date, end: Date } | null>(
-  eventIsMultidate.value
-    ? {
-        start: new Date(event.value.start_datetime * 1000),
-        end: new Date((event.value.end_datetime as number) * 1000)
-      }
-    : (event.value.start_datetime ? new Date(event.value.start_datetime * 1000) : null)
-)
-const selectedStartTime = ref<string | null>(event.value.start_datetime ? formatTime(event.value.start_datetime) : null)
-const selectedEndTime = ref<string | null>(event.value.end_datetime ? formatTime(event.value.end_datetime) : null)
+
+const selectedDates = ref<{ start?: Date, end?: Date }>({
+  start: event.value.start_datetime ? new Date(event.value.start_datetime * 1000) : undefined,
+  end: event.value.end_datetime ? new Date(event.value.end_datetime * 1000) : undefined
+})
+
+const selectedStartTime = ref<string | null>(event.value.start_datetime ? time.unixFormat(event.value.start_datetime, 'HH:mm') : null)
+const selectedEndTime = ref<string | null>(event.value.end_datetime ? time.unixFormat(event.value.end_datetime, 'HH:mm') : null)
 
 const todayEvents = computed(() => {
-  if (!events.value ||
-    (type.value === 'normal' && !selectedDates.value) ||
-    (type.value == 'multidate' && !selectedDates?.value?.start)) {
+  if (!events.value || !selectedDates.value.start) {
     console.error('no selected date')
     return []
   }
-  const startOfDay = selectedDates.value instanceof Date
-    ? DateTime.fromJSDate(selectedDates.value).startOf('day').toSeconds()
-    : DateTime.fromJSDate(selectedDates?.value?.start).startOf('day').toSeconds()
-  const endOfDay = selectedDates.value instanceof Date
-    ? DateTime.fromJSDate(selectedDates.value).endOf('day').toSeconds()
-    : DateTime.fromJSDate(selectedDates?.value?.end).endOf('day').toSeconds()
+  const startOfDay = DateTime.fromJSDate(selectedDates.value.start).startOf('day').toSeconds()
+  const endOfDay = DateTime.fromJSDate(selectedDates.value.end ? selectedDates.value.end : selectedDates.value.start).endOf('day').toSeconds()
 
   return events?.value?.filter(e => e.id !== event.value.id && e.start_datetime >= startOfDay && e.start_datetime <= endOfDay)
 })
 
+const whenPatterns = computed(() => {
+  if (!event.value.recurrent) return []
+  if (typeof selectedDates.value.start === 'undefined') return []
+  const date = DateTime.fromJSDate(selectedDates.value.start)
+  const freq = event.value.recurrent.frequency
+  const weekDay = date.toFormat('EEEE')
+  if (freq === '1w' || freq === '2w') {
+    return t(`event.recurrent_${freq}_days`, { days: weekDay }).toUpperCase()
+  } else if (freq === '1m' || freq === '2m') {
+    const n = Math.floor((date.day - 1) / 7) + 1
+
+    const patterns: { label: string, key: 'ordinal' | number }[] = [
+      { label: t(`event.recurrent_${freq}_days`, { days: date.day }), key: 'ordinal' }
+    ]
+
+    if (n < 5) {
+      patterns.push({
+        label: t(`event.recurrent_${freq}_ordinal`, { n: t(`ordinal.${n}`), days: weekDay }),
+        key: n
+      })
+    }
+
+    // if selected day is in last week, propose also this type of selection
+    const lastWeek = date.endOf('month').day - date.day < 7
+    if (lastWeek) {
+      patterns.push({
+        label: t(`event.recurrent_${freq}_ordinal`, { n: t('ordinal.-1'), days: weekDay }),
+        key: -1
+      })
+    }
+
+    return patterns
+  // } else if (freq === '1d') {
+  //   return t('event.recurrent_each_day')
+  }
+  return []
+})
+
+// update event start/end datetime when dates or times change
 watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, endTime]) => {
-  if (!startTime || !dates) {
+  // if no date or time is selected, reset datetime fields
+  if (!startTime || !dates.start) {
     event.value.start_datetime = 0
     event.value.end_datetime = undefined
-  } else if (dates instanceof Date) { // Single date
-    event.value.start_datetime = fromDateAndTimeToDateTime(dates, startTime)
-    event.value.end_datetime = endTime
-      ? fromDateAndTimeToDateTime(dates, endTime)
-      : undefined
-  } else if (endTime) { // multidate
-    event.value.start_datetime = fromDateAndTimeToDateTime(dates.start, startTime)
-    event.value.end_datetime = fromDateAndTimeToDateTime(dates.end, endTime)
+    return
+  }
+
+  event.value.start_datetime = time.fromDateAndTime(dates.start, startTime)
+  event.value.end_datetime = endTime ? time.fromDateAndTime(dates?.end ? dates.end : dates.start, endTime) : undefined
+})
+
+// normalize DatePicker input
+const pickDates = computed({
+  get: () => selectedDates.value,
+  set: (dates: Date | { start?: Date, end?: Date }) => {
+    if (dates instanceof Date) {
+      selectedDates.value = { start: dates, end: undefined }
+    } else {
+      selectedDates.value = dates
+    }
   }
 })
 
@@ -80,58 +108,55 @@ watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, e
 <v-col cols="12">
   <div class="text-center">
     <v-btn-toggle
-      v-if="!event.parentId && !event.recurrent"
+      v-if="!event.parentId"
       v-model="type"
       class="flex-wrap flex-row"
       variant='outlined'
       color="primary"
       mandatory
     >
-      <v-btn value="normal" label="normal">{{ $t('event.normal') }}</v-btn>
-      <v-btn v-if="settings.allow_multidate_event" value="multidate" label="multidate">{{ $t('event.multidate') }}</v-btn>
-      <v-btn v-if="settings.allow_recurrent_event" value="recurrent" label="recurrent">{{ $t('event.recurrent') }}</v-btn>
+      <v-btn value="normal" label="normal">{{ t('event.normal') }}</v-btn>
+      <v-btn v-if="settings.allow_multidate_event" value="multidate" label="multidate">{{ t('event.multidate') }}</v-btn>
+      <v-btn v-if="settings.allow_recurrent_event" value="recurrent" label="recurrent">{{ t('event.recurrent') }}</v-btn>
     </v-btn-toggle>
 
-    <p>{{ $t(`event.${type}_description`) }}</p>
-
+    <p>{{ t(`event.${type}_description`) }}</p>
+    <!-- <span> {{ event?.recurrent }} - {{ selectedDates }} - {{ whenPatterns }}</span> -->
     <v-btn-toggle
-      v-if="type === 'recurrent'"
+      v-if="type === 'recurrent' && event"
+      v-model="event.recurrent.frequency"
       class="v-col-6 flex-column flex-sm-row"
       color="primary"
-      :model-value="event.recurrent.frequency"
     >
       <!-- @change="fq => change('frequency', fq)" -->
       <v-btn v-for="f in frequencies" :key="f.value" :value="f.value">{{ f.text }}</v-btn>
     </v-btn-toggle>
 
     <div class="mx-auto d-block mt-3">
-      <v-input v-model="selectedDates" :rules="[$valid.required('common.when')]">
-        <template #default>
-          <DatePicker
-            v-model='selectedDates'
-            :rules="[$valid.required('common.when')]"
-            class='mx-auto'
-            :is-dark="theme.current?.value?.dark"
-            :is-range="type === 'multidate'"
-            :locale="$i18n.locale"
-            :attributes="attributes"
-            is-inline
-            :min-date="!isAdmin ? new Date() : undefined"
-            :initial-page="initialCalendarPage"
-            is-expanded
-          />
-        </template>
-      </v-input>
+      <DatePicker
+        v-model='pickDates'
+        :rules="[$valid.required('common.when')]"
+        class='mx-auto'
+        :is-dark="theme.current?.value?.dark"
+        :is-range="type === 'multidate'"
+        :locale="$i18n.locale"
+        :attributes="attributes"
+        is-inline
+        :min-date="!isAdmin ? new Date() : undefined"
+        :initial-page="initialCalendarPage"
+        is-expanded
+      />
     </div>
 
   </div>
 
+  <span v-if="type === 'recurrent'">{{ event.recurrent }} - JSON.{{ JSON.stringify(event.recurrent) }}</span>
   <div v-if="type === 'recurrent'" class="text-center mb-2">
-    <span v-if="event.recurrent.frequency !== '1m' && event.recurrent.frequency !== '2m'">{{ whenPatterns }}</span>
+    <span v-if="event.recurrent?.frequency !== '1m' && event.recurrent?.frequency !== '2m'">{{ whenPatterns }}</span>
     <v-btn-toggle
       v-else
+      v-model="event.recurrent.type"
       class="mt-1 flex-column flex-sm-row"
-      :model-value="event.recurrent.type"
     >
       <v-btn
         v-for="whenPattern in whenPatterns"
@@ -147,7 +172,7 @@ watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, e
     <v-col class="col-12 col-sm-6">
       <v-text-field
         v-model='selectedStartTime'
-        :label="$t('event.from')"
+        :label="t('event.from')"
         :rules="[$valid.required('event.from')]"
         prepend-icon='mdi-clock-time-four-outline'
         type='time'
@@ -159,7 +184,7 @@ watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, e
       <v-text-field
         v-model='selectedEndTime'
         :rules="[settings.allow_event_without_end_time && type !== 'multidate' ? true : $valid.required('event.due')]"
-        :label="$t('event.due')"
+        :label="t('event.due')"
         prepend-icon='mdi-clock-time-eight-outline' type='time' />
     </v-col>
 
@@ -167,7 +192,7 @@ watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, e
 
 </v-col>
 
-<CoreEventList v-if='todayEvents.length' :events='todayEvents' :title='$t("event.same_day")' />
+<CoreEventList v-if='todayEvents.length' :events='todayEvents' :title='t("event.same_day")' />
 
 <!-- // import { DateTime } from 'luxon'
 // import { mapState, mapActions, mapGetters } from 'vuex'
