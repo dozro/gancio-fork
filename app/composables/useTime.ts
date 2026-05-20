@@ -1,17 +1,22 @@
 import { DateTime } from 'luxon'
 
+/**
+ * this composable provides time-related utilities aware of instance timezone and locale
+ */
 export function useTime() {
   const settings = useState<Settings>('settings')
   const { locale } = useI18n()
 
-  // datetime helper to create a datetime from seconds or from ISO string
+  // datetime helper to create a datetime from seconds, from ISO string or from a Date object
   // with correct locale and timezone
-  function dt(input?: number | string) {
+  function dt(input?: number | string | Date) {
     let date: DateTime
     if (typeof input === 'number') {
       date = DateTime.fromSeconds(input)
     } else if (typeof input === 'string') {
       date = DateTime.fromISO(input)
+    } else if (input instanceof Date) {
+      date = DateTime.fromJSDate(input)
     } else {
       date = DateTime.local()
     }
@@ -20,14 +25,17 @@ export function useTime() {
       .setLocale(locale.value || settings.value.instance_locale)
   }
 
+  // get the year (2026)
   function currentYear() {
     return dt().year
   }
 
+  // get the month (1-12)
   function currentMonth() {
     return dt().month
   }
 
+  // get the start of the month (Unix timestamp)
   function startMonth(year?: number, month?: number) {
     const date = year && month ? dt().set({ year, month }) : dt()
     return date.startOf('month').toUnixInteger()
@@ -49,8 +57,19 @@ export function useTime() {
     return dt(date).toFormat(formatStr)
   }
 
+  // get the relative time from a timestamp (e.g. "3 days ago")
   function from(timestamp: number) {
     return dt(timestamp).toRelative()
+  }
+
+  function fromDateAndTime(dateObj: Date, timeStr: string): number {
+    const [hours, minutes] = timeStr.split(':').map(Number)
+    return dt(dateObj)
+      .set({ hour: hours, minute: minutes, second: 0, millisecond: 0 }).toUnixInteger()
+  }
+
+  function isMultiDate(start: number, end?: number) {
+    return end && !dt(end).hasSame(dt(start), 'day')
   }
 
   function when(event: EventAPI) {
@@ -96,7 +115,9 @@ export function useTime() {
     unixFormat,
     format,
     from,
-    when
+    when,
+    fromDateAndTime,
+    isMultiDate
   }
 }
 
