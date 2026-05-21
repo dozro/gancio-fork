@@ -65,5 +65,6 @@
   { "name": "KeepKarlsruheBoring", "url": "https://keepkarlsruheboring.org/", "place": "(Karlsruhe, Germany)" },
   { "name": "castello.convoca.la", "url": "https://castello.convoca.la/", "place": "(Castelló)" },
   { "name": "hacker.convoca.la", "url": "https://hacker.convoca.la/" },
-  { "name": "mlg.convoca.la", "url": "https://mlg.convoca.la/", "place": "(Málaga)" }
+  { "name": "mlg.convoca.la", "url": "https://mlg.convoca.la/", "place": "(Málaga)" },
+  { "name": "devent.cz", "url": "https://devent.cz/", "place": "(Czech Republic)" }
 ]

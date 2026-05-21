@@ -551,5 +551,14 @@
     "summary": "Agenda social y cultural autogestionada",
     "timezone": "Europe/Madrid",
     "handler": "relay@mlg.convoca.la"
+  },
+  {
+    "name": "Decentralizované Eventy",
+    "url": "https://devent.cz",
+    "logo": "https://devent.cz/logo.png",
+    "place": "(Czech Republic)",
+    "summary": "Decentralized event sharing and discovery in the Czech Republic.",
+    "timezone": "Europe/Prague",
+    "handler": "info@devent.cz"
   }
 ]
