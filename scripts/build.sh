@@ -61,5 +61,4 @@ cp .cli/index.js "$STAGING_DIR/server/gancio"
 jq --arg v "$VERSION" '.version = $v' package.publish.json >"$STAGING_DIR/package.json"
 
 cp .env.example "$STAGING_DIR/.env.example"
-cp config.example.json "$STAGING_DIR/config.example.json"
 # cp docs/gancio.service "$STAGING_DIR/gancio.service"
