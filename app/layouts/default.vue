@@ -8,7 +8,7 @@ useHead ({
   },
   link: [
     { rel: 'icon', type: 'image/png', href: settings.value.baseurl + '/logo.png' },
-    { rel: 'stylesheet', href: settings.value.baseurl + '/custom_css' }
+    { rel: 'stylesheet', href: '/custom_css' }
   ],
   script: [
     { type: 'application/javascript', async: true, src: '/custom_js', defer: true, tagPosition: 'bodyClose' }
