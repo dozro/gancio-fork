@@ -83,7 +83,24 @@ If the images are too big, you can change the max-width:
 }
 ```
 
-> info "References"
-> [#413](https://framagit.org/les/gancio/-/issues/413)
-> [#451](https://framagit.org/les/gancio/-/issues/451)
-> [#536](https://framagit.org/les/gancio/-/issues/536)
+### Kiosk / Fullscreen mode
+```css
+.fullscreen #AppBar,
+.fullscreen #footer {
+     display: none;
+}
+```
+
+```js
+const fullScreen = new URLSearchParams(window.location.search).get('fullscreen')
+if (fullScreen === 'true') {
+    document.body.classList.add('fullscreen')
+}
+```
+
+::: tip References
+[#413](https://framagit.org/les/gancio/-/issues/413), 
+[#451](https://framagit.org/les/gancio/-/issues/451), 
+[#536](https://framagit.org/les/gancio/-/issues/536), 
+[#697](https://framagit.org/les/gancio/-/issues/697)
+:::

@@ -25,7 +25,22 @@ el.setAttribute('data-website-id', 'your-website-id-string-of-numbers');
 document.body.appendChild(el);
 ```
 
+### Kiosk / Fullscreen mode
+```css
+.fullscreen #AppBar,
+.fullscreen #footer {
+     display: none;
+}
+```
+
+```js
+const fullScreen = new URLSearchParams(window.location.search).get('fullscreen')
+if (fullScreen === 'true') {
+    document.body.classList.add('fullscreen')
+}
+```
+
 ::: info References
-[#413](https://framagit.org/les/gancio/-/issues/413), [#320](https://framagit.org/les/gancio/-/issues/320), [#467](https://framagit.org/les/gancio/-/issues/467)
+[#413](https://framagit.org/les/gancio/-/issues/413), [#320](https://framagit.org/les/gancio/-/issues/320), [#467](https://framagit.org/les/gancio/-/issues/467), [#697](https://framagit.org/les/gancio/-/issues/697)
 :::
 
