@@ -6,15 +6,6 @@ import { findOrCreateTags } from './tags'
 import { Op } from '@sequelize/core'
 import { z } from 'zod'
 
-/**
- * this is the v1 recurrent type
- */
-export const RecurrentSchema = z.object({
-  frequency: z.enum(['1w', '2w', '1m', '2m', '1y']),
-  type: z.enum(['ordinal', '-1', '1', '2', '3', '4']).optional()
-})
-export type Recurrent = z.infer<typeof RecurrentSchema>
-
 const log = useLogger('recurrent')
 
 export function getWeekdayN(date: DateTime, n: number, weekday: WeekdayNumbers) {
@@ -88,12 +79,11 @@ export async function createRecurrentOccurrence(e, startAt = DateTime.local(), f
         cursor = cursor.plus(interval)
       }
     } else { // weekday
-
       // get recurrent freq details
-      cursor = helpers.getWeekdayN(cursor, type, parentStartDatetime.weekday)
+      cursor = getWeekdayN(cursor, type, parentStartDatetime.weekday)
       if (cursor < startAt) {
         cursor = cursor.plus(interval)
-        cursor = helpers.getWeekdayN(cursor, type, parentStartDatetime.weekday)
+        cursor = getWeekdayN(cursor, type, parentStartDatetime.weekday)
       }
     }
   }
@@ -122,19 +112,19 @@ export async function createRecurrentOccurrence(e, startAt = DateTime.local(), f
   * Create instances of recurrent events
   */
 export async function createRecurrent(start_datetime = DateTime.local().toUnixInteger()) {
-  // select recurrent events and its childs
+  // select recurrent events and its children
   const events = await Event.findAll({
     where: { is_visible: true, recurrent: { [Op.ne]: null } },
     include: [{ model: Tag, required: false },
-      { model: Event, as: 'child', required: false, where: { start_datetime: { [Op.gte]: start_datetime } } }],
-    order: [['child', 'start_datetime', 'DESC']]
+      { model: Event, as: 'children', required: false, where: { start_datetime: { [Op.gte]: start_datetime } } }],
+    order: [['children', 'start_datetime', 'DESC']]
   })
 
   // create a new occurrence for each recurring events but the one's that has an already visible occurrence coming
   const creations = events.map(e => {
-    if (e.child.length) {
-      if (e.child.find(c => c.is_visible)) return
-      return createRecurrentOccurrence(e, DateTime.fromSeconds(e.child[0].start_datetime + 1), false)
+    if (e.children?.length) {
+      if (e.children.find(c => c.is_visible)) return
+      return createRecurrentOccurrence(e, DateTime.fromSeconds(e.children[0].start_datetime + 1), false)
     }
     return createRecurrentOccurrence(e, DateTime.local(), true)
   })

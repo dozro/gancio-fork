@@ -12,7 +12,7 @@ export function enableCors(evt: H3Event) {
  * - when Stats from a file, it will use the file's mtimeMs as the etag
  * @link https://www.compilenrun.com/docs/middleware/nginx/nginx-caching/nginx-microcaching/
  */
-export async function handleCache(evt: H3Event, etagSource: Stats | Date | string | ModelStatic<Model> = '') {
+export async function handleCache(evt: H3Event, etagSource: Stats | Date | string | ModelStatic<Model> = '', maxAge: number = 1) {
   let etag
   if (etagSource instanceof Stats) {
     etag = `"${etagSource.size}-${Number(etagSource.mtimeMs).toString(16)}"`
@@ -25,5 +25,5 @@ export async function handleCache(evt: H3Event, etagSource: Stats | Date | strin
   } else if (typeof etagSource === 'string') {
     etag = etagSource
   }
-  return handleCacheHeaders(evt, { etag, maxAge: 1 })
+  return handleCacheHeaders(evt, { etag, maxAge })
 }

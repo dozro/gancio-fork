@@ -1,7 +1,6 @@
 import type { CreationAttributes } from '@sequelize/core'
 import type { PostalAddress } from '~~/server/federation/types'
-import type { Announcement, Event, Place } from '~~/server/services/db'
-import type { Recurrent } from '~~/server/services/recurrent'
+import type { Announcement, Event, Place, Recurrent } from '~~/server/services/db'
 
 export type {
   User, Event, Tag, Place, APUser, Notification, Announcement,
@@ -60,6 +59,12 @@ export type EventAPI = Omit<CreationAttributes<Event>, 'placeId' | 'is_visible'>
   media: Media[]
 
   recurrent?: Recurrent
+  parent?: {
+    id: number
+    is_visible?: boolean
+    start_datetime?: number
+    recurrent?: Recurrent
+  }
 
   ap_user?: {
     image: string

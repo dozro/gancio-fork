@@ -55,7 +55,7 @@ export const eventQuerySchema = z.object({
 }))
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-export async function getEvents(opts?: EventQueryType | undefined, user?: User) {
+export async function getEvents(opts?: unknown | undefined, user?: User): Promise<Event[]> {
   const args = eventQuerySchema.parse(opts)
 
   const andConditions: WhereOptions<Event> = [
@@ -74,10 +74,10 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
       ...(args.mine && user && { userId: user.id }),
 
       // include recurrent events?
-      ...(!args.show_recurrent && { parentId: null })
+      ...(!args.show_recurrent && { parentId: null }),
 
       // include parent event
-      // ...(!args.include_parent && { recurrent: { [Op.is]: null } })
+      ...(!args.include_parent && { recurrent: or(SQL_NULL, JSON_NULL) })
     }
   ]
 
@@ -125,7 +125,7 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
       exclude: [
         'likes', 'boost', 'userId', 'createdAt',
         'placeId', 'ap_object', 'ap_id',
-        ...(!opts?.include_description ? ['description'] : [])
+        ...(!args?.include_description ? ['description'] : [])
       ]
     },
     order: [['start_datetime', args.reverse ? 'DESC' : 'ASC']],
@@ -191,11 +191,13 @@ const eventAPISchema = z.object({
   .refine(data => data.end_datetime === undefined || data.start_datetime <= data.end_datetime,
     { message: 'start_datetime is greater than end_datetime' })
 
-export function validateEvent(publicSettings: { allow_anon_event: boolean }, user?: User) {
+export function validateEvent(publicSettings: Settings, user?: User) {
   const isAnonymous = !user
   return eventAPISchema
     .refine(() => !(isAnonymous && !publicSettings.allow_anon_event),
       { error: 'Anonymous event update/creation not allowed' })
+    .refine(data => !(data.recurrent?.frequency && !publicSettings.allow_recurrent_event),
+      { error: 'Recurrent event update/creation not allowed' })
     .refine(data => !(isAnonymous && data.start_datetime < DateTime.local().toUnixInteger()),
       { error: 'Anonymous user cannot create past events' })
     .transform((data) => {
@@ -274,7 +276,7 @@ export function mapEvent(event: Event,
 
     title: event.title,
 
-    media: event.media,
+    media: event?.media ?? [],
 
     start_datetime: event.start_datetime,
     end_datetime: event.end_datetime,
@@ -288,7 +290,9 @@ export function mapEvent(event: Event,
     online_locations: event.online_locations,
     tags: (event.tags ?? options?.tags)?.map(t => t.tag),
     boost: event.boost,
-    likes: event.likes
+    likes: event.likes,
+    parent: event?.parent,
+    parentId: event.parentId
     // TODO
     // n_msgs: event?.,
   }
