@@ -90,7 +90,7 @@ ul:not(.v-pagination__list) {
 .event {
   flex: 1 1 350px;
   max-width: 440px;
-  min-height: 387px;
+  min-height: 288px;
   position: relative;
   display: flex;
   flex-direction: column;
