@@ -1,24 +1,25 @@
 import { createError } from 'h3'
 import type { WhereOptions } from '@sequelize/core'
-import { Op, col, sql } from '@sequelize/core'
-import { APUser, Event, Place, Filter, Collection, Tag } from './db'
+import { JSON_NULL, Op, SQL_NULL, col, or, sql } from '@sequelize/core'
+import { Event, Place, Filter, Collection, Tag } from './db'
 import { DateTime } from 'luxon'
 import z from 'zod'
 import { publicSettings } from './settings'
 import { useLogger } from '../lib/logger'
+import { boolish } from './events'
 
 export const collectionQuerySchema = z.object({
   name: z.string(),
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
   end: z.coerce.number().optional(),
-  show_recurrent: z.coerce.boolean().default(publicSettings.recurrent_event_visible).optional(),
-  show_multidate: z.coerce.boolean().default(true).optional(),
-  show_federated: z.coerce.boolean().default(false).optional(),
+  show_recurrent: boolish.default(publicSettings.recurrent_event_visible),
+  show_multidate: boolish.default(true),
+  show_federated: boolish.default(false),
   limit: z.number().optional(),
-  include_description: z.coerce.boolean().optional(),
+  include_description: boolish.optional(),
   page: z.number().optional(),
-  older: z.coerce.boolean().optional(),
-  reverse: z.coerce.boolean().optional()
+  older: boolish.optional(),
+  reverse: boolish.optional()
 })
 export type CollectionQueryType = z.infer<typeof collectionQuerySchema>
 
@@ -63,7 +64,7 @@ function filterToConditions(filter: Filter) {
   return { conditions, replacements }
 }
 
-export async function getCollectionEvents(opts?: CollectionQueryType) {
+export async function getCollectionEvents(opts?: unknown): Promise<Event[]> {
   const log = useLogger('collections')
   const args = collectionQuerySchema.parse(opts)
 
@@ -86,7 +87,7 @@ export async function getCollectionEvents(opts?: CollectionQueryType) {
   // init stardard filter
   const where: WhereOptions<Event> = {
     // do not include parent recurrent event
-    // recurrent: JSON_NULL,
+    recurrent: or(SQL_NULL, JSON_NULL),
 
     // confirmed event only
     is_visible: true,
@@ -128,10 +129,13 @@ export async function getCollectionEvents(opts?: CollectionQueryType) {
   return Event.findAll({
     where,
     attributes: {
-      exclude: ['likes', 'boost', 'userId', 'is_visible', 'placeId',
-        'createdAt']
+      exclude: [
+        'likes', 'boost', 'userId', 'createdAt',
+        'placeId', 'ap_object', 'ap_id',
+        ...(!args?.include_description ? ['description'] : [])
+      ]
     },
-    order: [['start_datetime', opts?.reverse ? 'DESC' : 'ASC']],
+    order: [['start_datetime', args?.reverse ? 'DESC' : 'ASC']],
     include: [
       {
         model: Tag,
@@ -139,14 +143,11 @@ export async function getCollectionEvents(opts?: CollectionQueryType) {
         attributes: ['tag'],
         through: { attributes: [] }
       },
-      { model: Place, required: true, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] },
-      { model: APUser, required: false, attributes: ['object'], as: 'APUser' }
+      { model: Place, required: false, attributes: ['id', 'name', 'address', 'latitude', 'longitude'] },
+      { association: 'APUser', attributes: ['ap_id', 'object'] }
     ],
-    ...(opts?.limit && { limit: args.limit }),
-    ...(opts?.page && args.limit && { offset: opts.page * args.limit }),
+    ...(args?.limit && { limit: args.limit }),
+    ...(args?.page && args.limit && { offset: args.page * args.limit }),
     replacements
-  }).catch((e) => {
-    log.error('[EVENT]', e)
-    return []
   })
 }

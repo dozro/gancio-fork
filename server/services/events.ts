@@ -1,13 +1,13 @@
 import { DateTime } from 'luxon'
 import type { InferAttributes, WhereOptions } from '@sequelize/core'
-import { Op, literal, col, where, fn, sql } from '@sequelize/core'
+import { Op, literal, col, where, fn, sql, or, SQL_NULL, JSON_NULL } from '@sequelize/core'
 
 import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
 import type { EventAPI, User } from '~~/shared/types/generic'
 import { type H3Event, createError } from 'h3'
 import { createHash } from 'crypto'
-import { Place, Tag, Event, Message, type EventStatus } from './db'
+import { Place, Tag, Event, Message, RecurrentSchema, type EventStatus } from './db'
 import { publicSettings } from './settings'
 import type { UserSession } from '../lib/session'
 import { EventStatusEnum, PostalAddressSchema, type APAttachment, type APEvent, type APLocation, type APTag } from '../federation/types'
@@ -20,6 +20,14 @@ import { multipartFileSchema, saveUploadedEventImage } from '../lib/parseMultipa
 import { focalPointSchema, jsonCodec } from '../lib/validator'
 import { addressToString } from '../../shared/utils/addressToString'
 import { normalizeTag } from './tags'
+import type { Settings } from '~~/shared/types/settings'
+
+// query parameters for getEvents are coming from HTTP (string) and from internal code, this normalize everything to boolean
+export const boolish = z.preprocess((v) => {
+  if (v === 'true') return true
+  if (v === 'false') return false
+  return v
+}, z.boolean())
 
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
@@ -36,25 +44,25 @@ export const eventQuerySchema = z.object({
     if (typeof val === 'number') return [val]
     return []
   }, z.array(z.coerce.number())).optional(),
-  show_recurrent: z.coerce.boolean().default(publicSettings.recurrent_event_visible).optional(),
-  show_multidate: z.coerce.boolean().default(true).optional(),
-  show_federated: z.coerce.boolean().default(publicSettings.federated_events_in_home).optional(),
+  show_recurrent: boolish.prefault(publicSettings.recurrent_event_visible),
+  show_multidate: boolish.prefault(true).optional(),
+  show_federated: boolish.prefault(publicSettings.federated_events_in_home).optional(),
   max: z.coerce.number().optional(),
   page: z.coerce.number().optional(),
-  older: z.coerce.boolean().optional(),
-  reverse: z.coerce.boolean().optional(),
-  mine: z.coerce.boolean().optional(),
+  older: boolish.optional(),
+  reverse: boolish.optional(),
+  mine: boolish.optional(),
   ap_user_id: z.string().optional(),
-  include_unconfirmed: z.coerce.boolean().default(false).optional(),
-  include_parent: z.coerce.boolean().default(false).optional(),
-  include_description: z.coerce.boolean().default(false).optional()
+  include_unconfirmed: boolish.default(false).optional(),
+  include_parent: boolish.default(false).optional(),
+  include_description: boolish.default(false).optional()
 }).transform(o => ({
   ...o,
   ...(o.max && { limit: o.max })
 }))
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-export async function getEvents(opts?: EventQueryType | undefined, user?: User) {
+export async function getEvents(opts?: unknown | undefined, user?: User): Promise<Event[]> {
   const args = eventQuerySchema.parse(opts)
 
   const andConditions: WhereOptions<Event> = [
@@ -73,10 +81,10 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
       ...(args.mine && user && { userId: user.id }),
 
       // include recurrent events?
-      ...(!args.show_recurrent && { parentId: null })
+      ...(!args.show_recurrent && { parentId: null }),
 
       // include parent event
-      // ...(!args.include_parent && { recurrent: { [Op.is]: null } })
+      ...(!args.include_parent && { recurrent: or(SQL_NULL, JSON_NULL) })
     }
   ]
 
@@ -124,7 +132,7 @@ export async function getEvents(opts?: EventQueryType | undefined, user?: User) 
       exclude: [
         'likes', 'boost', 'userId', 'createdAt',
         'placeId', 'ap_object', 'ap_id',
-        ...(!opts?.include_description ? ['description'] : [])
+        ...(!args?.include_description ? ['description'] : [])
       ]
     },
     order: [['start_datetime', args.reverse ? 'DESC' : 'ASC']],
@@ -182,18 +190,21 @@ const eventAPISchema = z.object({
   place_postal_address: jsonCodec(PostalAddressSchema).optional(),
   place_address: z.string().optional(),
   place_latitude: z.coerce.number().optional(),
-  place_longitude: z.coerce.number().optional()
+  place_longitude: z.coerce.number().optional(),
+  recurrent: jsonCodec(RecurrentSchema).optional()
 })
   .refine(data => data.place_id || Boolean(data.place_name && (data.place_address || data.place_postal_address)),
     { message: 'place_id or place_name and place_address are required' })
   .refine(data => data.end_datetime === undefined || data.start_datetime <= data.end_datetime,
     { message: 'start_datetime is greater than end_datetime' })
 
-export function validateEvent(publicSettings: { allow_anon_event: boolean }, user?: User) {
+export function validateEvent(publicSettings: Settings, user?: User) {
   const isAnonymous = !user
   return eventAPISchema
     .refine(() => !(isAnonymous && !publicSettings.allow_anon_event),
       { error: 'Anonymous event update/creation not allowed' })
+    .refine(data => !(data.recurrent?.frequency && !publicSettings.allow_recurrent_event),
+      { error: 'Recurrent event update/creation not allowed' })
     .refine(data => !(isAnonymous && data.start_datetime < DateTime.local().toUnixInteger()),
       { error: 'Anonymous user cannot create past events' })
     .transform((data) => {
@@ -272,7 +283,7 @@ export function mapEvent(event: Event,
 
     title: event.title,
 
-    media: event.media,
+    media: event?.media ?? [],
 
     start_datetime: event.start_datetime,
     end_datetime: event.end_datetime,
@@ -286,7 +297,9 @@ export function mapEvent(event: Event,
     online_locations: event.online_locations,
     tags: (event.tags ?? options?.tags)?.map(t => t.tag),
     boost: event.boost,
-    likes: event.likes
+    likes: event.likes,
+    parent: event?.parent,
+    parentId: event.parentId
     // TODO
     // n_msgs: event?.,
   }

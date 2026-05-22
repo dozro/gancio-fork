@@ -125,6 +125,13 @@ async function done(publish) {
     formData.append('end_datetime', evt.end_datetime)
   }
 
+  if (evt.recurrent?.frequency) {
+    formData.append('recurrent', JSON.stringify({
+      ...evt.recurrent,
+      ...(evt.recurrent.type && ({ type: String(evt.recurrent.type) }))
+    }))
+  }
+
   if (normalizedTags?.value?.length) {
     normalizedTags.value?.forEach(tag => formData.append('tags[]', tag))
   } else {
@@ -179,8 +186,8 @@ const normalizedTags = computed({
   <v-card>
     <v-card-title>
       <!-- <v-btn variant='outlined' class='float-right' color='primary' @click='openImportDialog = true' prepend-icon="mdi-file-import">{{$t('common.import') }}</v-btn> -->
-      <v-chip v-if="!event.is_visible" class='float-right' size='small'>{{ $t('common.draft') }}</v-chip>
-      <h4>{{ eventId ? $t('common.edit_event') : $t('common.add_event') }}</h4>
+      <v-chip v-if="!event.is_visible" class='float-right' size='small'>{{ t('common.draft') }}</v-chip>
+      <h4>{{ eventId ? t('common.edit_event') : t('common.add_event') }}</h4>
     </v-card-title>
     <!-- <v-dialog v-model='openImportDialog' :fullscreen='$vuetify.display.mobile'>
         <ImportDialog @close='openImportDialog = false' />
@@ -191,14 +198,15 @@ const normalizedTags = computed({
           <v-row>
             <!-- Not logged event -->
             <v-col v-if='!loggedIn' cols=12>
-              <p v-html="$t('event.anon_description')" />
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <p v-html="t('event.anon_description')" />
             </v-col>
 
             <!-- Title -->
             <v-col cols=12>
               <v-text-field
                 ref='title' v-model="event.title" prepend-icon='mdi-format-title'
-                :label="$t('common.title')" :rules="[$valid.required('common.title')]" autofocus />
+                :label="t('common.title')" :rules="[$valid.required('common.title')]" autofocus />
             </v-col>
 
             <!-- Where -->
@@ -212,8 +220,8 @@ const normalizedTags = computed({
             <!-- Description -->
             <v-col class='px-0' cols='12'>
               <CoreEditor
-                v-model='event.description' class='px-3 ma-0' :label="$t('event.description_description')"
-                :placeholder="$t('event.description_description')" max-height='400px' />
+                v-model='event.description' class='px-3 ma-0' :label="t('event.description_description')"
+                :placeholder="t('event.description_description')" max-height='400px' />
             </v-col>
 
             <!-- MEDIA / FLYER / POSTER -->
@@ -227,7 +235,7 @@ const normalizedTags = computed({
                 v-model:search="searchTag" v-model="normalizedTags" prepend-icon="mdi-tag-multiple" chips no-filter
                 multiple closable-chips hide-no-data hide-selected persistent-hint :loading="statusTags === 'pending'"
                 :delimiters="[',', ';']" :items="tags || []"
-                :label="$t('common.tags')"/>
+                :label="t('common.tags')"/>
             </v-col>
 
           </v-row>
@@ -238,10 +246,10 @@ const normalizedTags = computed({
       <v-spacer />
       <v-btn :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='draft'>{{
         eventId ?
-          event.is_visible ? $t('common.convert_draft') : $t('common.save_draft')
-          : loggedIn ? $t('common.create_draft') : $t('common.send') }}</v-btn>
+          event.is_visible ? t('common.convert_draft') : t('common.save_draft')
+          : loggedIn ? t('common.create_draft') : t('common.send') }}</v-btn>
       <v-btn v-if='loggedIn' :loading='loading' :disabled='!valid || loading' variant='outlined' color='primary' @click='publish'>
-        {{ $t('common.publish') }}</v-btn>
+        {{ t('common.publish') }}</v-btn>
     </v-card-actions> </v-card>
 </v-container>
 </template>

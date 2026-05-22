@@ -53,6 +53,7 @@ import { get as getConfig, runtimeResolve } from '../services/config'
 import type { APActor, APEvent, APNote, PostalAddress } from '../federation/types'
 import { EventStatusEnum } from '../federation/types'
 import type { SecretSettings, Settings } from '~~/shared/types/settings'
+import z from 'zod'
 const config = getConfig()
 const log = useLogger('sequelize')
 
@@ -195,6 +196,15 @@ export type LDSignature = {
   'signatureValue': string
 }
 
+/**
+ * this is the v1 recurrent type
+ */
+export const RecurrentSchema = z.object({
+  frequency: z.enum(['1w', '2w', '1m', '2m', '1y']),
+  type: z.enum(['ordinal', '-1', '1', '2', '3', '4']).optional()
+})
+export type Recurrent = z.infer<typeof RecurrentSchema>
+
 @Table({
   tableName: 'events',
   timestamps: true
@@ -250,7 +260,7 @@ export class Event extends Model<
   declare online_locations: CreationOptional<string[]>
 
   @Attribute(DataTypes.JSON)
-  declare recurrent: CreationOptional<object | null>
+  declare recurrent?: CreationOptional<Recurrent | null>
 
   @Attribute(DataTypes.JSON)
   declare ld_signature: CreationOptional<LDSignature>
@@ -289,8 +299,10 @@ export class Event extends Model<
   })
   declare parentId: number | null
 
-  @BelongsTo(() => Event, { foreignKey: 'parentId', targetKey: 'id' })
-  declare parent: NonAttribute<Event>
+  declare parent?: NonAttribute<Event>
+
+  @HasMany(() => Event, { foreignKey: 'parentId', inverse: { as: 'parent' } })
+  declare children?: NonAttribute<Event[]>
 
   @Attribute({
     type: DataTypes.INTEGER.UNSIGNED,

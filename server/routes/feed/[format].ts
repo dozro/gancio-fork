@@ -1,11 +1,11 @@
-import { defineEventHandler, getValidatedQuery, getValidatedRouterParams, createError } from 'h3'
+import { defineEventHandler, getQuery, getValidatedRouterParams, createError } from 'h3'
 
 import { exportICS } from '~~/server/services/ics'
 import { exportFeed } from '~~/server/services/rss'
 import { Event, publicSettings } from '~~/server/services'
 import { formatSchema } from '~~/server/types/validator'
 import { useLogger } from '~~/server/lib/logger'
-import { eventQuerySchema, getEvents, mapEvents } from '~~/server/services/events'
+import { getEvents, mapEvents } from '~~/server/services/events'
 import { getCollectionEvents } from '~~/server/services/collections'
 import { handleCache } from '~~/server/lib/API'
 
@@ -17,11 +17,11 @@ export default defineEventHandler(async (evt) => {
   const log = useLogger('feed events')
   const { format } = await getValidatedRouterParams(evt, formatSchema.parse)
 
-  const opt = await getValidatedQuery(evt, eventQuerySchema.parse)
+  const opt = getQuery(evt)
 
   if (await handleCache(evt, Event)) return
 
-  let events
+  let events: Event[]
   if (publicSettings.collection_in_home && !(opt.tags || opt.places || opt.query)) {
     log.debug('get collection events', publicSettings.collection_in_home)
     events = await getCollectionEvents({ name: publicSettings.collection_in_home, ...opt })

@@ -8,6 +8,7 @@ import { useLogger } from '../lib/logger'
 import { cleanOrphanPlaces } from '../services/places'
 import { cleanOrphanTags } from './tags'
 import { cleanPastEvents, cleanUnusedAPActor } from './ap'
+import { createRecurrent } from './recurrent'
 const log = useLogger('Task Manager')
 
 const loopInterval = 60 // process.env.NODE_ENV === 'production' ? 1 : 1
@@ -101,12 +102,13 @@ export class TaskManager {
 
   start(interval = loopInterval) {
     // create and clean recurrent events
-    // this.add({
-    //   name: 'CREATE_RECURRENT_EVENT',
-    //   method: eventController._createRecurrent,
-    //   repeatDelay: hour / 2, // check each half an hour
-    //   repeat: true
-    // })
+    this.add({
+      name: 'CREATE_RECURRENT_EVENT',
+      method: createRecurrent,
+      repeatDelay: hour / 2, // check each half an hour
+      repeat: true,
+      callAtStart: true
+    })
 
     this.add({
       name: 'CLEAN_UNUSED_PLACES',
