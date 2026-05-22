@@ -9,6 +9,9 @@ const settings = useState<Settings>('settings')
 const { t } = useI18n()
 const event = defineModel<EventAPI>('event', { type: Object, required: true })
 
+if (!event.value.recurrent) {
+  event.value.recurrent = {}
+}
 const initialCalendarPage = useInitialCalendarPage()
 
 const frequencies = [
@@ -42,7 +45,7 @@ const todayEvents = computed(() => {
 
 const whenPatterns = computed(() => {
   if (!event.value.recurrent) return []
-  if (typeof selectedDates.value.start === 'undefined') return []
+  if (typeof selectedDates.value?.start === 'undefined') return []
   const date = DateTime.fromJSDate(selectedDates.value.start)
   const freq = event.value.recurrent.frequency
   const weekDay = date.toFormat('EEEE')
@@ -121,14 +124,12 @@ const pickDates = computed({
     </v-btn-toggle>
 
     <p>{{ t(`event.${type}_description`) }}</p>
-    <!-- <span> {{ event?.recurrent }} - {{ selectedDates }} - {{ whenPatterns }}</span> -->
     <v-btn-toggle
-      v-if="type === 'recurrent' && event"
+      v-if="type === 'recurrent' && event?.recurrent"
       v-model="event.recurrent.frequency"
       class="v-col-6 flex-column flex-sm-row"
       color="primary"
     >
-      <!-- @change="fq => change('frequency', fq)" -->
       <v-btn v-for="f in frequencies" :key="f.value" :value="f.value">{{ f.text }}</v-btn>
     </v-btn-toggle>
 
@@ -150,7 +151,6 @@ const pickDates = computed({
 
   </div>
 
-  <span v-if="type === 'recurrent'">{{ event.recurrent }} - JSON.{{ JSON.stringify(event.recurrent) }}</span>
   <div v-if="type === 'recurrent'" class="text-center mb-2">
     <span v-if="event.recurrent?.frequency !== '1m' && event.recurrent?.frequency !== '2m'">{{ whenPatterns }}</span>
     <v-btn-toggle
@@ -240,48 +240,6 @@ const pickDates = computed({
 //     attributes() {
 //       return this.$time.attributesFromEvents(this.events.filter(e => e.id !== this.event.id))
 //     },
-//     whenPatterns() {
-//       if (!this.value.from) { return }
-//       const date = DateTime.fromJSDate(this.value.from)
-
-//       const freq = this.value.recurrent.frequency
-//       const weekDay = date.toFormat('EEEE')
-//       if (freq === '1w' || freq === '2w') {
-//         return this.$t(`event.recurrent_${freq}_days`, { days: weekDay }).toUpperCase()
-//       } else if (freq === '1m' || freq === '2m') {
-//         const n = Math.floor((date.day-1) / 7) + 1
-
-//         const patterns = [
-//           { label: this.$t(`event.recurrent_${freq}_days`, { days: date.day }), key: 'ordinal' }
-//           // { label: this.$tc(`event.recurrent_${freq}_ordinal`, { n, days: weekDay }), key: 'weekday' }
-//         ]
-
-//         if (n < 5) {
-//           patterns.push(
-//             {
-//               label: this.$t(`event.recurrent_${freq}_ordinal`, { n: this.$t(`ordinal.${n}`), days: weekDay }),
-//               key: n
-//             }
-//           )
-//         }
-
-//         // if selected day is in last week, propose also this type of selection
-//         const lastWeek = date.endOf('month').day - date.day < 7
-//         if (lastWeek) {
-//           patterns.push(
-//             {
-//               label: this.$t(`event.recurrent_${freq}_ordinal`, { n: this.$t('ordinal.-1'), days: weekDay }),
-//               key: -1
-//             }
-//           )
-//         }
-
-//         return patterns
-//       } else if (freq === '1d') {
-//         return this.$t('event.recurrent_each_day')
-//       }
-//       return ''
-//     }
 //   },
 //   async mounted() {
 //     if (this.value.multidate) {

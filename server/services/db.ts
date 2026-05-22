@@ -260,7 +260,7 @@ export class Event extends Model<
   declare online_locations: CreationOptional<string[]>
 
   @Attribute(DataTypes.JSON)
-  declare recurrent: CreationOptional<Recurrent | null>
+  declare recurrent?: CreationOptional<Recurrent | null>
 
   @Attribute(DataTypes.JSON)
   declare ld_signature: CreationOptional<LDSignature>
