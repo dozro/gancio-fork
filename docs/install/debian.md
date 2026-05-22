@@ -52,7 +52,7 @@ Query OK, 0 rows affected (0.009 sec)
 
 ::: tip Package verification
 Distributed packages are signed with [this key](../underscore_to.hacklab.asc) you can verify the signature using:  
-`gpg --verify latest-2.0-alpha.tgz.sig`
+`gpg --verify latest.tgz.sig`
 :::
 
  

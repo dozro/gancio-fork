@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-alpha.10](https://framagit.org/les/gancio/compare/v2.0.0-alpha.9...v2.0.0-alpha.10) (2026-05-22)
+
+### Features
+
+* reintroduce the legacy recurrent event management ([0e9616e](https://framagit.org/les/gancio/-/commit/0e9616eee15003c5517398040a65e66e84662c34))
+
+### Bug Fixes
+
+* remove config.example.json from build staging ([bf8c349](https://framagit.org/les/gancio/commit/bf8c349f56819d39c94d8ff29c76576cf549ebd3))
+
 ## [2.0.0-alpha.9](https://framagit.org/les/gancio/compare/v2.0.0-alpha.8...v2.0.0-alpha.9) (2026-05-19)
 
 
