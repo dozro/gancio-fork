@@ -4,6 +4,7 @@ import imageFigures from 'markdown-it-image-figures'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base: '/v2',
   vite: {
     plugins: [vuetify()],
     ssr: {

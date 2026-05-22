@@ -1,18 +1,30 @@
 # Debian installation
 
-1. Install dependencies
-```bash
-sudo apt install curl gcc g++ make wget libpq-dev
-```
+You will need node.js (>= 20) to install Gancio.
 
-
-1. Install Node.js & yarn package manager
+1. Install Node.js
 ```bash
-curl -sL https://deb.nodesource.com/setup_20.x | sudo bash -
+sudo apt-get install -y curl
+sudo curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 sudo apt-get install -y nodejs
-sudo npm install -g yarn
+node -v
 ```
-<small>[source](https://github.com/nodesource/distributions/blob/master/README.md)</small>
+
+::: tip Other node.js installation methods
+You can install node.js also using the default debian package
+or with something like [NVM](https://github.com/nvm-sh/nvm).
+This last method is recommended if you have multiple node.js services running on your server so you can use different versions of node.js for each service in case of compatibility issues.
+:::
+
+1. Create a user to run gancio from
+```bash
+sudo adduser --group --system --shell /bin/false --home /opt/gancio gancio
+```
+
+1. Install Gancio
+```bash
+sudo npm global add https://gancio.org/v2/latest.tgz
+```
 
 <!-- #### Choose you database (sqlite, postgresql, mariadb, mysql)
 1. Setup using postgreSQL __(optional)__
@@ -37,28 +49,16 @@ MariaDB [(none)]> grant all privileges on gancio.* to gancio;
 Query OK, 0 rows affected (0.009 sec)
 ``` -->
 
-1. Create a user to run gancio from
-```bash
-sudo adduser --group --system --shell /bin/false --home /opt/gancio gancio
-```
-1. Install Gancio
-```bash
-sudo yarn global add --network-timeout 1000000000 --silent {{site.url}}/latest-2.0-alpha.tgz
-```
 
-> Note "Use yarn"
-> Only `yarn` is supported as package manager
+::: tip Package verification
+Distributed packages are signed with [this key](../underscore_to.hacklab.asc) you can verify the signature using:  
+`gpg --verify latest-2.0-alpha.tgz.sig`
+:::
 
-> info "Install another release"
-
-> info "Package verification"
-<!--> Distributed packages are signed with [this key](/assets/underscore_to.hacklab.asc) you can verify the signature using:  -->
-> `gpg --verify latest-2.0-alpha.tgz.sig`
-
-<!-- 
+ 
 1. Setup systemd service and reload systemd
 ```bash
-sudo wget http://gancio.org/gancio.service -O /etc/systemd/system/gancio.service
+sudo curl https://gancio.org/gancio.service -o /etc/systemd/system/gancio.service
 sudo systemctl daemon-reload
 sudo systemctl enable gancio
 ```
@@ -68,17 +68,18 @@ sudo systemctl enable gancio
 sudo systemctl start gancio
 ```
 
-1. [Setup nginx as a proxy](./install/nginx.md)
+1. [Setup nginx as a proxy](./nginx)
 
 1. Point your web browser to your domain :tada:
 
 ## Upgrade
 
-> warning "Backup your data"
-> Backup your data is generally a good thing to do and this is especially true before upgrading.
-> Don't be lazy and [backup](./install/backup.md) your data!
+::: warning Backup your data
+Backup your data is generally a good thing to do and this is especially true before upgrading.
+Don't be lazy and [backup](./backup) your data!
+:::
 
-```bash
+<!--```bash
 sudo yarn global remove gancio
 sudo yarn cache clean
 sudo yarn global add --network-timeout 1000000000 --silent {{site.url}}/latest.tgz

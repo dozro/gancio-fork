@@ -1,11 +1,3 @@
-<!--# ---
-# layout: default
-# title: Backup
-# permalink: /install/backup
-# nav_order: 5
-# parent: Install
-# ----->
-
 # Backup
 
 The following commands should be valid for every setup if you did not changed default configuration.
