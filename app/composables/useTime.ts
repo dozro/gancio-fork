@@ -5,7 +5,7 @@ import { DateTime } from 'luxon'
  */
 export function useTime() {
   const settings = useState<Settings>('settings')
-  const { locale } = useI18n()
+  const { locale, t } = useI18n()
 
   // datetime helper to create a datetime from seconds, from ISO string or from a Date object
   // with correct locale and timezone
@@ -106,6 +106,25 @@ export function useTime() {
     return timeStr
   }
 
+  // returns the recurrent detail for an event ("every Monday" or "every 2nd day of the month")
+  function recurrentDetail (event: EventAPI, format = 'EEEE') {
+    const parent = event.parent
+    if (!parent || !parent.recurrent || !parent.recurrent.frequency || !parent.start_datetime) return 'error!'
+    const { frequency, type } = parent.recurrent
+    let recurrent
+    if (frequency === '1w' || frequency === '2w') {
+      recurrent = t(`event.recurrent_${frequency}_days`, { days: unixFormat(parent.start_datetime, format) })
+    } else if (frequency === '1m' || frequency === '2m') {
+      const d = type === 'ordinal' ? dt(parent.start_datetime).day : unixFormat(parent.start_datetime, format)
+      if (type === 'ordinal') {
+        recurrent = t(`event.recurrent_${frequency}_days`, { days: d })
+      } else {
+        recurrent = t(`event.recurrent_${frequency}_ordinal`, { n: t('ordinal.' + type), days: d })
+      }
+    }
+    return recurrent
+  }
+
   return {
     currentYear,
     currentMonth,
@@ -117,7 +136,8 @@ export function useTime() {
     from,
     when,
     fromDateAndTime,
-    isMultiDate
+    isMultiDate,
+    recurrentDetail
   }
 }
 
