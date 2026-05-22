@@ -1,5 +1,5 @@
-import { defineEventHandler, getValidatedQuery } from 'h3'
-import { eventQuerySchema, getEvents, mapEvents } from '~~/server/services/events'
+import { defineEventHandler, getQuery } from 'h3'
+import { getEvents, mapEvents } from '~~/server/services/events'
 import { Event, publicSettings } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
 import { getCollectionEvents } from '~~/server/services/collections'
@@ -27,9 +27,8 @@ import { enableCors, handleCache } from '~~/server/lib/API'
 export default defineEventHandler(async (event) => {
   const log = useLogger('get events')
   enableCors(event)
-  const opt = await getValidatedQuery(event, eventQuerySchema.parse)
+  const opt = getQuery(event)
   let events
-
   if (await handleCache(event, Event)) return
 
   if (publicSettings.collection_in_home && !(opt.tags || opt.places || opt.query)) {

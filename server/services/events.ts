@@ -1,13 +1,13 @@
 import { DateTime } from 'luxon'
 import type { InferAttributes, WhereOptions } from '@sequelize/core'
-import { Op, literal, col, where, fn, sql } from '@sequelize/core'
+import { Op, literal, col, where, fn, sql, or, SQL_NULL, JSON_NULL } from '@sequelize/core'
 
 import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
 import type { EventAPI, User } from '~~/shared/types/generic'
 import { type H3Event, createError } from 'h3'
 import { createHash } from 'crypto'
-import { Place, Tag, Event, Message, type EventStatus } from './db'
+import { Place, Tag, Event, Message, RecurrentSchema, type EventStatus } from './db'
 import { publicSettings } from './settings'
 import type { UserSession } from '../lib/session'
 import { EventStatusEnum, PostalAddressSchema, type APAttachment, type APEvent, type APLocation, type APTag } from '../federation/types'
@@ -20,7 +20,14 @@ import { multipartFileSchema, saveUploadedEventImage } from '../lib/parseMultipa
 import { focalPointSchema, jsonCodec } from '../lib/validator'
 import { addressToString } from '../../shared/utils/addressToString'
 import { normalizeTag } from './tags'
-import { RecurrentSchema } from './recurrent'
+import type { Settings } from '~~/shared/types/settings'
+
+// query parameters for getEvents are coming from HTTP (string) and from internal code, this normalize everything to boolean
+export const boolish = z.preprocess((v) => {
+  if (v === 'true') return true
+  if (v === 'false') return false
+  return v
+}, z.boolean())
 
 export const eventQuerySchema = z.object({
   start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
@@ -37,18 +44,18 @@ export const eventQuerySchema = z.object({
     if (typeof val === 'number') return [val]
     return []
   }, z.array(z.coerce.number())).optional(),
-  show_recurrent: z.coerce.boolean().default(publicSettings.recurrent_event_visible).optional(),
-  show_multidate: z.coerce.boolean().default(true).optional(),
-  show_federated: z.coerce.boolean().default(publicSettings.federated_events_in_home).optional(),
+  show_recurrent: boolish.prefault(publicSettings.recurrent_event_visible),
+  show_multidate: boolish.prefault(true).optional(),
+  show_federated: boolish.prefault(publicSettings.federated_events_in_home).optional(),
   max: z.coerce.number().optional(),
   page: z.coerce.number().optional(),
-  older: z.coerce.boolean().optional(),
-  reverse: z.coerce.boolean().optional(),
-  mine: z.coerce.boolean().optional(),
+  older: boolish.optional(),
+  reverse: boolish.optional(),
+  mine: boolish.optional(),
   ap_user_id: z.string().optional(),
-  include_unconfirmed: z.coerce.boolean().default(false).optional(),
-  include_parent: z.coerce.boolean().default(false).optional(),
-  include_description: z.coerce.boolean().default(false).optional()
+  include_unconfirmed: boolish.default(false).optional(),
+  include_parent: boolish.default(false).optional(),
+  include_description: boolish.default(false).optional()
 }).transform(o => ({
   ...o,
   ...(o.max && { limit: o.max })
