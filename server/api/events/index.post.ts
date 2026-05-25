@@ -32,5 +32,4 @@ export default defineEventHandler(async (evt) => {
 
   const { event, place, tags } = await upsertEvent(multiPartBody || jsonBody, user)
   return mapEvent(event, { user, place, tags })
-
 })
