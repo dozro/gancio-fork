@@ -1,18 +1,7 @@
-import { defineEventHandler, readBody, createError } from 'h3'
+import { defineEventHandler, readBody } from 'h3'
 import { getUser } from '~~/server/lib/getUser'
 import { parseMultipartFormData } from '~~/server/lib/parseMultipartForm'
-import { findOrCreatePlace } from '~~/server/services/places'
-import { findOrCreateTags } from '~~/server/services/tags'
-import { eventToAP, mapEvent, setEventMedia, validateEvent } from '~~/server/services/events'
-import type { CreationAttributes } from '@sequelize/core'
-import type { Place, Tag } from '~~/server/services'
-import { publicSettings, secretSettings } from '~~/server/services'
-import { Event } from '~~/server/services/db'
-import { useLogger } from '~~/server/lib/logger'
-import { notifyEvent } from '~~/server/services/notifier'
-import { z } from 'zod'
-import { sign } from '~~/server/federation/ldsignature'
-import { createRecurrent } from '~~/server/services/recurrent'
+import { upsertEvent, mapEvent } from '~~/server/services/events'
 
 /**
  * Add a new event
@@ -37,68 +26,11 @@ import { createRecurrent } from '~~/server/services/recurrent'
  * @todo Multiple images upload
  */
 export default defineEventHandler(async (evt) => {
-  const log = useLogger('New event')
   const user = await getUser(evt)
   const multiPartBody = await parseMultipartFormData(evt)
   const jsonBody = await readBody(evt)
-  let eventPayload: CreationAttributes<Event>
-    & { place?: { id?: number, name?: string, address: string } }
-    & { tags?: string[] }
-  try {
-    eventPayload = validateEvent(publicSettings, user).parse(multiPartBody || jsonBody)
-  } catch (e) {
-    log.warn(e)
-    const message = e instanceof z.ZodError ? e.issues[0]?.message : String(e)
-    throw createError({ statusCode: 400, message })
-  }
 
-  // find or create the place
-  let place: Place | null
-  if (eventPayload.place) {
-    place = await findOrCreatePlace(eventPayload.place)
-      .catch((e) => {
-        log.warn(e)
-        throw createError({ statusCode: 400, message: String(e) })
-      })
-    eventPayload.placeId = place?.id
-  }
+  const { event, place, tags } = await upsertEvent(multiPartBody || jsonBody, user)
+  return mapEvent(event, { user, place, tags })
 
-  // const recurrent = body.recurrent ? JSON.parse(body.recurrent as string) : undefined
-
-  // do we have an image?
-  const media = await setEventMedia(eventPayload)
-  if (media) {
-    eventPayload.media = [media]
-  }
-
-  const event = await Event.create(eventPayload).catch((e) => {
-    throw createError({ statusCode: 500, message: e.message })
-  })
-
-  // create/assign tags
-  let tags: Tag[] = []
-  if (eventPayload.tags) {
-    tags = await findOrCreateTags(eventPayload.tags)
-    await event.setTags(tags)
-  }
-
-  // create recurrent instances of event if needed
-  // without waiting for the task manager
-  if (event?.recurrent && event.is_visible) {
-    await createRecurrent()
-  } else {
-    // sign Event if federation is enabled
-    if (publicSettings.enable_federation) {
-      try {
-        event.ld_signature = await sign(eventToAP(event), secretSettings.privateKey, `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key`)
-        await event.save({ silent: true })
-      } catch (e) {
-        log.warn('Error signing Event ', e)
-      }
-    }
-    // send notifications
-    notifyEvent('Create', event.id)
-  }
-
-  return mapEvent(event, { place, tags, user })
 })

@@ -1,26 +1,31 @@
 import { DateTime } from 'luxon'
 import type { InferAttributes, WhereOptions } from '@sequelize/core'
 import { Op, literal, col, where, fn, sql, or, SQL_NULL, JSON_NULL } from '@sequelize/core'
-
+import { useLogger } from '../lib/logger'
 import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
-import type { EventAPI, User } from '~~/shared/types/generic'
+import type { EventAPI, Media, User } from '~~/shared/types/generic'
 import { type H3Event, createError } from 'h3'
 import { createHash } from 'crypto'
 import { Place, Tag, Event, Message, RecurrentSchema, type EventStatus } from './db'
-import { publicSettings } from './settings'
+import { publicSettings, secretSettings } from './settings'
 import type { UserSession } from '../lib/session'
 import { EventStatusEnum, PostalAddressSchema, type APAttachment, type APEvent, type APLocation, type APTag } from '../federation/types'
 import { PlaceToAP } from '../federation/places'
 import { handleCache } from '../lib/API'
-import { placeToJSON } from './places'
+import { findOrCreatePlace, placeToJSON } from './places'
 import { getImageFromURL, sanitizeHTML } from '../helpers'
 import linkifyHtml from 'linkify-html'
 import { multipartFileSchema, saveUploadedEventImage } from '../lib/parseMultipartForm'
 import { focalPointSchema, jsonCodec } from '../lib/validator'
 import { addressToString } from '../../shared/utils/addressToString'
-import { normalizeTag } from './tags'
+import { findOrCreateTags, normalizeTag } from './tags'
 import type { Settings } from '~~/shared/types/settings'
+import { createRecurrent } from './recurrent'
+import { sign } from '../federation/ldsignature'
+import { notifyEvent } from './notifier'
+
+const log = useLogger('events')
 
 // query parameters for getEvents are coming from HTTP (string) and from internal code, this normalize everything to boolean
 export const boolish = z.preprocess((v) => {
@@ -153,6 +158,7 @@ export async function getEvents(opts?: unknown | undefined, user?: User): Promis
 
 const MAX_TIMESTAMP = 1000 * 24 * 60 * 60 * 365
 const eventAPISchema = z.object({
+  id: z.number().optional(),
   title: z.string({ message: 'title required' }).min(1).trim(),
   is_visible: z.stringbool().default(true),
   start_datetime: z.preprocess(val => Number(val),
@@ -162,7 +168,7 @@ const eventAPISchema = z.object({
       .max(MAX_TIMESTAMP, { message: 'start_datetime is too far in the future' })
   ),
   end_datetime: z.preprocess(val => val ? Number(val) : undefined,
-    z.number()
+    z.number({ error: 'end_datetime required' })
       .int()
       .max(MAX_TIMESTAMP, { message: 'end_datetime is too far in the future' })
       .optional()
@@ -193,7 +199,7 @@ const eventAPISchema = z.object({
   place_longitude: z.coerce.number().optional(),
   recurrent: jsonCodec(RecurrentSchema).optional()
 })
-  .refine(data => data.place_id || Boolean(data.place_name && (data.place_address || data.place_postal_address)),
+  .refine(data => data.place_id != null || data.online_locations?.length || Boolean(data.place_name && (data.place_address || data.place_postal_address)),
     { message: 'place_id or place_name and place_address are required' })
   .refine(data => data.end_datetime === undefined || data.start_datetime <= data.end_datetime,
     { message: 'start_datetime is greater than end_datetime' })
@@ -208,23 +214,104 @@ export function validateEvent(publicSettings: Settings, user?: User) {
     .refine(data => !(isAnonymous && data.start_datetime < DateTime.local().toUnixInteger()),
       { error: 'Anonymous user cannot create past events' })
     .transform((data) => {
-      const address = data.place_postal_address || data.place_address
-      const place = {
-        ...(data.place_id && { id: data.place_id }),
-        name: data.place_name,
-        postal_address: data.place_postal_address,
-        address: addressToString(address || ''),
-        latitude: data.place_latitude,
-        longitude: data.place_longitude
-      }
-      data.is_visible = isAnonymous ? false : data.is_visible
-      return { ...data, userId: user?.id, place }
+      const is_visible = isAnonymous ? false : data.is_visible
+      return { ...data, is_visible, userId: user?.id }
     })
 }
 
 export type EventAPIType = z.infer<typeof eventAPISchema>
 
-export async function setEventMedia(eventPayload: EventAPIType) {
+export async function upsertEvent(payload: unknown, user?: User) {
+  let event: Event | null = null
+  let eventPayload
+
+  try {
+    eventPayload = validateEvent(publicSettings, user).parse(payload)
+  } catch (e) {
+    log.warn(e)
+    const message = e instanceof z.ZodError ? e.issues[0]?.message : String(e)
+    throw createError({ statusCode: 400, message })
+  }
+
+  const isNewEvent = eventPayload.id == null
+  if (eventPayload.id != null) {
+    event = await Event.findByPk(eventPayload.id)
+    if (!event) {
+      log.warn('Event not found: %s', eventPayload.id)
+      throw createError({ statusCode: 404, message: 'Event not found' })
+    }
+    // check if the user is the owner of the event
+    if (!canModifyEvent(event, user)) {
+      log.warn('User not authorized to modify event: %s', eventPayload.id)
+      throw createError({ statusCode: 403, message: 'You are not authorized to modify this event' })
+    }
+  }
+
+  // find or create the place
+  let place: Place | undefined
+  const address = eventPayload.place_postal_address || eventPayload.place_address
+  if (eventPayload.place_id != null || (eventPayload.place_name && address)) {
+    place = await findOrCreatePlace({
+      ...(eventPayload.place_id && { id: eventPayload.place_id }),
+      name: eventPayload.place_name,
+      postal_address: eventPayload.place_postal_address,
+      address: addressToString(address || ''),
+      latitude: eventPayload.place_latitude,
+      longitude: eventPayload.place_longitude
+    })
+  }
+
+  // do we have an image?
+  const tmpMedia = await setEventMedia(eventPayload)
+  const media = tmpMedia ? [tmpMedia] : null
+
+  if (event) {
+    event = await event.update({
+      ...eventPayload,
+      ...(place?.id != null && { placeId: place.id }),
+      media
+    }).catch((e) => {
+      throw createError({ statusCode: 500, message: e.message })
+    })
+  } else {
+    event = await Event.create({
+      ...eventPayload,
+      ...(place?.id != null && { placeId: place.id }),
+      media
+    }).catch((e) => {
+      throw createError({ statusCode: 500, message: e.message })
+    })
+  }
+
+  // create/assign tags
+  let tags: Tag[] = []
+  if (eventPayload.tags) {
+    tags = await findOrCreateTags(eventPayload.tags)
+    await event.setTags(tags)
+  }
+
+  // create recurrent instances of event if needed
+  // without waiting for the task manager
+  if (event?.recurrent && event.is_visible) {
+    await createRecurrent()
+  } else {
+    // sign Event if federation is enabled
+    if (publicSettings.enable_federation) {
+      try {
+        event.ld_signature = await sign(eventToAP(event), secretSettings.privateKey, `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key`)
+        await event.save({ silent: true })
+      } catch (e) {
+        log.warn('Error signing Event ', e)
+      }
+    }
+    // send notifications
+    notifyEvent(isNewEvent ? 'Create' : 'Update', event.id)
+  }
+
+  return { event, place, tags }
+}
+
+export async function setEventMedia(eventPayload: EventAPIType): Promise<Media | undefined> {
   if (eventPayload.image || eventPayload.image_url) {
     const focalpoint = eventPayload.image_focalpoint
     if (!eventPayload.image && eventPayload.image_url && /^https?:\/\//.test(eventPayload.image_url)) {
