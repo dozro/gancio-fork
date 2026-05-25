@@ -51,11 +51,11 @@ Query OK, 0 rows affected (0.009 sec)
 
 
 ::: tip Package verification
-Distributed packages are signed with [this key](../underscore_to.hacklab.asc) you can verify the signature using:  
+Distributed packages are signed with [this key](/underscore_to.hacklab.asc) you can verify the signature using:
 `gpg --verify latest.tgz.sig`
 :::
 
- 
+
 1. Setup systemd service and reload systemd
 ```bash
 sudo curl https://gancio.org/gancio.service -o /etc/systemd/system/gancio.service

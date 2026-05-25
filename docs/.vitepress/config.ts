@@ -2,6 +2,9 @@ import { defineConfig } from 'vitepress'
 import vuetify from 'vite-plugin-vuetify'
 import imageFigures from 'markdown-it-image-figures'
 
+// fix dead link errors on build
+process.env.VITE_EXTRA_EXTENSIONS = 'asc' // comma separated list: 'foo,bar,baz'
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   base: '/v2',
@@ -26,6 +29,11 @@ export default defineConfig({
       }
   },
   themeConfig: {
+    logo: {
+      light: '/assets/gancio-dark.png',
+      dark: '/assets/gancio-light.png',
+      alt: 'Gancio',
+    },
     lastUpdated: {
       formatOptions: {
         dateStyle: 'long'
@@ -50,7 +58,7 @@ export default defineConfig({
       {
         text: 'USAGE',
         link: '/usage/',
-        collapsed: false, 
+        collapsed: false,
         items: [
           { text: 'Home', link: '/usage/home' },
           { text: 'Add Event', link: '/usage/add_event' },
@@ -87,6 +95,7 @@ export default defineConfig({
           { text: 'Internationalization', link: '/dev/locales' },
           { text: 'Plugins', link: '/dev/plugin' },
           { text: 'API', link: '/dev/api' },
+          { text: 'Federation', link: '/dev/federation' },
         ]
       },
       { text: 'About', link: '/about' },

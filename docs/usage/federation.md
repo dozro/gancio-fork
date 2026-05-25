@@ -13,7 +13,7 @@ This interaction is possible thanks to the [ActivityPub](https://www.w3.org/TR/a
 Each user, page, or website in the Fediverse has a unique ActivityPub handler, which is similar to an email address. This handler usually looks like @user@website.com. For example, an event website running Gancio might have an ActivityPub handler like @events@gancio.cisti.org. This identifier lets people from other Fediverse platforms follow it.
 
 ::: tip Note
-This document describes the operations you are able to do interacting with a gancio instance in the federation, if you are looking for technical details there is a [specific section](/federation)
+This document describes the operations you are able to do interacting with a gancio instance in the federation, if you are looking for technical details there is a [specific section](/dev/federation)
 :::
 
 
@@ -31,7 +31,7 @@ Once followed, new events from that specific Gancio instance will appear in your
 ### Following a Gancio website from Mastodon
 To follow a Gancio website from Mastodon, you simply need to search for the website and follow it from there (you can specify the handler to follow if you know it or directly use the URL of the website):
 
-<figure><video src='./follow_from_mastodon.webm' controls><figcaption>Follow from Mastodon</figcaption></video></figure>
+<figure><video src='/assets/videos/follow_from_mastodon.webm' controls><figcaption>Follow from Mastodon</figcaption></video></figure>
 
 ### Following a Gancio website from Mobilizon
 [Mobilizon](https://mobilizon.org/) is a tool designed to create platforms for managing communities and events. Its purpose is to help as many people as possible to free themselves from Facebook groups and events, from Meetup, etc.

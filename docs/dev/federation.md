@@ -1,11 +1,8 @@
 ---
-layout: default
-title: Federation
-permalink: /federation
-nav_order: 9
+title: Federation / ActivityPub
 ---
 
-## Federation / ActivityPub
+# {{ $frontmatter.title }}
 
 Gancio largely follows ActivityPub's server-to-server specification.
 
@@ -27,7 +24,7 @@ Gancio largely follows ActivityPub's server-to-server specification.
 
 ## ActivityPub
 
-Each instance has only one [AP Actor](https://www.w3.org/TR/activitypub/#actors) of type `Application` named `events@instance.tld` by default (was `relay` before 1.24), which publishes each event as [Event](https://www.w3.org/TR/activitystreams-vocabulary/#dfn-event) type.  
+Each instance has only one [AP Actor](https://www.w3.org/TR/activitypub/#actors) of type `Application` named `events@instance.tld` by default (was `relay` before 1.24), which publishes each event as [Event](https://www.w3.org/TR/activitystreams-vocabulary/#dfn-event) type.
 Each AP enabled software could decide how to interact with coming events, e.g. on Mastodon and forks you can see it with minimal information, with Friendica events are added into your own calendar, GoToSocial does not support [Event](https://www.w3.org/TR/activitystreams-vocabulary/#dfn-event) type.
 
 We are considering the introduction of other `Actor` but they will not be linked to users, rather to places, tags or collections.
@@ -43,20 +40,21 @@ All federation's related operations uses `/federation` as endpoint. You can disa
 ### Supported operations
 
 | **Operation** | **Since** | **Note** |
-| Follow Gancio from Fediverse | <span class='label label-yellow'>0.15.0</span> |  |
-| Send an Event  |  <span class='label label-yellow'>0.15.0</span>  | Sent as [Event](https://www.w3.org/TR/activitystreams-vocabulary/#dfn-event) type.|
-| Receive a Note | <span class='label label-yellow'>0.21.0</span> | Adds images, audio and notes to an event with a simple reply |
-| Delete a Note | <span class='label label-yellow'>0.21.0</span> |
-| Update a Note | <span class='label label-yellow'>0.21.0</span> |
-| Follow an Actor | <span class='label label-yellow'>1.10.0</span> | |
-| Receive an Event | <span class='label label-yellow'>1.10.0</span> | 
-| Update an Event | <span class='label label-yellow'>1.10.0</span> |
-| Delete an Event | <span class='label label-yellow'>1.10.0</span> |
+| ------------- | :-------: | :------- |
+| Follow Gancio from Fediverse | <v-chip color="primary">0.15.0</v-chip> |  |
+| Send an Event  | <v-chip color="primary">0.15.0</v-chip>  | Sent as [Event](https://www.w3.org/TR/activitystreams-vocabulary/#dfn-event) type.|
+| Receive a Note | <v-chip color="primary">0.21.0</v-chip> | Adds images, audio and notes to an event with a simple reply |
+| Delete a Note | <v-chip color="primary">0.21.0</v-chip> |
+| Update a Note | <v-chip color="primary">0.21.0</v-chip> |
+| Follow an Actor | <v-chip color="primary">1.10.0</v-chip> | |
+| Receive an Event | <v-chip color="primary">1.10.0</v-chip> |
+| Update an Event | <v-chip color="primary">1.10.0</v-chip> |
+| Delete an Event | <v-chip color="primary">1.10.0</v-chip> |
 
 
 ### Moderation
 
-- Hide or remove a remote event 
+- Hide or remove a remote event
 - Block a remote user
 - Block a remote instance
 
@@ -66,12 +64,12 @@ The minimum `REQUIRED` properties for an Event are `name`, `startTime` and `endT
 
 ```json
 {
-  name: "Event name", 
-  startTime: "2024-01-01T00:00:00Z", 
+  name: "Event name",
+  startTime: "2024-01-01T00:00:00Z",
   endTime: "2024-01-01T01:00:00Z"
 }
 ```
 `startTime` and `endTime` are required to be in ISO 8601 format and must include a timezone designator (e.g., "Z" for UTC or an offset like "+01:00").
 
-> info "Note"  
+> info "Note"
 > To maximize interoperability across federated systems, **Gancio is forgiving in what it consumes but exacting in what it produces**, for example when an event without `endTime` is received, Gancio will accept generate an `endTime` by adding a default duration (3 hour) to the `startTime`.

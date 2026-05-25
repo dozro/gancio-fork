@@ -123,9 +123,7 @@ export default {
   extends: DefaultTheme,
   Layout: MyLayout,
   enhanceApp({ app, router, siteData }) {
-    // ...
-    // app.use(vuetify)
     app.use(vuetify)
-    
+
   }
 } satisfies Theme
