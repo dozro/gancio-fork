@@ -3,7 +3,7 @@
 Gancio is a project designed to be adopted by different communities with specific use cases, which is why we tend to make features optional when we develop them.
 
 
-:: tip Note
+::: tip Note
 If you are searching for initial configuration (database settings, base url, http proxy, etc) take a look at [Configuration](/install/configuration).
 :::
 
@@ -103,6 +103,3 @@ Take a look at the [custom js](./custom_js) section.
 
 ### Custom CSS Style
 You can customize some stylesheet too, read some example at the [custom css](./custom_css) section.
-
-
-
