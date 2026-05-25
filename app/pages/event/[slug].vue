@@ -146,14 +146,13 @@ async function report() {
               :datetime="time.unixFormat(event.end_datetime, 'yyyy-MM-dd HH:mm')"
             />
           </time>
-          <div class="font-weight-light mb-3">
+          <div class="font-weight-light">
             {{ time.from(event.start_datetime) }}
             <small v-if="event.parent">({{time.recurrentDetail(event)}})</small>
           </div>
-          <div class="p-location h-adr" itemprop="location" itemscope itemtype="https://schema.org/Place">
+          <div v-if="event?.place" class="p-location h-adr" itemprop="location" itemscope itemtype="https://schema.org/Place">
             <v-icon icon="mdi-map-marker" size="small" />
             <nuxt-link
-              v-if="event?.place"
               class="vcard ml-2 p-name text-decoration-none text-uppercase"
               :to="`/place/${event?.place?.id}/${encodeURIComponent(event?.place?.name)}`">
               <span itemprop="name">{{ event?.place?.name }}</span>

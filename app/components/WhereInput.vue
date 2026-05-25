@@ -5,7 +5,9 @@ Choose event location
 import { refDebounced } from '@vueuse/core'
 const settings = useState<Settings>('settings')
 const event = defineModel<EventAPI>('event', { type: Object, required: true })
-
+if (!event.value?.place) {
+  event.value.place = { name: '', address: '' }
+}
 const whereInputAdvancedDialog = ref(false)
 
 // should I ask for address (only on new places)
@@ -54,7 +56,7 @@ function selectFirst () {
 
 </script>
 <template>
-<v-row v-if="event.place" class="mb-4">
+<v-row class="mb-4">
   <v-col cols="12" md="4">
     <!-- name -->
     <v-combobox

@@ -143,7 +143,7 @@ async function done(publish) {
         await $fetch('/api/events', { method: 'POST', body: formData })
 
     // navigate to created event in case its already visible and not a recurrent event!
-    if (!evt?.recurrent && (ret.is_visible || loggedIn.value)) {
+    if (!evt.recurrent?.frequency && (ret.is_visible || loggedIn.value)) {
       navigateTo(`/event/${ret.slug}`)
     } else {
       navigateTo('/')

@@ -28,7 +28,7 @@ const computedEvents = computed(() => {
     <v-list-item-subtitle>
       <v-icon v-if='event.parentId' size="small" color='success' icon='mdi-repeat' />
       {{ time.when(event)}}
-      <span class='text-primary ml-1'>@{{event?.place?.name}}</span>
+      <span v-if='event.place' class='text-primary ml-1'>@{{event.place?.name}}</span>
     </v-list-item-subtitle>
     <v-list-item-title>{{event.title}}</v-list-item-title>
   </v-list-item>
