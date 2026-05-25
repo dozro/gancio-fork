@@ -129,7 +129,8 @@
         "convert_draft": "Convertir a borrador",
         "create_draft": "Crear como borrador",
         "save_draft": "Guardar borrador",
-        "draft": "Borrador"
+        "draft": "Borrador",
+        "go_back": "Volver"
     },
     "login": {
         "description": "Entrando podrás publicar nuevos eventos.",
@@ -153,7 +154,9 @@
         "filter_description": "Aquí puede filtrar su exportación por etiquetas y lugar o por una colección preestablecida",
         "filter_title": "Filtro",
         "ical_title": "ics/ical",
-        "list_title": "Lista"
+        "list_title": "Lista",
+        "max_height": "Altura máxima",
+        "show_more": "Ver más"
     },
     "register": {
         "description": "Los movimientos sociales necesitan organizarse y autofinanciarse. <br/>\n<br/>Antes de que puedas publicar, <strong> debemos aprobar la cuenta </strong>. Como imaginarás, <strong> detrás de este sitio hay personas de carne y hueso</strong>, por esto te pedimos escribir algo para hacernos saber que tipos de eventos te gustaría publicar.",
@@ -235,7 +238,15 @@
         "recurrent_1y_days": "{days} de {months} de cada año",
         "recurrent_1y_ordinal": "Los {n} {days} en {months} cada año",
         "each_year": "Cada año",
-        "anon_description_without_registration": "Puedes añadir un evento, pero tendrá que ser revisado para confirmar que es adecuado.\nNo será posible modificarlo una vez enviado.<br/><br/>\nContinua y sube tu evento, lo revisaremos lo antes posible."
+        "anon_description_without_registration": "Puedes añadir un evento, pero tendrá que ser revisado para confirmar que es adecuado.\nNo será posible modificarlo una vez enviado.<br/><br/>\nContinua y sube tu evento, lo revisaremos lo antes posible.",
+        "cancel_description": "Este evento se marcará públicamente como cancelado.",
+        "cancelled": "Este evento está cancelado",
+        "postponed": "Pospuesto",
+        "moved_onlined": "Será en línea",
+        "rescheduled": "Reprogramado",
+        "tentative": "Provisional",
+        "reannounce": "Vovler a anunciar",
+        "reannounce_description": "¿Deberíamos volver a anunciar (impulsar) este evento a la federación?"
     },
     "admin": {
         "place_description": "En el caso de que un lugar sea incorrecto o cambie de dirección, puedes cambiarlo. <br/> Todos los eventos presentes y pasados asociados con este lugar cambiarán de dirección.",
@@ -397,7 +408,14 @@
         "receive_confirm_notification": "Obtener e-mail de confirmación de usuario/evento",
         "smtp_password_description": "Déjalo en blanco si no quieres cambiar la contraseña",
         "calendar_first_day_of_week_description": "Selecciona el día de la semana que los calendarios deben mostrar como el primer día de la semana. La configuración predeterminada se basa en la configuración regional del cliente.",
-        "calendar_first_day_of_week_default": "Predeterminado (configuración regional del cliente)"
+        "calendar_first_day_of_week_default": "Predeterminado (configuración regional del cliente)",
+        "edit_user": "Editar usuarie",
+        "user_update_ok": "Usuarie actualizade",
+        "enable_federation_quoting": "Permitir que se citen los eventos desde el fediverso",
+        "enable_federation_quoting_help": "Usuaries podrán citar eventos de esta instancia desde el fediverso",
+        "unblock_user": "Desbloquear usuarie",
+        "merge_place_help": "Se va a combinar el lugar \"<strong>{place}</strong>\" con el lugar seleccionado. Se actualizarán los {n} eventos asociados.",
+        "hidden": "Oculto"
     },
     "auth": {
         "not_confirmed": "Todavía no hemos confirmado este email…",
