@@ -46,7 +46,13 @@ export async function cleanDatabase(register = false) {
       role: 'user',
       is_active: true
     })
-    return { adminUser, editorUser, userUser }
+    const anotherUser = await User.create({
+      email: 'another',
+      password: 'password',
+      role: 'user',
+      is_active: true
+    })
+    return { adminUser, editorUser, userUser, anotherUser }
   }
 }
 

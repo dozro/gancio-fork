@@ -15,7 +15,7 @@ describe('Place', async () => {
   it('should create a new place creating an event', async () => {
     mockedGetUser.mockResolvedValue(adminUser)
     const event = {
-      id: 1, title: 'test event', start_datetime: now() + 1000,
+      title: 'test event', start_datetime: now() + 1000,
       place_name: 'test new place', place_address: 'test address'
 
     }

@@ -11,33 +11,34 @@ import mime from 'mime-types'
 import { createReadStream } from 'fs'
 import { stat } from 'fs/promises'
 import { handleCache } from './lib/API'
+import type { Media } from './services'
 
 const window = new JSDOM('').window
 const domPurify = DOMPurify(window)
 const log = useLogger('helper')
 const config = getConfig()
 
-// domPurify.addHook('beforeSanitizeElements', node => {
-//   if (node.hasAttribute && node.hasAttribute('href')) {
-//     const href = node.getAttribute('href')
-//     const text = node.textContent
+domPurify.addHook('beforeSanitizeElements', (node) => {
+  if (node.hasAttribute && node.hasAttribute('href')) {
+    const href = node.getAttribute('href')
+    const text = node.textContent
 
-//     // remove FB tracking param
-//     if (href.includes('fbclid=')) {
-//       try {
-//         const url = new URL.URL(href)
-//         url.searchParams.delete('fbclid')
-//         node.setAttribute('href', url.href)
-//         if (text.includes('fbclid=')) {
-//           node.textContent = url.href
-//         }
-//       } catch (e) {
-//         return node
-//       }
-//     }
-//   }
-//   return node
-// })
+    // remove FB tracking param
+    if (href.includes('fbclid=')) {
+      try {
+        const url = new URL(href)
+        url.searchParams.delete('fbclid')
+        node.setAttribute('href', url.href)
+        if (text.includes('fbclid=')) {
+          node.textContent = url.href
+        }
+      } catch {
+        return node
+      }
+    }
+  }
+  return node
+})
 
 export function sanitizeHTML(html: string) {
   return domPurify.sanitize(html, {
@@ -65,7 +66,7 @@ async function readableWebToNodeStream(webStream) {
   })
 }
 
-export async function getImageFromURL(url: string, name: string, focalpoint?: [number, number]) {
+export async function getImageFromURL(url: string, name: string, focalpoint?: [number, number]): Promise<Media> {
   log.debug(`getImageFromURL ${url}`)
 
   const filename = crypto.randomBytes(16).toString('hex')
@@ -89,9 +90,9 @@ export async function getImageFromURL(url: string, name: string, focalpoint?: [n
       return {
         name,
         url: filename + '.jpg',
-        height: info.height,
-        width: info.width,
-        size: info.size,
+        ...(info?.height && ({ height: info.height })),
+        ...(info?.width && ({ width: info.width })),
+        ...(info?.size && ({ size: info.size })),
         focalpoint
       }
     })

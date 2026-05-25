@@ -3,8 +3,8 @@ import { useLogger } from '../lib/logger'
 import { Place, Event } from './db'
 const log = useLogger('federation:places')
 
-export async function findOrCreatePlace(body: CreationAttributes<Place> & { id?: number }) {
-  if ((body?.id ?? null) !== null) {
+export async function findOrCreatePlace(body: CreationAttributes<Place> | { id?: number }) {
+  if (body?.id != null) {
     const place = await Place.findByPk(body.id)
     if (!place) {
       throw new Error('Place not found')
@@ -37,9 +37,10 @@ export async function findOrCreatePlace(body: CreationAttributes<Place> & { id?:
     }).catch((e) => {
       console.error(e)
       console.error(e?.errors)
-      return null
+      return
     })
   }
+  if (!place) return
   return place
 }
 

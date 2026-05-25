@@ -71,7 +71,6 @@ async function done(publish) {
   loading.value = true
 
   const formData = new FormData()
-  // formData.append('recurrent', JSON.stringify(evt.date.recurrent))
 
   formData.append('is_visible', publish)
 
@@ -118,7 +117,6 @@ async function done(publish) {
   }
 
   formData.append('description', evt.description)
-  // formData.append('multidate', !!this.date.multidate)
   formData.append('start_datetime', evt.start_datetime)
 
   if (evt.end_datetime) {

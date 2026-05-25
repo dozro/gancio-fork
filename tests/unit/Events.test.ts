@@ -1,16 +1,18 @@
 import { describe, expect, it, vi } from 'vitest'
-import { cleanDatabase } from '../api/setup'
+import { admin, cleanDatabase } from '../api/setup'
 import { mockH3Event, now } from './utils'
 import { setSetting } from '../../server/services'
 import { getUser } from '../../server/lib/getUser'
+import { DateTime } from 'luxon'
 
 vi.mock('../../server/lib/getUser')
 const mockedGetUser = vi.mocked(getUser)
 
-const { adminUser, editorUser, userUser } = await cleanDatabase(true)
+const { adminUser, editorUser, userUser, anotherUser } = await cleanDatabase(true)
 let event_id: number
 
 const { default: handleEvent } = await import('../../server/api/events/index.post')
+const { default: putHandler } = await import('../../server/api/events/[id]/index.put')
 const { default: patchHandler } = await import('../../server/api/events/[id]/index.patch')
 const { default: toggleHandler } = await import('../../server/api/events/[id]/toggle.put')
 
@@ -132,6 +134,30 @@ describe('Events', () => {
     await expect(response).resolves.toHaveProperty('status', 'EventCancelled')
   })
 
+  it('should modify title if allowed', async () => {
+    const event = {
+      title: 'new title',
+      place_name: 'test',
+      place_address: 'test',
+      start_datetime: now(),
+      end_datetime: now() + 1000,
+    }
+
+    mockedGetUser.mockResolvedValueOnce(anotherUser)
+    let response = putHandler(mockH3Event({ params: { id: String(event_id) }, body: event }))
+    await expect(response).rejects.toHaveProperty('statusCode', 403)
+    await expect(response).rejects.toHaveProperty('message', 'You are not authorized to modify this event')
+
+    mockedGetUser.mockResolvedValueOnce(userUser)
+    response = putHandler(mockH3Event({ params: { id: String(event_id) }, body: event }))
+    await expect(response).resolves.toHaveProperty('title', 'new title')
+
+    mockedGetUser.mockResolvedValueOnce(adminUser)
+    response = putHandler(mockH3Event({ params: { id: String(event_id) }, body: { ...event, title: 'new title 2' } }))
+    await expect(response).resolves.toHaveProperty('title', 'new title 2')
+    
+  })
+  
   it('should not allow start_datetime greater than end_datetime', async () => {
     const event = {
       title: ' test title 5',
@@ -146,139 +172,112 @@ describe('Events', () => {
     await expect(response).rejects.toHaveProperty('message', 'start_datetime is greater than end_datetime')
   })
 
-  //   it('should not allow start_datetime greater than 3000', async () => {
+  it('should not allow start_datetime greater than 3000', async () => {
 
-  //     const event = {
-  //       title: ' test title 5',
-  //       start_datetime: dayjs().set('year', 4000).unix(),
-  //       place_id: places[0],
-  //     }
+    const event = {
+      title: ' test title 5',
+      start_datetime: DateTime.now().set({ year: 4000 }).toUnixInteger(),
+      place_name: 'test',
+      place_address: 'test'
+    }
 
-  //     const response = await request(app).post('/api/event')
-  //       .send(event)
-  //       .expect(400)
+    const response = handleEvent(mockH3Event({ body: event }))
+    await expect(response).rejects.toHaveProperty('statusCode', 400)
+    await expect(response).rejects.toHaveProperty('message', 'start_datetime is too far in the future')
 
-  //     expect(response.text).toBe('are you sure?')
-  //   })
+  })
 
-  //   it('should validate start_datime', async () => {
-  //     const event = {
-  //       title: ' test title 5',
-  //       start_datetime: "antani",
-  //       place_id: places[0],
-  //     }
+  it('should validate start_datime', async () => {
+    const event = {
+      title: ' test title 5',
+      start_datetime: "antani",
+      place_name: 'test',
+    }
 
-  //     const response = await request(app).post('/api/event')
-  //       .send(event)
-  //       .expect(400)
-  //   })
+    const response = handleEvent(mockH3Event({ body: event }))
+    await expect(response).rejects.toHaveProperty('statusCode', 400)
+  })
 
-  //   it('should validate end_datime', async () => {
-  //     const event = {
-  //       title: ' test title 5',
-  //       start_datetime: dayjs().unix() + 1000,
-  //       end_datetime: "Antani",
-  //       place_id: places[0],
-  //     }
+  it('should validate end_datime', async () => {
+    const event = {
+      title: ' test title 5',
+      start_datetime: now() + 1000,
+      end_datetime: "Antani",
+      place_name: 'test',
+      place_address: 'test'
+    }
 
-  //     const response = await request(app).post('/api/event')
-  //       .send(event)
-  //       .expect(400)
-  //   })
+    const response = handleEvent(mockH3Event({ body: event }))
+    await expect(response).rejects.toHaveProperty('statusCode', 400)
+    await expect(response).rejects.toHaveProperty('message', 'end_datetime required')
+  })
 
-  //   it('should not allow create anonymous event in the past', async() => {
-  //     const time_in_past = dayjs().unix() - 1;
+  it('should not allow create anonymous event in the past', async () => {
+    const event = { 
+      title: 'anonymous event in the past',
+      start_datetime: now() - 1,
+      place_name: 'test',
+      place_address: 'test'
+    }
 
-  //     await request(app).post('/api/event')
-  //       .send({
-  //         title: 'anonymous event in the past',
-  //         place_id: places[0],
-  //         start_datetime: time_in_past
-  //       })
-  //       .expect(400)
-  //       .then(response => {
-  //         expect(response.text)
-  //           .toEqual('Anonymous user cannot create past events')
-  //       })
-  //   })
+    const response = handleEvent(mockH3Event({ body: event }))
+    await expect(response).rejects.toHaveProperty('statusCode', 400)
+    await expect(response).rejects.toHaveProperty('message', 'Anonymous event update/creation not allowed')
+  })
 
-  //   it('should allow create event in the past when authenticated', async() => {
-  //     const time_in_past = dayjs().unix() - 1
+  it('should allow create event in the past when admin', async() => {
+    const event = { 
+      title: 'authenticated event in the past',
+      start_datetime: now() - 1,
+      place_name: 'test',
+      place_address: 'test'
+    }
 
-  //     await request(app).post('/api/event')
-  //       .send({
-  //         title: 'authenticated event in the past',
-  //         place_id: places[0],
-  //         start_datetime: time_in_past
-  //       })
-  //       .auth(token.access_token, { type: 'bearer' })
-  //       .expect(200)
-  //   })
+    mockedGetUser.mockResolvedValueOnce(adminUser)
+    const response = handleEvent(mockH3Event({ body: event }))
+    await expect(response).resolves.toHaveProperty('title', 'authenticated event in the past')
+  })
 
-  //   it('should trim tags and title', async () => {
-  //     const event = {
-  //       title: ' test title 4 ',
-  //       place_id: places[0],
-  //       start_datetime: dayjs().unix() + 1000,
-  //       tags: [' test tag ']
-  //     }
+  it('should trim tags and title', async () => {
+    const event = {
+      title: ' test title 4 ',
+      place_name: 'test',
+      place_address: 'test',
+      start_datetime: now() + 1000,
+      tags: [' test tag ']
+    }
 
-  //     const response = await request(app).post('/api/event')
-  //       .send(event)
-  //       .expect(200)
-  //       .expect('Content-Type', /json/)
+    mockedGetUser.mockResolvedValueOnce(userUser)
+    const response = handleEvent(mockH3Event({ body: event }))
+    await expect(response).resolves.toHaveProperty('title', 'test title 4')
+    await expect(response).resolves.toHaveProperty('tags', ['test tag'])
+  })
 
-  //     expect(response.body.title).toBe('test title 4')
-  //     expect(response.body.tags[0]).toBe('test tag')
-  //   })
+  it('should sanitize htlm in description', async () => {
 
-  //   it('should sanitize htlm in description', async () => {
+    const event = {
+      title: 'test title',
+      place_name: 'test',
+      place_address: 'test',
+      start_datetime: now() + 1000,
+      tags: ['test tags'],
+      description: `<p wrong-attr="" onclick="alert('test');">inside paragraph</p><a href="https://test.com/?query=true&fbclid=facebook_id">link with fb reference</a>`
+    }
 
-  //     const event = {
-  //       title: 'test title',
-  //       place_id: places[0],
-  //       start_datetime: dayjs().unix() + 1000,
-  //       tags: ['test tags'],
-  //       description: `<p wrong-attr="" onclick="alert('test');">inside paragraph</p><a href="https://test.com/?query=true&fbclid=facebook_id">link with fb reference</a>`
-  //     }
+    mockedGetUser.mockResolvedValueOnce(userUser)
+    const response = handleEvent(mockH3Event({ body: event }))
+    await expect(response).resolves.toHaveProperty('description', `<p>inside paragraph</p><a href="https://test.com/?query=true">link with fb reference</a>`)
+  })
 
-  //     const response = await request(app).post('/api/event')
-  //       .send(event)
-  //       .expect(200)
-  //       .expect('Content-Type', /json/)
+  it('should add event with only online location', async () => {
+    const event = {
+      title: 'test title',
+      start_datetime: now() + 1000,
+      online_locations: ['https://test.com']
+    }
+    mockedGetUser.mockResolvedValueOnce(userUser)
 
-  //     event_id = response.body.id
-  //     expect(response.body.description).toBe(`<p>inside paragraph</p><a href="https://test.com/?query=true">link with fb reference</a>`)
-
-  //   })
-
-  //   it('should not update event with invalid start_datetime', async () => {
-  //     const event = {
-  //       id: event_id,
-  //       place_id: places[0],
-  //       start_datetime: "antani"
-  //     }
-
-  //     const response = await request(app).put('/api/event')
-  //       .auth(token.access_token, { type: 'bearer' })
-  //       .send(event)
-  //       .expect(400)
-
-  //     expect(response.text).toBe('Wrong format for start datetime')
-  //   })
-
-  //   it('should not update event with invalid end_datetime', async () => {
-  //     const event = {
-  //       id: event_id,
-  //       place_id: places[0],
-  //       end_datetime: 2
-  //     }
-
-  //     const response = await request(app).put('/api/event')
-  //       .auth(token.access_token, { type: 'bearer' })
-  //       .send(event)
-  //       .expect(400)
-
-  //     expect(response.text).toBe('start datetime is greater than end datetime')
-  //   })
+    const response = handleEvent(mockH3Event({ body: event }))
+    await expect(response).resolves.toHaveProperty('online_locations', ['https://test.com'])
+  })
 })
