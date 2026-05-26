@@ -29,11 +29,8 @@ docker-image:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   script:
     - echo "$REGISTRY_PASSWORD" | docker login "$REGISTRY_HOST" -u "$REGISTRY_USER" --password-stdin
-    - docker info
-    - sleep 5
-    - cat /etc/hosts
-    - docker info
-    - |
+    - docker run --privileged --rm tonistiigi/binfmt --install arm64
+    - docker buildx create --name builder --driver docker-container --use
       REF="${CI_COMMIT_TAG:-$CI_COMMIT_BRANCH}"
       TAGS="-t $REGISTRY_IMAGE:$REF${SUFFIX:+-$SUFFIX} -t $REGISTRY_IMAGE:git-$CI_COMMIT_SHORT_SHA${SUFFIX:+-$SUFFIX}"
       if [ "$CI_COMMIT_BRANCH" = "feat/test_docker_image" ]; then
