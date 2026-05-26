@@ -24,17 +24,13 @@ docker-image:
   rules:
     - if: '$CI_COMMIT_TAG'
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
-  parallel:
-    matrix:
-      - SUFFIX: ""
-      - SUFFIX: dev
   script:
     - echo "$REGISTRY_PASSWORD" | docker login "$REGISTRY_HOST" -u "$REGISTRY_USER" --password-stdin
     - |
       REF="${CI_COMMIT_TAG:-$CI_COMMIT_BRANCH}"
       TAGS="-t $REGISTRY_IMAGE:$REF${SUFFIX:+-$SUFFIX} -t $REGISTRY_IMAGE:git-$CI_COMMIT_SHORT_SHA${SUFFIX:+-$SUFFIX}"
-      if [ "$CI_COMMIT_BRANCH" = "main" ]; then
-        TAGS="$TAGS -t $REGISTRY_IMAGE:${SUFFIX:-latest}"
+      if [ "$CI_COMMIT_BRANCH" = "feat/test_docker_image" ]; then
+        TAGS="$TAGS -t $REGISTRY_IMAGE:${SUFFIX:-edge}"
       fi
       docker buildx build --platform linux/amd64,linux/arm64 \
         -f Dockerfile${SUFFIX:+.$SUFFIX} \
