@@ -560,5 +560,14 @@
     "summary": "Decentralized event sharing and discovery in the Czech Republic.",
     "timezone": "Europe/Prague",
     "handler": "info@devent.cz"
+  },
+  {
+    "name": "Agenda militant du Loiret",
+    "url": "https://agendamilitantloiret.emancipe.org",
+    "logo": "https://agendamilitantloiret.emancipe.org/logo.png",
+    "place": "Loiret, France)",
+    "summary": "Agenda participatif",
+    "timezone": "Europe/Paris",
+    "handler": "agenda@agendamilitantloiret.emancipe.org"
   }
 ]
