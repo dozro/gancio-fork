@@ -16,6 +16,17 @@ RUN corepack enable
 COPY --from=builder /app/.pack/package.json ./
 RUN pnpm install
 
+# using the same build to create the npm package
+# and export it as the only output artifact
+FROM node:24-alpine AS pack
+WORKDIR /app
+COPY --chown=node --from=builder /app/.pack/ ./
+RUN mkdir -p /artifacts && npm pack --pack-destination=/artifacts
+
+# this is a clean npm package exported as a tarball
+FROM scratch AS artifact
+COPY --from=pack /artifacts/ /
+
 # this is the production image for the gancio server
 FROM  node:24-alpine AS prod
 ENV GANCIO_DATA=/app/data
@@ -32,13 +43,3 @@ EXPOSE 13120
 
 CMD ["./server/gancio"]
 
-# using the same build to create the npm package
-# and export it as the only output artifact
-FROM node:24-alpine AS pack
-WORKDIR /app
-COPY --chown=node --from=builder /app/.pack/ ./
-RUN mkdir -p /artifacts && npm pack --pack-destination=/artifacts
-
-# this is a clean npm package exported as a tarball
-FROM scratch AS artifact
-COPY --from=pack /artifacts/ /

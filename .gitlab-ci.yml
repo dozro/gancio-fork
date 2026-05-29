@@ -4,7 +4,7 @@ stages:
 
 vitest:
   stage: test
-  image: node:24
+  image: node:20
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'

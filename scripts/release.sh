@@ -10,8 +10,14 @@ docker buildx build \
   --output type=local,dest=./releases \
   .
 
-#cp ./releases/gancio.tgz "./docs/public/releases/gancio-v${VERSION}.tgz"
-#mv ./releases/gancio.tgz ./docs/public/releases/latest.tgz
+gpg --pinentry-mode loopback --passphrase `pass underscore/pgp`  --detach-sign --local-user 5DAC477D5441B7A15ACBF680BBEB4DD39AC6CCA9 "./releases/gancio-$VERSION.tgz"
+mv ./releases/* "./docs/public/releases/"
 
-#pnpm docs:build
-#rsync -avz docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2/
+# symlink the latest release to nightly
+rm -f "./docs/public/releases/nightly.tgz"
+rm -f "./docs/public/releases/nightly.tgz.sig"
+ln -s "./gancio-$VERSION.tgz" "./docs/public/releases/nightly.tgz"
+ln -s "./gancio-$VERSION.tgz.sig" "./docs/public/releases/nightly.tgz.sig"
+
+pnpm docs:build
+rsync -avz docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2/
