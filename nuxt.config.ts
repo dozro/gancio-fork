@@ -3,7 +3,7 @@ import { version } from './package.json'
 import locales from './server/i18n/locales'
 import vitePluginVuetify from 'vite-plugin-vuetify'
 import { fileURLToPath } from 'url'
-import { readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 
 const isBuild = process.env.NODE_ENV === 'production'
 const isTest = process.env.VITEST == 'true'
@@ -126,8 +126,12 @@ export default defineNuxtConfig({
     // but we need to manually add the dependency needed by the CLI that we specify in package.json
     // we use this to merge the dependencies and to clean up the output of package.json needed to run `npm pack`
     'close'() {
-      const sourcePkg = fileURLToPath(new URL('./package.json', import.meta.url))
       const nitroPkg = fileURLToPath(new URL('./.output/server/package.json', import.meta.url))
+      if (!existsSync(nitroPkg)) {
+        console.log('.output/server/package.json not found, skipping merge')
+        return
+      }
+      const sourcePkg = fileURLToPath(new URL('./package.json', import.meta.url))
       const nitroPkgData = JSON.parse(readFileSync(nitroPkg, 'utf8'))
       const { dependencies: nitroDependencies } = nitroPkgData
       const outPkg = fileURLToPath(new URL('./.output/package.json', import.meta.url))
