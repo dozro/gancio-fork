@@ -23,7 +23,7 @@ function logout () {
 const in_home = computed(() => route.name === 'index')
 </script>
 <template>
-<div class='d-flex pa-4'>
+<div class='d-flex pa-3 pa-sm-4'>
   <v-btn icon to='/' variant='text' :active="false">
     <img :src='`/logo.png`' height='40'>
   </v-btn>

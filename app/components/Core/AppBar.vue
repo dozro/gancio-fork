@@ -9,7 +9,7 @@ const show_collections_bar = computed(() => ['index', 'collection-name'].include
 const headerImage = 'url("/headerimage.png")'
 </script>
 <template>
-<nav id='AppBar'>
+<nav id='AppBar' class="pb-2">
   <NavHeader />
 
   <!-- title -->

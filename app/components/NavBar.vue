@@ -3,7 +3,7 @@ const settings = useState('settings')
 const { loggedIn } = useUserSession()
 </script>
 <template>
-<div id="navbar" class='d-flex justify-space-between justify-sm-center ga-2 pa-2 mt-2'>
+<div id="navbar" class='d-flex justify-space-between justify-sm-center ga-2 px-2 mt-4'>
   <v-btn
     v-if='loggedIn || settings.allow_anon_event'
     to='/add'

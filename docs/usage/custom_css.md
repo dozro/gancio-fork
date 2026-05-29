@@ -11,46 +11,41 @@ Also note that for every element you want to change the style to, you need to ov
 
 ```css
 #navbar {
-  display: none;
+  display: none !important;
 }
 ```
 
-### Fixed navbar
+### Floating header bar
 
 ```css
-/* fixed navbar */
-nav {
-  margin-top: 80px;
+/* fixed header bar */
+#AppBar {
+  padding-top: 96px;
 }
 
-nav > div:first-of-type {
+#AppBar > div:first-of-type {
   position: fixed;
   width: 100%;
   top: 0px;
   z-index: 1;
-  background-color: #272727;
+  background-color: rgb(var(--v-theme-surface), .9);
 }
 ```
 
-### Fixed footer
+### Floating footer
 
 ```css
 /* fixed footer */
-footer.v-footer {
-  position: fixed;
+#footer {
+  position: sticky;
   bottom: 0px;
-  width: 100%;
-}
-
-div.v-application--wrap {
-  margin-bottom: 48px;
 }
 ```
 
 ### Remove search bar
 
 ```css
-#navsearch .v-input {
+.v-input:has(#main-search) {
   display: none;
 }
 ```
@@ -58,7 +53,7 @@ div.v-application--wrap {
 ### Change aspect ration of the images
 
 ```css
-.img.thumb img {
+.event .img > img {
   aspect-ratio: 0.7 !important;
   max-height: none !important;
 }
@@ -67,18 +62,17 @@ div.v-application--wrap {
 If the images are too big, you can change the max-width:
 
 ```css
-#events .event {
-  max-width: 300px !important;
+@media (width > 450px) {
+  .events .event {
+    max-width: 326px !important;
+  }
 }
 ```
 
 ### Round edges to the event cards
 
 ```css
-.theme--light .event {
-  border-radius: 10pt;
-}
-.theme--dark .event {
+.event {
   border-radius: 10pt;
 }
 ```
@@ -87,14 +81,14 @@ If the images are too big, you can change the max-width:
 ```css
 .fullscreen #AppBar,
 .fullscreen #footer {
-     display: none;
+  display: none;
 }
 ```
 
 ```js
 const fullScreen = new URLSearchParams(window.location.search).get('fullscreen')
 if (fullScreen === 'true') {
-    document.body.classList.add('fullscreen')
+  document.body.classList.add('fullscreen')
 }
 ```
 
