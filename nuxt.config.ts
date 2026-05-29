@@ -2,6 +2,8 @@ import { defineNuxtConfig } from 'nuxt/config'
 import { version } from './package.json'
 import locales from './server/i18n/locales'
 import vitePluginVuetify from 'vite-plugin-vuetify'
+import { fileURLToPath } from 'url'
+import { readFileSync, writeFileSync } from 'fs'
 
 const isBuild = process.env.NODE_ENV === 'production'
 const isTest = process.env.VITEST == 'true'
@@ -119,12 +121,33 @@ export default defineNuxtConfig({
       vitePluginVuetify()
     ]
   },
+  hooks: {
+    // nuxt build will write the needed dependencies in .output/server/package.json
+    // but we need to manually add the dependency needed by the CLI that we specify in package.json
+    // we use this to merge the dependencies and to clean up the output of package.json needed to run `npm pack`
+    'close'() {
+      const sourcePkg = fileURLToPath(new URL('./package.json', import.meta.url))
+      const nitroPkg = fileURLToPath(new URL('./.output/server/package.json', import.meta.url))
+      const nitroPkgData = JSON.parse(readFileSync(nitroPkg, 'utf8'))
+      const { dependencies: nitroDependencies } = nitroPkgData
+      const outPkg = fileURLToPath(new URL('./.output/package.json', import.meta.url))
+      const source = JSON.parse(readFileSync(sourcePkg, 'utf8'))
+
+      source.dependencies = { ...nitroDependencies, ...source.dependencies }
+      delete source.scripts
+      delete source.devDependencies
+      writeFileSync(outPkg, JSON.stringify(source, null, 2))
+    }
+  },
   nitro: {
-    preset: 'node-server',
-    compressPublicAssets: true,
-    imports: {
-      autoImport: false
+    rollupConfig: {
+    // the reason to skip this is because when nuxt build the dependency tree sharp will add multiple native libraries:
+    // "@img/sharp-libvips-linux-arm64", "@img/sharp-libvips-linux-x64",
+    // "@img/sharp-linux-arm64", "@img/sharp-linux-x64"
+    // those libs shouldn't be included in final package.json (we manually add sharp in our package.json)
+      external: ['sharp', 'sqlite3']
     },
+    inlineDynamicImports: true,
     esbuild: {
       options: {
         target: 'esnext',
