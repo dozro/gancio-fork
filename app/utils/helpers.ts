@@ -75,7 +75,7 @@ export function useAttributesFromEvents(events: EventAPI[]) {
   // }
   const now = DateTime.local().toUnixInteger()
   for (const e of events) {
-    const tmp = DateTime.fromSeconds(e.start_datetime)
+    const tmp = DateTime.fromSeconds(e?.start_datetime)
     if (!tmp || !tmp.year) continue
     const start = DateTime.local().set({ year: tmp.year, month: tmp.month, day: tmp.day })
     // merge events with same date

@@ -2,9 +2,7 @@ import { DateTime, type WeekdayNumbers } from 'luxon'
 import { useLogger } from '~~/server/lib/logger'
 import { Event, Tag } from '~~/server/services/db'
 import { notifyEvent } from '~~/server/services/notifier'
-import { findOrCreateTags } from './tags'
 import { Op } from '@sequelize/core'
-import { z } from 'zod'
 
 const log = useLogger('recurrent')
 
@@ -30,11 +28,12 @@ export function getWeekdayN(date: DateTime, n: number, weekday: WeekdayNumbers) 
 /**
   * Ensure we have the next occurrence of a recurrent event
   */
-export async function createRecurrentOccurrence(e, startAt = DateTime.local(), firstOccurrence = true) {
-  log.debug(`Create recurrent event [${e.id}] ${e.title}"`)
+export async function createRecurrentOccurrence(e: Event, startAt = DateTime.local()) {
+  if (!e.recurrent) return
+  log.debug(`Create recurrent event [${e.id}] ${e.title} - ${e.recurrent}"`)
 
   // prepare the new event occurrence copying the parent's properties
-  const event = {
+  const event: Partial<Event> = {
     parentId: e.id,
     title: e.title,
     description: e.description,
@@ -42,18 +41,20 @@ export async function createRecurrentOccurrence(e, startAt = DateTime.local(), f
     is_visible: true,
     userId: e.userId,
     placeId: e.placeId,
-    ...(e.online_locations && { online_locations: e.online_locations } )
+    ...(e.online_locations && { online_locations: e.online_locations })
   }
 
   const recurrentDetails = e.recurrent
   const parentStartDatetime = DateTime.fromSeconds(e.start_datetime)
-
+  if (!parentStartDatetime.isValid) {
+    return
+  }
   // cursor is when start to count
   // in case parent is in past, start to calculate from now
   let cursor = parentStartDatetime > startAt ? parentStartDatetime : startAt
   startAt = cursor
 
-  const duration = e.end_datetime ? e.end_datetime-e.start_datetime : 0
+  const duration = e.end_datetime ? e.end_datetime - e.start_datetime : 0
   const frequency = recurrentDetails.frequency
   const type = recurrentDetails.type
   if (!frequency) {
@@ -65,37 +66,35 @@ export async function createRecurrentOccurrence(e, startAt = DateTime.local(), f
 
   // each week or 2
   if (frequency[1] === 'w') {
-    cursor = cursor.set({ weekday: parentStartDatetime.weekday }) //day(parentStartDatetime.day())
+    cursor = cursor.set({ weekday: parentStartDatetime.weekday })
     if (cursor < startAt) {
       cursor = cursor.plus({ days: 7 * Number(frequency[0]) })
     }
   } else if (frequency === '1m' || frequency === '1y') {
-    let interval = frequency === '1y' ? { years: 1 } : { months: 1 }
+    const interval = frequency === '1y' ? { years: 1 } : { months: 1 }
     // day n.X each interval
     if (type === 'ordinal') {
       cursor = cursor.set({ day: parentStartDatetime.day })
 
-      if (cursor< startAt) {
+      if (cursor < startAt) {
         cursor = cursor.plus(interval)
       }
     } else { // weekday
       // get recurrent freq details
-      cursor = getWeekdayN(cursor, type, parentStartDatetime.weekday)
+      cursor = getWeekdayN(cursor, Number(type), parentStartDatetime.weekday)
       if (cursor < startAt) {
         cursor = cursor.plus(interval)
-        cursor = getWeekdayN(cursor, type, parentStartDatetime.weekday)
+        cursor = getWeekdayN(cursor, Number(type), parentStartDatetime.weekday)
       }
     }
   }
-  log.debug(cursor)
   event.start_datetime = cursor.toUnixInteger()
-  event.end_datetime = e.end_datetime ? event.start_datetime + duration : null
+  event.end_datetime = e.end_datetime ? event.start_datetime + duration : undefined
   try {
-    const newEvent = await Event.create(event)
+    const newEvent = await Event.create(event as Event)
     // create/assign tags
     if (e.tags) {
-      const tags = await findOrCreateTags(e.tags)
-      await newEvent.setTags(tags)
+      await newEvent.setTags(e.tags)
     }
 
     // send notifications
@@ -121,12 +120,13 @@ export async function createRecurrent(start_datetime = DateTime.local().toUnixIn
   })
 
   // create a new occurrence for each recurring events but the one's that has an already visible occurrence coming
-  const creations = events.map(e => {
+  const creations = events.map((e) => {
     if (e.children?.length) {
       if (e.children.find(c => c.is_visible)) return
-      return createRecurrentOccurrence(e, DateTime.fromSeconds(e.children[0].start_datetime + 1), false)
+      const last = DateTime.fromSeconds(e.children[0]!.start_datetime + 1)
+      return createRecurrentOccurrence(e, last.isValid ? last : DateTime.local())
     }
-    return createRecurrentOccurrence(e, DateTime.local(), true)
+    return createRecurrentOccurrence(e)
   })
 
   return Promise.all(creations)
