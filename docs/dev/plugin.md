@@ -14,7 +14,7 @@ is pretty the same).
 
 
 ## Basics
-To start developing a plugin you can copy the [example plugin](https://framagit.org/les/gancio/plugins/example) and modify it as you need.
+To start developing a plugin you can copy the [example plugin](https://framagit.org/les/gancio/-/tree/main/plugins/example?ref_type=heads) and modify it as you need.
 
 A plugin is essentially an `index.ts` file inside its own path in `./plugins`, e.g. `./plugins/my-example-plugin/index.ts`
 
@@ -33,14 +33,15 @@ export default ({ log, db, publicSettings, services }: GancioContext): GancioPlu
 Plugins should be inside `./plugins` directory but you can specify another location using [`plugins_path`](../install/configuration#plugins-path) configuration.
 
 ## Plugin details
-A plugins **MUST** expose a `manifest` key where to specify its details:
+A plugins **MUST** declare a `manifest` key where to specify its details:
 
 ```js
-module.exports = {
-  configuration: {
+import type { GancioContext, GancioPlugin } from '../server/services/plugins'
+export default ({ log, db, publicSettings, services }: GancioContext): GancioPlugin => ({
+  manifest: {
     name: 'Example',
     author: 'lesion',
-    url: 'https://framagit.org/les/gancio/plugins/gancioPluginExample.js',
+    url: 'https://my_plugin_repo',
     description: 'Example plugin',
     settings: {
       my_plugin_string_setting: {
@@ -69,74 +70,84 @@ module.exports = {
 }
 ```
 
-<!-- [![/assets/plugins/settings.png](/assets/plugins/settings.png)](/assets/plugins/settings.png){: data-fancybox="group" data-caption="Home"} -->
+![./plugin_settings.png](./plugin_settings.png)
 
 
 ## Load a plugin
 When a plugin is enabled by an administrator, Gancio will call the `load` method if specified:
 
-```js
-load ({ settings: gancio_settings, db, helpers, log}, settings) {
+```ts
+  load () {
+    // log debug message and access plugin settings
+    log.debug('Example plugin loaded with settings:', this.settings)
 
-  // access to your plugin local settings
-  console.info('Your local settings are in ', settings)
-  console.info(`For example, you can access to your default language setting by using ${settings.my_default_language}`)
+    // access to gancio settings
+    log.info(`This instance url is ${publicSettings.baseurl}`)
 
-  // access to gancio settings
-  console.info(`Gancio settings are in ${gancio_settings}, e.g. ${gancio.settings.baseurl}`)
-
-  // log something
-  log.warn('This is a log entry from my example plugin')
-
-  // use the DB (since 1.6.14)
-  console.info(db.models.findAll())
-  console.info(db.query('CREATE TABLE IF NOT EXISTS myPluginTable'))
-}
+    // add a task to the task manager
+    services.TaskManager.add({
+      name: 'Plugin:Example',
+      repeat: true,
+      repeatDelay: Number(this.settings?.refresh_minutes),
+      method: async () => {
+        log.info('Plugin:Example task')
+      }
+    })
+  }
 ```
 
-## Expose an API <span class='label label-yellow'>since 1.6.4</span>
+## Expose an API
 
-Plugins could have public HTTP endpoints by exposing an express Router in routeAPI object.
+Plugins could have public HTTP endpoints:
 
-```js
-const express = require('express')
-const routeAPI = express.Router()
+```ts
+import { getQuery, getRouterParams, type H3Event } from 'h3'
 
-routeAPI.get('/test', (req, res) => {
-  res.json('WOW!')
-})
+...
+routeAPI(evt: H3Event) {
+  log.debug('Example plugin routeAPI called with event:')
+  return {
+    message: 'Hello from example plugin API route!',
+    query: getQuery(evt),
+    params: getRouterParams(evt)
+  }
+}
 ```
 
 This endpoint will be exposed at `<your_instance>/api/plugin/<your_plugin_name>/test`
   
 
-## Access to DB <span class='label label-yellow'>since 1.6.4</span>
-TODO
+## Access to DB
 
-## Helpers <span class='label label-red'>DOCUMENTATION NEEDED</span>
-- randomString
-- sanitizeHTML
-- queryParamToBool
+```ts
+const event = await db.Event.findOne({
+  where: {
+    title: evt?.title,
+    start_datetime: evt?.start_datetime
+  }
+})
+```
+
+## Exposed Services <badge type="warning">Help needed</badge>
+- upsertEvent
+- getEvents
+- parseIcsData
+- TaskManager
+- findOrCreateTags
 
 ## React to events
 
-```js
-  onEventCreate (event) {
-    const eventLink = `${plugin.gancio.settings.baseurl}/event/${event.slug}`
-    if (!event.is_visible) {
-      console.error(`Unconfirmed event created: ${event.title} / ${eventLink}`)
-    } else {
-      console.error(`Event created: ${event.title} / ${eventLink}`)
-    }
-  },
+These functions are called when an event is created, deleted or updated in Gancio,
+you can use them to do some custom actions like sending a notification to an external service, etc...
 
-  onEventUpdate (event) {
-    console.error(`Event "${event.title}" updated`)
+```ts
+  onEventCreate(event) {
+    log.debug('Example plugin onEventCreate called with event:', event)
   },
-
-  onEventDelete (event) {
-    console.error(`Event "${event.title}" deleted`)
+  onEventDelete(event) {
+    log.debug('Example plugin onEventDelete called with event:', event)
+  },
+  onEventUpdate(event) {
+    log.debug('Example plugin onEventUpdate called with event:', event)
   }
 ```
-
-

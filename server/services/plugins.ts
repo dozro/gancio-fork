@@ -12,6 +12,7 @@ import type { EventAPI } from '~~/shared/types/generic'
 import type { PluginSettings, Settings } from '~~/shared/types/settings'
 import { findOrCreateTags } from './tags'
 import emitter from '../lib/emitter'
+import { getEvents, upsertEvent } from './events'
 
 const log = useLogger('plugins')
 
@@ -48,6 +49,8 @@ export interface GancioContext {
     parseIcsData: typeof parseIcsData
     TaskManager: TaskManager
     findOrCreateTags: typeof findOrCreateTags
+    upsertEvent: typeof upsertEvent
+    getEvents: typeof getEvents
   }
 }
 
@@ -169,7 +172,9 @@ const pluginController = {
         services: {
           parseIcsData,
           TaskManager: useTaskManager(),
-          findOrCreateTags
+          findOrCreateTags,
+          upsertEvent,
+          getEvents
         }
       })
       log.debug(`Imported plugin ${pluginPath}`)

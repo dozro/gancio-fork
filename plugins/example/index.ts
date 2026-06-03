@@ -14,7 +14,7 @@ type ExampleSettings = PluginSettings & {
  * An example plugin to show how to create a plugin for Gancio
  */
 // export default ({ log, db, publicSettings, services }: GancioContext): GancioPlugin => ({
-export default ({ log, publicSettings }: GancioContext): GancioPlugin => ({
+export default ({ log, publicSettings, services }: GancioContext): GancioPlugin => ({
   settings: {} as ExampleSettings,
   manifest: {
     name: 'Example',
@@ -51,7 +51,21 @@ export default ({ log, publicSettings }: GancioContext): GancioPlugin => ({
   // starting a Task with services.TaskManager or setting up some data in db, initialize external API connection, etc...
   // settings are available with this.settings, they are automatically updated when the settings are changed in the admin panel
   load() {
+    // log debug message and access plugin settings
     log.debug('Example plugin loaded with settings:', this.settings)
+
+    // access to gancio settings
+    log.info(`This instance url is ${publicSettings.baseurl}`)
+
+    // add a task to the task manager
+    services.TaskManager.add({
+      name: 'Plugin:Example',
+      repeat: true,
+      repeatDelay: Number(this.settings?.refresh_minutes),
+      method: async () => {
+        log.info('Plugin:Example task')
+      }
+    })
   },
   // this function can be called from the admin panel to test the plugin without enabling it,
   // useful for example if you want to test the connection to an external API with the provided settings before enabling the plugin
