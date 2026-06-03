@@ -2,11 +2,14 @@
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
+import { theme, useOpenapi } from 'vitepress-openapi/client'
+import 'vitepress-openapi/dist/style.css'
 import MyLayout from './MyLayout.vue'
 import { createVuetify } from 'vuetify'
 import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 import './style.css'
+import spec from '../../../openapi.json'
 
 const vuetify = createVuetify({
   icons: {
@@ -124,5 +127,13 @@ export default {
   Layout: MyLayout,
   enhanceApp({ app }) {
     app.use(vuetify)
+
+    // Set the OpenAPI specification.
+    useOpenapi({ 
+      spec, 
+    }) 
+
+    // Use the theme.
+    theme.enhanceApp({ app })
   }
 } satisfies Theme
