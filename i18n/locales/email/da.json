@@ -24,7 +24,7 @@
         "content": "Dette er en testmail, og hvis du læser dette, fungerer din konfiguration."
     },
     "event_confirm": {
-        "content": "Du kan bekræfte denne begivenhed på <a href='{{{url}}'>denne side</a>"
+        "content": "Du kan bekræfte denne begivenhed på <a href='{{{url}}}'>denne side</a>"
     },
     "report": {
         "subject": "Moderering af Event [{{event.title}}]",

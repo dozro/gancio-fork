@@ -97,7 +97,7 @@
         "insert_your_address": "输入你的电子邮箱地址",
         "ical_description": "电脑和智能手机通常预装了能够导入远程日历的日历应用。",
         "intro": "与那些竭尽全力保留用户和数据的非社交平台不同，我们认为信息和人一样，都必须是自由的。因此，即使不通过此网站，你仍可随时了解你想了解的事件之最新情况。",
-        "feed_description": "要想从电脑或智能手机上关注更新，而无需定期打开本网站，请使用RSS订阅。</p>\n\n<p>通过RSS订阅，您可以使用一个特殊的应用程序来接收你感兴趣的网站的更新。这是一个快速关注许多网站的好方法，不需要创建账户或做其他事。</p>\n\n<li> 如果您使用 Android，我们推荐 <a href=\"https://f-droid.org/en/packages/net.frju.flym/\">Flym</a> 或 Feeder。</li>\n<li> 对于iPhone/iPad，您可以使用 <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\">Feed4U</a> </li>\n<li> 对于台式机/笔记本电脑，我们推荐可在 <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\">Firefox</a> 或 <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\">Chrome</a> 上安装的 Feedbro。</li>\n<br/>\n将此链接添加到你的RSS阅读器中，以获得最新信息。"
+        "feed_description": "要想从电脑或智能手机上关注更新，而无需定期打开本网站，请使用RSS订阅。\n\n<p>通过RSS订阅，您可以使用一个特殊的应用程序来接收你感兴趣的网站的更新。这是一个快速关注许多网站的好方法，不需要创建账户或做其他事。</p>\n\n<li> 如果您使用 Android，我们推荐 <a href=\"https://f-droid.org/en/packages/net.frju.flym/\">Flym</a> 或 Feeder。</li>\n<li> 对于iPhone/iPad，您可以使用 <a href=\"https://itunes.apple.com/ua/app/feeds4u/id1038456442?mt=8\">Feed4U</a> </li>\n<li> 对于台式机/笔记本电脑，我们推荐可在 <a href=\"https://addons.mozilla.org/en-GB/firefox/addon/feedbroreader/\">Firefox</a> 或 <a href=\"https://chrome.google.com/webstore/detail/feedbro/mefgmmbdailogpfhfblcnnjfmnpnmdfa\">Chrome</a> 上安装的 Feedbro。</li>\n<br/>\n将此链接添加到你的RSS阅读器中，以获得最新信息。"
     },
     "register": {
         "description": "社会运动应该组织起来，并自筹资金<br/>\n<br/>在你能发布内容之前，<strong>你的账户必须审核通过</strong>，考虑到<strong>你可以通过此网站发现现实中的人</strong>，请写一些东西告诉我们你希望发布什么。",

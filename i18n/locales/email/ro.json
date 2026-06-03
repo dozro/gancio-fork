@@ -12,7 +12,7 @@
     },
     "admin_register": {
         "subject": "Înregistrare nouă",
-        "content": "{{user.email}} a solicitat înregistrarea pe {{config.title}}: <br/><pre>{{user.description}}</pre><br/> Confirmați-o <a href='{{ config.baseurl}}/admin'>aici</a>."
+        "content": "{{user.email}} a solicitat înregistrarea pe {{config.title}}: <br/><pre>{{user.description}}</pre><br/> Confirmați-o <a href='{{config.baseurl}}/admin'>aici</a>."
     },
     "confirm": {
         "subject": "Acum puteți începe să publicați evenimente",

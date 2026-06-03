@@ -9,7 +9,7 @@
     },
     "user_confirm": {
         "subject": "நீங்கள் இப்போது நிகழ்வுகளை வெளியிடத் தொடங்கலாம்",
-        "content": "ஆய், உங்கள் கணக்கு <a href = '{{{config.baseurl}}}'> {{config.title}} </a> உருவாக்கப்பட்டுள்ளது. <a href = '{{{config.baseurl}}}/USER_CONFIRM/{{user.recover_code}}'> அதை உறுதிப்படுத்தி கடவுச்சொல்லைத் தேர்வுசெய்க. </a>."
+        "content": "ஆய், உங்கள் கணக்கு <a href='{{{config.baseurl}}}'> {{config.title}} </a> உருவாக்கப்பட்டுள்ளது. <a href='{{{config.baseurl}}}/USER_CONFIRM/{{user.recover_code}}'> அதை உறுதிப்படுத்தி கடவுச்சொல்லைத் தேர்வுசெய்க. </a>."
     },
     "recover": {
         "subject": "கடவுச்சொல் மீட்பு",
@@ -20,7 +20,7 @@
         "content": "{{user.email}} என்பவர் {{config.title}} இல் பதிவு செய்யக் கோரியுள்ளார்: <br/><pre>{{user.description}}</pre><br/> <a href='{{{config.baseurl}}}/admin'>இங்கே</a> உறுதிப்படுத்தவும்."
     },
     "event_confirm": {
-        "content": "இந்த நிகழ்வை <a href = '{{{url}}}'> இந்த பக்கம் </a> இல் உறுதிப்படுத்தலாம்"
+        "content": "இந்த நிகழ்வை <a href='{{{url}}}'> இந்த பக்கம் </a> இல் உறுதிப்படுத்தலாம்"
     },
     "test": {
         "subject": "உங்கள் SMTP உள்ளமைவு செயல்படுகிறது",

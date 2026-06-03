@@ -386,7 +386,7 @@
     },
     "setup": {
         "start": "Başlangıç",
-        "completed_description": "<p> Artık aşağıdaki kullanıcıyla giriş yapabilirsiniz:<br/><br/>Kullanıcı: <b>{email}</b><br/>Password: <b>{password}<b /></p><br><br/><br>",
+        "completed_description": "<p> Artık aşağıdaki kullanıcıyla giriş yapabilirsiniz:<br/><br/>Kullanıcı: <b>{email}</b><br/>Password: <b>{password}<b/></p><br><br/><br>",
         "copy_password_dialog": "Evet, parolanı kopyalamalısın!",
         "https_warning": "Sayfaya HTTP kullanarak giriyorsun. HTTPS'e geçmek istersen, `config.json` dosyasındaki `baseurl` ayarını değiştirmeyi unutma!",
         "completed": "Kurulum tamamlandı"
