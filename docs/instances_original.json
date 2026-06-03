@@ -338,6 +338,21 @@
   {
     "name": "https://agendamilitantloiret.emancipe.org/",
     "url": "https://agendamilitantloiret.emancipe.org/",
-    "place": "Loiret, France)"
+    "place": "(Loiret, France)"
+  },
+  {
+    "name": "RezoneK",
+    "url": "https://rezonek.fr/",
+    "place": "(Ouest-Cornouaille - Finistère, France)"
+  },
+  {
+    "name": "AKCE",
+    "url": "https://akce.nolog.cz",
+    "place": "(Czech Republic)"
+  },
+  {
+    "name": "Autonoma Red",
+    "url": "https://autonoma.red",
+    "place": "(Bogotá, Colombia)"
   }
 ]

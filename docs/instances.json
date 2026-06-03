@@ -565,9 +565,36 @@
     "name": "Agenda militant du Loiret",
     "url": "https://agendamilitantloiret.emancipe.org",
     "logo": "https://agendamilitantloiret.emancipe.org/logo.png",
-    "place": "Loiret, France)",
+    "place": "(Loiret, France)",
     "summary": "Agenda participatif",
     "timezone": "Europe/Paris",
     "handler": "agenda@agendamilitantloiret.emancipe.org"
+  },
+  {
+    "name": "RezoneK",
+    "url": "https://rezonek.fr",
+    "logo": "https://rezonek.fr/logo.png",
+    "place": "(Ouest-Cornouaille - Finistère, France)",
+    "summary": "Agenda partagé de concerts, spectacles et évènements festifs\nen ouest-Cornouaille (Cap Sizun, Pays Bigoud' & Pays de Douarnenez)",
+    "timezone": "Europe/Paris",
+    "handler": "relay@rezonek.fr"
+  },
+  {
+    "name": "AKCE.NOLOG.CZ",
+    "url": "https://akce.nolog.cz",
+    "logo": "https://akce.nolog.cz/logo.png",
+    "place": "(Czech Republic)",
+    "summary": "Stránka pro sdílení politických akcí",
+    "timezone": "Europe/Prague",
+    "handler": "Levicove_Akce@akce.nolog.cz"
+  },
+  {
+    "name": "Agenda Autónoma",
+    "url": "https://autonoma.red",
+    "logo": "https://autonoma.red/logo.png",
+    "place": "(Bogotá, Colombia)",
+    "summary": "Bogotá",
+    "timezone": "America/Bogota",
+    "handler": "agenda@autonoma.red"
   }
 ]
