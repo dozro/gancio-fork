@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-alpha.11](https://framagit.org/les/gancio/compare/v2.0.0-testing...v2.0.0-alpha.11) (2026-06-03)
+
+
+### Bug Fixes
+
+* some i18n invalid keys, add i18n-check, update deps ([56f8f34](https://framagit.org/les/gancio/commit/56f8f349a3e135caeb81a1d389b96c666589356e))
+* various small recurring event issues ([f29c351](https://framagit.org/les/gancio/commit/f29c351765497110d81be134cfc77c839aa8c794))
+
 ## [2.0.0-alpha.10](https://framagit.org/les/gancio/compare/v2.0.0-alpha.9...v2.0.0-alpha.10) (2026-05-22)
 
 ### Features
