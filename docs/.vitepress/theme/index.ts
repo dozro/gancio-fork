@@ -7,6 +7,7 @@ import { createVuetify } from 'vuetify'
 import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 import './style.css'
+import BlogIndex from './BlogIndex.vue'
 
 const vuetify = createVuetify({
   icons: {
@@ -124,6 +125,6 @@ export default {
   Layout: MyLayout,
   enhanceApp({ app, router, siteData }) {
     app.use(vuetify)
-
+    app.component('BlogIndex', BlogIndex)
   }
 } satisfies Theme
