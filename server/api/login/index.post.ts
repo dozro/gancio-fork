@@ -3,7 +3,7 @@ import { readValidatedBody, defineEventHandler, createError } from 'h3'
 import bcrypt from 'bcryptjs'
 import { useLogger } from '~~/server/lib/logger'
 import { User } from '~~/server/services'
-import { setSession } from '~~/server/lib/session'
+import { setUserSession } from '~~/server/lib/session'
 
 const bodySchema = z.object({
   email: z.string(), // TODO: .email(), // or admin
@@ -27,12 +27,10 @@ export default defineEventHandler(async (event) => {
   if (await bcrypt.compare(password, user.password)) {
     // set the user session in the cookie
     // this server util is auto-imported by the auth-utils module
-    await setSession(event, {
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      }
+    await setUserSession(event, {
+      id: user.id,
+      email: user.email,
+      role: user.role
     })
     log.info('Logged in ', user.email)
     return { email: user.email, role: user.role }

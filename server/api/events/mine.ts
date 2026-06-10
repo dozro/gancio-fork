@@ -1,6 +1,6 @@
 import { defineEventHandler } from 'h3'
 import { getEvents, mapEvent } from '~~/server/services'
-import { requireUser } from '~~/server/lib/session'
+import { requireUser } from '~~/server/lib/auth'
 /**
  * Get events created by the current user.
  * @auth

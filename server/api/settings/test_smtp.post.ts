@@ -1,9 +1,9 @@
 import { defineEventHandler, createError, readBody } from 'h3'
 import { sendMail, publicSettings, setSetting } from '~~/server/services'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
   const setting = await readBody(event)
   await setSetting('smtp', setting)
   try {

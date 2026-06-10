@@ -134,6 +134,11 @@ const event = await db.Event.findOne({
 - parseIcsData
 - TaskManager
 - findOrCreateTags
+- requireAdmin
+- requireRole
+- requireUser
+- getUser
+- isRole
 
 ## React to events
 

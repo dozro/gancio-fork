@@ -35,7 +35,7 @@ export default defineNuxtConfig({
     '~/assets/css/main.css',
     '@mdi/font/css/materialdesignicons.css'
   ],
-  modules: ['@nuxt/eslint', 'nuxt-auth-utils', '@nuxtjs/i18n', (!isTest && '@nuxtjs/sitemap'), '@nuxt/hints'],
+  modules: ['@nuxt/eslint', '@nuxtjs/i18n', (!isTest && '@nuxtjs/sitemap'), '@nuxt/hints'],
   sitemap: {
     cacheMaxAgeSeconds: 3600, // 1 hour
 
@@ -80,14 +80,6 @@ export default defineNuxtConfig({
     inlineStyles: false
   },
   runtimeConfig: {
-    session: {
-      password: '',
-      maxAge: 60 * 60 * 24 * 365, // 1 year,
-      cookie: {
-        sameSite: 'lax',
-        secure: isBuild // process.env.NODE_ENV === 'production',
-      }
-    },
     public: {
       version
     }

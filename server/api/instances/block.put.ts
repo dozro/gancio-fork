@@ -1,6 +1,6 @@
 import { defineEventHandler, readValidatedBody, createError } from 'h3'
 import z from 'zod'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 import { useLogger } from '~~/server/lib/logger'
 import { Instance } from '~~/server/services'
 
@@ -10,7 +10,7 @@ const schema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
 
   const log = useLogger('instance')
 

@@ -1,7 +1,7 @@
 import { defineEventHandler, createError } from 'h3'
 import { Event, User } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
-import { requireUser } from '~~/server/lib/session'
+import { requireUser } from '~~/server/lib/auth'
 /**
  * Delete the current authenticated user and disassociate all events created by this user
  * @auth

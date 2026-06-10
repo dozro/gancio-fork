@@ -1,9 +1,9 @@
 import { defineEventHandler } from 'h3'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 import { pluginController, publicSettings } from '~~/server/services'
 
 export default defineEventHandler(async (evt) => {
-  await requireAdminSession(evt)
+  await requireAdmin(evt)
   // return plugins and inner settings
   return pluginController.plugins.map(({ manifest }) => {
     if (publicSettings['plugin_' + manifest.name]) {

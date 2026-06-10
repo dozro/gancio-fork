@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody, createError, getRouterParam } from 'h3'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 import { useLogger } from '~~/server/lib/logger'
 import { enqueueMail, User, publicSettings } from '~~/server/services'
 /**
@@ -8,7 +8,7 @@ import { enqueueMail, User, publicSettings } from '~~/server/services'
  * @info when user is activated a confirmation e-mail is sent with a link that allow to choose a password
  */
 export default defineEventHandler(async (evt) => {
-  await requireAdminSession(evt)
+  await requireAdmin(evt)
   const log = useLogger('user update')
   const id = getRouterParam(evt, 'id')
   const body = await readBody(evt)

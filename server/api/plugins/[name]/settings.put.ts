@@ -1,9 +1,9 @@
 import { createError, getRouterParam, readBody, defineEventHandler } from 'h3'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 import { pluginController, setSetting } from '~~/server/services'
 
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
   const pluginName = getRouterParam(event, 'name')
   if (!pluginName) {
     throw createError({ statusCode: 400, message: 'Plugin name is required' })

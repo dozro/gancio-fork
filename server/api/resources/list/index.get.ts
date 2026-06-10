@@ -1,6 +1,6 @@
 import { defineEventHandler, getValidatedQuery } from 'h3'
 import { Resource } from '~~/server/services'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 
 import z from 'zod'
 import type { Paginated } from '~~/server/types/pagination'
@@ -19,7 +19,7 @@ const schema = z.object({
  * @auth admin
  */
 export default defineEventHandler(async (evt): Promise<Paginated<Resource>> => {
-  await requireAdminSession(evt)
+  await requireAdmin(evt)
   const params = await getValidatedQuery(evt, schema.parse)
 
   const andWhere: WhereOptions<Resource> = []

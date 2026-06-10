@@ -1,10 +1,10 @@
 import { defineEventHandler, readBody, getRouterParam, createError } from 'h3'
+import { requireAdmin } from '~~/server/lib/auth'
 import { useLogger } from '~~/server/lib/logger'
 import { Filter } from '~~/server/services'
-import { requireAdminSession } from '~~/server/lib/session'
 
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
   const log = useLogger('Filter put')
   const id = getRouterParam(event, 'id')
   const body = await readBody(event)

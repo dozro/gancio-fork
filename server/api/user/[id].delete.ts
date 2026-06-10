@@ -1,14 +1,14 @@
 import { defineEventHandler, getRouterParam, createError } from 'h3'
 import { Event, User } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 
 /**
  * Delete a user by id and disassociate all events created by this user
  * @auth admin
  */
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
   const log = useLogger('user delete')
   const id = getRouterParam(event, 'id')
 

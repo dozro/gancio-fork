@@ -1,10 +1,10 @@
 import { defineEventHandler } from 'h3'
+import { requireAdmin } from '~~/server/lib/auth'
 // import { col, fn } from '@sequelize/core'
 // import { APUser, Instance } from '~~/server/services'
-import { requireAdminSession } from '~~/server/lib/session'
 
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
 
 //   return APUser.findAll({
 //     attributes: [

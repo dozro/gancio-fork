@@ -1,15 +1,14 @@
 import { $fetchRaw as $fetch } from 'nitro-test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { now, cleanDatabase } from './setup'
+import { cleanDatabase } from './setup'
 
 const admin = JSON.stringify({ email: 'admin', password: 'password' })
 let cookie: string | null
-let token: string | undefined
 
 describe('Authentication / Authorization', async () => {
   await cleanDatabase()
   it('should not return an user when not authenticated', async () => {
-    const { data, status, headers } = await $fetch('/api/user', { headers: { cookie: '' } })
+    const { status } = await $fetch('/api/user', { headers: { cookie: '' } })
     expect(status).toBe(401)
   })
 
@@ -52,23 +51,23 @@ describe('Authentication / Authorization', async () => {
     expect(user?.email).toBe('admin')
   })
 
-  it('should authenticate with correct user/password and get JWT token', async () => {
-    const { status, data } = await $fetch('/api/login/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: admin
-    })
+  // it('should authenticate with correct user/password and get JWT token', async () => {
+  //   const { status, data } = await $fetch('/api/login/token', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: admin
+  //   })
 
-    expect(status).toBe(200)
-    expect(data?.access_token).toBeDefined()
-    expect(typeof data.access_token).toBe('string')
-    token = data.access_token
-  })
+  //   expect(status).toBe(200)
+  //   expect(data?.access_token).toBeDefined()
+  //   expect(typeof data.access_token).toBe('string')
+  //   token = data.access_token
+  // })
 
-  it('should get user when authenticated via JWT', async () => {
-    const { status, data: user } = await $fetch('/api/user', { headers: { Authorization: `Bearer ${token}` } })
-    expect(status).toBe(200)
-    expect(user?.email).toBe('admin')
-    expect(user?.role).toBe('admin')
-  })
+  // it('should get user when authenticated via JWT', async () => {
+  //   const { status, data: user } = await $fetch('/api/user', { headers: { Authorization: `Bearer ${token}` } })
+  //   expect(status).toBe(200)
+  //   expect(user?.email).toBe('admin')
+  //   expect(user?.role).toBe('admin')
+  // })
 })

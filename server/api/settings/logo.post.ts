@@ -2,10 +2,10 @@ import { defineEventHandler, createError } from 'h3'
 import type { MultiPartData } from 'h3'
 import { parseMultipartFormData, saveUploadedImage } from '~~/server/lib/parseMultipartForm'
 import { setSetting } from '~~/server/services'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 
 export default defineEventHandler(async (evt) => {
-  await requireAdminSession(evt)
+  await requireAdmin(evt)
   const body = await parseMultipartFormData(evt)
 
   if (!body || !body?.logo) {

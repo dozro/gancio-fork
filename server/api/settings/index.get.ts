@@ -1,11 +1,11 @@
 import { defineEventHandler } from 'h3'
-import { isSessionRole } from '~~/server/lib/session'
+import { isRole } from '~~/server/lib/auth'
 import { handleCache } from '~~/server/lib/API'
 import { publicSettings, publicSettingsLastModified } from '~~/server/services'
 import type { Settings } from '~~/shared/types/settings'
 
 export default defineEventHandler(async (evt) => {
-  if (await isSessionRole(evt, 'admin')) {
+  if (await isRole(evt, 'admin')) {
     return publicSettings
   }
 
@@ -28,7 +28,7 @@ export default defineEventHandler(async (evt) => {
     }
   }
 
-  if (await handleCache(evt, lastModified)) return
+  if (await handleCache(evt, lastModified, 10)) return
 
   return data
 })

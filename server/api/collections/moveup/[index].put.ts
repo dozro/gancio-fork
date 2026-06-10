@@ -1,15 +1,15 @@
 import { defineEventHandler, getRouterParam, createError, sendNoContent } from 'h3'
 import { Op } from '@sequelize/core'
-import { requireAdminSession } from '~~/server/lib/session'
 import { useLogger } from '~~/server/lib/logger'
 import { Collection } from '~~/server/services'
+import { requireAdmin } from '~~/server/lib/auth'
 
 /**
  * move up a collection by swapping its sortIndex with the one above it.
  * @auth
  */
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
   const log = useLogger('collection moveup')
   const sortIndex = Number(getRouterParam(event, 'index'))
 

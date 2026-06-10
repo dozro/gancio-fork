@@ -73,7 +73,7 @@ export async function connect() {
     sequelize = new Sequelize(config.db as Options<AbstractDialect>)
     await sequelize.authenticate()
     log.info('Connection has been established successfully.')
-    sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message])
+    sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message, OAuthToken])
   } catch (error) {
     console.error('Unable to connect to the database:', config.db, error)
     process.exit(1)
@@ -847,4 +847,40 @@ export class Notification extends Model<
 
   @Attribute(DataTypes.ENUM(...NotificationTypeEnum))
   declare type: NotificationType
+}
+
+@Table({
+  tableName: 'oauth_tokens',
+  timestamps: false
+})
+export class OAuthToken extends Model<
+  InferAttributes<OAuthToken>,
+  InferCreationAttributes<OAuthToken>
+> {
+  @Attribute(DataTypes.STRING)
+  @PrimaryKey
+  declare accessToken: string
+
+  @Attribute(DataTypes.DATE)
+  declare accessTokenExpiresAt: Date
+
+  @Attribute(DataTypes.STRING)
+  declare refreshToken: string
+
+  @Attribute(DataTypes.DATE)
+  declare refreshTokenExpiresAt: Date
+
+  @Attribute(DataTypes.STRING)
+  declare scope: string
+
+  @Attribute({
+    type: DataTypes.INTEGER.UNSIGNED,
+    references: { table: 'users', key: 'id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
+  })
+  declare userId: number
+
+  @BelongsTo(() => User, { foreignKey: 'userId', targetKey: 'id' })
+  declare user: NonAttribute<User>
 }

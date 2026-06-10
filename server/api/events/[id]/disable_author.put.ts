@@ -1,6 +1,6 @@
 import { defineEventHandler, createError, getRouterParam } from 'h3'
 import { useLogger } from '~~/server/lib/logger'
-import { requireSessionRole } from '~~/server/lib/session'
+import { requireRole } from '~~/server/lib/auth'
 import { Event, publicSettings, User } from '~~/server/services'
 
 /**
@@ -14,7 +14,7 @@ export default defineEventHandler(async (evt) => {
     throw createError({ statusCode: 403 })
   }
 
-  await requireSessionRole(evt, ['editor', 'admin'])
+  await requireRole(evt, ['editor', 'admin'])
   const event = await Event.findByPk(id, { include: [{ model: User, required: true }] })
   if (!event) {
     log.warn(`Not found ${id}`)

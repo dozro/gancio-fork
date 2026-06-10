@@ -1,8 +1,8 @@
 import { defineEventHandler } from 'h3'
+import { requireAdmin } from '~~/server/lib/auth'
 import { Page } from '~~/server/services'
-import { requireAdminSession } from '~~/server/lib/session'
 
 export default defineEventHandler(async (evt) => {
-  await requireAdminSession(evt)
+  await requireAdmin(evt)
   return Page.findAll()
 })
