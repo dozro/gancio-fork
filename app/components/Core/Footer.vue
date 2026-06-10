@@ -47,6 +47,7 @@ const footerLinks = computed(() => settings.value.footerLinks?.map((link) => {
       >
         <v-list-item-title>{{ instance.name ?? instance.preferredUsername }}</v-list-item-title>
         <v-list-item-subtitle>
+          <!-- eslint-disable-next-line vue/no-v-html -->
           <span v-html="instance?.summary" />
         </v-list-item-subtitle>
       </v-list-item>

@@ -1,4 +1,3 @@
-import { vi } from 'vitest'
 import { DateTime } from 'luxon'
 import { Readable } from 'node:stream'
 import { IncomingMessage, ServerResponse } from 'node:http'

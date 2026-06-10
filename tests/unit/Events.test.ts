@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { admin, cleanDatabase } from '../api/setup'
+import { cleanDatabase } from '../api/setup'
 import { mockH3Event, now } from './utils'
 import { setSetting } from '../../server/services'
 import { getUser } from '../../server/lib/getUser'
@@ -140,7 +140,7 @@ describe('Events', () => {
       place_name: 'test',
       place_address: 'test',
       start_datetime: now(),
-      end_datetime: now() + 1000,
+      end_datetime: now() + 1000
     }
 
     mockedGetUser.mockResolvedValueOnce(anotherUser)
@@ -155,9 +155,8 @@ describe('Events', () => {
     mockedGetUser.mockResolvedValueOnce(adminUser)
     response = putHandler(mockH3Event({ params: { id: String(event_id) }, body: { ...event, title: 'new title 2' } }))
     await expect(response).resolves.toHaveProperty('title', 'new title 2')
-    
   })
-  
+
   it('should not allow start_datetime greater than end_datetime', async () => {
     const event = {
       title: ' test title 5',
@@ -173,7 +172,6 @@ describe('Events', () => {
   })
 
   it('should not allow start_datetime greater than 3000', async () => {
-
     const event = {
       title: ' test title 5',
       start_datetime: DateTime.now().set({ year: 4000 }).toUnixInteger(),
@@ -184,14 +182,13 @@ describe('Events', () => {
     const response = handleEvent(mockH3Event({ body: event }))
     await expect(response).rejects.toHaveProperty('statusCode', 400)
     await expect(response).rejects.toHaveProperty('message', 'start_datetime is too far in the future')
-
   })
 
   it('should validate start_datime', async () => {
     const event = {
       title: ' test title 5',
-      start_datetime: "antani",
-      place_name: 'test',
+      start_datetime: 'antani',
+      place_name: 'test'
     }
 
     const response = handleEvent(mockH3Event({ body: event }))
@@ -202,7 +199,7 @@ describe('Events', () => {
     const event = {
       title: ' test title 5',
       start_datetime: now() + 1000,
-      end_datetime: "Antani",
+      end_datetime: 'Antani',
       place_name: 'test',
       place_address: 'test'
     }
@@ -213,7 +210,7 @@ describe('Events', () => {
   })
 
   it('should not allow create anonymous event in the past', async () => {
-    const event = { 
+    const event = {
       title: 'anonymous event in the past',
       start_datetime: now() - 1,
       place_name: 'test',
@@ -226,7 +223,7 @@ describe('Events', () => {
   })
 
   it('should allow create event in the past when admin', async() => {
-    const event = { 
+    const event = {
       title: 'authenticated event in the past',
       start_datetime: now() - 1,
       place_name: 'test',
@@ -254,7 +251,6 @@ describe('Events', () => {
   })
 
   it('should sanitize htlm in description', async () => {
-
     const event = {
       title: 'test title',
       place_name: 'test',

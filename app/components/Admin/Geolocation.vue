@@ -1,26 +1,12 @@
 <script setup lang="ts">
 
-// const settings = useState<Settings>('settings')
 const { $notify } = useNuxtApp()
 
-// import { isoCountries } from '../../server/helpers/geolocation/isoCountries'
-// import geolocation from '../../server/helpers/geolocation/index'
-
-// mapKey: 0,
-// mapPreview: false,
-// mapCenter: [42, 42],
-// isNewTilelayerTest: false,
-// isNewGeocodingTest: false,
-// geocoding_provider_type_items: ['Nominatim', 'Photon'],
-// geocoding_provider_type: $store.state.settings.geocoding_provider_type || '',
-// geocoding_provider_type_default: 'Nominatim',
-// geocoding_provider: $store.state.settings.geocoding_provider || '',
-// geocoding_countrycodes: $store.state.settings.geocoding_countrycodes || [],
-// tilelayer_provider: $store.state.settings.tilelayer_provider || '',
-// tilelayer_provider_attribution: $store.state.settings.tilelayer_provider_attribution || '',
-// countries: isoCountries,
-
-const { data: countries } = await useFetch('/isoCountries.json')
+type ISOCountry = {
+  code: string
+  name: string
+}
+const { data: countries } = await useFetch<ISOCountry[]>('/isoCountries.json')
 
 const mapPreview = ref(false)
 const mapCenter = ref([42, 42])
@@ -29,7 +15,6 @@ const mapKey = ref(0)
 const testingTilelayer = ref(false)
 const testingGeocoding = ref(false)
 
-// const geocoding_provider_default = 'https://nominatim.openstreetmap.org/search'
 const tilelayer_provider_default = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
 const tilelayer_provider_attribution_default = '<a target=\'_blank\' href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 
@@ -68,11 +53,10 @@ function tilelayerTestSuccess() {
   testingTilelayer.value = false
 }
 
-// }
-// }
 </script>
 <template>
 <div class="d-flex flex-column ga-8 mt-4">
+  <!-- eslint-disable-next-line vue/no-v-html -->
   <span v-html="$t('admin.geolocation_description')" />
 
   <div>
@@ -116,7 +100,7 @@ function tilelayerTestSuccess() {
       </v-row>
 
       <Map
-        v-if="mapPreview" :key="mapKey" :LMapStyles="{ height: '20rem' }" :show-marker="false"
+        v-if="mapPreview" :key="mapKey" :l-map-styles="{ height: '20rem' }" :show-marker="false"
         :map-center="mapCenter" :zoom="10" @tileerror="tilelayerTestError" @tileload="tilelayerTestSuccess" />
     </v-form>
   </div>

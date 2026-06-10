@@ -204,7 +204,7 @@ const eventAPISchema = z.object({
   .refine(data => data.end_datetime === undefined || data.start_datetime <= data.end_datetime,
     { message: 'start_datetime is greater than end_datetime' })
 
-export function validateEvent(publicSettings: Settings, user?: User) {
+export function validateEvent(publicSettings: Settings, user?: InferAttributes<User>) {
   const isAnonymous = !user
   return eventAPISchema
     .refine(() => !(isAnonymous && !publicSettings.allow_anon_event),
@@ -221,7 +221,7 @@ export function validateEvent(publicSettings: Settings, user?: User) {
 
 export type EventAPIType = z.infer<typeof eventAPISchema>
 
-export async function upsertEvent(payload: unknown, user?: User) {
+export async function upsertEvent(payload: unknown, user?: InferAttributes<User>) {
   let event: Event | null = null
   let eventPayload
 

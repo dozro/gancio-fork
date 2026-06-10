@@ -117,7 +117,7 @@ export default defineNuxtConfig({
     // nuxt build will write the needed dependencies in .output/server/package.json
     // but we need to manually add the dependency needed by the CLI that we specify in package.json
     // we use this to merge the dependencies and to clean up the output of package.json needed to run `npm pack`
-    'close'() {
+    close() {
       const nitroPkg = fileURLToPath(new URL('./.output/server/package.json', import.meta.url))
       if (!existsSync(nitroPkg)) {
         console.log('.output/server/package.json not found, skipping merge')
@@ -137,10 +137,10 @@ export default defineNuxtConfig({
   },
   nitro: {
     rollupConfig: {
-    // the reason to skip this is because when nuxt build the dependency tree sharp will add multiple native libraries:
-    // "@img/sharp-libvips-linux-arm64", "@img/sharp-libvips-linux-x64",
-    // "@img/sharp-linux-arm64", "@img/sharp-linux-x64"
-    // those libs shouldn't be included in final package.json (we manually add sharp in our package.json)
+      // the reason to skip this is because when nuxt build the dependency tree sharp will add multiple native libraries:
+      // "@img/sharp-libvips-linux-arm64", "@img/sharp-libvips-linux-x64",
+      // "@img/sharp-linux-arm64", "@img/sharp-linux-x64"
+      // those libs shouldn't be included in final package.json (we manually add sharp in our package.json in the close hook up there)
       external: ['sharp', 'sqlite3']
     },
     inlineDynamicImports: true,

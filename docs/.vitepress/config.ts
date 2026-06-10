@@ -17,39 +17,40 @@ export default defineConfig({
   vue: {
     template: {
       compilerOptions: {
-        isCustomElement: (tag: string) => tag.startsWith('gancio-'),
-      },
-    },
-  },
-  title: "Gancio",
-  description: "A shared agenda for local communities",
-  markdown: {
-      config: md => {
-          md.use(imageFigures, { figcaption: true })
+        isCustomElement: (tag: string) => tag.startsWith('gancio-')
       }
+    }
+  },
+  title: 'Gancio',
+  description: 'A shared agenda for local communities',
+  markdown: {
+    config: (md) => {
+      md.use(imageFigures, { figcaption: true })
+    }
   },
   themeConfig: {
     logo: {
       light: '/assets/gancio-dark.png',
       dark: '/assets/gancio-light.png',
-      alt: 'Gancio',
+      alt: 'Gancio'
     },
     lastUpdated: {
       formatOptions: {
         dateStyle: 'long'
-      },
+      }
     },
     editLink: {
       text: 'Edit this page',
-      pattern: 'https://framagit.org/les/gancio/-/edit/main/docs/:path',
+      pattern: 'https://framagit.org/les/gancio/-/edit/main/docs/:path'
     },
     search: {
-      provider: 'local',
+      provider: 'local'
     },
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Instances', link: '/instances' },
       { text: 'Changelog', link: '/changelog' },
+      { text: 'Blog', link: '/blog/', activeMatch: '/blog' }
     ],
 
     sidebar: [
@@ -73,7 +74,7 @@ export default defineConfig({
           { text: 'Plugins', link: '/usage/plugins' },
           { text: 'Custom CSS', link: '/usage/custom_css' },
           { text: 'Custom JS', link: '/usage/custom_js' },
-          { text: 'CLI', link: '/usage/cli' },
+          { text: 'CLI', link: '/usage/cli' }
         ]
       },
       {
@@ -85,17 +86,17 @@ export default defineConfig({
           { text: 'Backup', link: '/install/backup' },
           { text: 'Configuration', link: '/install/configuration' },
           { text: 'Nominatim', link: '/install/nominatim' },
-          { text: 'Nginx', link: '/install/nginx' },
+          { text: 'Nginx', link: '/install/nginx' }
         ]
       },
-            {
+      {
         text: 'Hacking', link: '/dev/',
         items: [
           { text: 'Code', link: '/dev/code' },
           { text: 'Internationalization', link: '/dev/locales' },
           { text: 'Plugins', link: '/dev/plugin' },
           { text: 'API', link: '/dev/api' },
-          { text: 'Federation', link: '/dev/federation' },
+          { text: 'Federation', link: '/dev/federation' }
         ]
       },
       { text: 'About', link: '/about' },

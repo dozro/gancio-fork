@@ -6,6 +6,7 @@ import { randomBytes } from 'crypto'
 import { fileURLToPath } from 'url'
 
 export const isBuild = process.env.NODE_ENV === 'production'
+export const isTest = process.env.VITEST == 'true'
 
 export const ProxyAuthSchema = z.object({
   username: z.string().optional().default(''),
@@ -85,7 +86,6 @@ export function runtimeResolve(path: string) {
 }
 
 // read the .env
-const isTest = !!process.env.VITEST
 dotenv.config({ quiet: true, path: isTest ? '.env.test' : '.env' })
 
 const dialect = DialectSchema.parse(process.env.GANCIO_DB_DIALECT || 'sqlite3')
@@ -152,7 +152,7 @@ export function get(): Config {
 
   // read configuration file
   let configuration = {}
-  const config_path = absolutizePath(process.env.config_path || './config.json')
+  const config_path = absolutizePath(process.env.config_path || (isTest ? './config.test.json' : './config.json'))
   if (fs.existsSync(config_path)) {
     console.warn(`Reading configuration from: ${config_path}`)
     const configContent = fs.readFileSync(config_path, 'utf-8')

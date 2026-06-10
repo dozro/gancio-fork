@@ -61,18 +61,18 @@ export function now() {
 }
 
 export const admin = JSON.stringify({ email: 'admin', password: 'password', grant_type: 'password', client_id: 'self' })
-let cookie = '' // : string | null
+let cookie: string | null = ''
 let token: string | null
 // // let app
 // // let places = []
 // // let event_id: number
 
 // // type AuthType = 'cookie' | 'jwt' | 'none'
-export function setCookie(c) {
+export function setCookie(c: string | null) {
   cookie = c
 }
 
-export function setToken(t) {
+export function setToken(t: string) {
   token = t
 }
 
@@ -103,12 +103,13 @@ export async function fetchWithAuth(
   authType = 'cookie', // : AuthType = 'cookie',
   contentType = 'application/json' // : 'application/json' | 'multipart/form-data' = 'application/json'
 ) {
-  let headers = {} // : Record<string, string> = {}
+  let headers: Record<string, string> = {} // : Record<string, string> = {}
   // let authHeader: string | undefined
 
   if (authType === 'cookie') {
     if (!cookie) {
       await login()
+      if (!cookie) return
     }
     headers['cookie'] = cookie
   } else if (authType === 'jwt' && token) {

@@ -5,7 +5,9 @@ async function waitForServer() {
     try {
       const res = await fetch('/api/utils/ping')
       if (res.data === 'ready') return
-    } catch { }
+    } catch (e) {
+      console.error(e)
+    }
 
     await new Promise(r => setTimeout(r, 300))
   }

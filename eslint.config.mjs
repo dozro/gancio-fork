@@ -7,8 +7,10 @@ export default withNuxt([
   globalIgnores([
     'wp-plugin/js/',
     'server/migrations/',
-    'docs/',
-    'tests/'
+    'docs/.vitepress/cache/',
+    'docs/.vitepress/dist/',
+    'docs/assets',
+    'plugins/**/*.js'
   ]),
   stylistic.configs.recommended,
   ...vuetify.configs['flat/base'],
@@ -33,7 +35,7 @@ export default withNuxt([
       '@stylistic/space-before-function-paren': 'off',
       '@stylistic/eol-last': 'off',
       '@stylistic/comma-dangle': ['error', 'never'],
-      '@stylistic/operator-linebreak': 'off',
+      '@stylistic/operator-linebreak': 'off'
     }
   }
 

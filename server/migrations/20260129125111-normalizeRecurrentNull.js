@@ -1,4 +1,3 @@
-import { DataTypes } from '@sequelize/core'
 
 export async function up({ context: queryInterface }) {
   const dialect = queryInterface.sequelize.getDialect()
