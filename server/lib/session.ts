@@ -7,11 +7,11 @@ export type UserSession = { id: number, email: string, role: UserRole }
 const sessionOptions: SessionConfig = {
   maxAge: 60 * 60 * 24 * 365,
   name: 'nuxt-session',
-  password: process.env.NUXT_SESSION_PASSWORD!,
+  password: process.env.SESSION_PASSWORD!,
   cookie: {
+    httpOnly: true,
     sameSite: 'lax',
     secure: isBuild
-    // expires: DateTime.now().plus({ year: 1 }).toJSDate()
   }
 }
 
@@ -22,6 +22,8 @@ export async function setUserSession(event: H3Event, user: UserSession) {
 }
 
 export async function getUserSession(event: H3Event) {
+  const cookie = getCookie(event, 'nuxt-session')
+  if (!cookie) return
   const session = await useSession(event, sessionOptions)
   return session.data?.user
 }

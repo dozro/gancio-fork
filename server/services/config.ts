@@ -139,7 +139,7 @@ const defaultConfig: Config = {
       pass: process.env.SMTP_PASSWORD || ''
     }
   },
-  session_password: isBuild ? process.env.SESSION_PASSWORD || '' : randomBytes(32).toString('base64')
+  session_password: process.env.NUXT_SESSION_PASSWORD || process.env.SESSION_PASSWORD
 }
 
 /**
@@ -172,8 +172,7 @@ export function get(): Config {
       fs.writeFileSync(config_path, JSON.stringify(config, null, 2))
       return config
     }
-    // nuxt-auth uses NUXT_SESSION_PASSWORD env var
-    process.env.NUXT_SESSION_PASSWORD = config.session_password
+    process.env.SESSION_PASSWORD = config.session_password
     return config
   } catch (e) {
     console.error('Configuration error:', e)
