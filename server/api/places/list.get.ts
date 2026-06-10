@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 import { fn, col, literal } from '@sequelize/core'
 import { Event, Place } from '~~/server/services'
 import { placeToJSON } from '~~/server/services/places'
@@ -9,7 +9,7 @@ import { placeToJSON } from '~~/server/services/places'
  * @auth
  */
 export default defineEventHandler(async (evt) => {
-  await requireAdminSession(evt)
+  await requireAdmin(evt)
   const places = await Place.findAll({
     order: [[literal('eventCount'), 'DESC']],
     attributes: ['name', 'address', 'latitude', 'longitude', 'id', 'ap_id',

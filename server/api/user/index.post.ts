@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody, createError } from 'h3'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 import { User, enqueueMail, publicSettings } from '../../services'
 import { useLogger } from '~~/server/lib/logger'
 /**
@@ -15,7 +15,7 @@ import { useLogger } from '~~/server/lib/logger'
  * @returns status `400` if user creation fails (e.g. email already exists)
  */
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
   const log = useLogger('user')
 
   const newUser = await readBody(event)

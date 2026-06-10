@@ -1,5 +1,5 @@
 import { defineEventHandler, getRouterParam, createError } from 'h3'
-import { requireUser } from '~~/server/lib/session'
+import { requireUser } from '~~/server/lib/auth'
 import { useLogger } from '~~/server/lib/logger'
 import { Event } from '~~/server/services'
 import { canModifyEvent } from '~~/server/services/events'
@@ -15,7 +15,6 @@ export default defineEventHandler(async (evt) => {
 
   const user = await requireUser(evt)
   const event = await Event.findByPk(id)
-
   if (!event) {
     log.warn(`Not found ${id}`)
     throw createError({ statusCode: 404 })

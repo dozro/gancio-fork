@@ -1,6 +1,6 @@
 import { defineEventHandler, createError, getRouterParam, readBody } from 'h3'
 import { useLogger } from '~~/server/lib/logger'
-import { requireSessionRole } from '~~/server/lib/session'
+import { requireRole } from '~~/server/lib/auth'
 import { Event } from '~~/server/services'
 
 /**
@@ -12,7 +12,7 @@ export default defineEventHandler(async (evt) => {
   const log = useLogger('event:assign_to_author')
   const id = getRouterParam(evt, 'id')
 
-  await requireSessionRole(evt, ['editor', 'admin'])
+  await requireRole(evt, ['editor', 'admin'])
   const event = await Event.findByPk(id)
   if (!event) {
     log.warn(`Not found ${id}`)

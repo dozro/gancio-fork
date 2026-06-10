@@ -1,10 +1,10 @@
 import { defineEventHandler } from 'h3'
 import { Event, Tag } from '~~/server/services'
 import { fn, col } from '@sequelize/core'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 
 export default defineEventHandler(async (evt) => {
-  await requireAdminSession(evt)
+  await requireAdmin(evt)
   const tags = await Tag.findAll({
     order: [[fn('COUNT', col('tag')), 'DESC']],
     attributes: ['tag', [fn('COUNT', col('tag')), 'count']],

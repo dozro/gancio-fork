@@ -1,8 +1,8 @@
 import z from 'zod'
 import { defineEventHandler, getRouterParam, readValidatedBody } from 'h3'
-import { requireAdminSession } from '~~/server/lib/session'
 import { useLogger } from '~~/server/lib/logger'
 import { Announcement } from '~~/server/services'
+import { requireAdmin } from '~~/server/lib/auth'
 
 const schema = z.object({
   title: z.string().min(1).max(100),
@@ -11,7 +11,7 @@ const schema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
   const log = useLogger('announcement put')
   const id = getRouterParam(event, 'id')
   const body = await readValidatedBody(event, schema.parse)

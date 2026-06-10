@@ -1,10 +1,10 @@
 import { defineEventHandler, createError, getRouterParam } from 'h3'
+import { requireAdmin } from '~~/server/lib/auth'
 import { useLogger } from '~~/server/lib/logger'
-import { requireAdminSession } from '~~/server/lib/session'
 import { Event } from '~~/server/services'
 
 export default defineEventHandler(async (evt) => {
-  await requireAdminSession(evt)
+  await requireAdmin(evt)
   const log = useLogger('event delete')
   const id = getRouterParam(evt, 'id')
 

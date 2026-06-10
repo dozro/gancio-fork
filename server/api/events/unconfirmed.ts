@@ -2,7 +2,7 @@ import { defineEventHandler, createError } from 'h3'
 import { DateTime } from 'luxon'
 import { Place, Message, Event } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
-import { requireUser } from '~~/server/lib/session'
+import { requireUser } from '~~/server/lib/auth'
 
 export default defineEventHandler(async (event) => {
   await requireUser(event)

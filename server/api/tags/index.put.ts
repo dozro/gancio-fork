@@ -1,7 +1,7 @@
 import { defineEventHandler, readValidatedBody, createError } from 'h3'
 import { z } from 'zod'
 import { useLogger } from '~~/server/lib/logger'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 import { Tag } from '~~/server/services'
 import { normalizeTag } from '~~/server/services/tags'
 const schema = z.object({
@@ -17,7 +17,7 @@ const schema = z.object({
  * @info rename the tag with `newTag` or merge it with an existing one, in this case all associated events will also be updated
  */
 export default defineEventHandler(async (evt) => {
-  await requireAdminSession(evt)
+  await requireAdmin(evt)
   const log = useLogger('tag update')
   const { tag, newTag: newTagStr } = await readValidatedBody(evt, schema.parse)
 

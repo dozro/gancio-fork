@@ -1,9 +1,9 @@
 import { defineEventHandler, getRouterParam, createError } from 'h3'
+import { requireAdmin } from '~~/server/lib/auth'
 import { Collection } from '~~/server/services'
-import { requireAdminSession } from '~~/server/lib/session'
 
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
   const id = getRouterParam(event, 'id')
 
   const collection = await Collection.findByPk(id)

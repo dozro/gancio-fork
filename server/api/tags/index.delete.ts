@@ -1,6 +1,6 @@
 import { defineEventHandler, createError, readValidatedBody } from 'h3'
 import { useLogger } from '~~/server/lib/logger'
-import { requireAdminSession } from '~~/server/lib/session'
+import { requireAdmin } from '~~/server/lib/auth'
 import { Tag } from '~~/server/services'
 import { z } from 'zod'
 const schema = z.object({
@@ -13,7 +13,7 @@ const schema = z.object({
  * @param {string} tag - Original tag
  */
 export default defineEventHandler(async (evt) => {
-  await requireAdminSession(evt)
+  await requireAdmin(evt)
   const log = useLogger('tag remove')
   const { tag: tagName } = await readValidatedBody(evt, schema.parse)
 

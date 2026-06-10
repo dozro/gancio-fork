@@ -95,19 +95,36 @@ The event card fallback image is an example => [`server/routes/fallbackimage.png
 
 ## Authentication
 
-There are some utilities to manage authentication via cookies and via JWT token.
+There are some utilities to manage authentication and authorization in the server.
+
+```ts
+import { requireAdmin, requireUser, requireRole, isRole } from '~~/server/lib/auth'
+import { getUser } from '~~/server/lib/getUser'
+```
+
+::: tip
+`getUser` is in a different file because it is easier to mock it in tests
+:::
 
 ### Require an admin user
 
-`await requireAdminSession(event)`
+`await requireAdmin(event)`
 
 ### Get current logged user
 
-`const { user } = await getUser(event)`
+`const user = await getUser(event)`
 
 ### Require a logged user
 
-`const { user } = await requireUserSession(event)`
+`const user = await requireUser(event)`
+
+### Require a specific role
+
+`const user = await requireRole(event, 'editor')`
+
+### Check if user has a specific role
+
+`const hasRole = await isRole(event, 'editor')`
 
 ### Documenting API
 

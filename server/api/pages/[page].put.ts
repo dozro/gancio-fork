@@ -1,9 +1,9 @@
 import { defineEventHandler, readBody, getRouterParam, createError } from 'h3'
+import { requireAdmin } from '~~/server/lib/auth'
 import { Page } from '~~/server/services'
-import { requireAdminSession } from '~~/server/lib/session'
 
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
   const page_id = Number(getRouterParam(event, 'page'))
   const body = await readBody(event)
   const page = await Page.findByPk(page_id)

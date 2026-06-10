@@ -1,15 +1,15 @@
 import { defineEventHandler, getValidatedQuery } from 'h3'
-import { requireAdminSession } from '~~/server/lib/session'
 import type { WhereOptions } from '@sequelize/core'
 import { z } from 'zod'
 import { APUser, Instance } from '~~/server/services'
+import { requireAdmin } from '~~/server/lib/auth'
 
 const schema = z.object({
   instance: z.string().optional()
 })
 
 export default defineEventHandler(async (event) => {
-  await requireAdminSession(event)
+  await requireAdmin(event)
   const query = await getValidatedQuery(event, schema.parse)
 
   const where: WhereOptions<APUser> = {}

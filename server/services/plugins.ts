@@ -13,6 +13,8 @@ import type { PluginSettings, Settings } from '~~/shared/types/settings'
 import { findOrCreateTags } from './tags'
 import emitter from '../lib/emitter'
 import { getEvents, upsertEvent } from './events'
+import { getUser } from '../lib/getUser'
+import { isRole, requireAdmin, requireRole, requireUser } from '../lib/auth'
 
 const log = useLogger('plugins')
 
@@ -51,6 +53,11 @@ export interface GancioContext {
     findOrCreateTags: typeof findOrCreateTags
     upsertEvent: typeof upsertEvent
     getEvents: typeof getEvents
+    getUser: typeof getUser
+    requireAdmin: typeof requireAdmin
+    isRole: typeof isRole
+    requireRole: typeof requireRole
+    requireUser: typeof requireUser
   }
 }
 
@@ -174,7 +181,12 @@ const pluginController = {
           TaskManager: useTaskManager(),
           findOrCreateTags,
           upsertEvent,
-          getEvents
+          getEvents,
+          requireAdmin,
+          requireRole,
+          requireUser,
+          getUser,
+          isRole
         }
       })
       log.debug(`Imported plugin ${pluginPath}`)

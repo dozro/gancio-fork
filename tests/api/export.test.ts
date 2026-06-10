@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { $fetchRaw as fetch } from 'nitro-test-utils/e2e'
-import { fetchWithAuth, now } from './setup'
+// import { fetchWithAuth, now } from './setup'
 
 describe('Export', () => {
   it('should export an rss feed', async () => {

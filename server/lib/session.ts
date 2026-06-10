@@ -1,49 +1,53 @@
-import { type H3Event, useSession, createError } from 'h3'
-import type { UserRole } from '../services/db'
-import { getUser } from './getUser'
+import { type H3Event, useSession, type SessionConfig, getCookie } from 'h3'
+import { OAuthToken, User, type UserRole } from '../services/db'
+import { isBuild } from '../services/config'
 
 export type UserSession = { id: number, email: string, role: UserRole }
 
-export async function setSession(event: H3Event, user: UserSession) {
-  const session = await useSession(event, { password: process.env.NUXT_SESSION_PASSWORD!, name: 'nuxt-session' })
-  await session.update(user)
+const sessionOptions: SessionConfig = {
+  maxAge: 60 * 60 * 24 * 365,
+  name: 'nuxt-session',
+  password: process.env.NUXT_SESSION_PASSWORD!,
+  cookie: {
+    sameSite: 'lax',
+    secure: isBuild
+    // expires: DateTime.now().plus({ year: 1 }).toJSDate()
+  }
+}
+
+export async function setUserSession(event: H3Event, user: UserSession) {
+  const session = await useSession(event, sessionOptions)
+  await session.update({ user: { id: user.id, email: user.email, role: user.role } })
   return session.data
 }
 
-/**
- * Require an user to be authenticated (via cookie or JWT token)
- */
-export async function requireUser(event: H3Event) {
-  const user = await getUser(event)
-  if (!user) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
-
-  return user
+export async function getUserSession(event: H3Event) {
+  const session = await useSession(event, sessionOptions)
+  return session.data?.user
 }
 
-// require current user role to be one of the specified
-export async function requireSessionRole(evt: H3Event, roles: UserRole[] | UserRole) {
-  const user = await isSessionRole(evt, roles)
-  if (!user) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
-  return user
+export async function clearUserSession(event: H3Event) {
+  const session = await useSession(event, sessionOptions)
+  await session.clear()
 }
 
-// check if current user role is one of specified
-export async function isSessionRole(evt: H3Event, roles: UserRole[] | UserRole) {
-  const user = await getUser(evt)
-  if (!user) return
-  if (!Array.isArray(roles)) {
-    roles = [roles]
-  }
-  return roles.includes(user?.role) ? user : false
-}
+export async function getLegacyUserSession(event: H3Event) {
+  // in gancio legacy code, we store tokens inside oauth_tokens table, so we can check if the token is valid and get the user id from there
+  // this is not the best way to do it, but it allows us to keep using the same tokens for a while without breaking existing clients
+  const tokenCookie = getCookie(event, 'auth._token.local')
+  if (!tokenCookie) return
+  const accessToken = tokenCookie?.split(' ')?.[1]
+  if (!accessToken) return
+  const token = await OAuthToken.findByPk(accessToken, {
+    include: [{
+      required: true, where: { is_active: true },
+      model: User, attributes: { exclude: ['password'] }
+    }]
+  })
 
-/**
- * Require an admin session, throw a 401 error if the user is not logged in
- */
-export async function requireAdminSession(evt: H3Event) {
-  return requireSessionRole(evt, 'admin')
+  // if token is valid and active, issue a new session
+  if (token && token.user && token.user.is_active) {
+    await setUserSession(event, token.user)
+    return token.user
+  }
 }
