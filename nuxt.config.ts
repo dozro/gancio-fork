@@ -143,6 +143,9 @@ export default defineNuxtConfig({
       // those libs shouldn't be included in final package.json (we manually add sharp in our package.json in the close hook up there)
       external: ['sharp', 'sqlite3']
     },
+    imports: {
+      autoImport: false
+    },
     inlineDynamicImports: true,
     esbuild: {
       options: {
