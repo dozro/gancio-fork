@@ -69,7 +69,13 @@
   --vp-c-danger-2: var(--vp-c-red-2);
   --vp-c-danger-3: var(--vp-c-red-3);
   --vp-c-danger-soft: var(--vp-c-red-soft);
+
+  /*--vp-c-bg: rgba(255, 62, 62, 0.1);*/
+  /*--vp-c-bg-alt: #f9f2ec;   /* sidebar, code blocks, etc. */
+  
 }
+
+.v-application { background: transparent !important; }
 
 /**
  * Component: Button
