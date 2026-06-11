@@ -19,14 +19,14 @@ const vuetify = createVuetify({
       dark: {
         dark: true,
         colors: {
-          primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00',
+          primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00'
         }
       },
       light: {
         dark: false,
         colors: {
           surface: '#f8f8f8',
-          primary: '#FF4500', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00',
+          primary: '#FF4500', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00'
         }
       }
     }
@@ -122,8 +122,7 @@ const vuetify = createVuetify({
 export default {
   extends: DefaultTheme,
   Layout: MyLayout,
-  enhanceApp({ app, router, siteData }) {
+  enhanceApp({ app }) {
     app.use(vuetify)
-
   }
 } satisfies Theme

@@ -20,15 +20,15 @@ features:
   - title: Latest stable 1.28.2
     details: Stable and production ready.
     link: https://gancio.org/v1/install
-  - title: Alpha release 2.0.0-alpha.10
-    details: 22 May 2026
+  - title: Beta release 2.0.0-beta.1
+    details: 12 June 2026
     link: ./changelog
 
 ---
 
-::: warning Warning
-This is the documentation for the alpha release of Gancio 2.0, if you are looking for the old documentation, please refer to [v1 documentation](https://gancio.org/v1).
-We suggest you to use this release for new instances but please do not upgrade existing ones yet.
+::: warning :warning: Warning
+This is the documentation for the alpha release of Gancio 2.0, if you are looking for the old documentation, please refer to [v1 documentation](https://gancio.org/v1).  
+Please use this v2 release for new instances <u>**but please do not upgrade existing ones yet**</u>.
 :::
 
 

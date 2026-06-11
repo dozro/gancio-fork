@@ -12,7 +12,6 @@ aside: false
   })
 </script>
 # Instances
-
 <v-text-field v-model="search" placeholder="Search..." />
 <section id="instances">
   <v-card v-for="instance in filteredInstances" :key="instance.url"

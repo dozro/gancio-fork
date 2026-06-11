@@ -1,10 +1,3 @@
-<!--# ---
-# layout: default
-# title: Contacts
-# permalink: /contacts
-# nav_order: 9
-# ----->
-
 # Contacts
 
 
