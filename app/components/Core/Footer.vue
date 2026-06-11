@@ -6,7 +6,7 @@ const config = useRuntimeConfig()
 const { t } = useI18n()
 const showFollowMe = ref<boolean>(false)
 
-const { data: trusted_sources } = await useFetch('/api/ap_actors/trusted', { lazy: true })
+const { data: trusted_sources } = await useFetch('/api/ap_actors/trusted', { lazy: true, immediate: false })
 const footerLinks = computed(() => settings.value.footerLinks?.map((link) => {
   if (/^https?:\/\//.test(link.href)) {
     return { href: link.href, label: link.label.startsWith('common.') ? t(link.label) : link.label }
