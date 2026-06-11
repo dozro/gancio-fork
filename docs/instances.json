@@ -596,5 +596,14 @@
     "summary": "Bogotá",
     "timezone": "America/Bogota",
     "handler": "agenda@autonoma.red"
+  },
+  {
+    "name": "Agenda Subterrania",
+    "url": "https://agenda.subterrania.es",
+    "logo": "https://agenda.subterrania.es/logo.png",
+    "place": "(Cantabria, Spain)",
+    "summary": "Agenda colaborativa de conciertos y eventos independientes en Cantabria",
+    "timezone": "Europe/Madrid",
+    "handler": "agenda@agenda.subterrania.es"
   }
 ]
