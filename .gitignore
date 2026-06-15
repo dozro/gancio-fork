@@ -114,3 +114,6 @@ dist
 
 # Service worker
 sw.*
+
+# OpenAPI
+openapi.json
