@@ -53,7 +53,7 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
   <div class="mt-md-4 mb-8">
     <CoreSettings :menu-items="menuItems" :title="$t('common.admin')" query-param="view">
       <CoreSettingsView value="settings">
-        <AdminSettings />
+        <LazyAdminSettings />
       </CoreSettingsView>
 
       <CoreSettingsView value="users">
@@ -61,7 +61,7 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
       </CoreSettingsView>
 
       <CoreSettingsView value="events">
-        <AdminEvents
+        <LazyAdminEvents
           :unconfirmed-events='unconfirmedEvents?.events'
           :unconfirmed-old-events='unconfirmedEvents?.oldEvents'
           @confirmed='refresh'
@@ -70,43 +70,43 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
       </CoreSettingsView>
 
       <CoreSettingsView value='collections'>
-        <AdminCollections />
+        <LazyAdminCollections />
       </CoreSettingsView>
 
       <CoreSettingsView value='federation'>
-        <AdminFederation />
+        <LazyAdminFederation />
       </CoreSettingsView>
 
       <CoreSettingsView value='moderation'>
-        <AdminModeration />
+        <LazyAdminModeration />
       </CoreSettingsView>
 
       <CoreSettingsView value='places'>
-        <AdminPlaces />
+        <LazyAdminPlaces />
       </CoreSettingsView>
 
       <CoreSettingsView value='tags'>
-        <AdminTags />
+        <LazyAdminTags />
       </CoreSettingsView>
 
       <CoreSettingsView value='theme'>
-        <AdminTheme />
+        <LazyAdminTheme />
       </CoreSettingsView>
 
       <CoreSettingsView value='geolocation'>
-        <AdminGeolocation />
+        <LazyAdminGeolocation />
       </CoreSettingsView>
 
       <CoreSettingsView value='announcements'>
-        <AdminAnnouncements />
+        <LazyAdminAnnouncements />
       </CoreSettingsView>
 
       <CoreSettingsView value='pages'>
-        <AdminPages />
+        <LazyAdminPages />
       </CoreSettingsView>
 
       <CoreSettingsView value='plugins'>
-        <AdminPlugin />
+        <LazyAdminPlugin />
       </CoreSettingsView>
     </CoreSettings>
   </div>
