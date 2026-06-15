@@ -13,7 +13,7 @@ RUN npm run build:prod
 FROM node:24-alpine AS deps
 WORKDIR /app
 RUN corepack enable
-COPY --from=builder /app/.pack/package.json ./
+COPY --from=builder /app/.pack/package.json /app/pnpm-workspace.yaml ./
 RUN pnpm install
 
 # using the same build to create the npm package
