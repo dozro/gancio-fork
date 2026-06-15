@@ -28,7 +28,7 @@ features:
 
 ::: warning :warning: Warning
 This is the documentation for the alpha release of Gancio 2.0, if you are looking for the old documentation, please refer to [v1 documentation](https://gancio.org/v1).  
-Please use this v2 release for new instances <u>**but please do not upgrade existing ones yet**</u>.
+Please use this v2 release for new instances <u>**but do not upgrade existing ones yet**</u>.
 :::
 
 

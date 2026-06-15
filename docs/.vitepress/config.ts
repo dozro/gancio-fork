@@ -61,7 +61,7 @@ export default defineConfig({
     nav: [
       { text: 'Instances', link: '/instances' },
       { text: 'Changelog', link: '/changelog' },
-      { text: 'Blog', link: '/blog/', activeMatch: '/blog' }
+      { text: 'Blog', link: '/blog', activeMatch: '/blog' }
     ],
 
     sidebar: [

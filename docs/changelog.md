@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.2](https://framagit.org/les/gancio/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2026-06-15)
+
+
+### Features
+
+* lazy load settings views ([bd2ca9b](https://framagit.org/les/gancio/commit/bd2ca9be015db33db52795d26998a79babced65f))
+
 ## [2.0.0-beta.1](https://framagit.org/les/gancio/compare/v2.0.0-alpha.11...v2.0.0-beta.1) (2026-06-11)
 
 
