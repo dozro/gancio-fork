@@ -14,10 +14,10 @@ gpg --pinentry-mode loopback --passphrase `pass underscore/pgp`  --detach-sign -
 mv ./releases/* "./docs/public/releases/"
 
 # symlink the latest release to nightly
-rm -f "./docs/public/releases/nightly.tgz"
-rm -f "./docs/public/releases/nightly.tgz.sig"
-ln -s "./gancio-$VERSION.tgz" "./docs/public/releases/nightly.tgz"
-ln -s "./gancio-$VERSION.tgz.sig" "./docs/public/releases/nightly.tgz.sig"
+rm -f "./docs/public/releases/beta.tgz"
+rm -f "./docs/public/releases/beta.tgz.sig"
+ln -s "./gancio-$VERSION.tgz" "./docs/public/releases/beta.tgz"
+ln -s "./gancio-$VERSION.tgz.sig" "./docs/public/releases/beta.tgz.sig"
 
 pnpm docs:build
 rsync -avz docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2/

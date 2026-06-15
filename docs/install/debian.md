@@ -23,7 +23,7 @@ sudo adduser --group --system --shell /bin/false --home /opt/gancio gancio
 
 1. Install Gancio
 ```bash
-sudo npm --global add https://gancio.org/v2/latest.tgz
+sudo npm --global add https://gancio.org/releases/beta.tgz
 ```
 
 <!-- #### Choose you database (sqlite, postgresql, mariadb, mysql)

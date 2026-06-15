@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.1](https://framagit.org/les/gancio/compare/v2.0.0-alpha.11...v2.0.0-beta.1) (2026-06-11)
+
+
+### Bug Fixes
+
+* preload users session in SSR and session pwd in dev mode ([750dd87](https://framagit.org/les/gancio/commit/750dd87ce9fb48b1f2b925b232804979041b213f))
+
 ## [2.0.0-alpha.11](https://framagit.org/les/gancio/compare/v2.0.0-testing...v2.0.0-alpha.11) (2026-06-03)
 
 
