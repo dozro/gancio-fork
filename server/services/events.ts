@@ -4,10 +4,10 @@ import { Op, literal, col, where, fn, sql, or, SQL_NULL, JSON_NULL } from '@sequ
 import { useLogger } from '../lib/logger'
 import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
-import type { EventAPI, Media, User } from '~~/shared/types/generic'
+import type { EventAPI, Media } from '~~/shared/types/generic'
 import { type H3Event, createError } from 'h3'
 import { createHash } from 'crypto'
-import { Place, Tag, Event, Message, RecurrentSchema, type EventStatus } from './db'
+import { Place, Tag, Event, Message, User, RecurrentSchema, type EventStatus } from './db'
 import { publicSettings, secretSettings } from './settings'
 import type { UserSession } from '../lib/session'
 import { EventStatusEnum, PostalAddressSchema, type APAttachment, type APEvent, type APLocation, type APTag } from '../federation/types'
@@ -311,6 +311,34 @@ export async function upsertEvent(payload: unknown, user?: InferAttributes<User>
   return { event, place, tags }
 }
 
+export async function getEventBySlugOrId(slug_or_id?: string) {
+  const id = Number(slug_or_id)
+  const where: WhereOptions<Event> = isNaN(id) || !Number.isInteger(id)
+    ? { slug: slug_or_id }
+    : { [Op.or]: [{ slug: slug_or_id }, { id }] }
+
+  const event = await Event.findOne({
+    where,
+    attributes: {
+      exclude: ['createdAt', 'placeId', 'apUserApId']
+    },
+    include: [
+      { model: Tag, required: false, attributes: ['tag'], through: { attributes: [] } },
+      { model: Place, attributes: ['name', 'address', 'latitude', 'longitude', 'id', 'ap_id'] },
+      { model: User, required: false, attributes: ['is_active'] },
+      { model: Event, required: false, as: 'parent', attributes: ['id', 'recurrent', 'is_visible', 'start_datetime'] }
+    ]
+  })
+
+  return event
+  // TODO
+  // admin, editors and event's owner gets the number of moderation messages (could open moderation)
+  // let n_messages = 0
+  // if (isAdminOrEditor || event.userId !== user?.id) {
+  //   n_messages = await Message.count({ where: { eventId: event.id, ...(!isAdminOrEditor && { is_author_visible: true }) } }).catch(() => 0)
+  // }
+}
+
 export async function setEventMedia(eventPayload: EventAPIType): Promise<Media | undefined> {
   if (eventPayload.image || eventPayload.image_url) {
     const focalpoint = eventPayload.image_focalpoint
@@ -503,6 +531,7 @@ export function eventToAP(event: Event) {
 
   const e: APEvent = {
     '@context': [
+      'https://schema.org',
       'https://www.w3.org/ns/activitystreams',
       'https://w3id.org/fep/8a8e',
       'https://schema.org',

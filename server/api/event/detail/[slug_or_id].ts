@@ -1,14 +1,12 @@
-import { defineEventHandler, getRouterParam, getValidatedQuery, createError, setHeader } from 'h3'
+import { defineEventHandler, getRouterParam, createError, setHeader } from 'h3'
 import { getUser } from '~~/server/lib/getUser'
 
-import { Event, Place, Tag, User, mapEvent } from '~~/server/services'
-import type { WhereOptions } from '@sequelize/core'
-import { Op } from '@sequelize/core'
-import { formatSchema } from '~~/server/types/validator'
+import { mapEvent } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
 import { exportICS } from '~~/server/services/ics'
-import { canModifyEvent, eventToAP } from '~~/server/services/events'
+import { canModifyEvent, eventToAP, getEventBySlugOrId } from '~~/server/services/events'
 import { enableCors } from '~~/server/lib/API'
+import { preferCalendar, preferLDJSON } from '~~/server/lib/negotiator'
 
 /**
  * Get event details.
@@ -23,25 +21,7 @@ export default defineEventHandler(async (evt) => {
   const user = await getUser(evt)
 
   const slug_or_id = getRouterParam(evt, 'slug_or_id')
-  const { format } = await getValidatedQuery(evt, formatSchema.parse)
-
-  const id = Number(slug_or_id)
-  const where: WhereOptions<Event> = isNaN(id) || !Number.isInteger(id)
-    ? { slug: slug_or_id }
-    : { [Op.or]: [{ slug: slug_or_id }, { id }] }
-
-  const event = await Event.findOne({
-    where,
-    attributes: {
-      exclude: ['createdAt', 'placeId', 'apUserApId']
-    },
-    include: [
-      { model: Tag, required: false, attributes: ['tag'], through: { attributes: [] } },
-      { model: Place, attributes: ['name', 'address', 'latitude', 'longitude', 'id', 'ap_id'] },
-      { model: User, required: false, attributes: ['is_active'] },
-      { model: Event, required: false, as: 'parent', attributes: ['id', 'recurrent', 'is_visible', 'start_datetime'] }
-    ]
-  })
+  const event = await getEventBySlugOrId(slug_or_id)
 
   if (!event) {
     log.warn(`Event not found: ${slug_or_id}`)
@@ -59,12 +39,10 @@ export default defineEventHandler(async (evt) => {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 
-  if (format === 'json') {
-    return mapEvent(event, { user })
-  } else if (format === 'json-ld') {
+  if (preferLDJSON(evt)) {
     setHeader(evt, 'Content-Type', 'application/activity+json')
     return eventToAP(event)
-  } else if (format === 'ics') {
+  } else if (preferCalendar(evt)) {
     setHeader(evt, 'Content-Type', 'text/calendar')
     // last arg is alarms/reminder, ref: https://github.com/adamgibbons/ics#attributes (alarms)
     return exportICS(evt, [event], [{
@@ -73,4 +51,5 @@ export default defineEventHandler(async (evt) => {
       trigger: { hours: 1, before: true }
     }])
   }
+  return mapEvent(event, { user })
 })
