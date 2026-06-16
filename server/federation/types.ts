@@ -178,6 +178,7 @@ export const APEventSchema = z.object({
   location: z.union([APLocationSchema, z.array(APLocationSchema)]).optional(),
   tag: z.array(APTagSchema).optional(),
   published: z.iso.datetime().optional(),
+  timezone: z.string().optional(),
   signature: z.object().optional().nullable(),
   updated: z.iso.datetime().optional(),
   interactionPolicy: z.object({

@@ -547,6 +547,7 @@ export function eventToAP(event: Event) {
     location,
     attachment,
     tag,
+    'timezone': event.ap_object?.timezone ?? publicSettings.instance_timezone,
     'published': event.updatedAt.toISOString(),
     'updated': event.updatedAt.toISOString(),
     'attributedTo': event.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
