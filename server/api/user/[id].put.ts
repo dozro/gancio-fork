@@ -35,6 +35,8 @@ import { enqueueMail, User, publicSettings } from '~~/server/services'
  *         description: User has been updated.
  *       404:
  *         description: User does not exist.
+ *     security:
+ *       - bearerAuth: []
  *     tags:
  *       - Users
  */

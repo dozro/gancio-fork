@@ -43,6 +43,8 @@ import { requireUser } from '~~/server/lib/auth'
  *                   example: ""
  *       400:
  *         description: Failed to get authenticated user.
+ *     security:
+ *       - bearerAuth: []
  *     tags:
  *       - Users
  */

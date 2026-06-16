@@ -6,3 +6,10 @@ info:
 servers:
   - url: https://demo.gancio.org
     description: Demo
+components:
+  securitySchemes:
+    bearerAuth:
+      description: Bearer token using a JWT
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT
