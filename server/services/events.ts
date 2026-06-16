@@ -534,7 +534,6 @@ export function eventToAP(event: Event) {
       'https://schema.org',
       'https://www.w3.org/ns/activitystreams',
       'https://w3id.org/fep/8a8e',
-      'https://schema.org',
       'https://w3id.org/security/v1'
     ],
     'id': event.ap_id ?? `${publicSettings.baseurl}/federation/m/${event.id}`,
@@ -542,8 +541,8 @@ export function eventToAP(event: Event) {
     'url': event?.ap_object?.url ?? event?.ap_object?.id ?? `${publicSettings.baseurl}/event/${event.slug || event.id}`,
     'type': 'Event' as const,
     'eventStatus': event.status,
-    'startTime': DateTime.fromSeconds(event.start_datetime, opt).toISO() ?? '',
-    ...(event.end_datetime ? { endTime: DateTime.fromSeconds(event.end_datetime, opt).toISO() } : {}),
+    'startTime': DateTime.fromSeconds(event.start_datetime, opt).toISO({ suppressMilliseconds: true }) ?? '',
+    ...(event.end_datetime ? { endTime: DateTime.fromSeconds(event.end_datetime, opt).toISO({ suppressMilliseconds: true }) } : {}),
     ...(event.ld_signature ? { signature: event.ld_signature } : {}),
     location,
     attachment,
