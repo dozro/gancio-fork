@@ -52,10 +52,6 @@ export function sanitizeHTML(html: string) {
 //   return req.accepts('html', 'application/activity+json', 'application/ld+json') === 'html'
 // },
 
-// preferJSON (req) {
-//   return ['application/activity+json', 'application/ld+json'].includes(req.accepts('html', 'application/activity+json', 'application/ld+json'))
-// },
-
 async function readableWebToNodeStream(webStream) {
   const reader = webStream.getReader()
   return new Readable({
