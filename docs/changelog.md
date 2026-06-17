@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.3](https://framagit.org/les/gancio/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2026-06-17)
+
+
+### Features
+
+* add timezone to AP representation ([c644213](https://framagit.org/les/gancio/commit/c64421336a2242e897c4f3f2f8ccd5643841e691))
+* get AP representation of event based on Accept header ([32df4d4](https://framagit.org/les/gancio/commit/32df4d4b1a3cdcd13230dd062f6c3f5bd7a8094c))
+
+
+### Bug Fixes
+
+* suppress ms in AP event times ([890f4cd](https://framagit.org/les/gancio/commit/890f4cdf1ecedbea5c4f31e36dbeaa2b93206fff))
+
 ## [2.0.0-beta.2](https://framagit.org/les/gancio/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2026-06-15)
 
 
