@@ -23,7 +23,7 @@ sudo adduser --group --system --shell /bin/false --home /opt/gancio gancio
 
 1. Install Gancio
 ```bash
-sudo npm --global add https://gancio.org/releases/beta.tgz
+sudo npm --global add https://gancio.org/beta.tgz
 ```
 
 <!-- #### Choose you database (sqlite, postgresql, mariadb, mysql)
@@ -79,9 +79,8 @@ Backup your data is generally a good thing to do and this is especially true bef
 Don't be lazy and [backup](./backup) your data!
 :::
 
-<!--```bash
-sudo yarn global remove gancio
-sudo yarn cache clean
-sudo yarn global add --network-timeout 1000000000 --silent {{site.url}}/latest.tgz
+```bash
+sudo systemctl stop gancio
+sudo npm --global add https://gancio.org/beta.tgz
 sudo systemctl restart gancio
-``` -->
+```

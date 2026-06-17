@@ -1,6 +1,6 @@
-# Podman
+# Podman <badge type="warning">beta</badge>
 
-## Setup
+## Install podman
 Make sure to have [Podman](https://podman.io/docs/installation) and [nginx](https://nginx.org/en/docs/install.html) installed:
 
 ```bash
@@ -14,6 +14,19 @@ loginctl enable-linger `whoami`
 ```
 
 
+## Simple container
+
+Prepare the directory where data will be stored (config, logs, database, etc.) and set ownership:
+
+```bash
+mkdir -p ./data
+podman unshare chown -R 1000:1000 ./data
+```
+
+```bash
+podman run --name gancio --volume ./data:/app/data -p 127.0.0.1:13120:13120 docker.io/cisti/gancio:beta
+```
+
 ### Quadlet
 Setup Quadlet systemd unit file:
 
@@ -23,7 +36,8 @@ echo '[Unit]
 Description=Gancio
 
 [Container]
-Image=docker.io/cisti/gancio:2.0-alpha.5
+Image=docker.io/cisti/gancio:beta
+Volume=./data:/app/data
 PublishPort=127.0.0.1:13120:13120
 
 [Service]

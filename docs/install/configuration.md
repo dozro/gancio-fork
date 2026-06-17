@@ -3,10 +3,8 @@
 The configuration file shoud be a `.json` or a `.js` file and could be specified using the `--config` flag.
 
 - <small>eg. `gancio start --config ./config.json`</small>
-- <small>eg. `pm2 start gancio start -- --config ~/config.json`</small>
 
 ## Server
-This probably support unix socket too
 
 ```json
 "server": {
@@ -54,9 +52,11 @@ and then point the `user_locale` configuration to that directory (in your `confi
 Watch [here](https://framagit.org/les/gancio/tree/master/locales) for a
 list of strings you can override.
 
-> warning "Restart needed"
-> Note that a restart is needed when you change user_locale's content.
+::: warning Restart needed
+Note that a restart is needed when you change user_locale's content.
+:::
 
+<!--
 ## Proxy
 Proxy outward request from gancio.
 Look [here](https://www.npmjs.com/package/https-proxy-agent) for options.
@@ -76,4 +76,4 @@ Note: `hostname` option takes precedence over `host`.
       "X-Proxy-Header": "example"
     }
 }
-```
+```-->

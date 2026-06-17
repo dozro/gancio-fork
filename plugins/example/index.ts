@@ -42,7 +42,7 @@ export default ({ log, publicSettings, services }: GancioContext): GancioPlugin 
         description: 'My default language',
         type: 'LIST',
         items: ['it', 'en', 'fr'],
-        default: publicSettings.instance_locale || 'en'
+        default: publicSettings?.instance_locale ?? 'en'
       }
     }
 
