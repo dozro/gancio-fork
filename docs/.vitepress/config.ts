@@ -7,7 +7,6 @@ import { Feed } from 'feed'
 import { defineConfig, createContentLoader } from 'vitepress'
 // import { imagetools } from 'vite-imagetools'
 import formatPageContentForRSS from './theme/utils/formatPageContentForRSS'
-
 const formattedPagesForRSS: Record<string, string> = {}
 
 // fix dead link errors on build
@@ -15,7 +14,7 @@ process.env.VITE_EXTRA_EXTENSIONS = 'asc' // comma separated list: 'foo,bar,baz'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  base: '/v2',
+  // base: '/v2',
   vite: {
     plugins: [vuetify(),
       {
@@ -139,7 +138,7 @@ export default defineConfig({
           { text: 'Code', link: '/dev/code' },
           { text: 'Internationalization', link: '/dev/locales' },
           { text: 'Plugins', link: '/dev/plugin' },
-          { text: 'API', link: '/dev/api' },
+          // { text: 'API', link: '/dev/api' },
           { text: 'Federation', link: '/dev/federation' }
         ]
       },

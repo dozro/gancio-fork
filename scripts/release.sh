@@ -23,4 +23,4 @@ ln -s "./releases/gancio-$VERSION.tgz" "./docs/public/beta.tgz"
 ln -s "./releases/gancio-$VERSION.tgz.sig" "./docs/public/beta.tgz.sig"
 
 pnpm docs:build
-rsync -avz docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2/
+rsync -avz docs/.vitepress/dist/ cisti.web:/var/www/gancio/
