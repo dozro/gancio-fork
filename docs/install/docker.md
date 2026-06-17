@@ -1,11 +1,3 @@
-<!--# ---
-# layout: default
-# title: Docker
-# permalink: /install/docker
-# parent: Install
-# nav_order: 2
-# ----->
-
 # Docker installation
 
 ## Setup
@@ -32,7 +24,7 @@ wget {{site.url}}/docker/$DB/docker-compose.yml
 ## Start gancio
 
 ```bash
-docker run --rm  -p 13120:13120 -v ./data:/app/data -v ./.env.example:/app/.env cisti/gancio:2.0-alpha
+docker run --rm  -p 13120:13120 -v ./data:/app/data -v ./.env.example:/app/.env cisti/gancio:beta
 ```
 <!-- 
 Start your container:
