@@ -13,18 +13,18 @@ hero:
     - theme: alt
       text: Usage
       link: ./usage/
-  # image:
-  #   src: /logo.png
-  #   alt: Gancio Logo
-features:
-  - title: Latest stable 1.28.2
-    details: Stable and production ready.
-    link: https://gancio.org/v1/install
-  - title: Beta release 2.0.0-beta.1
-    details: 12 June 2026
-    link: ./changelog
-
 ---
+
+<script setup>
+  import { version, date } from '../package.json'
+</script>
+
+
+<span>{{versions}}</span>
+<div class='d-flex ga-4 w-100'>
+  <v-card class='border pa-2 flex-grow-1' title='Latest stable 1.28.2' subtitle='Stable and production ready' href='/v1/install' />
+  <v-card class='border pa-2 flex-grow-1' :title='`Beta release ${version}`' :subtitle='date' href='/changelog' />
+</div>
 
 ::: warning :warning: Warning
 This is the documentation for the alpha release of Gancio 2.0, if you are looking for the old documentation, please refer to [v1 documentation](https://gancio.org/v1).  
