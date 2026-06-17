@@ -9,7 +9,7 @@ import plugins from 'virtual:plugins'
 Plugins allow you to extend Gancio features and integrate it with other services.
 This page is a guide to install plugins, if you want to develop one instead look [here](/dev/plugin).  
 __Please note that some plugins are officially supported and distributed along with the release__
-
+<!-- 
 ## Install
 
 To install a plugin you have to:
@@ -40,7 +40,7 @@ sudo sytemctl restart gancio
 __with docker__
 ```
 docker-compose restart
-```
+``` -->
 
 # List of embedded plugins
 
