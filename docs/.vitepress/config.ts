@@ -2,7 +2,7 @@ import vuetify from 'vite-plugin-vuetify'
 import imageFigures from 'markdown-it-image-figures'
 
 import path from 'path'
-import { writeFileSync } from 'fs'
+import { writeFileSync, readdirSync, existsSync } from 'node:fs'
 import { Feed } from 'feed'
 import { defineConfig, createContentLoader } from 'vitepress'
 // import { imagetools } from 'vite-imagetools'
@@ -17,7 +17,39 @@ process.env.VITE_EXTRA_EXTENSIONS = 'asc' // comma separated list: 'foo,bar,baz'
 export default defineConfig({
   base: '/v2',
   vite: {
-    plugins: [vuetify()],
+    plugins: [vuetify(),
+      {
+        name: 'load-plugins',
+        async load(id) {
+          if (id === 'virtual:plugins') {
+            const pluginPath = path.join(__dirname, '..', '..', 'plugins')
+            const pluginsPath = readdirSync(pluginPath)
+            const plugins = await Promise.allSettled(
+              pluginsPath.map(async (p) => {
+                const indexTsPath = path.join(pluginPath, p, 'index.ts')
+                const indexJsPath = path.join(pluginPath, p, 'index.js')
+                let pr
+                if (existsSync(indexJsPath)) {
+                  pr = await import(indexJsPath)
+                } else if (existsSync(indexTsPath)) {
+                  pr = await import(indexTsPath)
+                } else if (existsSync(p) && (p.endsWith('.js') || p.endsWith('.ts'))) {
+                  pr = await import(p)
+                }
+                if (pr) {
+                  const plugin = await pr.default({ log: console.log })
+                  return plugin.manifest
+                }
+              })
+            )
+            return `export default ${JSON.stringify(plugins.map(p => p.status === 'fulfilled' ? p.value : null))}`
+          }
+          return null
+        },
+        resolveId(id) {
+          if (id === 'virtual:plugins') return id
+        }
+      }],
     ssr: {
       noExternal: ['vuetify']
     }
@@ -92,8 +124,9 @@ export default defineConfig({
         text: 'INSTALL', link: '/install/', collapsed: false,
         items: [
           { text: 'Debian', link: '/install/debian' },
+          { text: 'Podman', link: '/install/podman' },
           { text: 'Docker', link: '/install/docker' },
-          { text: 'Nixos', link: '/install/nixos' },
+          // { text: 'Nixos', link: '/install/nixos' },
           { text: 'Backup', link: '/install/backup' },
           { text: 'Configuration', link: '/install/configuration' },
           { text: 'Nominatim', link: '/install/nominatim' },

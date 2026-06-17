@@ -1,3 +1,10 @@
+---
+aside: false
+---
+<script setup>
+import plugins from 'virtual:plugins'
+</script>
+
 # Plugins
 Plugins allow you to extend Gancio features and integrate it with other services.
 This page is a guide to install plugins, if you want to develop one instead look [here](/dev/plugin).  
@@ -37,14 +44,31 @@ docker-compose restart
 
 # List of embedded plugins
 
-## Feed
-Import events from a specified ICS/iCal feed with a custom frequency.
+<section id='plugins'>
+  <v-card v-for="plugin in plugins" :key="plugin.url" :href="plugin.url" target="_blank">
+    <template #text>
+      <h4>{{ plugin.name }}</h4>
+      <span class='text-body-small font-weight-light'>
+        {{plugin.description}}
+      </span>
+      <div><span class='text-body-small font-weight-thin'>{{ plugin.author }}</span></div>
+    </template>
+  </v-card>
+</section>
 
-<!--## __Telegram__
+<style>
+  #plugins {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
 
-This plugin republishes events to Telegram channels or groups. 
-The goal is to spread the info of our networks to the capitalist cyberspace, and pull otherwise isolated people to our radical and free part of the internet.
+  #plugins > .v-card {
+    flex: 1 1 350px;
+  }
 
-- **Website**: [https://framagit.org/bcn.convocala/gancio-plugin-telegram-bridge](https://framagit.org/bcn.convocala/gancio-plugin-telegram-bridge)
-- **Release**: https://framagit.org/bcn.convocala/gancio-plugin-telegram-bridge/-/commit/af0eed7b42242ba484d9828157f1be0355bba69b
--->
+  #plugins > .v-card h4 {
+    margin: 0 0 10px 0;
+    padding: 0;
+  }
+</style>
