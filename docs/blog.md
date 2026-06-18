@@ -5,6 +5,7 @@ sidebar: false
 next: false
 prev: false
 editLink: false
+lastUpdated: false
 ---
 <script setup lang="ts">
 import { withBase } from 'vitepress'
@@ -25,6 +26,6 @@ function formatDate(date: string) {
 
 <style scoped>
 .blog-list article { margin-bottom: 2rem; }
-.blog-list article a { font-size: 2rem; font-weight: 300; }
+.blog-list article a { font-size: 2rem; font-weight: 200; }
 .meta { color: var(--vp-c-text-2); font-size: .875rem; margin: 0px; }
 </style>

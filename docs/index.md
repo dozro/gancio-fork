@@ -22,7 +22,7 @@ hero:
 
 <span>{{versions}}</span>
 <div class='d-flex ga-4 w-100'>
-  <v-card class='border pa-2 flex-grow-1' title='Latest stable 1.28.2' subtitle='Stable and production ready' href='/v1/install' />
+  <v-card class='border pa-2 flex-grow-1' title='Latest stable 1.28.2' subtitle='Stable and production ready' href='/v1/install' target='_blank' />
   <v-card class='border pa-2 flex-grow-1' :title='`Beta release ${version}`' :subtitle='date' href='/changelog' />
 </div>
 

@@ -6,7 +6,7 @@ import { writeFileSync, readdirSync, existsSync } from 'node:fs'
 import { Feed } from 'feed'
 import { defineConfig, createContentLoader } from 'vitepress'
 // import { imagetools } from 'vite-imagetools'
-import formatPageContentForRSS from './theme/utils/formatPageContentForRSS'
+import formatPageContentForRSS from './utils/formatPageContentForRSS'
 const formattedPagesForRSS: Record<string, string> = {}
 
 // fix dead link errors on build
@@ -14,7 +14,14 @@ process.env.VITE_EXTRA_EXTENSIONS = 'asc' // comma separated list: 'foo,bar,baz'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  // base: '/v2',
+  head: [
+    ['link', { rel: 'alternate', type: 'application/rss+xml', href: '/feed.rss' }],
+    ['meta', { name: 'title', content: 'Gancio' }],
+    ['meta', { name: 'og:site_name', content: 'Gancio' }],
+    ['meta', { name: 'og:locale', content: 'en' }],
+    ['meta', { name: 'fediverse:creator', content: '@gancio@mastodon.cisti.org' }],
+    ['me', { name: 'fediverse:creator', content: '@gancio@mastodon.cisti.org' }]
+  ],
   vite: {
     plugins: [vuetify(),
       {
@@ -63,7 +70,7 @@ export default defineConfig({
   title: 'Gancio',
   description: 'A shared agenda for local communities',
   cleanUrls: true,
-  ignoreDeadLinks: [/\/feed\.rss$/],
+  ignoreDeadLinks: [/\/feed\.xml/],
   markdown: {
     typographer: true,
     config: (md) => {
@@ -150,7 +157,8 @@ export default defineConfig({
 
     socialLinks: [
       { icon: 'git', link: 'https://framagit.org/les/gancio' },
-      { icon: 'activitypub', link: 'https://mastodon.cisti.org/@gancio' }
+      { icon: 'activitypub', link: 'https://mastodon.cisti.org/@gancio' },
+      { icon: 'rss', link: '/feed.xml' }
     ]
   },
   transformHtml(_code, _id, { content, pageData }) {
@@ -176,6 +184,7 @@ export default defineConfig({
     })
 
     const posts = await createContentLoader(`blog/*.md`, {
+      excerpt: true,
       render: true,
       includeSrc: true,
       transform (rawData) {
@@ -205,6 +214,6 @@ export default defineConfig({
       })
     }
 
-    writeFileSync(path.join(config.outDir, 'feed.rss'), feed.rss2())
+    writeFileSync(path.join(config.outDir, 'feed.xml'), feed.rss2())
   }
 })
