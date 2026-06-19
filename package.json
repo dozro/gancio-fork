@@ -60,6 +60,7 @@
     "test:unit": "vitest run --project unit",
     "test": "vitest run",
     "test:mariadb": "export GANCIO_DB_DIALECT=mariadb && vitest run",
+    "test:postgres": "export GANCIO_DB_DIALECT=postgres && vitest run",
     "test:dev": "vitest dev",
     "test:ui": "TZ=UTC vitest --ui --open",
     "migrate": "NODE_ENV=production sequelize db:migrate",
