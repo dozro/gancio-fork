@@ -1,6 +1,6 @@
 import { createError } from 'h3'
 import type { WhereOptions } from '@sequelize/core'
-import { JSON_NULL, Op, SQL_NULL, col, or, sql } from '@sequelize/core'
+import { Op, SQL_NULL, col, sql } from '@sequelize/core'
 import { Event, Place, Filter, Collection, Tag } from './db'
 import { DateTime } from 'luxon'
 import z from 'zod'
@@ -87,7 +87,7 @@ export async function getCollectionEvents(opts?: unknown): Promise<Event[]> {
   // init stardard filter
   const where: WhereOptions<Event> = {
     // do not include parent recurrent event
-    recurrent: or(SQL_NULL, JSON_NULL),
+    recurrent: SQL_NULL,
 
     // confirmed event only
     is_visible: true,

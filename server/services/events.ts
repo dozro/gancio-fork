@@ -89,7 +89,7 @@ export async function getEvents(opts?: unknown | undefined, user?: User): Promis
       ...(!args.show_recurrent && { parentId: null }),
 
       // include parent event
-      ...(!args.include_parent && { recurrent: or(SQL_NULL, JSON_NULL) })
+      ...(!args.include_parent && { recurrent: SQL_NULL })
     }
   ]
 

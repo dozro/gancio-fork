@@ -113,7 +113,7 @@ export async function createRecurrentOccurrence(e: Event, startAt = DateTime.loc
 export async function createRecurrent(start_datetime = DateTime.local().toUnixInteger()) {
   // select recurrent events and its children
   const events = await Event.findAll({
-    where: { is_visible: true, recurrent: { [Op.ne]: null } },
+    where: { is_visible: true, recurrent: { [Op.isNot]: null } },
     include: [{ model: Tag, required: false },
       { model: Event, as: 'children', required: false, where: { start_datetime: { [Op.gte]: start_datetime } } }],
     order: [['children', 'start_datetime', 'DESC']]
