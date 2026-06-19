@@ -21,21 +21,19 @@ describe('Tags', () => {
     expect(normalizeTag('ÜNIVERSITE ETKINLIĞI')).toBe('universiteetkinligi')
   })
 
-  it('should find or create tags', async () => {
+  it('should find or create tags removing duplicates', async () => {
     const tags = ['Tag1', 'tag1', 'TAG1']
     const result = await findOrCreateTags(tags)
     const tagNames = result.map(tag => tag.tag)
-    expect(tagNames).toHaveLength(3)
+    expect(tagNames).toHaveLength(1)
     expect(tagNames).toContain('Tag1')
-    expect(tagNames).toContain('tag1')
-    expect(tagNames).toContain('TAG1')
   })
 
   it('should return existing tag when found', async () => {
     const tags = ['TAG1']
     const result = await findOrCreateTags(tags)
     expect(result).toHaveLength(1)
-    expect(result[0].tag).toBe('TAG1')
+    expect(result[0].tag).toBe('Tag1')
   })
 
   it('should create new tag when not found', async () => {
@@ -46,11 +44,11 @@ describe('Tags', () => {
   })
 
   it('should return multiple tags when found', async () => {
-    const tags = ['tAg1', 'tag2']
+    const tags = ['tAg1', 'Tag2']
     const result = await findOrCreateTags(tags)
     expect(result).toHaveLength(2)
-    expect(result[0].tag).toBe('tAg1')
-    expect(result[1].tag).toBe('tag2')
+    expect(result[0].tag).toBe('Tag1')
+    expect(result[1].tag).toBe('Tag2')
   })
 
   it('should ignore empty tags', async () => {
@@ -86,7 +84,7 @@ describe('Tags', () => {
     })
     const result = await handleEvent(event)
     expect(result.tags).toHaveLength(3)
-    expect(result.tags).toStrictEqual(['tag1', 'Tag2', 'tAg3'])
+    expect(result.tags).toStrictEqual(['Tag1', 'Tag2', 'tAg3'])
   })
 
   it('should show no tags on non confirmed events', async () => {
@@ -109,7 +107,7 @@ describe('Tags', () => {
     const { default: handleEvent } = await import('../../server/api/tags/index.get')
     const h3event = mockH3Event({ method: 'GET' })
     const result = await handleEvent(h3event)
-    expect(result).toContain('tag1')
+    expect(result).toContain('Tag1')
     expect(result).toContain('Tag2')
     expect(result).toContain('another')
     expect(result).toHaveLength(3)
@@ -119,7 +117,7 @@ describe('Tags', () => {
     const { default: handleEvent } = await import('../../server/api/tags/index.get')
     const h3event = mockH3Event({ method: 'GET', query: { query: 'tag' } })
     const result = await handleEvent(h3event)
-    expect(result).toContain('tag1')
+    expect(result).toContain('Tag1')
     expect(result).toContain('Tag2')
     expect(result).toHaveLength(2)
   })

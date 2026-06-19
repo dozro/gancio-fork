@@ -16,18 +16,18 @@ export async function findOrCreateTags(tags: string[]) {
     return []
   }
 
-  tags = tags
-    .map(normalizeTagName)
-    .filter(tag => tag.length > 0)
-    .filter((tag, idx, arr) => arr.indexOf(tag) === idx)
+  // normalize and deduplicate tags
+  const tagsToCreate = tags
+    .filter(tag => tag?.length > 0)
+    .map(tag => ({ tag: normalizeTagName(tag), normalizedTag: normalizeTag(tag) }))
+    .filter((tag, _idx, arr) => arr.find(t => t.normalizedTag === tag.normalizedTag) === tag)
 
   // search for existing tags
-  const existingTags = await Tag.findAll({ where: { tag: { [Op.in]: tags } } })
+  const existingTags = await Tag.findAll({ where: { normalizedTag: { [Op.in]: tagsToCreate.map(t => t.normalizedTag) } } })
 
   // missing tags
-  const missing = tags
-    .filter(t => !existingTags.some(existingTag => existingTag.tag === t))
-    .map(tag => ({ tag, normalizedTag: normalizeTag(tag) }))
+  const missing = tagsToCreate
+    .filter(t => !existingTags.some(existingTag => existingTag.normalizedTag === t.normalizedTag))
 
   const createdTags = await Tag.bulkCreate(missing, { returning: true })
 
