@@ -605,5 +605,14 @@
     "summary": "Agenda colaborativa de conciertos y eventos independientes en Cantabria",
     "timezone": "Europe/Madrid",
     "handler": "agenda@agenda.subterrania.es"
+  },
+  {
+    "name": "Carbondale Community Calendar",
+    "url": "https://carbondale.info",
+    "logo": "https://www.carbondale.info/logo.png",
+    "place": "Carbondale, Illinois",
+    "summary": "A shared calendar for the alternative and diy community in Carbondale",
+    "timezone": "America/Chicago",
+    "handler": "relay@carbondale.info"
   }
 ]
