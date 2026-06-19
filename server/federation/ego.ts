@@ -65,13 +65,13 @@ export async function handleLike(message: APActivityLike, actor: APUser) {
   }
 
   // check if already liked
-  if (event.likes.includes(actor.ap_id)) {
+  if (event.likes?.includes(actor.ap_id)) {
     log.debug(`${actor.ap_id} already liked ${event.title}`)
     return
   }
 
-  log.info(`${actor.ap_id} like ${event.title} (${event.likes.length})`)
-  await event.update({ likes: [...event.likes, actor.ap_id] })
+  log.info(`${actor.ap_id} like ${event.title} (${event.likes?.length})`)
+  await event.update({ likes: [...event?.likes ?? [], actor.ap_id] })
 }
 
 export async function handleUnlike(message: APActivityUndo, actor: APUser) {
