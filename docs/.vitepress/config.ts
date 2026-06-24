@@ -7,6 +7,10 @@ import { Feed } from 'feed'
 import { defineConfig, createContentLoader } from 'vitepress'
 // import { imagetools } from 'vite-imagetools'
 import formatPageContentForRSS from './utils/formatPageContentForRSS'
+import { useSidebar } from 'vitepress-openapi'
+import spec from '../../openapi.json' with { type: 'json' }
+
+const sidebarAPI = useSidebar({ spec })
 const formattedPagesForRSS: Record<string, string> = {}
 
 // fix dead link errors on build
@@ -145,7 +149,14 @@ export default defineConfig({
           { text: 'Code', link: '/dev/code' },
           { text: 'Internationalization', link: '/dev/locales' },
           { text: 'Plugins', link: '/dev/plugin' },
-          // { text: 'API', link: '/dev/api' },
+          { text: 'API', link: '/dev/api',
+            items: sidebarAPI.generateSidebarGroups({
+              tags: ['Login', 'Users']
+            }).map(group => ({
+              ...group,
+              collapsed: true
+            }))
+          },
           { text: 'Federation', link: '/dev/federation' }
         ]
       },
