@@ -152,7 +152,7 @@ export function get(): Config {
 
   // read configuration file
   let configuration = {}
-  const config_path = absolutizePath(process.env.config_path || (isTest ? `./tests/config.${process.env.GANCIO_DB_DIALECT}.json` : './config.json'))
+  const config_path = absolutizePath(process.env.config_path || (isTest ? `./tests/config.${dialect}.json` : './config.json'))
   if (fs.existsSync(config_path)) {
     console.warn(`Reading configuration from: ${config_path}`)
     const configContent = fs.readFileSync(config_path, 'utf-8')
