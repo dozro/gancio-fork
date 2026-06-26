@@ -12,23 +12,32 @@ const bodySchema = z.object({
 })
 
 /**
- * Login via JWT
- * To interact with some API you'll need an `access_token` you'll get from this call
- * @param {string} email
- * @param {string} password
- * @return A JSON response with an `access_token` property you have to use in `Authorization: Bearer <access_token>` header for authenticated request.
- * @return A 401 HTTP Status in case of bad credentials
- * @example
- * ```js
- * const auth = { email: 'admin', password: 'my_super_secret_password' }
- * fetch("http://localhost:4000/api/login/token", {
- *   "headers": { "content-type": "application/json" },
- *   "body": auth,
- *   "method": "POST"
- * })
- * ```
+ * @openapi
+ * /api/login/token:
+ *   post:
+ *     summary: Get token
+ *     description: Login via JWT. To interact with some API you'll need an `access_token` you'll get from this call.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: admin@gancio.org
+ *               password:
+ *                 type: string
+ *                 example: my_super_secret_password
+ *     responses:
+ *       200:
+ *         description: "A JSON response with an `access_token` property you have to use in `Authorization: Bearer <access_token>` header for authenticated request."
+ *       401:
+ *         description: Bad credentials.
+ *     tags:
+ *       - Login
  */
-
 export default defineEventHandler(async (event) => {
   const log = useLogger('login via API')
   const { email, password } = await readValidatedBody(event, bodySchema.parse)
