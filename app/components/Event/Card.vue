@@ -15,6 +15,7 @@ const isPast = computed(() => {
   }
 })
 
+const isOnline = computed(() => !event?.place && event.online_locations?.length)
 const isCancelled = computed(() => event.status === 'EventCancelled')
 </script>
 
@@ -64,6 +65,16 @@ const isCancelled = computed(() => event.status === 'EventCancelled')
         <span itemprop='name'>{{ event.place.name }}</span>
       </nuxt-link>
       <div class='d-none' itemprop='address'>{{ event.place.address }}</div>
+    </div>
+    <div v-else-if='isOnline'>
+      <v-icon icon="mdi-web" class='mr-2' />
+      <nuxt-link
+        class='place p-location text-body-2 text-md-body-1'
+        :to='`/place/online`'
+        itemprop="location" itemscope itemtype="https://schema.org/Place">
+        <span itemprop='name'>online</span>
+      </nuxt-link>
+      <div class='d-none' itemprop='address'>online</div>
     </div>
 
     <div v-if='event.tags?.length' class='d-flex flex-wrap ga-1 mt-3'>
