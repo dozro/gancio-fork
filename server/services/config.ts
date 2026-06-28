@@ -29,7 +29,7 @@ const LogLevelSchema = z.enum(['fatal', 'error', 'warn', 'warning', 'normal', 'i
 
 export const DbSchema = z.object({
   dialect: DialectSchema,
-  storage: z.string().optional().transform(absolutizePath),
+  storage: z.string().transform(absolutizePath).optional(),
   host: z.string().optional(),
   port: z.coerce.number().optional(),
   user: z.string().optional(),
@@ -152,7 +152,7 @@ export function get(): Config {
 
   // read configuration file
   let configuration = {}
-  const config_path = absolutizePath(process.env.config_path || (isTest ? './config.test.json' : './config.json'))
+  const config_path = absolutizePath(process.env.config_path || (isTest ? `./tests/config.${dialect}.json` : './config.json'))
   if (fs.existsSync(config_path)) {
     console.warn(`Reading configuration from: ${config_path}`)
     const configContent = fs.readFileSync(config_path, 'utf-8')
