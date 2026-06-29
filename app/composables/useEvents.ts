@@ -1,9 +1,9 @@
 export const useEvents = () => {
   const time = useTime()
-  const settings = useState<Settings>('settings')
+  const { showRecurrent } = useShowRecurrent()
   const route = useRoute()
   const params = useState<Record<string, unknown>>('params', () => ({
-    show_recurrent: settings.value.recurrent_event_visible,
+    show_recurrent: showRecurrent.value,
     start: time.startMonth(time.currentYear(), time.currentMonth()),
     query: route.query?.query
   }))
