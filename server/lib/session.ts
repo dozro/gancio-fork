@@ -1,6 +1,7 @@
-import { type H3Event, useSession, type SessionConfig, getCookie } from 'h3'
+import { type H3Event, useSession, type SessionConfig, getCookie, getHeader, createError } from 'h3'
 import { OAuthToken, User, type UserRole } from '../services/db'
 import { isBuild } from '../services/config'
+import { verifyJwtToken } from './jwt'
 
 export type UserSession = { id: number, email: string, role: UserRole }
 
@@ -31,6 +32,16 @@ export async function getUserSession(event: H3Event) {
 export async function clearUserSession(event: H3Event) {
   const session = await useSession(event, sessionOptions)
   await session.clear()
+}
+
+export async function getBearerUserSession(event: H3Event) {
+  const tokenBearer = getHeader(event, 'authorization')
+  if (!tokenBearer) return
+  const token = tokenBearer?.split(' ')?.[1]
+  if (!token) return
+  return verifyJwtToken(token).catch(() => {
+    throw createError({ statusCode: 401, message: 'Invalid token' })
+  })
 }
 
 export async function getLegacyUserSession(event: H3Event) {
