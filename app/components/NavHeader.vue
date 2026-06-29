@@ -4,8 +4,8 @@ import { useLocale } from 'vuetify'
 const { loggedIn, user, clear } = useUserSession()
 const { $notify } = useNuxtApp()
 const theme = useAppTheme()
+const { showRecurrent, toggleShowRecurrent } = useShowRecurrent()
 const route = useRoute()
-const { params } = useEvents()
 
 const { locales, t } = useI18n()
 const { current } = useLocale()
@@ -33,12 +33,13 @@ const in_home = computed(() => route.name === 'index')
     <v-switch
       v-if='in_home'
       id='show_recurrent_switch'
-      v-model='params.show_recurrent'
+      :model-value='showRecurrent'
       class='mr-2'
       color='primary'
       true-icon='mdi-repeat'
       false-icon='mdi-repeat-off'
       hide-details
+      @update:model-value="toggleShowRecurrent"
     />
 
     <!-- TODO <t-btn icon='mdi-magnify' to='/search' tooltip='common.search' /> -->
