@@ -1,9 +1,9 @@
-import type { JWTPayload } from 'jose'
 import { jwtVerify, SignJWT } from 'jose'
+import type { UserSession } from './session'
 
-const secret = new TextEncoder().encode(process.env.NUXT_SESSION_PASSWORD)
+const secret = new TextEncoder().encode(process.env.SESSION_PASSWORD)
 
-export async function signJwt(payload: JWTPayload, expiresIn = '1m') {
+export async function signJwt(payload: UserSession, expiresIn = '1 day') {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime(expiresIn)
@@ -12,5 +12,5 @@ export async function signJwt(payload: JWTPayload, expiresIn = '1m') {
 
 export async function verifyJwtToken(token: string) {
   const { payload } = await jwtVerify(token, secret)
-  return payload
+  return payload as UserSession
 }

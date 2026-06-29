@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { cleanDatabase } from './setup'
 
 const admin = JSON.stringify({ email: 'admin', password: 'password' })
+const wrong_credentials = JSON.stringify({ email: 'admin', password: 'wrong' })
+
 let cookie: string | null
 let token: string | null
 
@@ -52,6 +54,16 @@ describe('Authentication / Authorization', async () => {
     expect(user?.email).toBe('admin')
   })
 
+  it('should not authenticate with wrong user/password', async () => {
+    const { status } = await $fetch('/api/login/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: wrong_credentials
+    })
+
+    expect(status).toBe(401)
+  })
+
   it('should authenticate with correct user/password and get JWT token', async () => {
     const { status, data } = await $fetch('/api/login/token', {
       method: 'POST',
@@ -70,5 +82,10 @@ describe('Authentication / Authorization', async () => {
     expect(status).toBe(200)
     expect(user?.email).toBe('admin')
     expect(user?.role).toBe('admin')
+  })
+
+  it('should not get user when authenticated via wrong JWT', async () => {
+    const { status } = await $fetch('/api/user', { headers: { Authorization: `Bearer a${token}` } })
+    expect(status).toBe(401)
   })
 })
