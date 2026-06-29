@@ -534,7 +534,13 @@ export function eventToAP(event: Event) {
       'https://schema.org',
       'https://www.w3.org/ns/activitystreams',
       'https://w3id.org/fep/8a8e',
-      'https://w3id.org/security/v1'
+      'https://w3id.org/security/v1',
+      {
+        quote: 'https://w3id.org/fep/044f#quote',
+        canQuote: 'gts:canQuote',
+        automaticApproval: 'gts:automaticApproval',
+        interactionPolicy: 'gts:interactionPolicy'
+      }
     ],
     'id': event.ap_id ?? `${publicSettings.baseurl}/federation/m/${event.id}`,
     'name': event.title,
