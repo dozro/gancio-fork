@@ -1,4 +1,4 @@
-import { defineEventHandler, getRouterParam, createError, setHeader } from 'h3'
+import { defineEventHandler, getRouterParam, createError, setHeader, getQuery } from 'h3'
 import { getUser } from '~~/server/lib/getUser'
 
 import { mapEvent } from '~~/server/services'

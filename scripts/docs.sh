@@ -2,5 +2,5 @@
 
 # Generate openapi.json before building docs
 
-pnpx swagger-jsdoc -d openapiDef.yaml 'server/api/*/*' -o openapi.json
+pnpx swagger-jsdoc -d openapiDef.yaml 'server/api/**/*' -o openapi.json
 vitepress $1 docs
