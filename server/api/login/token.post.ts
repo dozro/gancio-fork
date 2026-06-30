@@ -33,6 +33,14 @@ const bodySchema = z.object({
  *     responses:
  *       200:
  *         description: "A JSON response with an `access_token` property you have to use in `Authorization: Bearer <access_token>` header for authenticated request."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 access_token:
+ *                   type: string
+ *                   example: YOUR_TOKEN
  *       401:
  *         description: Bad credentials.
  *     tags:
