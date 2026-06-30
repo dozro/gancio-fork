@@ -5,3 +5,5 @@ _site
 vendor
 .vitepress/cache
 *.webm
+docker/mariadb/data
+docker/mariadb/db
