@@ -126,33 +126,26 @@ import { getUser } from '~~/server/lib/getUser'
 
 `const hasRole = await isRole(event, 'editor')`
 
-### Documenting API
+## Documenting API
 
-As you can see in the [API](/dev/api) page, there are some documented API.
-This is done via the `scripts/gendocs.js` (its quite an hack because of jsdoc/tsdoc) that parse some files in `server/api` to extract the documentation and use the `scripts/api_template.hbs` template to create the `docs/api.md` source that jekyll will parse.
+As you can see in the [API](/dev/api) section, there are some documented API endpoints. We use [swagger-jsdoc](https://github.com/Surnet/swagger-jsdoc) and
+[vitepress-openapi](https://vitepress-openapi.vercel.app/) to get these endpoints automatically documented.
 
-The HTTP method and the API routes are calculated from file path.
+To get this automated documentation ready to use, you should add the proper docstring using [OpenAPI specification](https://spec.openapis.org/oas/).
 
-````js
-/**
- * Login via JWT
- * To interact with some API you'll need an `access_token` you'll get from this call
- * @param {string} email
- * @param {string} password
- * @return A 401 HTTP Status in case of bad credentials
- * @auth
- * @see #234
- * @example
- * ```js
- * const auth = { email: 'admin', password: 'my_super_secret_password' }
- * fetch("http://localhost:4000/api/login/token", {
- *   "headers": { "content-type": "application/json" },
- *   "body": auth,
- *   "method": "POST"
- * })
- * ```
- */
+For instance:
+* See docstring for [/api/login/token (POST)](https://framagit.org/les/gancio/-/blob/main/server/api/login/token.post.ts) to get an authentication token.
+* See docstring for [/api/user (GET)](https://framagit.org/les/gancio/-/blob/main/server/api/user/index.get.ts?ref_type=heads) to get current user.
+
+You have more examples at `server/api` folder.
+
+You can check your API endpoint is right documented running:
+
+````sh
+pnpm run docs:dev
 ````
+
+Your endpoint documentation should be shown in sidebar menu, at API section.
 
 ## Task Manager / Queue scheduling
 
