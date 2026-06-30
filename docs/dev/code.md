@@ -126,7 +126,7 @@ import { getUser } from '~~/server/lib/getUser'
 
 `const hasRole = await isRole(event, 'editor')`
 
-### Documenting API
+## Documenting API
 
 As you can see in the [API](/dev/api) section, there are some documented API endpoints. We use [swagger-jsdoc](https://github.com/Surnet/swagger-jsdoc) and
 [vitepress-openapi](https://vitepress-openapi.vercel.app/) to get these endpoints automatically documented.
