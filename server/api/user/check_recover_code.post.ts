@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const user = await User.findOne({ where: { recover_code } })
   if (!user) {
     log.error('User not found')
-    throw createError({ status: 400 })
+    throw createError({ status: 404 })
   }
 
   return { email: user.email }
