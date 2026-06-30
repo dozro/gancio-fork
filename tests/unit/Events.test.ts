@@ -15,6 +15,7 @@ const { default: handleEvent } = await import('../../server/api/events/index.pos
 const { default: putHandler } = await import('../../server/api/events/[id]/index.put')
 const { default: patchHandler } = await import('../../server/api/events/[id]/index.patch')
 const { default: toggleHandler } = await import('../../server/api/events/[id]/toggle.put')
+const { default: detailHandler } = await import('../../server/api/event/detail/[slug_or_id]')
 
 describe('Events', () => {
   it('should create an anon event when allowed', async () => {
@@ -66,7 +67,6 @@ describe('Events', () => {
   })
 
   it('should not get unconfirmed events', async () => {
-    const { default: detailHandler } = await import('../../server/api/event/detail/[slug_or_id]')
     const detail = detailHandler(mockH3Event({ params: { slug_or_id: String(event_id) } }))
     await expect(detail).rejects.toHaveProperty('statusCode', 404)
     await expect(detail).rejects.toHaveProperty('statusMessage', 'Event not found')
@@ -112,7 +112,6 @@ describe('Events', () => {
   })
 
   it('should get detail of my hidden event', async () => {
-    const { default: detailHandler } = await import('../../server/api/event/detail/[slug_or_id]')
     mockedGetUser.mockResolvedValue(userUser)
     const detail = await detailHandler(mockH3Event({ params: { slug_or_id: String(event_id) } }))
     expect(detail).toHaveProperty('id', event_id)
@@ -275,5 +274,23 @@ describe('Events', () => {
 
     const response = handleEvent(mockH3Event({ body: event }))
     await expect(response).resolves.toHaveProperty('online_locations', ['https://test.com'])
+  })
+
+  it('should return a valid ics if format is ics', async () => {
+    const icsString = await detailHandler(mockH3Event({ params: { slug_or_id: String(event_id) }, query: { format: 'ics' } }))
+
+    expect(icsString).toContain('BEGIN:VEVENT')
+    expect(icsString).toContain('SUMMARY:new title 2')
+    expect(icsString).toContain('LOCATION:test - test')
+    expect(icsString).toContain('END:VEVENT')
+  })
+
+  it('should return a valid ics if accept is text/calendar', async () => {
+    const icsString = await detailHandler(mockH3Event({ params: { slug_or_id: String(event_id) }, headers: { accept: 'text/calendar' } }))
+
+    expect(icsString).toContain('BEGIN:VEVENT')
+    expect(icsString).toContain('SUMMARY:new title 2')
+    expect(icsString).toContain('LOCATION:test - test')
+    expect(icsString).toContain('END:VEVENT')
   })
 })

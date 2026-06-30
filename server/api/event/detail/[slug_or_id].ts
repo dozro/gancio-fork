@@ -22,6 +22,7 @@ export default defineEventHandler(async (evt) => {
 
   const slug_or_id = getRouterParam(evt, 'slug_or_id')
   const event = await getEventBySlugOrId(slug_or_id)
+  const format = getQuery(evt)?.format ?? 'json'
 
   if (!event) {
     log.warn(`Event not found: ${slug_or_id}`)
@@ -39,10 +40,10 @@ export default defineEventHandler(async (evt) => {
     throw createError({ statusCode: 404, statusMessage: 'Event not found' })
   }
 
-  if (preferLDJSON(evt)) {
+  if (preferLDJSON(evt) || format === 'json-ld') {
     setHeader(evt, 'Content-Type', 'application/activity+json')
     return eventToAP(event)
-  } else if (preferCalendar(evt)) {
+  } else if (preferCalendar(evt) || format === 'ics') {
     setHeader(evt, 'Content-Type', 'text/calendar')
     // last arg is alarms/reminder, ref: https://github.com/adamgibbons/ics#attributes (alarms)
     return exportICS(evt, [event], [{

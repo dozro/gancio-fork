@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { parseIcsData } from '../../server/services/icsparser'
+
+import { mockH3Event } from './utils'
+import { cleanDatabase } from '../api/setup'
+await cleanDatabase()
+const { default: feedHandler } = await import('../../server/routes/feed/[format]')
+
 // const base_url = 'http://localhost:13120'
 
 // await setup({ host: base_url })
@@ -127,27 +132,11 @@ describe('ICSParser', () => {
 //   })
 // })
 
-// describe('ICS output', () => {
-//   it('should return a valid ICS feed', async () => {
-//     const icsString = await fetch('/feed/ics')
-
-//     expect(icsString.ok).toBe(true)
-//     const data = await icsString.text()
-//     expect(data).toContain('BEGIN:VCALENDAR')
-//     expect(data).toContain('VERSION:2.0')
-//     expect(data).toContain('END:VCALENDAR')
-//   })
-
-//   it('should return a valid ics for each event detail', async () => {
-//     const icsString = await fetch('/api/event/detail/1?format=ics')
-
-//     expect(icsString.status).toBe(200)
-//     expect(icsString.ok).toBe(true)
-//     expect(icsString.headers.get('content-type')).toContain('text/calendar')
-//     const data = await icsString.text()
-//     expect(data).toContain('BEGIN:VEVENT')
-//     // expect(data).toContain('SUMMARY:Single Event Test')
-//     // expect(data).toContain('LOCATION:Test Location')
-//     expect(data).toContain('END:VEVENT')
-//   })
-// })
+describe('ICS output', () => {
+  it('should return a valid ICS feed', async () => {
+    const icsString = await feedHandler(mockH3Event({ params: { format: 'ics' } }))
+    expect(icsString).toContain('BEGIN:VCALENDAR')
+    expect(icsString).toContain('VERSION:2.0')
+    expect(icsString).toContain('END:VCALENDAR')
+  })
+})
