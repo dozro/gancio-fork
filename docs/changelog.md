@@ -1,6 +1,23 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+
+## [2.0.0-beta.4](https://framagit.org/les/gancio/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2026-06-30)
+
+
+### Bug Fixes
+
+* add JWT bearer token auth ([02e5253](https://framagit.org/les/gancio/commit/02e52531d649181dbbf3d4961ce0f6bf4acd4fe2))
+* another issue with db ret [] vs null ([da97370](https://framagit.org/les/gancio/commit/da97370283e74dd6bff351c53f76807fd311be00))
+* **AP:** add quote specific context ([273a9be](https://framagit.org/les/gancio/commit/273a9be3dd42f4c79542bc472156dcabd8d008ff))
+* hide switch when recurrent events not allowed ([e6ccdd0](https://framagit.org/les/gancio/commit/e6ccdd0703dd707644e60e66e8257a550f6453a7))
+* **mariadb:** quoting in osm migration ([28c4dee](https://framagit.org/les/gancio/commit/28c4dee0554a9bca18cfde1b258453f8ccce4196))
+* **openapi:** make swagger-jsdoc parse nested api ([6ef208b](https://framagit.org/les/gancio/commit/6ef208b405a38e45aace4c85cb2a3f86126d0118))
+* postgres / mariadb issue with a migration ([7105757](https://framagit.org/les/gancio/commit/7105757999a5315bc9802a40ecfd05aa1ef28276))
+* postgres issue with literal alias field name ([99d2240](https://framagit.org/les/gancio/commit/99d224036e0db12687e354a424b316817c29495c))
+* restore format ics feature ([ccb4567](https://framagit.org/les/gancio/commit/ccb4567c43bd5c957b4c248511ded3c58d2002f2))
+* store showRecurrent user preference in a cookie if modified ([ce9ce24](https://framagit.org/les/gancio/commit/ce9ce24e61056b088e0026651db8ec3a997c51f5))
+* use 404 status code for user not found ([dbd3937](https://framagit.org/les/gancio/commit/dbd393779964b209d45b8781d56f089bb1d6a239))
 
 ## [2.0.0-beta.3](https://framagit.org/les/gancio/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2026-06-17)
 
