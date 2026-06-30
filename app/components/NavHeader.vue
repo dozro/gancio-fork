@@ -6,6 +6,7 @@ const { $notify } = useNuxtApp()
 const theme = useAppTheme()
 const { showRecurrent, toggleShowRecurrent } = useShowRecurrent()
 const route = useRoute()
+const settings = useState<Settings>('settings')
 
 const { locales, t } = useI18n()
 const { current } = useLocale()
@@ -31,7 +32,7 @@ const in_home = computed(() => route.name === 'index')
 
   <div class='d-flex'>
     <v-switch
-      v-if='in_home'
+      v-if='in_home && settings.allow_recurrent_event'
       id='show_recurrent_switch'
       :model-value='showRecurrent'
       class='mr-2'
