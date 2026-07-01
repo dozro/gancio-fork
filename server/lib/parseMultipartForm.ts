@@ -70,7 +70,7 @@ export async function saveUploadedImage(image: MultiPartData, dest: string) {
 export async function saveUploadedEventImage(image: MultiPartData, name: string, focalpoint: [number, number]): Promise<Media | undefined> {
   const config = getConfig()
   const filename = crypto.randomUUID() + '.jpg'
-  const sharpStream = sharp(image.data, { failOnError: true })
+  const sharpStream = sharp(image.data, { failOn: 'error' })
   const promises = [
     sharpStream.clone().rotate().resize(500, null, { withoutEnlargement: true })
       .jpeg({ mozjpeg: true, progressive: true }).toFile(path.resolve(config.upload_path, 'thumb', filename)),
