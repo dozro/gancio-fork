@@ -66,7 +66,7 @@ export async function getImageFromURL(url: string, name: string, focalpoint?: [n
   log.debug(`getImageFromURL ${url}`)
 
   const filename = crypto.randomBytes(16).toString('hex')
-  const sharpStream = sharp({ failOnError: true })
+  const sharpStream = sharp({ failOn: 'error' })
   const promises = [
     sharpStream.clone().rotate().resize(500, null, { withoutEnlargement: true }).jpeg({ mozjpeg: true })
       .toFile(path.resolve(config.upload_path, 'thumb', filename + '.jpg')),
