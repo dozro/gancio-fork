@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     services: { inbound: [], outbound: ['rss2.0'] },
     software: {
       name: 'gancio',
-      config: config.public.version,
+      version: config.public.version,
       ...(nodeinfo_version === '2.1' && { repository: 'https://framagit.org/les/gancio' })
     },
     version: event.context?.params?.nodeinfo_version ?? '2.1',
