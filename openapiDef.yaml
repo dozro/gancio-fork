@@ -13,3 +13,43 @@ components:
       type: http
       scheme: Bearer
       bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: User identifier
+          example: 1
+        email:
+          type: string
+          description: User email
+          example: example@gancio.org
+        description:
+          type: string
+          description: User description
+          example: Example user
+        is_active:
+          type: boolean
+          description: Indicates if user is enabled or not
+          example: true
+        to_notify:
+          type: boolean
+          description: Indicates if user must be notified or not
+          example: true
+        role:
+          $ref: '#/components/schemas/UserRole'
+        createdAt:
+          type: string
+          description: Datetime when user was created
+          example: 2020-01-29T18:10:16.630Z
+        updatedAt:
+          type: string
+          description: Datetime when user was updated last time
+          example: 2020-01-30T22:42:14.789Z
+    UserRole:
+      type: string
+      enum: [user,editor,admin]
+      description: User role
+      example: user
+
