@@ -2,15 +2,8 @@ import { defineEventHandler, createError, readBody } from 'h3'
 import * as linkify from 'linkifyjs'
 import { useLogger } from '~~/server/lib/logger'
 import { enqueueMail, publicSettings, User, notifyAdmins } from '~~/server/services'
-/**
- * Register a new user
- * This will send an email to the user and to all the administrators
- * @todo flood protection
- * @info The first registered user will be an active admin
- * @param {string} email - user e-mail
- * @param {string} password - password
- * @param {string} description - description
- */
+
+// TODO flood protection
 
 // TODO
 // const userSchema = z.object({
@@ -19,6 +12,46 @@ import { enqueueMail, publicSettings, User, notifyAdmins } from '~~/server/servi
 //   description: z.string().min(5).max(255).optional()
 // })
 
+/**
+ * @openapi
+ * /api/user/register:
+ *   post:
+ *     summary: Register user
+ *     description: Register a new user. This will send an email to the user and to all the administrators. The first registered user will be an active admin.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 required: true
+ *                 description: User email
+ *                 example: example@gancio.org
+ *               password:
+ *                 type: string
+ *                 description: User password
+ *                 example: MY_PASSWORD
+ *               description:
+ *                 type: string
+ *                 description: User description
+ *                 example: A new user for gancio
+ *     responses:
+ *       200:
+ *         description: User has been registered.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Creation error.
+ *       404:
+ *         description: Registration not allowed.
+ *     tags:
+ *       - Users
+ */
 export default defineEventHandler(async (event) => {
   const log = useLogger('register')
 

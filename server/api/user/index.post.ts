@@ -2,17 +2,49 @@ import { defineEventHandler, readBody, createError } from 'h3'
 import { requireAdmin } from '~~/server/lib/auth'
 import { User, enqueueMail, publicSettings } from '../../services'
 import { useLogger } from '~~/server/lib/logger'
+
 /**
- * Create a new user.
- * a recovery code is generated and sent via email to allow
- * the user to set their password and confirm their account creation
- *
- * @auth
- * @param {string} email - User email address
- * @param {string} description - User description
- * @param {string} role - User role ('user','admin','editor')
- * @returns Created user object
- * @returns status `400` if user creation fails (e.g. email already exists)
+ * @openapi
+ * /api/user:
+ *   post:
+ *     summary: Create user
+ *     description: Create a new user. Admin role is required.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 required: true
+ *                 description: User email.
+ *                 example: example@gancio.org
+ *               description:
+ *                 type: string
+ *                 description: User description.
+ *                 example: A new user for gancio
+ *               role:
+ *                 type: string
+ *                 enum: [user,editor,admin]
+ *                 description: User role.
+ *                 example: user
+ *     responses:
+ *       200:
+ *         description: Created user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: If user creation fails (e.g. email already exists).
+ *       401:
+ *         description: Unauthorized.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Users
  */
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)

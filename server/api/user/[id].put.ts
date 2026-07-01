@@ -13,9 +13,10 @@ import { enqueueMail, User, publicSettings } from '~~/server/services'
  *       - name: id
  *         in: path
  *         required: true
+ *         description: Identifier of the user to be updated.
  *         example: 1
  *         schema:
- *           type: string
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
@@ -25,14 +26,21 @@ import { enqueueMail, User, publicSettings } from '~~/server/services'
  *             properties:
  *               is_active:
  *                 type: boolean
+ *                 description: Set if the user is enabled or not.
  *                 example: true
  *               role:
  *                 type: string
  *                 enum: [user,editor,admin]
+ *                 description: Set the new role of the user.
  *                 example: user
  *     responses:
  *       200:
  *         description: User has been updated.
+ *         content:
+ *           application/json:
+ *             $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized.
  *       404:
  *         description: User does not exist.
  *     security:
