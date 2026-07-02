@@ -9,9 +9,52 @@ const schema = z.object({
 })
 
 /**
- * Return events and past events related to the specified place
- * @return {EventAPI[]}
-*/
+ * @openapi
+ * /api/events/place/{place}:
+ *   get:
+ *     summary: Get events by place
+ *     description: Get events and past events related to the specified place.
+ *     parameters:
+ *       - name: place
+ *         in: path
+ *         description: Place identifier.
+ *         required: true
+ *         example: 1
+ *         schema:
+ *           type: integer
+ *       - name: show_recurrent
+ *         in: query
+ *         description: Show recurrent events or not.
+ *         example: true
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: List of events related to the place.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 events:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/EventAPI'
+ *                   description: Unconfirmed future events.
+ *                 pastEvents:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/EventAPI'
+ *                   description: Unconfirmed old events.
+ *                 place:
+ *                   $ref: '#/components/schemas/Place'
+ *       400:
+ *         description: Invalid place parameter.
+ *       404:
+ *         description: Place not found.
+ *     tags:
+ *       - Events
+ */
 const log = useLogger('events/place')
 export default defineEventHandler(async (evt) => {
   const query = await getValidatedQuery(evt, schema.parse)

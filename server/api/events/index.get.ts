@@ -6,24 +6,110 @@ import { getCollectionEvents } from '~~/server/services/collections'
 import { enableCors, handleCache } from '~~/server/lib/API'
 
 /**
-* Get events
-* by default returns upcoming events from now on or of specific collection if collection in home is set
-* @param {integer} [start] - start timestamp (default: now)
-* @param {integer} [end] - end timestamp (optional)
-* @param {string}  [query] - search for this string in title, place or tags
-* @param {array} [tags] - List of tags
-* @param {array} [places] - List of places id
-* @param {boolean} [show_multidate] - Show also multidate events (default: true)
-* @param {boolean} [show_recurrent] - Show also recurrent events (default: as choosen in admin settings)
-* @param {boolean} [show_federated] - Show federated events too
-* @param {integer} [max] - Limit events
-* @param {integer} [page] - Pagination
-* @param {boolean} [older] - select <= start instead of >=
-* @param {boolean} [reverse] - reverse order
-* @example
-* - [https://demo.gancio.org/api/events](https://demo.gancio.org/api/events)
-* - [usage example](https://framagit.org/les/gancio/-/blob/master/webcomponents/src/GancioEvents.svelte#L18-42)
-*/
+ * @openapi
+ * /api/events:
+ *   get:
+ *     summary: Get events
+ *     description: "Get events. By default, returns upcoming events from now on or of specific collection if collection in home is set.
+ *
+ *       You can see examples at:
+ *
+ *       - [https://demo.gancio.org/api/events](https://demo.gancio.org/api/events)
+ *
+ *       - [Usage example](https://framagit.org/les/gancio/-/blob/master/webcomponents/src/GancioEvents.svelte#L18-42)"
+ *     parameters:
+ *       - name: start
+ *         in: query
+ *         description: "Start timestamp (default: now)."
+ *         schema:
+ *           type: integer
+ *         example: 1784109600
+ *       - name: end
+ *         in: query
+ *         description: End timestamp (optional).
+ *         schema:
+ *           type: integer
+ *         example: 1784109600
+ *       - name: query
+ *         in: query
+ *         description: Search for this string in title, place or tags.
+ *         schema:
+ *           type: string
+ *         example: test
+ *       - name: tags
+ *         in: query
+ *         description: List of tags.
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         example:
+ *           - testtag
+ *           - testtag2
+ *       - name: place
+ *         in: query
+ *         description: List of places identifiers.
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         example:
+ *           - 20
+ *           - 34
+ *       - name: show_multidate
+ *         in: query
+ *         description: "Show also multidate events (default: true)."
+ *         schema:
+ *           type: boolean
+ *         example: false
+ *       - name: show_recurrent
+ *         in: query
+ *         description: "Show also recurrent events (default: as choosen in admin settings)."
+ *         schema:
+ *           type: boolean
+ *         example: false
+ *       - name: show_federated
+ *         in: query
+ *         description: Show federated events too.
+ *         schema:
+ *           type: boolean
+ *         example: false
+ *       - name: max
+ *         in: query
+ *         description: Limit events.
+ *         schema:
+ *           type: integer
+ *         example: 100
+ *       - name: pagination
+ *         in: query
+ *         description: Pagination.
+ *         schema:
+ *           type: integer
+ *         example: 50
+ *       - name: older
+ *         in: query
+ *         description: Select <= start instead of >=.
+ *         schema:
+ *           type: boolean
+ *         example: true
+ *       - name: reverse
+ *         in: query
+ *         description: Reverse order.
+ *         schema:
+ *           type: boolean
+ *         example: true
+ *     responses:
+ *       200:
+ *         description: List of events.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/EventAPI'
+ *     tags:
+ *       - Events
+ */
 export default defineEventHandler(async (event) => {
   const log = useLogger('get events')
   enableCors(event)

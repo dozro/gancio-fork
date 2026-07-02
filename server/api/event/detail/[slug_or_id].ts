@@ -9,11 +9,69 @@ import { enableCors } from '~~/server/lib/API'
 import { preferCalendar, preferLDJSON } from '~~/server/lib/negotiator'
 
 /**
- * Get event details.
- * @param {string | number} slug_or_id - The slug or id of the event
- * @param {string} format - The format of the response (json, json-ld, or ics) (default 'json')
- * @returns Event details in the requested format (JSON, JSON-LD, or ICS)
- * @throws {404} When event is not found or not visible to the current user
+ * @openapi
+ * /api/event/detail/{slug_or_id}:
+ *   get:
+ *     summary: Get event details
+ *     description: Get event details by id.
+ *     parameters:
+ *       - name: slug_or_id
+ *         in: path
+ *         description: Slug or id of the event to get.
+ *         required: true
+ *         example: 1
+ *         schema:
+ *           type: string
+ *       - name: format
+ *         in: query
+ *         description: The format of the response (default 'json').
+ *         schema:
+ *           type: string
+ *           enum: [json,json-ld,ics]
+ *         example: json
+ *     responses:
+ *       200:
+ *         description: Event details in the requested format (JSON, JSON-LD, or ICS).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/EventAPI'
+ *           application/activity+json:
+ *             schema:
+ *               $ref: '#/components/schemas/APEvent'
+ *           text/calendar:
+ *             schema:
+ *               type: string
+ *               example: |
+ *                 BEGIN:VCALENDAR
+ *                 VERSION:2.0
+ *                 CALSCALE:GREGORIAN
+ *                 PRODID:adamgibbons/ics
+ *                 METHOD:PUBLISH
+ *                 X-PUBLISHED-TTL:PT1H
+ *                 BEGIN:VEVENT
+ *                 UID:1@localhost
+ *                 SUMMARY:Event test
+ *                 DTSTAMP:20260702T135146Z
+ *                 DTSTART:20260715T100000Z
+ *                 DTEND:20260715T160000Z
+ *                 DESCRIPTION:Event description
+ *                 URL:https://demo.gancio.org/event/event-test
+ *                 LOCATION:Location test - Address test
+ *                 STATUS:CONFIRMED
+ *                 CATEGORIES:testtag
+ *                 X-ALT-DESC;FMTTYPE=text/html:<p>Event description</p>
+ *                 BEGIN:VALARM
+ *                 ACTION:DISPLAY
+ *                 DESCRIPTION:Event test
+ *                 TRIGGER:-PT1H
+ *                 END:VALARM
+ *                 END:VEVENT
+ *                 END:VCALENDAR
+ *       404:
+ *         description: Event is not found or not visible to the current user.
+ *     tags:
+ *       - Events
  */
 export default defineEventHandler(async (evt) => {
   enableCors(evt)

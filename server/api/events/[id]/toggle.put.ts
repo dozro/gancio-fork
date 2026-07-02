@@ -5,9 +5,34 @@ import { Event } from '~~/server/services'
 import { canModifyEvent } from '~~/server/services/events'
 
 /**
- * toggle event confirmation status
- * note that this could be called by an editor, an admin or the event owner
- * @auth
+ * @openapi
+ * /api/events/{id}/toggle:
+ *   put:
+ *     summary: Toggle confirmation
+ *     description: Toggle event confirmation status by id. Note that this could be called by an editor, an admin or the event owner.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id of the event to toggle status.
+ *         required: true
+ *         example: 1
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Updated event.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Event'
+ *       401:
+ *         description: Cannot modify the event.
+ *       404:
+ *         description: Event does not exist.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Events
  */
 export default defineEventHandler(async (evt) => {
   const log = useLogger('Event toggle confirmation')

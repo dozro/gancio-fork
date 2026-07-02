@@ -6,6 +6,36 @@ import { Event, publicSettings, User } from '~~/server/services'
 /**
  * disable the author of specified event
  */
+
+/**
+ * @openapi
+ * /api/events/{id}/disable_author:
+ *   put:
+ *     summary: Disable author
+ *     description: Disable the author of specified event.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         example: 1
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: The author that has been disabled.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       403:
+ *         description: Cannot disable author, moderation is not enabled.
+ *       404:
+ *         description: Event not found.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Events
+ */
 export default defineEventHandler(async (evt) => {
   const log = useLogger('event:disable_author')
   const id = getRouterParam(evt, 'id')
