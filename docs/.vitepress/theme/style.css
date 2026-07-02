@@ -162,3 +162,7 @@ a.v-card {
 .OAPath > span {
   margin-top: 3rem;
 }
+
+label.v-label {
+  padding: 0px;
+}

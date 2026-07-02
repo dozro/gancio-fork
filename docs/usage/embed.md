@@ -1,3 +1,7 @@
+---
+aside: false
+---
+
 # Embed events in webpages
 
 
@@ -44,7 +48,7 @@ You can also embed a list of events using `<gancio-events>` custom element, you 
   })
 
   const dark = ref(false)
-  const sidebar = ref(false)
+  const sidebar = ref(true)
   const show_more = ref(true)
   const max = ref(4)
   const height = ref('50vh')
@@ -61,23 +65,23 @@ You can also embed a list of events using `<gancio-events>` custom element, you 
     padding: 10px;
   }
 </style>
-<div style='display: flex; gap: 20px;'>
-<aside>
-  <label>Title <input type='text' v-model='title'/></label>
-  <label><input type='checkbox' v-model='dark'/> Dark</label>
-  <label><input type='checkbox' checked v-model='sidebar'/> Sidebar</label>
-  <label><input type='checkbox' checked v-model='show_more' /> Show More</label>
-  <label>Max items <input type='number' label='Max items' v-model='max'/></label>
-  <label>Max inner height <input label='Max inner height' v-model='height'/></label>
-  <select v-model='instance'>
-    <option value="https://gancio.cisti.org">Gancio</option>
-    <option value="https://lapunta.org">LaPunta</option>
-    <option value="https://demo.gancio.org">Demo</option>
-  </select>
-  <label>Instance <input id='baseurl' label="Instance" v-model='instance'/></label>
+<div style='display: flex; gap: 10px;'>
+<aside class='flex-1/3'>
+  <v-switch label='Dark' v-model='dark'/>
+  <v-switch label='Sidebar' v-model='sidebar'/>
+  <v-switch label='Show More' v-model='show_more'/>
+  <v-text-field label='Title' v-model='title'/>
+  <v-text-field label='Max items' v-model='max'/>
+  <v-text-field label='Max inner height' v-model='height'/>
+  <v-select label='Instance' v-model='instance' :item-props="true" :items='[
+    { subtitle: "https://gancio.cisti.org", title: "Gancio", value: "https://gancio.cisti.org" },
+    { subtitle: "https://lapunta.org", title: "LaPunta", value: "https://lapunta.org" },
+    { subtitle: "https://demo.gancio.org", title: "Demo", value: "https://demo.gancio.org" }
+  ]'/>
 </aside>
 
 <gancio-events
+  class='flex-1'
   :title='title'
   :sidebar='sidebar ? "true" : "false"'
   :theme='theme'
@@ -89,7 +93,7 @@ You can also embed a list of events using `<gancio-events>` custom element, you 
 </div>
 
 ::: info Customize
-Note that you can modify the title (or completely remove it using an empty `title` param),
+Note that you can modify the title (or completely remove it using an empty `title`),
 you can limit the list to a maximum number of events using the `maxlength` parameter and filter events by `tags` or `places` using that parameters (it's easier using **gancio** than to explain it here)
 :::
 
