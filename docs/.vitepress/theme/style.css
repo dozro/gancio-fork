@@ -70,6 +70,7 @@
   --vp-c-danger-3: var(--vp-c-red-3);
   --vp-c-danger-soft: var(--vp-c-red-soft);
 
+  --vp-custom-block-font-size: 18px;
   /*--vp-c-bg: rgba(255, 62, 62, 0.1);*/
   /*--vp-c-bg-alt: #f9f2ec;   /* sidebar, code blocks, etc. */
   
@@ -157,6 +158,11 @@ a.v-card {
 
 .v-card img {
   margin: 0 auto;
+}
+
+.vp-doc {
+  font-size: 18px;
+  font-weight: 300;
 }
 
 .OAPath > span {

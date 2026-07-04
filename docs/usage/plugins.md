@@ -42,7 +42,7 @@ __with docker__
 docker-compose restart
 ``` -->
 
-# List of embedded plugins
+## List of embedded plugins
 
 <section id='plugins'>
   <v-card v-for="plugin in plugins" :key="plugin.url" :href="plugin.url" target="_blank">

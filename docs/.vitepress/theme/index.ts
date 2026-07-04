@@ -1,22 +1,17 @@
 // https://vitepress.dev/guide/custom-theme
-import { aliases, mdi } from 'vuetify/iconsets/mdi'
+// import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
-import { theme, useOpenapi } from 'vitepress-openapi/client'
 import 'vitepress-openapi/dist/style.css'
 import MyLayout from './MyLayout.vue'
 import { createVuetify } from 'vuetify'
-import 'vuetify/styles'
-import '@mdi/font/css/materialdesignicons.css'
+// import 'vuetify/styles'
+// import '@mdi/font/css/materialdesignicons.css'
 import './style.css'
 import spec from '../../../openapi.json'
+const { theme, useOpenapi } = await import('vitepress-openapi/client')
 
 const vuetify = createVuetify({
-  icons: {
-    defaultSet: 'mdi',
-    aliases,
-    sets: { mdi }
-  },
   theme: {
     themes: {
       dark: {
@@ -129,9 +124,7 @@ export default {
     app.use(vuetify)
 
     // Set the OpenAPI specification.
-    useOpenapi({ 
-      spec, 
-    }) 
+    useOpenapi({ spec })
 
     // Use the theme.
     theme.enhanceApp({ app })

@@ -61,7 +61,17 @@ export default defineConfig({
         }
       }],
     ssr: {
-      noExternal: ['vuetify']
+      noExternal: ['vuetify', 'vitepress-openapi']
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vuetify': ['vuetify'],
+            'vitepress-openapi': ['vitepress-openapi']
+          }
+        }
+      }
     }
   },
   vue: {
