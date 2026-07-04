@@ -1,6 +1,6 @@
 VERSION=$(npm pkg get version | xargs echo)
 DATE=$(date "+%d %B %Y")
-npm pkg set date=$DATE
+npm pkg set date="$DATE"
 
 docker buildx build \
   --platform linux/amd64,linux/arm64 \

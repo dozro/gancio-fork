@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: 'gancio'
-  version: '1.0.0'
+  version: '2.0.0'
   description: 'Gancio API'
 servers:
   - url: https://demo.gancio.org
