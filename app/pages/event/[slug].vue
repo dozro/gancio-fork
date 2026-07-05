@@ -19,9 +19,6 @@ const canonicalUrl = computed(() => `${settings.value.baseurl}/event/${event.val
 
 useHead({
   title: `${settings.value.title} - ${event.value.title}`,
-  script: [
-    { src: '/gancio-events.es.js', type: 'application/javascript', defer: true }
-  ],
   meta: [
     { property: 'og:title', content: event.value.title },
     { property: 'og:description', content: event.value?.plain_description ?? '' },

@@ -11,6 +11,7 @@ useHead ({
     { rel: 'stylesheet', href: '/custom_css' }
   ],
   script: [
+    { src: '/gancio-events.es.js', async: true, defer: true, tagPosition: 'bodyClose', type: 'module' },
     { type: 'application/javascript', async: true, src: '/custom_js', defer: true, tagPosition: 'bodyClose' }
   ]
 })

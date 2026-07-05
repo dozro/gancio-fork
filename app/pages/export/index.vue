@@ -4,10 +4,7 @@ const settings = useState<Settings>('settings')
 const { t } = useI18n()
 
 useHead({
-  title: settings.value.title + ' - ' + t('common.share'),
-  script: [
-    { src: '/gancio-events.es.js', type: 'application/javascript', defer: true }
-  ]
+  title: settings.value.title + ' - ' + t('common.share')
 })
 
 const type = ref(route?.hash || 'feed')
