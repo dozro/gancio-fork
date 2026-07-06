@@ -10,6 +10,53 @@ const schema = z.object({
   visible: z.boolean().optional()
 })
 
+/**
+ * @openapi
+ * /api/announcements/{id}:
+ *   put:
+ *     summary: Update announcement
+ *     description: Update an announcement by id.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id of the announcement to update.
+ *         required: true
+ *         example: 1
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: Announcement title.
+ *                 example: Announcement title
+ *               announcement:
+ *                 type: string
+ *                 description: Announcement text.
+ *                 example: Announcement text
+ *               visible:
+ *                 type: boolean
+ *                 description: Indicates if an announcement is visible or not.
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: The updated announcement with identifier `id`.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Announcement'
+ *       404:
+ *         description: Announcement not found.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Announcements
+ */
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
   const log = useLogger('announcement put')

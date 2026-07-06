@@ -3,9 +3,31 @@ import { enableCors, handleCache } from '~~/server/lib/API'
 import { Announcement } from '~~/server/services'
 
 /**
- * return visible announcements to show preview in homepage
- * @cors
- * @return {Array<{ id: number, title: string }>} announcements
+ * @openapi
+ * /api/announcements:
+ *   get:
+ *     summary: Get visible announcements
+ *     description: Get all visible announcements to show preview in homepage.
+ *     responses:
+ *       200:
+ *         description: All visible announcements.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   title:
+ *                     type: string
+ *                     description: Announcement title.
+ *                     example: Announcement title
+ *                   id:
+ *                     type: integer
+ *                     description: Announcement identifier.
+ *                     example: 1
+ *     tags:
+ *       - Announcements
  */
 export default defineEventHandler(async (evt) => {
   enableCors(evt)

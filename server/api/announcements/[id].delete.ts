@@ -3,6 +3,30 @@ import { requireAdmin } from '~~/server/lib/auth'
 import { useLogger } from '~~/server/lib/logger'
 import { Announcement } from '~~/server/services'
 
+/**
+ * @openapi
+ * /api/announcements/{id}:
+ *   delete:
+ *     summary: Delete announcement
+ *     description: Delete an announcement by id.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id of the announcement to delete.
+ *         required: true
+ *         example: 1
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: The announcement has been deleted.
+ *       404:
+ *         description: Announcement not found.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Announcements
+ */
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
   const log = useLogger('announcement delete')
