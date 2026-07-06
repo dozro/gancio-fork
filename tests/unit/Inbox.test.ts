@@ -27,4 +27,15 @@ describe('Inbox', () => {
     await expect(ret).rejects.toHaveProperty('statusCode', 404)
     await expect(ret).rejects.toHaveProperty('message', 'No actor found for non_existent (applicationActor is relay)')
   })
+
+  it('should reject invalid JSON', async () => {
+    const evt = mockH3Event({
+      headers: { Accept: 'application/activity+json' },
+      method: 'POST',
+      params: { name: 'relay' },
+      body: 'invalid json'
+    })
+    const ret = handler(evt)
+    await expect(ret).rejects.toHaveProperty('statusCode', 400)
+  })
 })

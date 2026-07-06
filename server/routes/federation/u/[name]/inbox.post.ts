@@ -33,7 +33,13 @@ export default defineEventHandler(async (event) => {
   const rawBody = await readRawBody(event)
   if (!rawBody) throw createError({ status: 400, message: 'Empty body' })
 
-  const activity = JSON.parse(rawBody.toString())
+  let activity: unknown
+  try {
+    activity = JSON.parse(rawBody.toString())
+  } catch {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid JSON body' })
+  }
+
   const { success, data: activityData, error } = APActivityBaseSchema.safeParse(activity)
   if (!success) {
     log.warn('Wrong AP activity: %s', error.issues[0]?.message)
