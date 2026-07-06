@@ -1,6 +1,16 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [2.0.0-beta.5](https://framagit.org/les/gancio/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2026-07-06)
+
+
+### Bug Fixes
+
+* **AP:** correct version in nodeinfo ([adb9438](https://framagit.org/les/gancio/commit/adb943881e728f9ddfeacbdfa5625cc255720bd9))
+* getImageFromURL using wrong sharp option, fix [#713](https://framagit.org/les/gancio/issues/713) ([2c3a5c6](https://framagit.org/les/gancio/commit/2c3a5c665b9269266516733fceeb27cecc6a47c2))
+* various issues with announcement API ([b9c5782](https://framagit.org/les/gancio/commit/b9c5782b7fd86b503fa173e77fbef10b19bd1b94))
+* load webcomponent once ([e60e2acb](https://framagit.org/les/gancio/commit/e60e2acb8ecfa3631c36f75068e4f47673bf2d00))
 
 ## [2.0.0-beta.4](https://framagit.org/les/gancio/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2026-06-30)
 
