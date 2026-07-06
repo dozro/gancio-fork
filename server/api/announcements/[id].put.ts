@@ -1,5 +1,5 @@
 import z from 'zod'
-import { defineEventHandler, getRouterParam, readValidatedBody } from 'h3'
+import { defineEventHandler, getRouterParam, readValidatedBody, createError } from 'h3'
 import { useLogger } from '~~/server/lib/logger'
 import { Announcement } from '~~/server/services'
 import { requireAdmin } from '~~/server/lib/auth'
