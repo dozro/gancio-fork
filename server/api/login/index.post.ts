@@ -10,6 +10,45 @@ const bodySchema = z.object({
   password: z.string()
 })
 
+/**
+ * @openapi
+ * /api/login:
+ *   post:
+ *     summary: Log in
+ *     description: Login a user.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: admin@gancio.org
+ *               password:
+ *                 type: string
+ *                 example: password
+ *     responses:
+ *       200:
+ *         description: User logged.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 email:
+ *                   type: string
+ *                   example: admin@gancio.org
+ *                 role:
+ *                   type: string
+ *                   enum: [user,editor,admin]
+ *                   example: user
+ *       401:
+ *         description: Bad credentials.
+ *     tags:
+ *       - Login
+ */
 export default defineEventHandler(async (event) => {
   const log = useLogger('login')
   // const body = await readBody(event)
