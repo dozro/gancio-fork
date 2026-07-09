@@ -2,12 +2,14 @@ import { defineEventHandler, readValidatedBody, createError } from 'h3'
 import { z } from 'zod'
 import { unfollowActor } from '~~/server/federation/helpers'
 import { APUser } from '~~/server/services'
+import { requireAdmin } from '~~/server/lib/auth'
 
 const schema = z.object({
   ap_id: z.string()
 })
 
 export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
   const body = await readValidatedBody(event, schema.parse)
 
   const ap_actor = await APUser.findByPk(body.ap_id) // , { include: Instance })
