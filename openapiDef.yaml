@@ -95,6 +95,37 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Resource'
+    Collection:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Collection identifier.
+          example: 2
+        name:
+          type: string
+          description: Collection name.
+          example: Collection name
+        isActor:
+          type: boolean
+          description: Indicates if the collection is an AP actor or not.
+          example: false
+        isTop:
+          type: boolean
+          description: Indicates if the collection is pinned at home page or not.
+          example: false
+        sortIndex:
+          type: integer
+          description: Order in the list of collections.
+          example: 12
+        createdAt:
+          type: string
+          description: Datetime when collection was created.
+          example: 2020-01-29T18:10:16.630Z
+        updatedAt:
+          type: string
+          description: Datetime when collection was updated last time.
+          example: 2020-01-30T22:42:14.789Z
     Event:
       type: object
       properties:
@@ -247,6 +278,52 @@ components:
       enum: [EventCancelled,EventScheduled,EventTentative,EventMovedOnline,EventPostponed,EventRescheduled]
       description: Event status.
       example: EventScheduled
+    Filter:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Filter identifierr.
+          example: 12
+        negate:
+          type: boolean
+          description: Indicates if the filter is to exclude condition or not.
+          example: false
+        tags:
+          type: array
+          items: string
+          description: Tags that events must have to match the condition of the filter.
+          example:
+            - tag1
+            - tag2
+        places:
+          type: array
+          description: Places where events must be located to match the condition of the filter.
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: Place identifier.
+                example: 23
+              name:
+                type: string
+                description: Place name.
+                example: Place name
+        actors:
+          type: array
+          description: AP actors where events must belong to match the condition of the filter.
+          items:
+            type: object
+            properties:
+              ap_id:
+                type: string
+                description: AP actor identifier.
+                example: AP_ID
+        collectionId:
+          type: integer
+          description: Collection identifier.
+          example: 3
     Instance:
       type: object
       properties:
