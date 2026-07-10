@@ -368,7 +368,7 @@
         "interact_with_me_at": "Спілкуйтесь зі мною у федіверсі -",
         "recurrent_1y_days": "{days} {months} кожен рік",
         "follow_me_description": "Один із способів слідкувати за подіями опублікованими на {title} - \nпідписатись на акаунт <u>{account}</u> у федіверсі, наприклад через Mastodon, і, можливо, додавати ресурси до подій звідти.<br/><br/>\nЯкщо ви ніколи не чули про Mastodon або федіверс, рекомендуємо почитати <a href='https://www.savjee.be/videos/simply-explained/mastodon-and-fediverse-explained/'>цю статтю</a>(англійською).<br/><br/>Введіть адресу вашого інстансу нижче (наприклад mastodon.social)",
-        "interact_with_me": "Підпишіться на мене",
+        "interact_with_me": "Підписатись",
         "reannounce": "Повторний анонс",
         "ics": "ICS",
         "recurrent_2m_days": "{days} днів кожного другого місяця",
