@@ -8,7 +8,7 @@ export default defineEventHandler(async (evt) => {
   const body = await parseMultipartFormData(evt)
 
   if (!body || !body?.fallback_image) {
-    setSetting('header_image', undefined)
+    setSetting('fallback_image', undefined)
     throw createError({ statusCode: 200 })
   }
 
