@@ -16,7 +16,7 @@
         "change_role_confirm": "Ви впевнені що хочете змінити роль <strong>{user}</strong> з <strong>{from_role}</strong> на <strong>{to_role}</strong>",
         "disable_user_confirm": "Ви впевнені що хочете відключити <strong>{user}</strong>?",
         "delete_resource_confirm": "Ви впевнені що хочете видалити цей ресурс?",
-        "enable_federation_help": "На цей інстанс можна буде підписатись з федіверсу",
+        "enable_federation_help": "Користувачі зможуть цитувати події цього інстансу у федіверсі",
         "enable_moderation_hint": "Адміни можуть обговорювати події між собою, та, опціонально, автором події",
         "user_blocked": "Користувача {user} заблоковано",
         "event_remove_ok": "Подію видалено",
@@ -154,7 +154,9 @@
         "custom_css_help": "Також ви можете налаштувати таблицю стилів, дивіться приклади <a href='https://gancio.org/usage/custom_css'>тут</a>.",
         "instance_place": "Орієнтовне місце цього інстансу",
         "geocoding_countrycodes": "Коди країн",
-        "wrong_domain_warning": "Налаштований baseurl <b>({baseurl})</b> відрізняється від того на якому ви зараз - <b>({url})</b>"
+        "wrong_domain_warning": "Налаштований baseurl <b>({baseurl})</b> відрізняється від того на якому ви зараз - <b>({url})</b>",
+        "enable_federation_quoting": "Дозволити цитування подій у федіверсі",
+        "enable_federation_quoting_help": "Користувачі матимуть змогу цитувати у федіверсі події з цього інстансу"
     },
     "common": {
         "related": "Пов'язані",
@@ -366,7 +368,7 @@
         "interact_with_me_at": "Спілкуйтесь зі мною у федіверсі -",
         "recurrent_1y_days": "{days} {months} кожен рік",
         "follow_me_description": "Один із способів слідкувати за подіями опублікованими на {title} - \nпідписатись на акаунт <u>{account}</u> у федіверсі, наприклад через Mastodon, і, можливо, додавати ресурси до подій звідти.<br/><br/>\nЯкщо ви ніколи не чули про Mastodon або федіверс, рекомендуємо почитати <a href='https://www.savjee.be/videos/simply-explained/mastodon-and-fediverse-explained/'>цю статтю</a>(англійською).<br/><br/>Введіть адресу вашого інстансу нижче (наприклад mastodon.social)",
-        "interact_with_me": "Підпишіться на мене",
+        "interact_with_me": "Підписатись",
         "reannounce": "Повторний анонс",
         "ics": "ICS",
         "recurrent_2m_days": "{days} днів кожного другого місяця",
