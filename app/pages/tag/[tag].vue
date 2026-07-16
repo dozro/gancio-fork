@@ -3,7 +3,8 @@ const settings = useState<Settings>('settings')
 
 const route = useRoute()
 const tagName = route.params.tag as string
-const { data, error } = await useFetch<Tag>(`/api/events/tag/${encodeURIComponent(tagName)}`)
+const { showRecurrent } = useShowRecurrent()
+const { data, error } = await useFetch<Tag>(`/api/events/tag/${encodeURIComponent(tagName)}`, { query: { show_recurrent: showRecurrent } })
 
 if (!data.value || error.value) {
   throw createError({
