@@ -17,32 +17,18 @@ import { requireUser } from '~~/server/lib/auth'
  *               properties:
  *                 id:
  *                   type: integer
+ *                   description: User identifier
  *                   example: 1
  *                 email:
  *                   type: string
+ *                   description: User email
  *                   example: example@gancio.org
- *                 description:
- *                   type: string
- *                   example: ""
- *                 is_active:
- *                   type: boolean
- *                   example: true
- *                 is_admin:
- *                   type: boolean
- *                   example: false
- *                 createdAt:
- *                   type: string
- *                   example: 2020-01-29T18:10:16.630Z
- *                 updatedAt:
- *                   type: string
- *                   example: 2020-01-30T22:42:14.789Z
- *                 settings:
- *                   type: object
- *                 recover_code:
- *                   type: string
- *                   example: ""
+ *                 role:
+ *                   $ref: '#/components/schemas/UserRole'
  *       400:
  *         description: Failed to get authenticated user.
+ *       401:
+ *         description: Unauthorized.
  *     security:
  *       - bearerAuth: []
  *     tags:

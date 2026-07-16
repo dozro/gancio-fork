@@ -2,9 +2,26 @@ import { defineEventHandler, createError } from 'h3'
 import { Event, User } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
 import { requireUser } from '~~/server/lib/auth'
+
 /**
- * Delete the current authenticated user and disassociate all events created by this user
- * @auth
+ * @openapi
+ * /api/user:
+ *   delete:
+ *     summary: Delete current user
+ *     description: Delete the current authenticated user and disassociate all events created by this user.
+ *     responses:
+ *       200:
+ *         description: Current user deleted.
+ *       401:
+ *         description: Unauthorized.
+ *       404:
+ *         description: User does not exist.
+ *       500:
+ *         description: Error deleting user.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Users
  */
 export default defineEventHandler(async (event) => {
   const log = useLogger('user self delete')

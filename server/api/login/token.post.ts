@@ -29,7 +29,7 @@ const bodySchema = z.object({
  *                 example: admin@gancio.org
  *               password:
  *                 type: string
- *                 example: my_super_secret_password
+ *                 example: password
  *     responses:
  *       200:
  *         description: "A JSON response with an `access_token` property you have to use in `Authorization: Bearer <access_token>` header for authenticated request."
