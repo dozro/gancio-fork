@@ -2,7 +2,8 @@
 const settings = useState<Settings>('settings')
 
 const route = useRoute()
-const { data } = await useFetch(`/api/events/place/${route.params.id}`)
+const { showRecurrent } = useShowRecurrent()
+const { data } = await useFetch(`/api/events/place/${route.params.id}`, { query: { show_recurrent: showRecurrent } })
 if (!data.value) {
   throw createError({ status: 404, statusMessage: `Place ${route.params?.id} not found` })
 }
