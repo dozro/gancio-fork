@@ -24,7 +24,7 @@ const frequencies = [
 const eventIsMultidate = computed(() => time.isMultiDate(event.value.start_datetime, event.value.end_datetime))
 const type = ref(eventIsMultidate.value ? 'multidate' : 'normal')
 
-const selectedDates = ref<{ start?: Date, end?: Date }>({
+const selectedDates = ref<{ start?: Date, end?: Date } | null>({
   start: event.value.start_datetime ? new Date(event.value.start_datetime * 1000) : undefined,
   end: event.value.end_datetime ? new Date(event.value.end_datetime * 1000) : undefined
 })
@@ -33,7 +33,7 @@ const selectedStartTime = ref<string | null>(event.value.start_datetime ? time.u
 const selectedEndTime = ref<string | null>(event.value.end_datetime ? time.unixFormat(event.value.end_datetime, 'HH:mm') : null)
 
 const todayEvents = computed(() => {
-  if (!events.value || !selectedDates.value.start) {
+  if (!events.value || !selectedDates.value?.start) {
     console.error('no selected date')
     return []
   }
@@ -84,7 +84,7 @@ const whenPatterns = computed(() => {
 // update event start/end datetime when dates or times change
 watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, endTime]) => {
   // if no date or time is selected, reset datetime fields
-  if (!startTime || !dates.start) {
+  if (!startTime || !dates?.start) {
     event.value.start_datetime = 0
     event.value.end_datetime = undefined
     return
@@ -96,8 +96,8 @@ watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, e
 
 // normalize DatePicker input
 const pickDates = computed({
-  get: () => selectedDates.value,
-  set: (dates: Date | { start?: Date, end?: Date }) => {
+  get: () => type.value === 'multidate' ? selectedDates.value : selectedDates.value?.start,
+  set: (dates: Date | { start?: Date, end?: Date } | null) => {
     if (dates instanceof Date) {
       selectedDates.value = { start: dates, end: undefined }
     } else {
@@ -105,8 +105,8 @@ const pickDates = computed({
     }
   }
 })
-
 </script>
+
 <template>
 <v-col cols="12">
   <div class="text-center">
@@ -144,7 +144,7 @@ const pickDates = computed({
         :attributes="attributes"
         is-inline
         :min-date="!isAdmin ? new Date() : undefined"
-        :initial-page="initialCalendarPage"
+        :initial-page="pickDates ? undefined : initialCalendarPage"
         is-expanded
       />
     </div>
