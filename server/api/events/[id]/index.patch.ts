@@ -13,6 +13,45 @@ const schema = z.object({
   error: 'At least one field must be provided'
 })
 
+/**
+ * @openapi
+ * /api/events/{id}:
+ *   patch:
+ *     summary: Update event status
+ *     description: Update event status by id.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id of the event to update status.
+ *         required: true
+ *         example: 1
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 $ref: '#/components/schemas/EventStatus'
+ *     responses:
+ *       200:
+ *         description: Updated event.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/EventAPI'
+ *       401:
+ *         description: Anonymous user cannot patch events or cannot modufy the event.
+ *       404:
+ *         description: Event does not exist.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Events
+ */
 export default defineEventHandler(async (evt) => {
   const log = useLogger('Patch event')
   const id = getRouterParam(evt, 'id')

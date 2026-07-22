@@ -161,7 +161,7 @@ export default defineConfig({
           { text: 'Plugins', link: '/dev/plugin' },
           { text: 'API', link: '/dev/api',
             items: sidebarAPI.generateSidebarGroups({
-              tags: ['Login', 'Users']
+              tags: ['Login', 'Events', 'Users']
             }).map(group => ({
               ...group,
               collapsed: true

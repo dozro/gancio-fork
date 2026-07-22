@@ -4,6 +4,50 @@ import { useLogger } from '~~/server/lib/logger'
 import { Message, Event, publicSettings, User, notifyAdmins, enqueueMail } from '~~/server/services'
 import { canModifyEvent } from '~~/server/services/events'
 
+/**
+ * @openapi
+ * /api/events/messages/{event_id}:
+ *   post:
+ *     summary: Create message
+ *     description: Create a message for an event.
+ *     parameters:
+ *       - name: event_id
+ *         in: path
+ *         description: Id of the event.
+ *         required: true
+ *         example: 1
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 description: Message text.
+ *                 example: Message for the event
+ *               is_author_visible:
+ *                 type: boolean
+ *                 description: Indicates if the author is visible or not.
+ *     responses:
+ *       200:
+ *         description: Event's messages.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Message'
+ *       403:
+ *         description: Moderation is disabled or no permission to create messages.
+ *       404:
+ *         description: Event does not exist.
+ *       500:
+ *         description: Message can not be created or notified.
+ *     tags:
+ *       - Events
+ */
 export default defineEventHandler(async (evt) => {
   const log = useLogger('event:moderation')
   if (!publicSettings.enable_moderation) {

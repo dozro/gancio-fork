@@ -9,6 +9,46 @@ const schema = z.object({
   show_recurrent: z.stringbool().optional()
 })
 
+/**
+ * @openapi
+ * /api/events/tag/{tag}:
+ *   get:
+ *     summary: Get events by tag
+ *     description: Get events by tag.
+ *     parameters:
+ *       - name: tag
+ *         in: path
+ *         required: true
+ *         example: eventtag
+ *         schema:
+ *           type: string
+ *       - name: show_recurrent
+ *         in: query
+ *         description: Show recurrent events or not.
+ *         example: true
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: List of events.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 events:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/EventAPI'
+ *                   description: Future events tagged by `tag`.
+ *                 pastEvents:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/EventAPI'
+ *                   description: Old events tagged by `tag`.
+ *     tags:
+ *       - Events
+ */
 export default defineEventHandler(async (evt) => {
   const log = useLogger('events/tag')
   const tagName = getRouterParam(evt, 'tag', { decode: true })
