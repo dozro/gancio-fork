@@ -201,7 +201,7 @@ export type LDSignature = {
  */
 export const RecurrentSchema = z.object({
   frequency: z.enum(['1w', '2w', '1m', '2m', '1y']),
-  type: z.enum(['ordinal', '-1', '1', '2', '3', '4']).optional()
+  type: z.enum(['ordinal', '-1', '1', '2', '3', '4'])
 })
 export type Recurrent = z.infer<typeof RecurrentSchema>
 
