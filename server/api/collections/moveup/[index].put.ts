@@ -5,8 +5,28 @@ import { Collection } from '~~/server/services'
 import { requireAdmin } from '~~/server/lib/auth'
 
 /**
- * move up a collection by swapping its sortIndex with the one above it.
- * @auth
+ * @openapi
+ * /api/collections/moveup/{index}:
+ *   put:
+ *     summary: Move up
+ *     description: Move up a collection by swapping its sortIndex with the one above it. Admin role is required.
+ *     parameters:
+ *       - name: index
+ *         in: path
+ *         description: "`sortIndex` attribute of the collection to move up."
+ *         required: true
+ *         example: 3
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Collection has been moved up.
+ *       404:
+ *         description: "Collection with this `sortIndex` value does not exist."
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Collections
  */
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)

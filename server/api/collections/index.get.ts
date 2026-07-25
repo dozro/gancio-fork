@@ -9,10 +9,35 @@ const queryParams = z.object({
 })
 
 /**
- * Retrieve collections
- * @param {boolean} withFilters - Whether to include filters in the response (used in admin panel).
- * @param {boolean} pin - Only retrieve collections that are pinned (used in homepage).
- * @returns {Collection[]} - An array of collections.
+ * @openapi
+ * /api/collections:
+ *   get:
+ *     summary: Get collections
+ *     description: Get collections.
+ *     parameters:
+ *       - name: withFilters
+ *         in: query
+ *         description: Indicates if including filters in the response or not (used in admin panel).
+ *         schema:
+ *           type: boolean
+ *         example: true
+ *       - name: pin
+ *         in: query
+ *         description: Only retrieve collections that are pinned (used in homepage).
+ *         schema:
+ *           type: boolean
+ *         example: true
+ *     responses:
+ *       200:
+ *         description: Events of the collection with name `id`.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Collection'
+ *     tags:
+ *       - Collections
  */
 export default defineEventHandler(async (evt) => {
   const { withFilters, pin } = await getValidatedQuery(evt, queryParams.parse)
