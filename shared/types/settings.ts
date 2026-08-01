@@ -28,6 +28,8 @@ export type Settings = {
   'allow_multidate_event': boolean
   'allow_recurrent_event': boolean
   'allow_event_without_end_time': boolean
+  /** in hour */
+  'open_ended_event_default_duration': number
   'allow_online_event': boolean
   'show_download_media': boolean
   'enable_moderation': boolean

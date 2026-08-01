@@ -46,8 +46,8 @@ const visibleEvents = computed(() => {
     return events.value?.filter(e => (e.start_datetime <= max && (e.end_datetime || e.start_datetime) >= min))
   } else if (isCurrentMonth.value) {
     return events.value?.filter((e) => {
-      const max_datetime = Math.max(e.start_datetime, e?.end_datetime ?? 0)
-      return (e.end_datetime ? max_datetime >= now : e.start_datetime + 3 * 60 * 60 >= now)
+      const end_datetime = e?.end_datetime ?? e.start_datetime + settings.value.open_ended_event_default_duration * 60 * 60
+      return end_datetime >= now
     })
   } else {
     return events.value

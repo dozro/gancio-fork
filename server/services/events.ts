@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import type { InferAttributes, WhereOptions } from '@sequelize/core'
-import { Op, literal, col, where, fn, sql, or, SQL_NULL, JSON_NULL } from '@sequelize/core'
+import { Op, literal, col, where, fn, sql, SQL_NULL } from '@sequelize/core'
 import { useLogger } from '../lib/logger'
 import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
@@ -24,6 +24,7 @@ import type { Settings } from '~~/shared/types/settings'
 import { createRecurrent } from './recurrent'
 import { sign } from '../federation/ldsignature'
 import { notifyEvent } from './notifier'
+import type { IntermediateRepresentation } from 'linkifyjs'
 
 const log = useLogger('events')
 
@@ -49,7 +50,7 @@ export const eventQuerySchema = z.object({
     if (typeof val === 'number') return [val]
     return []
   }, z.array(z.coerce.number())).optional(),
-  show_recurrent: boolish.prefault(publicSettings.recurrent_event_visible),
+  show_recurrent: boolish.prefault(publicSettings.recurrent_event_visible).optional(),
   show_multidate: boolish.prefault(true).optional(),
   show_federated: boolish.prefault(publicSettings.federated_events_in_home).optional(),
   max: z.coerce.number().optional(),
@@ -67,17 +68,22 @@ export const eventQuerySchema = z.object({
 }))
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-export async function getEvents(opts?: unknown | undefined, user?: User): Promise<Event[]> {
+export async function getEvents(opts?: EventQueryType, user?: User): Promise<Event[]> {
   const args = eventQuerySchema.parse(opts)
 
   const andConditions: WhereOptions<Event> = [
-    {
-      [Op.or]: {
-        start_datetime: { [args.older ? Op.lte : Op.gte]: args.start },
-        end_datetime: { [args.older ? Op.lte : Op.gte]: args.start }
-      }
-    },
     { // AND
+      ...(args.start && {
+        [Op.or]: [
+          { start_datetime: { [args.older ? Op.lte : Op.gte]: args.start } },
+          { end_datetime: { [args.older ? Op.lte : Op.gte]: args.start } },
+          {
+            end_datetime: SQL_NULL,
+            start_datetime: { [args.older ? Op.lte : Op.gte]: args.start - publicSettings.open_ended_event_default_duration * 3600 }
+          }
+        ]
+      }),
+
       ...(args.end && { start_datetime: { [args.older ? Op.gte : Op.lte]: args.end } }),
 
       // include uncondirmed
@@ -167,19 +173,15 @@ const eventAPISchema = z.object({
       .positive()
       .max(MAX_TIMESTAMP, { message: 'start_datetime is too far in the future' })
   ),
-  end_datetime: z.preprocess(val => val ? Number(val) : undefined,
-    z.number({ error: 'end_datetime required' })
-      .int()
-      .max(MAX_TIMESTAMP, { message: 'end_datetime is too far in the future' })
-      .optional()
-  ),
+  end_datetime: z.int({ error: 'end_datetime must be a valid timestamp' })
+    .max(MAX_TIMESTAMP, { message: 'end_datetime is too far in the future' }).optional(),
   tags: z.array(z.string(), { error: 'tags field must be an array' }).optional(),
   status: z.enum(EventStatusEnum).default('EventScheduled'),
   description: z.preprocess((val) => {
     const str = typeof val === 'string' ? val : val ? String(val) : ''
     try {
       // apply linkify then sanitize the resulting HTML
-      return sanitizeHTML(linkifyHtml(str, { target: '_blank', render: { email: (ctx: any) => ctx.content } }))
+      return sanitizeHTML(linkifyHtml(str, { target: '_blank', render: { email: (ctx: IntermediateRepresentation) => ctx.content } }))
     } catch {
       return str
     }
@@ -207,6 +209,8 @@ const eventAPISchema = z.object({
 export function validateEvent(publicSettings: Settings, user?: InferAttributes<User>) {
   const isAnonymous = !user
   return eventAPISchema
+    .refine(data => !(data.end_datetime === undefined && !publicSettings.allow_event_without_end_time),
+      { error: 'end_datetime is required' })
     .refine(() => !(isAnonymous && !publicSettings.allow_anon_event),
       { error: 'Anonymous event update/creation not allowed' })
     .refine(data => !(data.recurrent?.frequency && !publicSettings.allow_recurrent_event),
@@ -402,6 +406,8 @@ export function mapEvent(event: Event,
 
     start_datetime: event.start_datetime,
     end_datetime: event.end_datetime,
+    displayEndTime: event.ap_object?.displayEndTime,
+
     place: placeToJSON(event?.place ?? options?.place),
 
     is_mine: event.userId ? event.userId === options?.user?.id : false,
@@ -474,6 +480,9 @@ export async function getMessages(eventId: number) {
 }
 
 export function eventToAP(event: Event) {
+  // if it's a remote event return the original
+  if (event.ap_object) return event.ap_object
+
   const username = publicSettings.instance_name
   const opt = {
     zone: publicSettings.instance_timezone,
@@ -518,8 +527,8 @@ export function eventToAP(event: Event) {
 
   let tags = event.tags?.map(tag => tag.tag) ?? []
 
-  // add default fedi hashtags if needed on local events only
-  if (!event.ap_id && publicSettings.default_fedi_hashtags.length) {
+  // add default fedi hashtags if needed
+  if (publicSettings.default_fedi_hashtags.length) {
     tags = [...new Set([...tags, ...publicSettings.default_fedi_hashtags])]
   }
 
@@ -528,6 +537,9 @@ export function eventToAP(event: Event) {
     name: tag,
     href: `${publicSettings.baseurl}/tag/${encodeURIComponent(tag)}`
   })) ?? []
+
+  const endTime = DateTime.fromSeconds(event.end_datetime || (event.start_datetime + publicSettings.open_ended_event_default_duration * 3600), opt)
+    .toISO({ suppressMilliseconds: true })
 
   const e: APEvent = {
     '@context': [
@@ -542,21 +554,22 @@ export function eventToAP(event: Event) {
         interactionPolicy: 'gts:interactionPolicy'
       }
     ],
-    'id': event.ap_id ?? `${publicSettings.baseurl}/federation/m/${event.id}`,
+    'id': `${publicSettings.baseurl}/federation/m/${event.id}`,
     'name': event.title,
-    'url': event?.ap_object?.url ?? event?.ap_object?.id ?? `${publicSettings.baseurl}/event/${event.slug || event.id}`,
+    'url': `${publicSettings.baseurl}/event/${event.slug || event.id}`,
     'type': 'Event' as const,
     'eventStatus': event.status,
     'startTime': DateTime.fromSeconds(event.start_datetime, opt).toISO({ suppressMilliseconds: true }) ?? '',
-    ...(event.end_datetime ? { endTime: DateTime.fromSeconds(event.end_datetime, opt).toISO({ suppressMilliseconds: true }) } : {}),
+    'endTime': endTime,
+    'displayEndTime': event.end_datetime ? true : false,
     ...(event.ld_signature ? { signature: event.ld_signature } : {}),
     location,
     attachment,
     tag,
-    'timezone': event.ap_object?.timezone ?? publicSettings.instance_timezone,
+    'timezone': publicSettings.instance_timezone,
     'published': event.updatedAt.toISOString(),
     'updated': event.updatedAt.toISOString(),
-    'attributedTo': event.ap_object?.attributedTo ?? `${publicSettings.baseurl}/federation/u/${username}`,
+    'attributedTo': `${publicSettings.baseurl}/federation/u/${username}`,
     'to': ['https://www.w3.org/ns/activitystreams#Public'],
     'content': event.description || '',
     // https://fediverse.codeberg.page/fep/fep/044f/

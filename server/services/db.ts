@@ -245,7 +245,7 @@ export class Event extends Model<
 
   @Attribute(DataTypes.INTEGER.UNSIGNED)
   @Index
-  declare end_datetime: CreationOptional<number>
+  declare end_datetime: CreationOptional<number | null>
 
   @Attribute(DataTypes.JSON)
   declare media?: CreationOptional<Media[] | null>

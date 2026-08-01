@@ -87,7 +87,7 @@ export function useTime() {
       ...(addTimezone && { timeZoneName: 'short' })
     })
 
-    if (event?.end_datetime) {
+    if (event?.end_datetime && event.displayEndTime !== false) {
       const end = dt(event.end_datetime)
       const isMultiDate = !end.hasSame(start, 'day')
 
