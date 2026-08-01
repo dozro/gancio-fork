@@ -427,6 +427,37 @@ components:
           type: string
           description: Datetime when message was updated last time.
           example: 2020-01-30T22:42:14.789Z
+    Page:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Page identifier.
+          example: 3
+        title:
+          type: string
+          description: Page title.
+          example: More info
+        content:
+          type: string
+          description: Page content.
+          example: More info about Gancio.
+        visible:
+          type: boolean
+          description: Indicates if page is visible or not.
+          example: true
+        slug:
+          type: string
+          description: Page slug.
+          example: more-info
+        createdAt:
+          type: string
+          description: Datetime when page was created
+          example: 2020-01-29T18:10:16.630Z
+        updatedAt:
+          type: string
+          description: Datetime when page was updated last time
+          example: 2020-01-30T22:42:14.789Z
     Place:
       type: object
       properties:
