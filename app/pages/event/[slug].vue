@@ -138,7 +138,9 @@ async function report() {
             <v-icon icon="mdi-calendar" />
             <span class="ml-2 text-uppercase">{{ time.when(event) }}</span>
             <div
-              v-if="event?.end_datetime" class="d-none dt-end" itemprop="endDate"
+              v-if="event?.end_datetime && event.displayEndTime !== false"
+              class="d-none dt-end"
+              itemprop="endDate"
               :content="time.unixFormat(event.end_datetime,'yyyy-MM-dd\'T\'HH:mm')"
               :datetime="time.unixFormat(event.end_datetime, 'yyyy-MM-dd HH:mm')"
             />

@@ -63,11 +63,13 @@ export type EventAPI = Omit<CreationAttributes<Event>, 'placeId' | 'is_visible'>
     id: number
     is_visible?: boolean
     start_datetime?: number
-    recurrent?: Recurrent
+    recurrent?: Recurrent | null
   }
 
   ap_user?: {
     image: string
     name?: string
   }
+
+  displayEndTime?: boolean
 }

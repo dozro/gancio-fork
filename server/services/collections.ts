@@ -92,10 +92,16 @@ export async function getCollectionEvents(opts?: unknown): Promise<Event[]> {
     // confirmed event only
     is_visible: true,
 
-    [Op.or]: {
-      start_datetime: { [args.older ? Op.lte : Op.gte]: args.start },
-      end_datetime: { [args.older ? Op.lte : Op.gte]: args.start }
-    },
+    ...(args.start && {
+      [Op.or]: [
+        { start_datetime: { [args.older ? Op.lte : Op.gte]: args.start } },
+        { end_datetime: { [args.older ? Op.lte : Op.gte]: args.start } },
+        {
+          end_datetime: SQL_NULL,
+          start_datetime: { [args.older ? Op.lte : Op.gte]: args.start - publicSettings.open_ended_event_default_duration * 3600 } }
+      ]
+    }),
+
     ...(args.end && { start_datetime: { [args.older ? Op.gte : Op.lte]: args.end } }),
 
     // include recurrent events?

@@ -20,7 +20,8 @@ const event = ref<EventAPI>({
   description: '',
   media: [{}],
   place: { name: '', address: '' },
-  status: 'EventScheduled'
+  status: 'EventScheduled',
+  displayEndTime: false
 })
 
 let eventId = route.params.eventId

@@ -8,7 +8,7 @@ import { createRecurrentOccurrence } from '../../server/services/recurrent'
 vi.mock('../../server/lib/getUser')
 // const mockedGetUser = vi.mocked(getUser)
 
-const { adminUser, editorUser, userUser } = await cleanDatabase(true)
+await cleanDatabase(true)
 // let event_id: number
 
 const { default: handleEvent } = await import('../../server/api/events/index.post')

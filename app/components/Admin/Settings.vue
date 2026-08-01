@@ -17,6 +17,7 @@ const allow_multidate_event = manageSetting('allow_multidate_event')
 const allow_recurrent_event = manageSetting('allow_recurrent_event')
 const recurrent_event_visible = manageSetting('recurrent_event_visible')
 const allow_event_without_end_time = manageSetting('allow_event_without_end_time')
+const open_ended_event_default_duration = manageSetting('open_ended_event_default_duration')
 const allow_online_event = manageSetting('allow_online_event')
 const allow_geolocation = manageSetting('allow_geolocation')
 const show_download_media = manageSetting('show_download_media')
@@ -67,6 +68,8 @@ const filteredTimezones = computed(() => {
       item-value="code"
       :items="locales" />
 
+    <v-divider class="my-6" />
+
     <v-switch
       v-model="allow_registration"
       class="mt-4"
@@ -75,7 +78,10 @@ const filteredTimezones = computed(() => {
     <v-switch
       v-model="allow_anon_event"
       class="mt-1"
-      :label="$t('admin.allow_anon_event')" />
+      :label="$t('admin.allow_anon_event')"
+      hide-details />
+
+    <v-divider class="my-6" />
 
     <v-switch
       v-model="allow_multidate_event"
@@ -95,7 +101,23 @@ const filteredTimezones = computed(() => {
     <v-switch
       v-model="allow_event_without_end_time"
       class="mt-1"
-      :label="$t('admin.allow_event_without_end_time')" />
+      :label="$t('admin.allow_event_without_end_time')"
+    />
+
+    <v-text-field
+      v-if="allow_event_without_end_time"
+      v-model="open_ended_event_default_duration"
+      :label="$t('admin.open_ended_event_default_duration')"
+      type="number"
+      min="1"
+      step="1"
+      persistent-hint
+      suffix="h"
+      :clearable="false"
+      :hint="$t('admin.open_ended_event_default_duration_hint')"
+    />
+
+    <v-divider class="my-6" />
 
     <v-switch
       v-model="allow_online_event"
@@ -114,6 +136,8 @@ const filteredTimezones = computed(() => {
       persistent-hint :hint="$t('admin.show_download_media_hint')"
       :label="$t('admin.show_download_media')" />
 
+    <v-divider class="my-6" />
+
     <v-switch
       v-model="enable_moderation"
       class="mt-4"
@@ -128,7 +152,9 @@ const filteredTimezones = computed(() => {
       :hint="$t('admin.enable_report_hint')"
       :label="$t('admin.enable_report')" />
 
-    <v-btn variant='outlined' color='primary' class="mt-6" @click='showSMTP=true'>
+    <v-divider class="my-6" />
+
+    <v-btn variant='outlined' color='primary' @click='showSMTP=true'>
       {{$t('admin.show_smtp_setup')}}
     </v-btn>
 

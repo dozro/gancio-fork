@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 import { cleanDatabase } from '../api/setup'
 import { mockH3Event, now } from './utils'
-import { setSetting } from '../../server/services'
+import { getEvents, publicSettings, setSetting } from '../../server/services'
 import { getUser } from '../../server/lib/getUser'
 import { DateTime } from 'luxon'
+import { eventToAP, upsertEvent } from '../../server/services/events'
 
 vi.mock('../../server/lib/getUser')
 const mockedGetUser = vi.mocked(getUser)
@@ -205,7 +206,75 @@ describe('Events', () => {
 
     const response = handleEvent(mockH3Event({ body: event }))
     await expect(response).rejects.toHaveProperty('statusCode', 400)
-    await expect(response).rejects.toHaveProperty('message', 'end_datetime required')
+    await expect(response).rejects.toHaveProperty('message', 'end_datetime must be a valid timestamp')
+  })
+
+  it('should not allow open ended events if disabled', async () => {
+    await setSetting('allow_event_without_end_time', false)
+    const event = {
+      title: 'open ended event',
+      start_datetime: now() + 1000,
+      place_name: 'test',
+      place_address: 'test'
+    }
+
+    mockedGetUser.mockResolvedValueOnce(userUser)
+    const response = handleEvent(mockH3Event({ body: event }))
+    await expect(response).rejects.toHaveProperty('statusCode', 400)
+    await expect(response).rejects.toHaveProperty('message', 'end_datetime is required')
+  })
+
+  it('should allow open ended events if enabled', async () => {
+    await setSetting('allow_event_without_end_time', true)
+    const event = {
+      title: 'open ended event',
+      start_datetime: now() + 1000,
+      place_name: 'test',
+      place_address: 'test'
+    }
+
+    mockedGetUser.mockResolvedValueOnce(adminUser)
+    const response = handleEvent(mockH3Event({ body: event }))
+    await expect(response).resolves.toHaveProperty('title', 'open ended event')
+  })
+
+  it('should add endTime to AP representation based on default duration', async () => {
+    await setSetting('allow_event_without_end_time', true)
+    const start_datetime = now() + 1000
+    const eventPayload = {
+      title: 'open ended event',
+      start_datetime,
+      place_name: 'test',
+      place_address: 'test'
+    }
+
+    await setSetting('open_ended_event_default_duration', 3)
+    const { event } = await upsertEvent(eventPayload, adminUser)
+    const ap = eventToAP(event)
+    expect(ap.name).toBe('open ended event')
+    expect(ap.displayEndTime).toBeFalsy()
+    expect(ap.endTime).toBe(DateTime.fromSeconds(start_datetime + 3 * 3600, { zone: publicSettings.instance_timezone }).toISO({ suppressMilliseconds: true }))
+  })
+
+  it('should get started open endend events', async () => {
+    const event = {
+      title: 'open ended started event',
+      start_datetime: now() - 4000,
+      place_name: 'test',
+      place_address: 'test'
+    }
+
+    mockedGetUser.mockResolvedValueOnce(adminUser)
+    const response = handleEvent(mockH3Event({ body: event }))
+    await expect(response).resolves.toHaveProperty('title', 'open ended started event')
+
+    let events = await getEvents({ start: now(), limit: 1 })
+    expect(events[0]).toHaveProperty('title', 'open ended started event')
+
+    // change the event default duration to 1h
+    await setSetting('open_ended_event_default_duration', 1)
+    events = await getEvents({ start: now(), limit: 1 })
+    expect(events[0].title).not.toEqual('open ended started event')
   })
 
   it('should not allow create anonymous event in the past', async () => {

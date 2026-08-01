@@ -96,11 +96,21 @@ describe('Tags', () => {
   })
 
   it('should autocomplete tags for confirmed events', async () => {
-    const event = await Event.create({ title: 'test', is_visible: true, status: 'EventScheduled', start_datetime: now() + 1000 })
+    const event = await Event.create({
+      title: 'test',
+      is_visible: true,
+      status: 'EventScheduled',
+      start_datetime: now() + 1000
+    })
     const tags = await findOrCreateTags(['tag1', 'Tag2', 'another'])
     await event.setTags(tags)
 
-    const event2 = await Event.create({ title: 'test 2', is_visible: false, status: 'EventScheduled', start_datetime: now() + 1000 })
+    const event2 = await Event.create({
+      title: 'test 2',
+      is_visible: false,
+      status: 'EventScheduled',
+      start_datetime: now() + 1000
+    })
     const tags2 = await findOrCreateTags(['other', 'example'])
     await event2.setTags(tags2)
 

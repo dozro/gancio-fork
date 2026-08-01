@@ -32,6 +32,7 @@ export const publicSettings: Settings = {
   'allow_multidate_event': true,
   'allow_recurrent_event': false,
   'allow_event_without_end_time': true,
+  'open_ended_event_default_duration': 3,
   'allow_online_event': true,
   'show_download_media': true,
   'enable_moderation': false,

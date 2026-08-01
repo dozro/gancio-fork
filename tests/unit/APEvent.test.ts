@@ -52,12 +52,12 @@ describe('Event Schema Validator', () => {
     expect(error?.issues.some(issue => issue.message === 'endTime must be after startTime')).toBe(true)
   })
 
-  it('should generate endTime if missing, defaulting to 3 hour after startTime', async () => {
+  it('should parse an event without endTime', async () => {
     const event = await loadJSON('../fixtures/APEvent/no-endTime.json')
     const { success, error, data } = APEventSchema.safeParse(event)
     expect(success).toBe(true)
     expect(error).toBeUndefined()
-    expect(data?.endTime).toBe('2026-02-12T03:00:00.000+01:00')
+    expect(data?.endTime).toBeUndefined()
   })
 
   it('should parse an event with tags', async () => {

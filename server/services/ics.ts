@@ -43,7 +43,7 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ics.Alarm[]) {
       ret.geo = { lat: e.place.latitude, lon: e.place.longitude }
     }
 
-    if (e.end_datetime) {
+    if (e.end_datetime && e.ap_object?.displayEndTime !== false) {
       const tmpEnd = DateTime.fromSeconds(e.end_datetime, { zone: 'UTC' })
       const end = [tmpEnd.year, tmpEnd.month, tmpEnd.day, tmpEnd.hour, tmpEnd.minute]
       ret.end = end

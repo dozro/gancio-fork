@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { DateTime } from 'luxon'
 
 export const APActivityTypeSchema = z.enum([
   'Follow', 'Undo', 'Like', 'Announce',
@@ -166,6 +165,7 @@ export const APEventSchema = z.object({
   name: z.string().trim(),
   startTime: z.string().refine(v => !isNaN(Date.parse(v))),
   endTime: z.string().nullable().refine(v => v === null || !isNaN(Date.parse(v))).optional(),
+  displayEndTime: z.boolean().optional(),
   id: z.string().optional(),
   attributedTo: z.string().optional(),
   to: z.array(z.string()).optional(),
@@ -187,12 +187,8 @@ export const APEventSchema = z.object({
       manualApproval: z.string().optional()
     }).optional()
   }).optional()
-}).transform(event => ({
-  ...event,
-  endTime: event.endTime ?? DateTime.fromISO(event.startTime, { setZone: true })
-    .plus({ hours: 3 }).toISO()
-})).refine(
-  e => e.endTime > e.startTime,
+}).refine(
+  e => !e.endTime || e.endTime > e.startTime,
   { message: 'endTime must be after startTime' }
 )
 export type APEvent = z.infer<typeof APEventSchema>
