@@ -8,6 +8,35 @@ const schema = z.object({
   ap_id: z.string()
 })
 
+/**
+ * @openapi
+ * /api/ap_actors/follow:
+ *   put:
+ *     summary: Follow/unfollow
+ *     description: Follow an AP actor if is unfollowed, or unfollow otherwise. Admin role is required.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ap_id:
+ *                 type: string
+ *                 description: AP identifier.
+ *                 example: https://ap_domain/relay
+ *     responses:
+ *       200:
+ *         description: AP actor has been followed/unfollowed.
+ *       401:
+ *         description: Unauthorized.
+ *       404:
+ *         description: AP actor does not exist.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - AP Actors
+ */
 export default defineEventHandler(async (event) => {
   // authenticate
   await requireAdmin(event)

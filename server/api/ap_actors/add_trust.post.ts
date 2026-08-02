@@ -12,6 +12,41 @@ const schema = z.object({
   url: z.string()
 })
 
+/**
+ * @openapi
+ * /api/ap_actors/add_trust:
+ *   post:
+ *     summary: Trust
+ *     description: Trust an AP actor by URL. Admin role is required.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               url:
+ *                 type: string
+ *                 description: AP URL. In case we have a @ we should use webfinger, in case we have a full url could be an actor or a nodeinfo url to search for.
+ *                 example: https://ap_domain.org
+ *     responses:
+ *       200:
+ *         description: The updated AP actor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/APUser'
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Hidden service not allowed.
+ *       404:
+ *         description: No actor found or no self links in webfinger or wrong webfinger response or error adding trusted actor.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - AP Actors
+ */
 export default defineEventHandler(async (event) => {
   const config = getConfig()
 
@@ -21,12 +56,6 @@ export default defineEventHandler(async (event) => {
   const log = useLogger('add trust')
   const body = await readValidatedBody(event, schema.parse)
 
-  /**
-    * url
-    * in case we have a @ we should use webfinger
-    * in case we have a full url could be an actor
-    * or a nodeinfo url to search for
-    */
   let url = body.url.trim()
   let instance: Instance | undefined
 
