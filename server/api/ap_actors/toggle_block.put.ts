@@ -7,6 +7,39 @@ const schema = z.object({
   ap_id: z.string()
 })
 
+/**
+ * @openapi
+ * /api/ap_actors/toggle_block:
+ *   put:
+ *     summary: Block/unblock
+ *     description: Block an AP actor if is unblocked, or unblock otherwise. Admin role is required.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ap_id:
+ *                 type: string
+ *                 description: AP identifier.
+ *                 example: https://ap_domain/relay
+ *     responses:
+ *       200:
+ *         description: AP actor has been blocked/unblocked.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/APUser'
+ *       401:
+ *         description: Unauthorized.
+ *       404:
+ *         description: AP actor does not exist.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - AP Actors
+ */
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
 
