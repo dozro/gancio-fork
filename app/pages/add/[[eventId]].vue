@@ -117,11 +117,11 @@ async function done(publish) {
     evt.online_locations.forEach((l: string) => formData.append('online_locations[]', l))
   }
 
-  formData.append('description', evt.description)
-  formData.append('start_datetime', evt.start_datetime)
+  formData.append('description', evt.description ?? '')
+  formData.append('start_datetime', evt.start_datetime.toString())
 
   if (evt.end_datetime) {
-    formData.append('end_datetime', evt.end_datetime)
+    formData.append('end_datetime', evt.end_datetime.toString())
   }
 
   if (evt.recurrent?.frequency) {

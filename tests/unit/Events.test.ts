@@ -112,6 +112,26 @@ describe('Events', () => {
     expect(response).toHaveProperty('is_anon', false)
   })
 
+  it('should create an event using string as datime as in multipart/form-data', async () => {
+    mockedGetUser.mockResolvedValueOnce(userUser)
+    const event = mockH3Event({
+      method: 'POST',
+      body: {
+        title: 'test title', place_name: 'place name',
+        place_address: 'address', tags: ['test'],
+        start_datetime: (now() + 1000).toString(),
+        end_datetime: (now() + 2000).toString()
+      }
+    })
+    const response = await handleEvent(event)
+    expect(response).toHaveProperty('id')
+    expect(response).toHaveProperty('title', 'test title')
+    expect(response).toHaveProperty('place.name', 'place name')
+    expect(response).toHaveProperty('is_visible', true)
+    expect(response).toHaveProperty('is_mine', true)
+    expect(response).toHaveProperty('is_anon', false)
+  })
+
   it('should get detail of my hidden event', async () => {
     mockedGetUser.mockResolvedValue(userUser)
     const detail = await detailHandler(mockH3Event({ params: { slug_or_id: String(event_id) } }))
@@ -155,6 +175,35 @@ describe('Events', () => {
     mockedGetUser.mockResolvedValueOnce(adminUser)
     response = putHandler(mockH3Event({ params: { id: String(event_id) }, body: { ...event, title: 'new title 2' } }))
     await expect(response).resolves.toHaveProperty('title', 'new title 2')
+  })
+
+  it('should remove empty field on update', async () => {
+    const newEvent = {
+      start_datetime: now(),
+      place_name: 'test',
+      place_address: 'test',
+      title: 'new title',
+      online_locations: ['https://test.com'],
+      description: 'test description',
+      end_datetime: now() + 1000,
+      tags: ['test', 'tags']
+    }
+    mockedGetUser.mockResolvedValueOnce(userUser)
+    let response = await handleEvent(mockH3Event({ body: newEvent }))
+    const id = response.id
+    const event = {
+      start_datetime: now(),
+      place_name: 'test',
+      place_address: 'test',
+      title: 'new title'
+    }
+    mockedGetUser.mockResolvedValueOnce(userUser)
+    response = putHandler(mockH3Event({ params: { id: String(id) }, body: event }))
+    await expect(response).resolves.toHaveProperty('title', 'new title')
+    await expect(response).resolves.not.toHaveProperty('end_datetime')
+    await expect(response).resolves.not.toHaveProperty('tags')
+    await expect(response).resolves.not.toHaveProperty('online_locations')
+    await expect(response).resolves.not.toHaveProperty('description')
   })
 
   it('should not allow start_datetime greater than end_datetime', async () => {
@@ -349,7 +398,7 @@ describe('Events', () => {
     const icsString = await detailHandler(mockH3Event({ params: { slug_or_id: String(event_id) }, query: { format: 'ics' } }))
 
     expect(icsString).toContain('BEGIN:VEVENT')
-    expect(icsString).toContain('SUMMARY:new title 2')
+    expect(icsString).toContain('SUMMARY:new title')
     expect(icsString).toContain('LOCATION:test - test')
     expect(icsString).toContain('END:VEVENT')
   })
@@ -358,7 +407,7 @@ describe('Events', () => {
     const icsString = await detailHandler(mockH3Event({ params: { slug_or_id: String(event_id) }, headers: { accept: 'text/calendar' } }))
 
     expect(icsString).toContain('BEGIN:VEVENT')
-    expect(icsString).toContain('SUMMARY:new title 2')
+    expect(icsString).toContain('SUMMARY:new title')
     expect(icsString).toContain('LOCATION:test - test')
     expect(icsString).toContain('END:VEVENT')
   })
