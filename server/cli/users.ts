@@ -39,7 +39,7 @@ async function list() {
   await db.close()
 }
 
-async function resetPassword(args) {
+async function resetPassword(args: { email: string, password?: string }) {
   const db = await connect()
   const user = await User.findOne({ where: { email: args.email } })
   console.log()
@@ -48,10 +48,20 @@ async function resetPassword(args) {
     return db.close()
   }
 
-  // const password = helpers.randomString()
-  user.password = args.password
-  await user.save()
-  console.log(`New password for user ${user.email} is '${args.password}'`)
+  // if not password is specified ask user for it
+  // TODO: wait for this https://github.com/unjs/consola/issues/285
+  if (!args.password) {
+    args.password = await log.prompt(`Enter new password for user ${args.email}:`, { type: 'text' })
+  }
+
+  if (args.password) {
+    user.password = args.password
+    await user.save()
+    log.box(`New password for user ${user.email} is '${args.password}'`)
+  } else {
+    log.box(`Password cannot be empty`)
+  }
+
   return db.close()
 }
 
@@ -99,7 +109,7 @@ const usersCLI = yargs => yargs
     { role: { describe: 'Define this user role', choices: ['user', 'admin', 'editor'] } }, setRole)
   .command('enable <email>', 'Enable an user', {}, args => enable(args, true))
   .command('disable <email>', 'Enable an user', {}, args => enable(args, false))
-  .command('reset-password <email> <password>', 'Resets the password of the given user', {
+  .command('reset-password <email> [password]', 'Resets the password of the given user', {
   }, resetPassword)
   .command('create <email> [password] [role]', 'Create an user (role could be `user`, `admin` or `editor`)',
     { role: { describe: 'Define this user role', choices: ['user', 'admin', 'editor'] } }, create)
