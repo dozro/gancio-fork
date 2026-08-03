@@ -167,14 +167,15 @@ const eventAPISchema = z.object({
   id: z.number().optional(),
   title: z.string({ message: 'title required' }).min(1).trim(),
   is_visible: z.stringbool().default(true),
-  start_datetime: z.preprocess(val => Number(val),
-    z.number({ error: 'start_datetime required' })
-      .int()
-      .positive()
-      .max(MAX_TIMESTAMP, { message: 'start_datetime is too far in the future' })
-  ),
-  end_datetime: z.int({ error: 'end_datetime must be a valid timestamp' })
-    .max(MAX_TIMESTAMP, { message: 'end_datetime is too far in the future' }).optional(),
+  start_datetime: z.coerce.number({ error: 'start_datetime required' })
+    .int()
+    .positive()
+    .max(MAX_TIMESTAMP, { message: 'start_datetime is too far in the future' }),
+  end_datetime: z.coerce.number({ error: 'end_datetime must be a valid timestamp' })
+    .int()
+    .max(MAX_TIMESTAMP, { message: 'end_datetime is too far in the future' })
+    .nullable()
+    .default(null),
   tags: z.array(z.string(), { error: 'tags field must be an array' }).optional(),
   status: z.enum(EventStatusEnum).default('EventScheduled'),
   description: z.preprocess((val) => {
@@ -185,8 +186,8 @@ const eventAPISchema = z.object({
     } catch {
       return str
     }
-  }, z.string().optional()),
-  online_locations: z.array(z.string()).optional(),
+  }, z.string()),
+  online_locations: z.array(z.string()).nullable().default(null),
   // image
   image_name: z.string().optional(),
   image: multipartFileSchema.optional(),
@@ -203,13 +204,13 @@ const eventAPISchema = z.object({
 })
   .refine(data => data.place_id != null || data.online_locations?.length || Boolean(data.place_name && (data.place_address || data.place_postal_address)),
     { message: 'place_id or place_name and place_address are required' })
-  .refine(data => data.end_datetime === undefined || data.start_datetime <= data.end_datetime,
+  .refine(data => data.end_datetime === null || data.start_datetime <= data.end_datetime,
     { message: 'start_datetime is greater than end_datetime' })
 
 export function validateEvent(publicSettings: Settings, user?: InferAttributes<User>) {
   const isAnonymous = !user
   return eventAPISchema
-    .refine(data => !(data.end_datetime === undefined && !publicSettings.allow_event_without_end_time),
+    .refine(data => !(data.end_datetime === null && !publicSettings.allow_event_without_end_time),
       { error: 'end_datetime is required' })
     .refine(() => !(isAnonymous && !publicSettings.allow_anon_event),
       { error: 'Anonymous event update/creation not allowed' })
@@ -267,8 +268,8 @@ export async function upsertEvent(payload: unknown, user?: InferAttributes<User>
 
   // do we have an image?
   const tmpMedia = await setEventMedia(eventPayload)
-  const media = tmpMedia ? [tmpMedia] : null
-
+  // media could be undefined (do not modify), null (remove) or an array of media
+  const media = tmpMedia && [tmpMedia]
   if (event) {
     event = await event.update({
       ...eventPayload,
@@ -343,10 +344,18 @@ export async function getEventBySlugOrId(slug_or_id?: string) {
   // }
 }
 
-export async function setEventMedia(eventPayload: EventAPIType): Promise<Media | undefined> {
+/**
+ * This method return the media to set to an event, based on the request payload:
+ * in case a remote url is specified, this will be downloaded and the related Media is returned
+ * in case an image is uploaded, the image is saved and the related Media is returned
+ * in case a local url is specified this is probably a PUT so undefined is returned to avoid an update of that field
+ * in case there is no url a null is returned to remove any media from the event
+ */
+export async function setEventMedia(eventPayload: EventAPIType): Promise<Media | undefined | null> {
   if (eventPayload.image || eventPayload.image_url) {
     const focalpoint = eventPayload.image_focalpoint
-    if (!eventPayload.image && eventPayload.image_url && /^https?:\/\//.test(eventPayload.image_url)) {
+    if (!eventPayload.image && eventPayload.image_url) {
+      if (!/^https?:\/\//.test(eventPayload.image_url)) return undefined
       return getImageFromURL(
         eventPayload.image_url,
         eventPayload.image_name || eventPayload.title,
@@ -360,6 +369,7 @@ export async function setEventMedia(eventPayload: EventAPIType): Promise<Media |
       )
     }
   }
+  return null
 }
 
 /**
@@ -395,7 +405,7 @@ export function mapEvent(event: Event,
     tags?: Tag[]
     user?: InferAttributes<User>
   }): EventAPI {
-  const response: EventAPI = {
+  let response: EventAPI = {
     id: event.id,
     slug: event.slug,
     status: event.status,
@@ -431,13 +441,9 @@ export function mapEvent(event: Event,
   }
 
   // remove undefined or empty fields from response
-  for (const key of Object.keys(response)) {
-    const val = response[key]
-    if (val === undefined || val === null || (Array.isArray(val) && val.length === 0)) {
-      delete response[key]
-      continue
-    }
-  }
+  response = Object.fromEntries(
+    Object.entries(response)
+      .filter(([_, val]) => (val !== undefined && val !== null && !(Array.isArray(val) && val.length === 0)))) as EventAPI
 
   // add the original AP user if present and not excluded
   if (event?.APUser?.object) {

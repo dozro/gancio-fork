@@ -257,7 +257,7 @@ export class Event extends Model<
   declare is_visible: boolean
 
   @Attribute(DataTypes.JSON)
-  declare online_locations: CreationOptional<string[]>
+  declare online_locations?: CreationOptional<string[] | null>
 
   @Attribute(DataTypes.JSON)
   declare recurrent?: CreationOptional<Recurrent | null>
