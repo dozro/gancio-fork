@@ -15,8 +15,55 @@ const schema = z.object({
 })
 
 /**
- * Get all resources
- * @auth admin
+ * @openapi
+ * /api/resources/list:
+ *   get:
+ *     summary: Get resources
+ *     description: Get all resources. Admin role is required.
+ *     parameters:
+ *       - name: query
+ *         in: query
+ *         description: Search text in resource (in resource data, AP actor or event)
+ *         example: myevent
+ *         schema:
+ *           type: string
+ *       - name: page
+ *         in: query
+ *         description: Get resources from this number of page.
+ *         example: 3
+ *         schema:
+ *           type: integer
+ *       - name: pageSize
+ *         in: query
+ *         description: Number of resources in each page.
+ *         example: 10
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Filtered resources.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   description: List of resources.
+ *                   items:
+ *                     $ref: '#/components/schemas/Resource'
+ *                 count:
+ *                   type: integer
+ *                   description: Number of resources
+ *                   example: 34
+ *                 totalPages:
+ *                   type: integer
+ *                   description: Number of pages
+ *                   example: 4
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Resources
  */
 export default defineEventHandler(async (evt): Promise<Paginated<Resource>> => {
   await requireAdmin(evt)

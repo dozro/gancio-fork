@@ -10,8 +10,39 @@ const schema = z.object({
 })
 
 /**
- * Update a resource hidden state.
- * @auth
+ * @openapi
+ * /api/resources:
+ *   put:
+ *     summary: Update resource
+ *     description: Update a resource hidden state. Admin role is required.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 description: Resource identifier.
+ *                 example: https://domain.org/path
+ *               hidden:
+ *                 type: boolean
+ *                 description: Hide/show a resource.
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: The updated resource.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Resource'
+ *       404:
+ *         description: Resource not found.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Resources
  */
 export default defineEventHandler(async (evt) => {
   await requireAdmin(evt)
