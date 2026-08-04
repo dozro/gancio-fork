@@ -161,7 +161,10 @@ export default defineConfig({
           { text: 'Plugins', link: '/dev/plugin' },
           { text: 'API', link: '/dev/api',
             items: sidebarAPI.generateSidebarGroups({
-              tags: ['Login', 'Announcements', 'AP Actors', 'Collections', 'Events', 'GeoCode', 'Locale', 'Pages', 'Sitemap', 'Users']
+              tags: [
+                'Login', 'Announcements', 'AP Actors', 'Collections', 'Events',
+                'GeoCode', 'ICS', 'Locale', 'Pages', 'Sitemap', 'Users'
+              ]
             }).map(group => ({
               ...group,
               collapsed: true
