@@ -575,6 +575,28 @@ components:
           example: 2
         event:
           $ref: '#/components/schemas/Event'
+    Setting:
+      type: object
+      properties:
+          key:
+            type: string
+            description: Setting key.
+            example: title
+          value:
+            type: string
+            description: Setting value.
+            example: Demo Gancio
+          is_secret:
+            type: boolean
+            description: Indicates if the setting is secret or not.
+          createdAt:
+            type: string
+            description: Datetime when setting was created.
+            example: 2020-01-29T18:10:16.630Z
+          updatedAt:
+            type: string
+            description: Datetime when setting was updated last time.
+            example: 2020-01-30T22:42:14.789Z
     Tag:
       type: object
       properties:
