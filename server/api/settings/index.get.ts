@@ -4,6 +4,31 @@ import { handleCache } from '~~/server/lib/API'
 import { publicSettings, publicSettingsLastModified } from '~~/server/services'
 import type { Settings } from '~~/shared/types/settings'
 
+/**
+ * @openapi
+ * /api/settings:
+ *   get:
+ *     summary: Get settings
+ *     description: Get settings. If role is not admin, only get public settings.
+ *     responses:
+ *       200:
+ *         description: Settings values.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               x-additionalPropertiesName: setting_key
+ *               additionalProperties:
+ *                 type:
+ *                   - string
+ *                   - boolean
+ *                   - integer
+ *                 example: setting_value
+ *       404:
+ *         description: Cannot access this setting.
+ *     tags:
+ *       - Settings
+ */
 export default defineEventHandler(async (evt) => {
   if (await isRole(evt, 'admin')) {
     return publicSettings
