@@ -364,5 +364,11 @@
     "name": "Carbondale Community Calendar",
     "url": "https://carbondale.info/",
     "place": "Carbondale, Illinois"
+  },
+  {
+    "name": "Calendari empordanès dels moviments socials",
+    "url": "https://emporda.figueres.social/",
+    "place": "Figueres, Empordà"
+
   }
 ]

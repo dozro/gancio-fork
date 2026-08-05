@@ -614,5 +614,14 @@
     "summary": "A shared calendar for the alternative and diy community in Carbondale",
     "timezone": "America/Chicago",
     "handler": "relay@carbondale.info"
+  },
+  {
+    "name": "Convoca-la alternativa",
+    "url": "https://emporda.figueres.social",
+    "logo": "https://emporda.figueres.social/logo.png",
+    "place": "Figueres, Empordà",
+    "summary": "Calendari empordanès dels moviments socials",
+    "timezone": "Europe/Paris",
+    "handler": "relay@emporda.figueres.social"
   }
 ]
