@@ -163,8 +163,8 @@ export default defineConfig({
             items: sidebarAPI.generateSidebarGroups({
               tags: [
                 'Login', 'Announcements', 'AP Actors', 'Collections', 'Events',
-                'Filters', 'GeoCode', 'ICS', 'Locale', 'Pages', 'Plugins',
-                'Resources', 'Settings', 'Sitemap', 'Users'
+                'Filters', 'GeoCode', 'ICS', 'Instances', 'Locale', 'Pages',
+                'Plugins', 'Resources', 'Settings', 'Sitemap', 'Users'
               ]
             }).map(group => ({
               ...group,
