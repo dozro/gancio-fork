@@ -9,6 +9,39 @@ const schema = z.object({
   blocked: z.coerce.boolean()
 })
 
+/**
+ * @openapi
+ * /api/instances/block:
+ *   put:
+ *     summary: Block/unblock
+ *     description: Block/unblock instance. Admin role is required.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               domain:
+ *                 type: string
+ *                 description: Instance domain.
+ *                 example: mastodon.example.org
+ *               blocked:
+ *                 type: boolean
+ *                 description: Block instance or not.
+ *                 example: true
+ *     responses:
+ *       204:
+ *         description: Instance has been blocked/unblocked.
+ *       401:
+ *         decription: Unauthorized.
+ *       404:
+ *         description: Instance not found.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Instances
+ */
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
 
