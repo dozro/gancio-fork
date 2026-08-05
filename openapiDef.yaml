@@ -278,13 +278,9 @@ components:
       enum: [EventCancelled,EventScheduled,EventTentative,EventMovedOnline,EventPostponed,EventRescheduled]
       description: Event status.
       example: EventScheduled
-    Filter:
+    FilterCreation:
       type: object
       properties:
-        id:
-          type: integer
-          description: Filter identifierr.
-          example: 12
         negate:
           type: boolean
           description: Indicates if the filter is to exclude condition or not.
@@ -324,6 +320,15 @@ components:
           type: integer
           description: Collection identifier.
           example: 3
+    Filter:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: Filter identifier.
+              example: 12
+        - $ref: '#/components/schemas/FilterCreation'
     Instance:
       type: object
       properties:
