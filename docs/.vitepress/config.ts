@@ -164,7 +164,8 @@ export default defineConfig({
               tags: [
                 'Login', 'Announcements', 'AP Actors', 'Collections', 'Events',
                 'Filters', 'GeoCode', 'ICS', 'Instances', 'Locale', 'Pages',
-                'Plugins', 'Resources', 'Session', 'Settings', 'Sitemap', 'Users'
+                'Plugins', 'Resources', 'Session', 'Settings', 'Sitemap',
+                'Users', 'Utils'
               ]
             }).map(group => ({
               ...group,
