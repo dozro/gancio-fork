@@ -167,7 +167,9 @@
         "unblock_user": "Odblokovat uživatele",
         "hidden": "Skryté",
         "enable_federation_quoting": "Povolit citování událostí z fediverse",
-        "enable_federation_quoting_help": "Uživatelé budou moci citovat události z tého instance na fediverse"
+        "enable_federation_quoting_help": "Uživatelé budou moci citovat události z tého instance na fediverse",
+        "open_ended_event_default_duration": "Interní výchozí trvání událostí",
+        "open_ended_event_default_duration_hint": "Výchozí trvání událostí v hodinách. Toto bude použito interně při vyhledávání událostí bez konce, které stále mohou probíhat."
     },
     "common": {
         "related": "Příbuzné",
