@@ -29,6 +29,7 @@
     "report": {
         "subject": "Модерация события [{{event.title}}]",
         "content_ANON": "Посетитель сообщил о событии <strong>{{event.title}}</strong>:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Открыть модерацию</a>",
-        "content_AUTHOR": "Автор события <strong>{{event.title}}</strong> написал:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Открыть модерацию</a>"
+        "content_AUTHOR": "Автор события <strong>{{event.title}}</strong> написал:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Открыть модерацию</a>",
+        "content_ADMIN": "Администратор прокомментировал событие <strong>{{event.title}}</strong>:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Open moderation</a>"
     }
 }
