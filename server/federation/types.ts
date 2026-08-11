@@ -1,4 +1,7 @@
 import { z } from 'zod'
+import type { APUser } from '../services'
+
+const stringOrArray = z.union([z.string(), z.array(z.string())]).optional().transform(v => Array.isArray(v) ? v : v ? [v] : [])
 
 export const APActivityTypeSchema = z.enum([
   'Follow', 'Undo', 'Like', 'Announce',
@@ -10,7 +13,16 @@ export type APActivityType = z.infer<typeof APActivityTypeSchema>
 export const APActivityBaseSchema = z.object({
   id: z.string().optional(), // id is not mandatory for some activities (i.e. Follow)
   type: APActivityTypeSchema,
-  actor: z.url().optional()
+  object: z.union([z.string(), z.object({ id: z.string().optional() })]),
+  proof: z.object({
+    type: z.string(),
+    created: z.string(),
+    creator: z.string(),
+    signatureValue: z.string()
+  }).optional(),
+  actor: z.union([z.string(), z.object({ id: z.string() })]).optional().transform(v => typeof v === 'string' ? v : v?.id),
+  to: stringOrArray,
+  cc: stringOrArray
 })
 
 export type APActivityBase = z.infer<typeof APActivityBaseSchema>
@@ -78,6 +90,18 @@ export interface APActivityQuoteRequest extends APActivityBase {
   instrument: string | { id: string }
 }
 
+// https://www.w3.org/TR/activitystreams-vocabulary/#dfn-attachment
+export const APAttachmentSchema = z.object({
+  type: z.enum(['Image', 'Video', 'Audio', 'Document', 'Link']),
+  mediaType: z.string().optional(),
+  name: z.string().optional(),
+  url: z.url().optional(),
+  link: z.url().optional(),
+  href: z.url().optional(),
+  focalPoint: z.array(z.number()).length(2).optional()
+})
+export type APAttachment = z.infer<typeof APAttachmentSchema>
+
 export const APNoteSchema = z.object({
   type: z.literal('Note').default('Note'),
   id: z.string(),
@@ -87,6 +111,11 @@ export const APNoteSchema = z.object({
   content: z.string().optional(),
   summary: z.string().optional(),
   published: z.iso.date().optional(),
+  updated: z.iso.date().optional(),
+  attachment: z.array(APAttachmentSchema).optional(),
+  sensitive: z.boolean().optional(),
+  to: stringOrArray,
+  cc: stringOrArray,
   quote: z.string().optional(),
   quoteUri: z.string().optional(),
   _misskey_quote: z.string().optional()
@@ -100,7 +129,7 @@ export interface APActivityUpdate extends APActivityBase {
 
 export interface APActivityCreate extends APActivityBase {
   type: 'Create'
-  object: APEvent | APNote
+  object: APEvent | APNote | string
 }
 
 export interface APActivityDelete extends APActivityBase {
@@ -131,18 +160,6 @@ export const APTagSchema = z.object({
   href: z.url().optional()
 })
 export type APTag = z.infer<typeof APTagSchema>
-
-// https://www.w3.org/TR/activitystreams-vocabulary/#dfn-attachment
-export const APAttachmentSchema = z.object({
-  type: z.enum(['Image', 'Video', 'Audio', 'Document', 'Link']),
-  mediaType: z.string().optional(),
-  name: z.string().optional(),
-  url: z.url().optional(),
-  link: z.url().optional(),
-  href: z.url().optional(),
-  focalPoint: z.array(z.number()).length(2).optional()
-})
-export type APAttachment = z.infer<typeof APAttachmentSchema>
 
 // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-place
 export const APLocationSchema = z.object({
