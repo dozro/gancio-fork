@@ -1,59 +1,25 @@
 import { ofetch } from 'ofetch'
-import { sanitizeHTML } from '../helpers'
 import { _signAndSend } from './sign_and_send'
 import { useLogger } from '../lib/logger'
-import { secretSettings } from '../services/settings'
-import { Instance, APUser } from '../services/db'
-import type { APActor } from './types'
+import { Instance, type APUser } from '../services/db'
+import { getActor } from './get_actor'
+// import { secretSettings } from '../services'
 
 const log = useLogger('federation')
 
 /**
- * Get an Actor from a URL using GET HTTP Signature.
- * @param actorUrl - The URL of the Actor to get.
- * @param force - bypass the cache and make a fresh request.
- * @returns The APUser representing the Actor, or null if not found.
+ * https://swicg.github.io/activitypub-http-signature/#how-to-obtain-a-signature-s-public-key
  */
-export async function getActor(actorUrl: string, force = false) {
-  log.debug(`[FEDI] getActor for ${actorUrl}`)
-  let fedi_user
+export async function getActorFromKeyId(keyId: string): Promise<APUser | undefined> {
+  log.debug(`[FEDI] getActorFromKeyId for ${keyId}`)
+  // 1. it should be an URL
+  const url = new URL(keyId)
 
-  // try with cache first
-  if (!force) {
-    fedi_user = await APUser.findByPk(actorUrl, { include: { model: Instance, required: true } }) as APUser & { instance: Instance }
-    if (fedi_user) {
-      return fedi_user
-    }
-  }
-
-  try {
-    const ret: APActor = await _signAndSend('', actorUrl, 'get', secretSettings.privateKey)
-    if (!ret?.id) {
-      log.debug('getActor failed for %s', actorUrl)
-      return
-    }
-
-    if (ret) {
-      const instance = await getInstance(actorUrl, false)
-      log.info('[FEDI] Create/Update a new AP User "%s" and associate it to instance "%s"', ret.id, instance?.domain)
-      try {
-        ([fedi_user] = await APUser.upsert({
-          ap_id: ret.id,
-          object: { ...ret, summary: sanitizeHTML(ret?.summary ?? '') },
-          instanceDomain: instance.domain ?? new URL(actorUrl).origin,
-          blocked: false
-        }))
-
-        await fedi_user.setInstance(instance)
-        return fedi_user
-      } catch (e) {
-        log.debug('[FEDI] Error in update/create ', e)
-      }
-    }
-  } catch (e) {
-    log.debug('getActor failed for %s, %s', actorUrl, e)
-    return
-  }
+  // 2. search it locally
+  // 3. if not found, fetch it from the network (discarding its fragment first if necessary)
+  url.hash = ''
+  const actor = await getActor(url.href) // await _signAndSend('', url.href, 'get', secretSettings.privateKey)
+  return actor
 }
 
 export async function getNodeInfo(instance_url: string) {
