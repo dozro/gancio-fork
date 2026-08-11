@@ -1,10 +1,29 @@
 import { verifyHTTPSignature } from '~~/server/federation/httpsignature'
-// import * as LDSignature from '~~/server/federation/ldsignature'
 import { useLogger } from '~~/server/lib/logger'
 import { handleActivity } from '~~/server/federation/handlers'
-import { APActivityBaseSchema } from '~~/server/federation/types'
-import { defineEventHandler, readRawBody, createError, setResponseStatus, setResponseHeader } from 'h3'
+import { type APActivityBase, APActivityBaseSchema } from '~~/server/federation/types'
+import { defineEventHandler, readRawBody, createError, setResponseStatus, setResponseHeader, getHeader, type H3Event } from 'h3'
 import { publicSettings } from '~~/server/services'
+
+export async function verifySignature(event: H3Event, rawBody: string, activityData: APActivityBase) {
+  // check signature's type
+  const sigHeader = getHeader(event, 'signature')
+  if (sigHeader === undefined) return
+
+  const signatureInput = getHeader(event, 'signature-input')
+  const authorActorId = activityData.actor
+  if (!authorActorId) {
+    throw createError({ status: 401, message: 'No actor field in body' })
+  }
+
+  // draft
+  if (sigHeader.includes('(request-target)')) {
+    return verifyHTTPSignature(event, rawBody)
+  // rfc
+  } else if (signatureInput !== undefined) {
+    // return verifyRFCSignature(event, rawBody, activityData.actor, !!activityData.proof)
+  }
+}
 
 /**
  * Federation route handler for ActivityPub (AP) POST requests to /inbox.
@@ -17,16 +36,16 @@ export default defineEventHandler(async (event) => {
   const log = useLogger('AP inbox')
 
   // check destination inbox
-  const actorName = event.context?.params?.name
-  if (!actorName) {
+  const destActorName = event.context?.params?.name
+  if (!destActorName) {
     log.info('Invalid /inbox request')
     throw createError({ status: 401, message: 'Invalid actor name' })
   }
 
   // only the instance shared inbox is supported
-  if (actorName !== publicSettings.instance_name) {
-    log.info(`No record found for ${actorName} (applicationActor is ${publicSettings.instance_name})`)
-    throw createError({ status: 404, message: `No actor found for ${actorName} (applicationActor is ${publicSettings.instance_name})` })
+  if (destActorName !== publicSettings.instance_name) {
+    log.info(`No record found for ${destActorName} (applicationActor is ${publicSettings.instance_name})`)
+    throw createError({ status: 404, message: `No actor found for ${destActorName} (applicationActor is ${publicSettings.instance_name})` })
   }
 
   // read and parse the raw body
@@ -41,7 +60,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const { success, data: activityData, error } = APActivityBaseSchema.safeParse(activity)
-  if (!success) {
+  if (!success || !activityData) {
     log.warn('Wrong AP activity: %s', error.issues[0]?.message)
     log.debug(activity)
     return
@@ -76,7 +95,7 @@ export default defineEventHandler(async (event) => {
   //   }
   // }
 
-  const activityActor = await verifyHTTPSignature(event, rawBody, activityData).catch((e) => {
+  const activityActor = await verifySignature(event, rawBody, activityData).catch((e) => {
     log.info(e)
     throw e
   })

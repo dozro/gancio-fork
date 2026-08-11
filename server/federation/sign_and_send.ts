@@ -17,7 +17,7 @@ export async function _signAndSend(object: APActivityBase | '', inbox: string, m
   log.debug('[FEDI] Sign and %s %s', method, inbox)
 
   const body = JSON.stringify(object)
-  const httpSignatureHeaders = await prepareHTTPSignature(body, inbox, method, privkey)
+  const httpSignatureHeaders = prepareHTTPSignature(body, inbox, method, privkey)
   try {
     const ret = await fetch(inbox, {
       headers: {

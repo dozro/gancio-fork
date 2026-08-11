@@ -16,7 +16,7 @@ import { _signAndSend } from './sign_and_send'
 import { secretSettings } from '../services/settings'
 
 import { verify } from './ldsignature'
-import { getActor } from './lookup'
+import { getActor } from './get_actor'
 
 const log = useLogger('APHandlers')
 
@@ -33,7 +33,7 @@ export const APHandlers: APHandlerMap = {
   Accept: async () => { }
 }
 
-export function isAPActivity(obj: any): obj is APActivity {
+export function isAPActivity(obj: unknown): obj is APActivity {
   return obj &&
     typeof obj === 'object' &&
     typeof obj.type === 'string' &&
@@ -117,7 +117,7 @@ async function handleAnnounce(message: APActivityAnnounce, activityActor: APUser
   }
 }
 
-async function handleUnannounce(message, activityActor) {
+async function handleUnannounce(message, _activityActor) {
   log.info(`Undo Announce message: `, message.id)
 }
 

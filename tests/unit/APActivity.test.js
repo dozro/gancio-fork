@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { handleActivity } from '../../server/federation/handlers'
-import { getActor, getInstance } from '../../server/federation/lookup'
+import { getInstance } from '../../server/federation/lookup'
+import { getActor } from '../../server/federation/get_actor'
 import { connect, Event, Instance, Resource, APUser, runMigrations } from '../../server/services/db'
 import { loadSettings, setSetting } from '../../server/services/settings'
 
