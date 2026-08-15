@@ -39,6 +39,7 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
 
   ...(isAdmin.value ? [{ value: 'settings', title: t('common.settings'), icon: 'mdi-cog' }] : []),
   { value: 'theme', title: t('common.theme'), icon: 'mdi-shape' },
+  { value: 'email', title: t('common.email'), icon: 'mdi-email-outline' },
   { value: 'federation', title: t('common.federation'), icon: 'mdi-web' },
   { value: 'geolocation', title: t('admin.geolocation'), icon: 'mdi-map' },
   { value: 'plugins', title: t('common.plugins'), icon: 'mdi-toy-brick' }
@@ -75,6 +76,10 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
 
       <CoreSettingsView value='federation'>
         <LazyAdminFederation />
+      </CoreSettingsView>
+
+      <CoreSettingsView value='email'>
+        <LazyAdminSMTP />
       </CoreSettingsView>
 
       <CoreSettingsView value='moderation'>

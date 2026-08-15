@@ -54,7 +54,7 @@ export type Settings = {
   'footerLinks': Array<FooterLink>
   'plugins': Array<object>
   'admin_email': string
-  'smtp'?: { port?: number, host?: string, secure?: boolean, requireTLS?: boolean, auth?: { user?: string, pass?: string }, from?: string }
+  'smtp'?: SmtpSettings
   'collection_in_home'?: string
   'calendar_first_day_of_week'?: number
   'default_fedi_hashtags': Array<string>
@@ -65,6 +65,16 @@ export type Settings = {
   'trusted_sources_label'?: string
   'status': 'loading' | 'ready'
 } & PluginSettings
+
+export interface SmtpSettings {
+  port?: number
+  host?: string
+  secure?: boolean
+  requireTLS?: boolean
+  auth?: { user?: string, pass?: string }
+  from?: string
+  sendmail?: boolean
+}
 
 // { primary: '#FF6E40', error: '#FF5252', info: '#2196F3', success: '#4CAF50', warning: '#FB8C00' },
 export type ThemeColorPalette = { [key: string]: string }
