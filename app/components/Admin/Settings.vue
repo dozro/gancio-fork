@@ -23,7 +23,6 @@ const allow_geolocation = manageSetting('allow_geolocation')
 const show_download_media = manageSetting('show_download_media')
 const enable_moderation = manageSetting('enable_moderation')
 const enable_report = manageSetting('enable_report')
-const showSMTP = ref(false)
 
 // move the current user timezone to the top of the list
 const filteredTimezones = computed(() => {
@@ -151,17 +150,6 @@ const filteredTimezones = computed(() => {
       persistent-hint
       :hint="$t('admin.enable_report_hint')"
       :label="$t('admin.enable_report')" />
-
-    <v-divider class="my-6" />
-
-    <v-btn variant='outlined' color='primary' @click='showSMTP=true'>
-      {{$t('admin.show_smtp_setup')}}
-    </v-btn>
-
-    <v-dialog v-model='showSMTP' destroy-on-close max-width='900px' :fullscreen='$vuetify.display?.mobile'>
-      <AdminSMTP @close='showSMTP = false' />
-    </v-dialog>
-
   </div>
 </div>
 </template>
