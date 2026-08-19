@@ -608,6 +608,32 @@ export class APUser extends Model<
 }
 
 @Table({
+  tableName: 'ap_keys'
+})
+export class APKey extends Model<
+  InferAttributes<APKey>,
+  InferCreationAttributes<APKey>
+> {
+  @Attribute(DataTypes.STRING)
+  @PrimaryKey
+  declare ap_id: string
+
+  @Attribute(DataTypes.STRING)
+  declare public_key: string
+
+  @Attribute({
+    type: DataTypes.STRING,
+    references: { table: 'ap_users', key: 'ap_id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
+  })
+  declare apUserApId: string
+
+  @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
+  declare APUser: NonAttribute<APUser>
+}
+
+@Table({
   tableName: 'settings'
 })
 export class Setting extends Model<
