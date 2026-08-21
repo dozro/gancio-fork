@@ -11,17 +11,21 @@ In addition to the name of the node and a small description you will find a simp
 
 Today is shown on the calendar circled.
 
-Multi-day events are shown with a range and colored dots are shown based on the number of events scheduled each day (>20 purple, >10 red, >5 orange, >3 yellow, teal otherwise).
+Multi-day events are shown with a range and colored dots based on the number of events scheduled each day (>20 purple, >10 red, >5 orange, >3 yellow, teal otherwise).
 
 Pressing on a specific day will display the events for that day (or multi-day events still in progress that day).
 
 Changing the month or year through the calendar will show the events for the selected month, this way you can use gancio as an archive.
 
-![calendar](calendar.png)
+![Calendar](/img/calendar.png)
+
+Calendar can be hidden on the home page from admin panel. If calendar is hidden a date selector will be shown in the search field:
+
+![Date selector in search field](/img/date_selector.png)
 
 ## Events
 
-Event's list is the same for everyone. There's no personal timeline.
+Events list is the same for everyone. There's no personal timeline.
 
 Each card gives you a quick preview of the event, including:
 
@@ -29,8 +33,9 @@ Each card gives you a quick preview of the event, including:
 - The name of the event
 - The date and time
 - The location
+- Tags (if any)
 
-![event.png](event.png)
+![Event card](/img/event.png)
 
 There are also icons that indicate whether the event is recurring and whether it has already passed.
 
@@ -38,7 +43,7 @@ There are also icons that indicate whether the event is recurring and whether it
 
 You can set whether recurring events are displayed by default on the home page from the admin panel. In addition, each visitor can change this setting using the switch at the top of the navigation bar.
 
-![alt text](image.png)
+![Recurring event logo](/img/recurring.png)
 
 ### Show a subset of events on the homepage
 
@@ -47,3 +52,9 @@ It is possible to create subsets of events (called collections in the administra
 ### Is there another way I can stay updated?
 
 Yes, you can subscribe the rss feed of the events, to the iCal feed of the events, or follow the federated activitypub account.
+
+You can find all these options clicking on `Share` link:
+
+![Share link](/img/share.png)
+
+There is a [dedicated section](./share) for this.
