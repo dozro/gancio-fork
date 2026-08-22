@@ -73,7 +73,7 @@ export async function connect() {
     sequelize = new Sequelize(config.db as Options<AbstractDialect>)
     await sequelize.authenticate()
     log.info('Connection has been established successfully.')
-    sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message, OAuthToken])
+    sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message, OAuthToken, APKey])
   } catch (error) {
     console.error('Unable to connect to the database:', config.db, error)
     process.exit(1)
@@ -605,10 +605,14 @@ export class APUser extends Model<
 
   @HasMany(() => Resource, { foreignKey: 'activitypub_id', sourceKey: 'ap_id' })
   declare resources?: NonAttribute<Resource[]>
+
+  @HasMany(() => APKey, { foreignKey: 'apUserApId', sourceKey: 'ap_id' })
+  declare keys?: NonAttribute<APKey[]>
 }
 
 @Table({
-  tableName: 'ap_keys'
+  tableName: 'ap_keys',
+  timestamps: false
 })
 export class APKey extends Model<
   InferAttributes<APKey>,

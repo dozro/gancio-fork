@@ -7,7 +7,7 @@ export function up ({ context: queryInterface }) {
         type: DataTypes.STRING,
         primaryKey: true
       },
-      public_keys: {
+      public_key: {
         type: DataTypes.TEXT,
         allowNull: false
       },
