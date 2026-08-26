@@ -1,6 +1,6 @@
 import { DataTypes } from '@sequelize/core'
 
-export async function up ({ context: queryInterface }) {
+export function up ({ context: queryInterface }) {
     return queryInterface.createTable('pages', {
       id: {
         allowNull: false,

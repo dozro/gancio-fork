@@ -20,6 +20,6 @@ export function up ({ context: queryInterface }) {
   })
 }
 
-export function down ( { context: queryInterface }) {
+export function down ({ context: queryInterface }) {
   return queryInterface.dropTable('fed_users')
 }
