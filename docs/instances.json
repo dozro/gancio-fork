@@ -623,5 +623,14 @@
     "summary": "Calendari empordanès dels moviments socials",
     "timezone": "Europe/Paris",
     "handler": "relay@emporda.figueres.social"
+  },
+  {
+    "name": "The Trans Agenda™",
+    "url": "https://queerleven.be",
+    "logo": "https://queerleven.be/logo.png",
+    "place": "Belgium",
+    "summary": "A shared agenda by and for the belgian trans* community",
+    "timezone": "Europe/Brussels",
+    "handler": "relay@queerleven.be"
   }
 ]
