@@ -1,1 +1,35 @@
-{}
+{
+    "register": {
+        "subject": "S’est retzida una rechesta de registratzione",
+        "content": "Amus retzidu una rechesta de registratzione. Dda amus a cunfirmare su prima possìbile."
+    },
+    "confirm": {
+        "subject": "Podes cumintzare a publicare eventos giai",
+        "content": "Salude, s’est cunfirmadu su contu tuo in <a href='{{{config.baseurl}}}'>{{config.title}}</a>.<br/>Iscrie·nos a {{config.admin_email}} pro cale-si-siat duda."
+    },
+    "user_confirm": {
+        "subject": "Podes cumintzare a publicare eventos giai",
+        "content": "Salude, s’est creadu su contu tuo in <a href='{{{config.baseurl}}}'>{{config.title}}</a>.<br/><a href='{{{config.baseurl}}}/user_confirm/{{user.recover_code}}'>Cunfirma·ddu e sèbera una crae</a>."
+    },
+    "recover": {
+        "subject": "Recùpera sa crae",
+        "content": "Salude, as rechestu unu recùperu de sa crae in {{config.title}}.<br/><a href='{{{config.baseurl}}}/recover/{{user.recover_code}}'>Incarca inoghe</a> pro ddu cunfirmare."
+    },
+    "admin_register": {
+        "subject": "Registru nou",
+        "content": "{{user.email}} at rechestu de si registrare in {{config.title}}: <br/><pre>{{user.description}}</pre><br/> Cunfirma·ddu <a href='{{{config.baseurl}}}/admin'>inoghe</a>."
+    },
+    "event_confirm": {
+        "content": "Podes cunfirmare custu eventu in <a href='{{{url}}}'>custa pàgina</a>"
+    },
+    "test": {
+        "subject": "Sa cunfiguratzione SMTP tua funtzionat",
+        "content": "Custu est unu messàgiu de posta eletrònica de proa. Si dda ses leghende, bolet nàrrere chi sa cunfiguratzione tua est funtzionende."
+    },
+    "report": {
+        "subject": "Moderatzione de eventos [{{event.title}}]",
+        "content_ADMIN": "Una persone de s'amministratzione at cummentadu s'eventu <strong> {{event.title}}</strong>:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Aberi sa pàgina de moderatzione</a>",
+        "content_ANON": "Una persone at cummentadu s'eventu <strong> {{event.title}}</strong>:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Aberi sa pàgina de moderatzione</a>",
+        "content_AUTHOR": "Chie at propostu s'eventu <strong>{{event.title}}</strong> at iscritu:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Aberi sa pàgina de moderatzione</a>"
+    }
+}
