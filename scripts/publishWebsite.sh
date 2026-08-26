@@ -1,1 +1,1 @@
-rsync -avz docs/.vitepress/dist/ cisti.web:/var/www/gancio/v2/
+rsync -avz docs/.vitepress/dist/ cisti.web:/var/www/gancio/
