@@ -1,8 +1,7 @@
-
 export function up({ context: queryInterface }) {
   const dialect = queryInterface.sequelize.dialect.name
 
-  let castType = 'CHAR';
+  let castType = 'CHAR'
   if (dialect === 'postgres') castType = 'TEXT'
 
   return queryInterface.sequelize.query(`

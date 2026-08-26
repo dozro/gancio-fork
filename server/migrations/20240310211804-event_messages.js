@@ -33,5 +33,6 @@ export function up ({ context: queryInterface }) {
         allowNull: false,
         type: DataTypes.DATE
       }
-    })
-  }
+    }
+  )
+}
