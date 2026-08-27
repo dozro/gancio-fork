@@ -7,8 +7,11 @@ export function up ({ context: queryInterface }) {
         type: DataTypes.STRING,
         primaryKey: true
       },
+      type: {
+        type: DataTypes.ENUM(['ed25519', 'rsa-v1_5-sha256', 'rsa-pss-sha512'])
+      },
       public_key: {
-        type: DataTypes.TEXT,
+        type: DataTypes.BLOB,
         allowNull: false
       },
       apUserApId: {
