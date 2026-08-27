@@ -1,7 +1,12 @@
-import { defineEventHandler, getQuery, getRouterParam, setHeader, createError } from 'h3'
+import { defineEventHandler, getValidatedQuery, getRouterParam, setHeader, createError } from 'h3'
+import { z } from 'zod'
 import { useLogger } from '~~/server/lib/logger'
 import { Event, Place, publicSettings, Tag } from '~~/server/services'
 import { eventToAP } from '~~/server/services/events'
+
+const schema = z.object({
+  page: z.coerce.number().gte(1).optional()
+})
 
 // https://www.w3.org/TR/activitypub/#outbox
 export default defineEventHandler(async (event) => {
@@ -13,7 +18,7 @@ export default defineEventHandler(async (event) => {
   //   return res.redirect(302, '/')
   // }
 
-  const page = parseInt(getQuery(event).page)
+  const { page } = await getValidatedQuery(event, schema.parse)
   const name = getRouterParam(event, 'name')
   if (!name) {
     log.warn(`[FEDI] Bad /outbox request`)
@@ -28,15 +33,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  let events = []
   setHeader(event, 'Content-Type', 'application/activity+json; charset=utf-8')
 
   const n_events = await Event.count({ where: { is_visible: true, ap_id: null } })
-  const last_page = Math.ceil(n_events / 10)
+  const last_page = Math.ceil(n_events / EVENTS_PER_PAGE)
   log.debug(`[FEDI] GET /outbox, should return all events from this instance: ${n_events}`)
 
-  if (page > 0) {
-    events = await Event.findAll({
+  if (page && page <= last_page) {
+    const events = await Event.findAll({
       where: { is_visible: true, ap_id: null },
       include: [{ model: Tag, required: false }, Place],
       limit: EVENTS_PER_PAGE,
@@ -49,10 +53,12 @@ export default defineEventHandler(async (event) => {
       type: 'OrderedCollectionPage',
       totalItems: n_events,
       partOf: `${publicSettings.baseurl}/federation/u/${name}/outbox`,
-      ...(page > 1 && last_page > 0 && {
-        prev: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${Math.min(page - 1, last_page)}`
-      }),
-      ...(page < last_page && { next: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${page + 1}` }),
+      ...(page > 1 &&
+        { prev: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${page - 1}` }
+      ),
+      ...(page < last_page &&
+        { next: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${page + 1}` }
+      ),
       orderedItems: events.map(e => ({
         id: `${publicSettings.baseurl}/federation/m/${e.id}#create`,
         type: 'Create',
@@ -68,10 +74,13 @@ export default defineEventHandler(async (event) => {
       'id': `${publicSettings.baseurl}/federation/u/${name}/outbox`,
       'type': 'OrderedCollection',
       'totalItems': n_events,
-      ...(last_page > 0 && {
-        first: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=1`,
-        last: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${last_page}`
-      })
+      ...(last_page > 0
+        ? {
+            first: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=1`,
+            last: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${last_page}`
+          }
+        : { first: null, last: null }
+      )
     }
   }
 })

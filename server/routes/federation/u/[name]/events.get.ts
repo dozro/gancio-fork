@@ -5,7 +5,7 @@ import { eventToAP } from '~~/server/services/events'
 import { z } from 'zod'
 
 const schema = z.object({
-  page: z.coerce.number().optional()
+  page: z.coerce.number().gte(1).optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const { page } = await getValidatedQuery(event, schema.parse)
   const name = getRouterParam(event, 'name')
   if (!name) {
-    log.warn(`Bad /outbox request`)
+    log.warn(`Bad /events request`)
     throw createError({ statusCode: 400, statusMessage: 'Bad request' })
   }
 
@@ -27,15 +27,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  let events = []
   setHeader(event, 'Content-Type', 'application/activity+json; charset=utf-8')
 
   const n_events = await Event.count({ where: { is_visible: true, ap_id: null } })
-  const last_page = Math.ceil(n_events / 10)
-  log.debug(`[FEDI] GET /outbox, should return all events from this instance: ${n_events}`)
+  const last_page = Math.ceil(n_events / EVENTS_PER_PAGE)
+  log.debug(`[FEDI] GET /events, should return all events from this instance: ${n_events}`)
 
-  if (page) {
-    events = await Event.findAll({
+  if (page && page <= last_page) {
+    const events = await Event.findAll({
       where: { is_visible: true, ap_id: null },
       include: [{ model: Tag, required: false }, Place],
       limit: EVENTS_PER_PAGE,
@@ -44,12 +43,16 @@ export default defineEventHandler(async (event) => {
     })
     return {
       // '@context': Helpers['@context'],
-      id: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${page}`,
+      id: `${publicSettings.baseurl}/federation/u/${name}/events?page=${page}`,
       type: 'OrderedCollectionPage',
       totalItems: n_events,
-      partOf: `${publicSettings.baseurl}/federation/u/${name}/outbox`,
-      ...(page > 1 && { prev: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${page - 1}` }),
-      ...(page !== last_page && { next: `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${page + 1}` }),
+      partOf: `${publicSettings.baseurl}/federation/u/${name}/events`,
+      ...(page > 1 &&
+        { prev: `${publicSettings.baseurl}/federation/u/${name}/events?page=${page - 1}` }
+      ),
+      ...(page < last_page &&
+        { next: `${publicSettings.baseurl}/federation/u/${name}/events?page=${page + 1}` }
+      ),
       orderedItems: events.map(e => ({
         id: `${publicSettings.baseurl}/federation/m/${e.id}#create`,
         type: 'Create',
@@ -62,11 +65,16 @@ export default defineEventHandler(async (event) => {
   } else {
     return {
       '@context': 'https://www.w3.org/ns/activitystreams',
-      'id': `${publicSettings.baseurl}/federation/u/${name}/outbox`,
+      'id': `${publicSettings.baseurl}/federation/u/${name}/events`,
       'type': 'OrderedCollection',
       'totalItems': n_events,
-      'first': `${publicSettings.baseurl}/federation/u/${name}/outbox?page=1`,
-      'last': `${publicSettings.baseurl}/federation/u/${name}/outbox?page=${last_page}`
+      ...(last_page > 0
+        ? {
+            first: `${publicSettings.baseurl}/federation/u/${name}/events?page=1`,
+            last: `${publicSettings.baseurl}/federation/u/${name}/events?page=${last_page}`
+          }
+        : { first: null, last: null }
+      )
     }
   }
 })
