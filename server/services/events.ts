@@ -49,12 +49,12 @@ export const eventQuerySchema = z.object({
     if (typeof val === 'string') return val.split(',')
     if (typeof val === 'number') return [val]
     return []
-  }, z.array(z.coerce.number())).optional(),
+  }, z.array(z.coerce.number().int())).optional(),
   show_recurrent: boolish.prefault(publicSettings.recurrent_event_visible).optional(),
   show_multidate: boolish.prefault(true).optional(),
   show_federated: boolish.prefault(publicSettings.federated_events_in_home).optional(),
-  max: z.coerce.number().optional(),
-  page: z.coerce.number().optional(),
+  max: z.coerce.number().int().optional(),
+  page: z.coerce.number().int().optional(),
   older: boolish.optional(),
   reverse: boolish.optional(),
   mine: boolish.optional(),
@@ -164,7 +164,7 @@ export async function getEvents(opts?: EventQueryType, user?: User): Promise<Eve
 
 const MAX_TIMESTAMP = 1000 * 24 * 60 * 60 * 365
 const eventAPISchema = z.object({
-  id: z.number().optional(),
+  id: z.int().optional(),
   title: z.string({ message: 'title required' }).min(1).trim(),
   is_visible: z.stringbool().default(true),
   start_datetime: z.coerce.number({ error: 'start_datetime required' })

@@ -8,6 +8,8 @@ import { fileURLToPath } from 'url'
 export const isBuild = process.env.NODE_ENV === 'production'
 export const isTest = process.env.VITEST == 'true'
 
+const PortSchema = z.coerce.number().int().positive()
+
 export const ProxyAuthSchema = z.object({
   username: z.string().optional().default(''),
   password: z.string().optional().default('')
@@ -31,7 +33,7 @@ export const DbSchema = z.object({
   dialect: DialectSchema,
   storage: z.string().transform(absolutizePath).optional(),
   host: z.string().optional(),
-  port: z.coerce.number().optional(),
+  port: PortSchema.optional(),
   user: z.string().optional(),
   password: z.string().optional(),
   database: z.string().optional()
@@ -43,12 +45,12 @@ export const ConfigSchema = z.object({
   baseurl: z.url(),
   server: z.object({
     host: z.string().optional().default('0.0.0.0'),
-    port: z.coerce.number().optional().default(13120)
+    port: PortSchema.optional().default(13120)
   }).optional().default({ host: '0.0.0.0', port: 13120 }),
   admin_email: z.string().optional(),
   smtp: z.object({
     host: z.string().optional(),
-    port: z.coerce.number().optional(),
+    port: PortSchema.optional(),
     secure: z.boolean().optional(),
     auth: z.object({
       user: z.string().optional(),

@@ -5,7 +5,7 @@ import { eventToAP } from '~~/server/services/events'
 import { z } from 'zod'
 
 const schema = z.object({
-  page: z.coerce.number().gte(1).optional()
+  page: z.coerce.number().int().gte(1).optional()
 })
 
 export default defineEventHandler(async (event) => {
