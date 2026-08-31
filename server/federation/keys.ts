@@ -1,20 +1,24 @@
 import { APKey, type KeyType } from '../services/db'
 import type { APActor } from './types'
 import { useLogger } from '../lib/logger'
-
 const log = useLogger('federation/keys')
 
-export async function getActorKeys(actor: APActor) {
-  const keys = []
+/**
+ * Imports keys from an actor
+ * @param actor<APActor> - the actor to import keys from
+ * @returns imported keys
+ */
+export async function importActorKeys(actor: APActor) {
+  const keys: APKey[] = []
   if (actor.publicKey) {
     log.debug(`create APKey with ap_id: ${actor.publicKey.id}`)
     const k = await APKey.upsert({
       ap_id: actor.publicKey.id,
-      type: 'rsa-pss-sha512',
-      public_key: decodePem(actor.publicKey.publicKeyPem),
+      type: 'rsa-v1_5-sha256',
+      public_key: decodePemToBinary(actor.publicKey.publicKeyPem),
       apUserApId: actor.id
     })
-    keys.push(k)
+    keys.push(k[0])
   }
 
   if (actor.assertionMethod && Array.isArray(actor.assertionMethod)) {
@@ -28,17 +32,17 @@ export async function getActorKeys(actor: APActor) {
           public_key: keyData,
           apUserApId: actor.id
         })
-        keys.push(k)
+        keys.push(k[0])
       }
     }
   }
   return keys
 }
 
-export function decodePem(pem: string): Uint8Array {
+export function decodePemToBinary(pem: string): Uint8Array {
   const lines = pem.split('\n')
   const base64 = lines.slice(1, -2).join('')
-  return Buffer.from(base64, 'base64')
+  return Uint8Array.from(Buffer.from(base64, 'base64'))
 }
 
 // https://datatracker.ietf.org/doc/html/draft-msporny-base58-03
@@ -73,28 +77,50 @@ export function decodeBase58(s: string): Uint8Array {
   return Uint8Array.from(out.reverse())
 }
 
+export async function importPublicKey(
+  spkiBuffer: Uint8Array,
+  algorithm: any
+): Promise<CryptoKey> {
+  const binary = new ArrayBuffer(spkiBuffer.byteLength)
+  new Uint8Array(binary).set(spkiBuffer)
+
+  return await crypto.subtle.importKey(
+    'spki',
+    binary,
+    algorithm,
+    false,
+    ['verify']
+  )
+}
+
+export function decodeMultibase(input: string): Uint8Array {
+  const prefix = input[0]
+  if (prefix === 'z') {
+    return decodeBase58(input.slice(1))
+  } else if (prefix === 'u') {
+    return Buffer.from(input.slice(1), 'base64url')
+  } else {
+    throw new Error(`Unsupported multi-base prefix: ${input}`)
+  }
+}
+
 // AHA! https://multiformats.readthedocs.io/en/latest/implementation-report.html
 // also: https://github.com/multiformats/multicodec/blob/master/table.csv
 const PREFIX_ED25519_PUBLIC = 'ed01' // 0xed
 const PREFIX_RSA_DER_PUBLIC = '8524' // 0x1205
 
 export function decodePublicKeyMultibase(publicKeyMultibase: string): { type: KeyType, keyData: Uint8Array } {
-  const prefix = publicKeyMultibase[0]
-  let data
-  if (prefix === 'z') {
-    data = decodeBase58(publicKeyMultibase.slice(1))
-  } else if (prefix === 'u') {
-    data = Buffer.from(publicKeyMultibase.slice(1), 'base64url')
-  } else {
-    log.warn(`Unsupported multi-base prefix ${publicKeyMultibase}`)
-    throw new Error(`Unsupported multi-base prefix: ${publicKeyMultibase}`)
-  }
-
+  const data = decodeMultibase(publicKeyMultibase)
   const ident = Buffer.from(data.slice(0, 2)).toString('hex')
   if (ident == PREFIX_ED25519_PUBLIC) {
+    const rawKey = data.slice(2)
+    const PREFIX_ED25519_SPKI = Buffer.from([0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00])
+    const spki = new Uint8Array(PREFIX_ED25519_SPKI.length + rawKey.length)
+    spki.set(PREFIX_ED25519_SPKI)
+    spki.set(rawKey, PREFIX_ED25519_SPKI.length)
     return {
       type: 'ed25519',
-      keyData: data.slice(2)
+      keyData: spki
     }
   } else if (ident == PREFIX_RSA_DER_PUBLIC) {
     return {

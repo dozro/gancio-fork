@@ -52,6 +52,12 @@ export interface APActor {
     owner: string
     publicKeyPem: string
   }
+  assertionMethod?: Array<{
+    id: string
+    type: 'Multikey'
+    controller: string
+    publicKeyMultibase: string
+  }>
 }
 
 export interface APActivityFollow extends APActivityBase {

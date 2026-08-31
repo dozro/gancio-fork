@@ -610,6 +610,9 @@ export class APUser extends Model<
   declare keys?: NonAttribute<APKey[]>
 }
 
+export const KeyTypeEnum = ['ed25519', 'rsa-v1_5-sha256', 'rsa-pss-sha512'] as const
+export type KeyType = typeof KeyTypeEnum[number]
+
 @Table({
   tableName: 'ap_keys',
   timestamps: false
@@ -622,8 +625,11 @@ export class APKey extends Model<
   @PrimaryKey
   declare ap_id: string
 
-  @Attribute(DataTypes.STRING)
-  declare public_key: string
+  @Attribute(DataTypes.ENUM(...KeyTypeEnum))
+  declare type: KeyType
+
+  @Attribute(DataTypes.BLOB)
+  declare public_key: Uint8Array
 
   @Attribute({
     type: DataTypes.STRING,

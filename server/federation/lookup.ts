@@ -1,7 +1,7 @@
 import { ofetch } from 'ofetch'
 import { _signAndSend } from './sign_and_send'
 import { useLogger } from '../lib/logger'
-import { Instance, type APUser } from '../services/db'
+import { APKey, APUser, Instance } from '../services/db'
 import { getActor } from './get_actor'
 // import { secretSettings } from '../services'
 
@@ -10,22 +10,35 @@ const log = useLogger('federation')
 /**
  * https://swicg.github.io/activitypub-http-signature/#how-to-obtain-a-signature-s-public-key
  */
-export async function getActorFromKeyId(keyId: string): Promise<APUser | undefined> {
+export async function getActorFromKeyId(keyId: string, retry: boolean = false, bypassCache: boolean = false): Promise<APUser | undefined> {
   log.debug(`[FEDI] getActorFromKeyId for ${keyId}`)
-  // 1. it should be an URL
+  // it should be an URL
   const url = new URL(keyId)
 
-  // 2. search it locally
-  // 3. if not found, fetch it from the network (discarding its fragment first if necessary)
+  // search it locally
+  let actor: APUser | undefined | null
+  if (!bypassCache) {
+    actor = await APUser.findOne({ include: [{ model: APKey, where: { ap_id: keyId }, required: true }] })
+    if (actor) {
+      return actor
+    }
+  }
+
+  log.info('Key %s not found locally', keyId)
+  // refetch actor and retry
+  // if not found, fetch it from the network (discarding its fragment first if necessary)
   url.hash = ''
-  const actor = await getActor(url.href) // await _signAndSend('', url.href, 'get', secretSettings.privateKey)
-  return actor
+  actor = await getActor(url.href)
+  if (actor && !retry) {
+    return getActorFromKeyId(keyId, true)
+  }
 }
 
 export async function getNodeInfo(instance_url: string) {
   let nodeInfo = await ofetch(`${instance_url}/.well-known/nodeinfo`, { headers: { Accept: 'application/json' } })
-    .catch(() => {
+    .catch(e => {
       log.debug('[FEDI] Node %s does not support nodeInfo', instance_url)
+      throw e
     })
 
   if (nodeInfo?.links) {
@@ -33,10 +46,11 @@ export async function getNodeInfo(instance_url: string) {
     const supportedVersion = nodeInfo.links.find(l => l.rel === 'http://nodeinfo.diaspora.software/ns/schema/2.1' || 'http://nodeinfo.diaspora.software/ns/schema/2.0')
     if (!supportedVersion) {
       log.info('No nodeinfo version supported!')
-      return
     }
     const applicationActor = nodeInfo.links.find(l => l.rel === 'https://www.w3.org/ns/activitystreams#Application')
-    log.debug('application actor url: ', applicationActor)
+    if (applicationActor) {
+      log.debug('application actor url: ', applicationActor)
+    }
     nodeInfo = await ofetch(supportedVersion?.href)
     log.debug('[FEDI] getNodeInfo "%s", applicationActor: %s, nodeInfo: %s', instance_url, applicationActor?.href, nodeInfo)
 
@@ -61,9 +75,7 @@ export async function getInstance(actor_url: string, force = false) {
   }
 
   try {
-    const { applicationActor, nodeInfo } = await getNodeInfo(instance_url).catch((e) => {
-      log.warn('get node info failed', e)
-    })
+    const { applicationActor, nodeInfo } = await getNodeInfo(instance_url)
     const [instance] = await Instance.upsert({
       name: nodeInfo?.metadata?.nodeName ?? domain,
       domain,

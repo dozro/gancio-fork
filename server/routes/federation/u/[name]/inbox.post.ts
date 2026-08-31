@@ -1,4 +1,5 @@
 import { verifyHTTPSignature } from '~~/server/federation/httpsignature'
+import { verifyRFCSignature } from '~~/server/federation/rfcsignature'
 import { useLogger } from '~~/server/lib/logger'
 import { handleActivity } from '~~/server/federation/handlers'
 import { type APActivityBase, APActivityBaseSchema } from '~~/server/federation/types'
@@ -6,6 +7,7 @@ import { defineEventHandler, readRawBody, createError, setResponseStatus, setRes
 import { publicSettings } from '~~/server/services'
 
 export async function verifySignature(event: H3Event, rawBody: string, activityData: APActivityBase) {
+  const log = useLogger('AP Verify Signature')
   // check signature's type
   const sigHeader = getHeader(event, 'signature')
   if (sigHeader === undefined) return
@@ -13,15 +15,18 @@ export async function verifySignature(event: H3Event, rawBody: string, activityD
   const signatureInput = getHeader(event, 'signature-input')
   const authorActorId = activityData.actor
   if (!authorActorId) {
+    log.warn('No actor field in body')
     throw createError({ status: 401, message: 'No actor field in body' })
   }
 
   // draft
   if (sigHeader.includes('(request-target)')) {
+    log.warn('Found HTTP cavage signature')
     return verifyHTTPSignature(event, rawBody)
   // rfc
   } else if (signatureInput !== undefined) {
-    // return verifyRFCSignature(event, rawBody, activityData.actor, !!activityData.proof)
+    log.warn('Check for RFC Signature')
+    return verifyRFCSignature(event, rawBody)
   }
 }
 
@@ -63,15 +68,11 @@ export default defineEventHandler(async (event) => {
   if (!success || !activityData) {
     log.warn('Wrong AP activity: %s', error.issues[0]?.message)
     log.debug(activity)
+    log.debug(error)
     return
   }
 
   // this verifies who sent the activity
-  // object and a type property are required
-  // if (!activity?.object || !activity?.type) {
-  //   log.warn('activity without `object` or `type` property: %s', activity)
-  //   throw createError({ status: 400, message: 'Wrong AP activity: no object or type property' })
-  // }
 
   // authorship check is required for forwarded objects not owned by the sender actor
   // const hasEmbeddedObject = typeof activity.object === 'object'
@@ -99,9 +100,12 @@ export default defineEventHandler(async (event) => {
     log.info(e)
     throw e
   })
-  if (!activityActor) return false
+  if (!activityActor) {
+    log.warn('No valid signature')
+    throw createError({ status: 401 })
+  }
   try {
-    await handleActivity(activity, activityActor)
+    await handleActivity(activityData, activityActor)
   } catch (error) {
     log.error('Error handling activity: %s', error)
     throw createError({ status: 500, message: 'Error handling activity' })

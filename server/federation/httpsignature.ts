@@ -1,13 +1,14 @@
 import crypto from 'crypto'
 import { publicSettings } from '../services/settings'
 import { type H3Event, getHeader, createError } from 'h3'
-import type { APActivityBase } from './types'
 import { useLogger } from '../lib/logger'
 import { getActorFromKeyId } from './lookup'
 import type { APUser } from '../services'
-import { decodeStructuredField } from './http_dict'
 import { parseHttpKeyValueHeader } from '../lib/http'
 const log = useLogger('HTTPSignature')
+
+// http signature has to be within an hour of now
+const ALLOWED_SIGNATURE_SPAN = 60 * 60 * 1000
 
 /**
  * https://swicg.github.io/activitypub-http-signature/#how-to-sign-a-request
@@ -82,7 +83,7 @@ export async function verifyHTTPSignature(
 
   const signedDate = new Date(date).getTime()
   const receivedTime = Date.now()
-  if (signedDate < receivedTime - 60 * 60 * 1000 || signedDate > receivedTime + 60 * 60 * 1000) {
+  if (signedDate < receivedTime - ALLOWED_SIGNATURE_SPAN || signedDate > receivedTime + ALLOWED_SIGNATURE_SPAN) {
     throw createError('Signature no longer valid in time (expired)')
   }
   const signedHeaderKeys = (parsedSignature.get('headers') ?? '').split(' ')
@@ -148,128 +149,6 @@ export async function verifyHTTPSignature(
     }
   }
 
+  log.debug('Valid signature from %s', signedActor?.ap_id)
   return signedActor
-  // if (isValid) {
-  //   log.debug(`Valid signature from ${actor_url} `)
-  //   return ap_actor
-  // }
-
-  // // signature not valid, try get the actor again skipping the cache
-  // ap_actor = await getActor(actor_url, true)
-  // if (!ap_actor) {
-  //   log.info(`Actor ${actor_url} not found`)
-  //   throw createError({ status: 401, message: 'Actor not found' })
-  // }
-
-  // if (!ap_actor?.object?.publicKey?.publicKeyPem) {
-  //   log.info(`Actor %s has no publicKey at %s`, ap_actor.ap_id, actor_url)
-  //   throw createError({ status: 401, message: 'No public key' })
-  // }
-
-  // if (httpSignature.verifySignature(parsed, ap_actor.object.publicKey.publicKeyPem)) {
-  //   log.debug(`Valid signature from ${actor_url} `)
-  //   return ap_actor
-  // }
-
-  // // still not valid
-  // log.info(`Invalid signature from Actor ${actor_url} - ${parsed}`)
-  // throw createError({ status: 401, message: 'Request signature could not be verified' })
-  //
-  // // get the actor
-  // const actor_url = body?.actor
-
-  // log.debug('Verify Signature ', actor_url)
-
-  // // do we have an actor?
-  // if (!actor_url) {
-  //   log.warn(`[FEDI] Verify Signature: No actor url or empty body`)
-  //   throw createError({ status: 401, message: `No actor field in body` })
-  // }
-
-  // // get actor
-  // let ap_actor = await getActor(actor_url, false)
-  // if (!ap_actor) {
-  //   log.info(`Actor ${actor_url} not found`)
-  //   throw createError({ status: 401, message: 'Actor not found' })
-  // }
-
-  // // Is this instance blocked?
-  // if (ap_actor.instance?.blocked) {
-  //   log.warn(`Instance ${ap_actor.instance.domain} blocked`)
-  //   throw createError({ status: 401, message: 'Instance blocked' })
-  // }
-
-  // if (ap_actor.blocked) {
-  //   log.info(`Actor ${ap_actor.ap_id} blocked`)
-  //   throw createError({ status: 401, message: 'Actor blocked' })
-  // }
-
-  // if (!ap_actor?.object?.publicKey?.publicKeyPem) {
-  //   log.info(`Actor %s has no publicKey at %s`, ap_actor.ap_id, actor_url)
-  //   throw createError({ status: 401, message: 'No public key' })
-  // }
-
-  // if (parsed.keyId !== ap_actor.object.publicKey?.id) {
-  //   log.warn(`keyId mismatch: ${parsed.keyId} !== ${ap_actor.object.publicKey?.id}`)
-  //   throw createError({ status: 401, message: 'keyId mismatch' })
-  // }publicSettings
-
-  // const isValid = httpSignature.verifySignature(parsed, ap_actor.object.publicKey.publicKeyPem)
-}
-
-export async function prepareRFCSignature(_message: string, _actor: APUser, _keyId: string) {
-
-}
-
-/**
- * Verify a RFC 9421 signature
- */
-export async function verifyRFCSignature(event: H3Event, _rawBody: string, _activityData: APActivityBase): Promise<APUser | undefined> {
-  const signatureInput = getHeader(event, 'signature-input')
-  if (signatureInput === undefined) return
-  const input = decodeStructuredField(signatureInput.toString())
-
-  // each key in the input & sig is a signature. find one we have a key for!
-  const sigKeys = [...input.keys()]
-    .map(key => input.get(key)?.params?.get('keyid')?.toString())
-    .filter(Boolean)
-  if (sigKeys.length == 0) return
-
-  // use the first key we already have locally, or if we have none, fetch the first one
-  // const keyId = sigKeys.find(id => app.db.actor.getActorByAnyKeyId(id) !== undefined) ?? sigKeys[0]!
-
-  // const actors = await getAndCheckActors(app, authorActorId, keyId, alternateSignerIds, hasProof);
-  // if (actors === undefined) return "invalid";
-  // const { signingActor, authorActor: _ } = actors;
-  // const keys = signingActor.record.assertionMethod ?? [];
-  // if (signingActor.record.publicKey !== undefined) {
-  //   const oldPk = signingActor.record.publicKey;
-  //   if (oldPk.publicKeyPem !== undefined) {
-  //     keys.push(await getPublicMultiKeyFromPem(oldPk.owner, oldPk.id, "rsa", oldPk.publicKeyPem));
-  //   }
-  // }
-
-  // // in fastify: request.url == metadata.target, "host" header is set by nginx, "x-forwarded-proto" is scheme
-  // const metadata: HttpRequestMetadata = {
-  //   method: request.method,
-  //   scheme: request.headers["x-forwarded-proto"]?.toString() ?? "https",
-  //   host: request.headers["host"] ?? app.config.domain,
-  //   target: request.url,
-  // };
-
-  // try {
-  //   await checkHttpRfc(metadata, request.headers, (request.rawBody ?? "") as string, keys);
-  // } catch (error) {
-  //   if (error instanceof Error) {
-  //     app.log.info(`Discarding request from ${signingActor.id}: bad HTTP RFC signature: ${error.message}`);
-  //   }
-  //   app.events.add(
-  //     "bad-signature",
-  //     { severity: EventSeverity.Error, actor: signingActor.id, target: authorActorId, reason: "rfc-signature" },
-  //   );
-  //   return "invalid";
-  // }
-
-  // app.log.info(`WHOA we got an RFC 9421 signature!!!`);
-  // return signingActor;
 }

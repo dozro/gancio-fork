@@ -6,6 +6,7 @@ import { Instance, APUser } from '../services/db'
 
 import type { APActor } from './types'
 import { getInstance } from './lookup'
+import { importActorKeys } from './keys'
 
 const log = useLogger('federation')
 
@@ -36,7 +37,9 @@ export async function getActor(actorUrl: string, bypassCache = false): Promise<A
       log.debug('getActor failed for %s', actorUrl)
       return
     }
+
     if (!['Application', 'Group', 'Organization', 'Person', 'Service'].includes(ret?.type)) {
+      log.debug('getActor failed for %s, invalid type %s', actorUrl, ret?.type)
       return
     }
 
@@ -51,6 +54,7 @@ export async function getActor(actorUrl: string, bypassCache = false): Promise<A
           blocked: false
         }))
 
+        await importActorKeys(ret)
         await fedi_user.setInstance(instance)
         return fedi_user
       } catch (e) {
@@ -59,6 +63,6 @@ export async function getActor(actorUrl: string, bypassCache = false): Promise<A
     }
   } catch (e) {
     log.debug('getActor failed for %s, %s', actorUrl, e)
-    return
   }
+  return
 }
