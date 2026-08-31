@@ -33,7 +33,7 @@ export const APHandlers: APHandlerMap = {
   Accept: async () => { }
 }
 
-export function isAPActivity(obj: unknown): obj is APActivity {
+export function isAPActivity(obj: any): obj is APActivity {
   return obj &&
     typeof obj === 'object' &&
     typeof obj.type === 'string' &&
@@ -68,6 +68,7 @@ export async function handleActivity(activity: APActivityBase, activityActor?: A
 
 async function handleUndo(message: APActivityUndo, activityActor: APUser) {
   const obj = message.object
+  log.debug(`Undo activity from ${activityActor.ap_id} with activity: `, obj)
   if (!obj) return
 
   switch (obj.type) {

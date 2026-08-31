@@ -91,7 +91,7 @@ describe('AP Activity handler', () => {
     await setSetting('enable_resources', false)
     const { default: event } = await import('../fixtures/APActivities/2-CreateNote')
     const ret = handleActivity(event, actor)
-    return expect(ret).rejects.toThrow('Note are disabled')
+    return expect(ret).resolves.toBeUndefined()
   })
 
   it('should handle a Create > Note to an existing event', async () => {
@@ -107,7 +107,7 @@ describe('AP Activity handler', () => {
     await setSetting('enable_resources', true)
     const { default: activity } = await import('../fixtures/APActivities/2-CreateNote')
     const ret = handleActivity({ ...activity, object: { ...activity.object, inReplyTo: 'http://localhost:13120/event/123' } }, actor)
-    return expect(ret).rejects.toThrow('Not found')
+    return expect(ret).resolves.toBeUndefined()
   })
 
   it('should not handle a Delete > Note with different actor (adversarial)', async () => {

@@ -16,7 +16,7 @@ const log = useLogger('federation:notes')
 export async function handleCreateNote(message: APNote, actor: APUser) {
   if (!publicSettings.enable_resources) {
     log.info('Ignore resource as it is disabled in settings')
-    throw new Error('Note are disabled')
+    return
   }
 
   // search for related event
@@ -45,7 +45,7 @@ export async function handleCreateNote(message: APNote, actor: APUser) {
   if (!event) {
     log.warn('Create Activity for Note object are only supported for events or other local notes')
     log.warn(message)
-    throw new Error('Not found')
+    return
   }
 
   log.debug(`Reply from ${actor.ap_id} to "${publicSettings.baseurl}/event/${event.slug}"`)
@@ -111,7 +111,7 @@ export async function handleUpdateNote(message: APNote, actor: APUser) {
   const resource = await Resource.findOne({ where: { activitypub_id: message?.id, apUserApId: actor.ap_id } })
   if (!resource) {
     log.warn('Note not found')
-    throw new Error('Not found')
+    return
   }
 
   message.content = sanitizeHTML(linkifyHtml(message.content || '', { target: '_blank', render: { email: ctx => ctx.content } }))
@@ -127,7 +127,7 @@ export async function handleDeleteNote(message: APNote, actor: APUser) {
   const resource = await Resource.findOne({ where: { activitypub_id: message?.id, apUserApId: actor.ap_id } })
   if (!resource) {
     log.warn(`Note not found`)
-    throw new Error('Not found')
+    return
   }
   await resource.destroy()
   log.info(`Note ${resource.activitypub_id} removed`)
