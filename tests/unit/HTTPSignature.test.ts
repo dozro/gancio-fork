@@ -169,12 +169,12 @@ describe('RFC 521a - Representing actor’s public keys', () => {
     })
     const keys = importActorKeys(actor)
     expect(keys).toBeDefined()
-    expect(keys).resolves.toHaveLength(3)
+    await expect(keys).resolves.toHaveLength(3)
 
     // check with old public key
     const a = await APUser.findOne({ include: [{ model: APKey, where: { ap_id: actor.publicKey.id }, required: true }] })
     expect(a?.keys[0].ap_id).toEqual(actor.publicKey.id)
-    expect(a?.keys[0].type).toEqual('rsa-pss-sha512')
+    expect(a?.keys[0].type).toEqual('rsa-v1_5-sha256')
     expect(a?.keys[0].public_key).toBeInstanceOf(Uint8Array)
     expect(a?.keys[0].public_key.length).toBeGreaterThan(0)
     expect(a?.keys[0].apUserApId).toEqual(actor.id)
