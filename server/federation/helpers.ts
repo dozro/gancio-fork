@@ -124,7 +124,7 @@ export async function getFollowersInbox() {
 
 export const APContext = [
   'https://www.w3.org/ns/activitystreams',
-  'https://w3id.org/fep/8a8e',
+  // 'https://w3id.org/fep/8a8e',
   'https://schema.org',
   'https://w3id.org/security/v1',
   {

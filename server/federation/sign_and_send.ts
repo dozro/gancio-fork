@@ -17,7 +17,7 @@ export async function _signAndSend(object: APActivityBase | '', inbox: string, m
   log.debug('[FEDI] Sign and %s %s', method, inbox)
 
   const body = JSON.stringify(object)
-  const httpSignatureHeaders = await prepareHTTPSignature(body, inbox, method, privkey)
+  const httpSignatureHeaders = prepareHTTPSignature(body, inbox, method, privkey)
   try {
     const ret = await fetch(inbox, {
       headers: {
@@ -31,9 +31,9 @@ export async function _signAndSend(object: APActivityBase | '', inbox: string, m
 
     const contentType = ret.headers.get('content-type')
     // check if content-type is json
-    if (!contentType?.includes('json') && !contentType?.includes('text/plain')) {
-      log.error(`[FEDI] Error in sign and send, wrong content-type returned: ${contentType} - status: ${ret.status}`)
-      console.error(await ret.text())
+    if (!contentType?.includes('json')) {
+      const body = await ret.text()
+      log.info(`[FEDI] Error in sign and send, wrong content-type returned: ${contentType} - status: ${ret.status} - body: ${body}`)
       return
     }
 

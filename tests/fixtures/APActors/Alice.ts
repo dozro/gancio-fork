@@ -1,5 +1,3 @@
-import { APActor } from '../../../server/federation/types'
-
 export default {
   type: 'Person',
   name: 'alice',

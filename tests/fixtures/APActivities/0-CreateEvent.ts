@@ -1,6 +1,8 @@
 export default {
   '@context': 'https://www.w3.org/ns/activitystreams',
   'type': 'Create',
+  'to': ['https://example.com/user1', 'https://example.com/user2'],
+  'cc': 'https://example.com/user3',
   'actor': 'http://localhost:13120/federation/u/relay',
   'object': {
     id: 'http://localhost:13120/federation/m/1',

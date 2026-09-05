@@ -1,10 +1,34 @@
 import { verifyHTTPSignature } from '~~/server/federation/httpsignature'
-// import * as LDSignature from '~~/server/federation/ldsignature'
+import { verifyRFCSignature } from '~~/server/federation/rfcsignature'
 import { useLogger } from '~~/server/lib/logger'
 import { handleActivity } from '~~/server/federation/handlers'
-import { APActivityBaseSchema } from '~~/server/federation/types'
-import { defineEventHandler, readRawBody, createError, setResponseStatus, setResponseHeader } from 'h3'
+import { type APActivityBase, APActivityBaseSchema } from '~~/server/federation/types'
+import { defineEventHandler, readRawBody, createError, setResponseStatus, setResponseHeader, getHeader, type H3Event } from 'h3'
 import { publicSettings } from '~~/server/services'
+
+export async function verifySignature(event: H3Event, rawBody: string, activityData: APActivityBase) {
+  const log = useLogger('AP Verify Signature')
+  // check signature's type
+  const sigHeader = getHeader(event, 'signature')
+  if (sigHeader === undefined) return
+
+  const signatureInput = getHeader(event, 'signature-input')
+  const authorActorId = activityData.actor
+  if (!authorActorId) {
+    log.warn('No actor field in body')
+    throw createError({ status: 401, message: 'No actor field in body' })
+  }
+
+  // draft
+  if (sigHeader.includes('(request-target)')) {
+    log.warn('Found HTTP cavage signature')
+    return verifyHTTPSignature(event, rawBody)
+  // rfc
+  } else if (signatureInput !== undefined) {
+    log.warn('Check for RFC Signature')
+    return verifyRFCSignature(event, rawBody)
+  }
+}
 
 /**
  * Federation route handler for ActivityPub (AP) POST requests to /inbox.
@@ -17,36 +41,38 @@ export default defineEventHandler(async (event) => {
   const log = useLogger('AP inbox')
 
   // check destination inbox
-  const actorName = event.context?.params?.name
-  if (!actorName) {
+  const destActorName = event.context?.params?.name
+  if (!destActorName) {
     log.info('Invalid /inbox request')
     throw createError({ status: 401, message: 'Invalid actor name' })
   }
 
   // only the instance shared inbox is supported
-  if (actorName !== publicSettings.instance_name) {
-    log.info(`No record found for ${actorName} (applicationActor is ${publicSettings.instance_name})`)
-    throw createError({ status: 404, message: `No actor found for ${actorName} (applicationActor is ${publicSettings.instance_name})` })
+  if (destActorName !== publicSettings.instance_name) {
+    log.info(`No record found for ${destActorName} (applicationActor is ${publicSettings.instance_name})`)
+    throw createError({ status: 404, message: `No actor found for ${destActorName} (applicationActor is ${publicSettings.instance_name})` })
   }
 
   // read and parse the raw body
   const rawBody = await readRawBody(event)
   if (!rawBody) throw createError({ status: 400, message: 'Empty body' })
 
-  const activity = JSON.parse(rawBody.toString())
+  let activity: unknown
+  try {
+    activity = JSON.parse(rawBody.toString())
+  } catch {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid JSON body' })
+  }
+
   const { success, data: activityData, error } = APActivityBaseSchema.safeParse(activity)
-  if (!success) {
+  if (!success || !activityData) {
     log.warn('Wrong AP activity: %s', error.issues[0]?.message)
     log.debug(activity)
+    log.debug(error)
     return
   }
 
   // this verifies who sent the activity
-  // object and a type property are required
-  // if (!activity?.object || !activity?.type) {
-  //   log.warn('activity without `object` or `type` property: %s', activity)
-  //   throw createError({ status: 400, message: 'Wrong AP activity: no object or type property' })
-  // }
 
   // authorship check is required for forwarded objects not owned by the sender actor
   // const hasEmbeddedObject = typeof activity.object === 'object'
@@ -70,13 +96,16 @@ export default defineEventHandler(async (event) => {
   //   }
   // }
 
-  const activityActor = await verifyHTTPSignature(event, rawBody, activityData).catch((e) => {
+  const activityActor = await verifySignature(event, rawBody, activityData).catch((e) => {
     log.info(e)
     throw e
   })
-  if (!activityActor) return false
+  if (!activityActor) {
+    log.warn('No valid signature')
+    throw createError({ status: 401 })
+  }
   try {
-    await handleActivity(activity, activityActor)
+    await handleActivity(activityData, activityActor)
   } catch (error) {
     log.error('Error handling activity: %s', error)
     throw createError({ status: 500, message: 'Error handling activity' })

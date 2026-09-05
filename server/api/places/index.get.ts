@@ -1,12 +1,12 @@
 import { getValidatedQuery, defineEventHandler } from 'h3'
 import { z } from 'zod'
 import { Op, fn, col, where } from '@sequelize/core'
-import { Place, Event, publicSettings } from '~~/server/services'
+import { Place, Event } from '~~/server/services'
 
 import { placeToJSON } from '~~/server/services/places'
 const schema = z.object({
-  query: z.string().optional().transform(q => q?.toLocaleLowerCase(publicSettings.instance_locale)),
-  limit: z.number().min(1).max(100).default(10)
+  query: z.string().toLowerCase().optional(),
+  limit: z.coerce.number().min(1).max(100).default(10)
 })
 
 /**

@@ -1,65 +1,44 @@
 import { ofetch } from 'ofetch'
-import { sanitizeHTML } from '../helpers'
 import { _signAndSend } from './sign_and_send'
 import { useLogger } from '../lib/logger'
-import { secretSettings } from '../services/settings'
-import { Instance, APUser } from '../services/db'
-import type { APActor } from './types'
+import { APKey, APUser, Instance } from '../services/db'
+import { getActor } from './get_actor'
+// import { secretSettings } from '../services'
 
 const log = useLogger('federation')
 
 /**
- * Get an Actor from a URL using GET HTTP Signature.
- * @param actorUrl - The URL of the Actor to get.
- * @param force - bypass the cache and make a fresh request.
- * @returns The APUser representing the Actor, or null if not found.
+ * https://swicg.github.io/activitypub-http-signature/#how-to-obtain-a-signature-s-public-key
  */
-export async function getActor(actorUrl: string, force = false) {
-  log.debug(`[FEDI] getActor for ${actorUrl}`)
-  let fedi_user
+export async function getActorFromKeyId(keyId: string, retry: boolean = false, bypassCache: boolean = false): Promise<APUser | undefined> {
+  log.debug(`[FEDI] getActorFromKeyId for ${keyId}`)
+  // it should be an URL
+  const url = new URL(keyId)
 
-  // try with cache first
-  if (!force) {
-    fedi_user = await APUser.findByPk(actorUrl, { include: { model: Instance, required: true } }) as APUser & { instance: Instance }
-    if (fedi_user) {
-      return fedi_user
+  // search it locally
+  let actor: APUser | undefined | null
+  if (!bypassCache) {
+    actor = await APUser.findOne({ include: [{ model: APKey, where: { ap_id: keyId }, required: true }] })
+    if (actor) {
+      return actor
     }
   }
 
-  try {
-    const ret: APActor = await _signAndSend('', actorUrl, 'get', secretSettings.privateKey)
-    if (!ret?.id) {
-      log.debug('getActor failed for %s', actorUrl)
-      return
-    }
-
-    if (ret) {
-      const instance = await getInstance(actorUrl, false)
-      log.info('[FEDI] Create/Update a new AP User "%s" and associate it to instance "%s"', ret.id, instance?.domain)
-      try {
-        ([fedi_user] = await APUser.upsert({
-          ap_id: ret.id,
-          object: { ...ret, summary: sanitizeHTML(ret?.summary ?? '') },
-          instanceDomain: instance.domain ?? new URL(actorUrl).origin,
-          blocked: false
-        }))
-
-        await fedi_user.setInstance(instance)
-        return fedi_user
-      } catch (e) {
-        log.debug('[FEDI] Error in update/create ', e)
-      }
-    }
-  } catch (e) {
-    log.debug('getActor failed for %s, %s', actorUrl, e)
-    return
+  log.info('Key %s not found locally', keyId)
+  // refetch actor and retry
+  // if not found, fetch it from the network (discarding its fragment first if necessary)
+  url.hash = ''
+  actor = await getActor(url.href)
+  if (actor && !retry) {
+    return getActorFromKeyId(keyId, true)
   }
 }
 
 export async function getNodeInfo(instance_url: string) {
   let nodeInfo = await ofetch(`${instance_url}/.well-known/nodeinfo`, { headers: { Accept: 'application/json' } })
-    .catch(() => {
+    .catch(e => {
       log.debug('[FEDI] Node %s does not support nodeInfo', instance_url)
+      throw e
     })
 
   if (nodeInfo?.links) {
@@ -67,10 +46,11 @@ export async function getNodeInfo(instance_url: string) {
     const supportedVersion = nodeInfo.links.find(l => l.rel === 'http://nodeinfo.diaspora.software/ns/schema/2.1' || 'http://nodeinfo.diaspora.software/ns/schema/2.0')
     if (!supportedVersion) {
       log.info('No nodeinfo version supported!')
-      return
     }
     const applicationActor = nodeInfo.links.find(l => l.rel === 'https://www.w3.org/ns/activitystreams#Application')
-    log.debug('application actor url: ', applicationActor)
+    if (applicationActor) {
+      log.debug('application actor url: ', applicationActor)
+    }
     nodeInfo = await ofetch(supportedVersion?.href)
     log.debug('[FEDI] getNodeInfo "%s", applicationActor: %s, nodeInfo: %s', instance_url, applicationActor?.href, nodeInfo)
 
@@ -95,9 +75,7 @@ export async function getInstance(actor_url: string, force = false) {
   }
 
   try {
-    const { applicationActor, nodeInfo } = await getNodeInfo(instance_url).catch((e) => {
-      log.warn('get node info failed', e)
-    })
+    const { applicationActor, nodeInfo } = await getNodeInfo(instance_url)
     const [instance] = await Instance.upsert({
       name: nodeInfo?.metadata?.nodeName ?? domain,
       domain,

@@ -10,6 +10,7 @@ const mockedGetUser = vi.mocked(getUser)
 const { adminUser, editUser, userUser } = await cleanDatabase(true)
 const { default: eventPlaceHandler } = await import('../../server/api/events/place/[place]')
 const { default: createEventHandler } = await import('../../server/api/events/index.post')
+const { default: placesHandler } = await import('../../server/api/places/index.get')
 
 describe('Place', async () => {
   it('should create a new place creating an event', async () => {
@@ -60,8 +61,7 @@ describe('Place', async () => {
   })
 
   it('should search for a place', async () => {
-    const { default: placesHandler } = await import('../../server/api/places/index.get')
-    const ret = await placesHandler(mockH3Event({ query: { query: 'test' } }))
+    const ret = await placesHandler(mockH3Event({ query: { query: 'Test' } }))
     expect(ret.length).toBe(1)
   })
 
@@ -89,5 +89,12 @@ describe('Place', async () => {
     }))
     expect(ret.place.name).toBe('test place')
     expect(ret.place.address).toBe('15 Fediverse Street, Fediverse Town, Steiermark, Austria')
+  })
+
+  it('should get limited results', async () => {
+    let ret = await placesHandler(mockH3Event({}))
+    expect(ret.length).toBe(2)
+    ret = await placesHandler(mockH3Event({ query: { limit: '1' } }))
+    expect(ret.length).toBe(1)
   })
 })

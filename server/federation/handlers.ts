@@ -16,7 +16,7 @@ import { _signAndSend } from './sign_and_send'
 import { secretSettings } from '../services/settings'
 
 import { verify } from './ldsignature'
-import { getActor } from './lookup'
+import { getActor } from './get_actor'
 
 const log = useLogger('APHandlers')
 
@@ -68,6 +68,7 @@ export async function handleActivity(activity: APActivityBase, activityActor?: A
 
 async function handleUndo(message: APActivityUndo, activityActor: APUser) {
   const obj = message.object
+  log.debug(`Undo activity from ${activityActor.ap_id} with activity: `, obj)
   if (!obj) return
 
   switch (obj.type) {
@@ -117,7 +118,7 @@ async function handleAnnounce(message: APActivityAnnounce, activityActor: APUser
   }
 }
 
-async function handleUnannounce(message, activityActor) {
+async function handleUnannounce(message, _activityActor) {
   log.info(`Undo Announce message: `, message.id)
 }
 

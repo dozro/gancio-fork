@@ -3,6 +3,7 @@ import { Readable } from 'node:stream'
 import { IncomingMessage, ServerResponse } from 'node:http'
 import { createEvent } from 'h3'
 import type { IncomingHttpHeaders } from 'node:http2'
+import { Socket } from 'node:net'
 
 type MockH3EventOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -17,13 +18,13 @@ export function mockH3Event({ body = null, method = 'POST', url = '/', query = {
   // build query string
   const qs = new URLSearchParams(query).toString()
 
-  const req = new IncomingMessage(null as any)
+  const req = new IncomingMessage(new Socket())
   req.method = method
   req.url = qs ? `${url}?${qs}` : url
 
   req.headers = { ...headers }
   if (body) {
-    const json = JSON.stringify(body)
+    const json = typeof body === 'string' ? body : JSON.stringify(body)
 
     // simulate request stream
     const stream = Readable.from([Buffer.from(json)])
@@ -39,7 +40,7 @@ export function mockH3Event({ body = null, method = 'POST', url = '/', query = {
   return evt
 }
 
-export function mockInboxActivity(body: any) {
+export function mockInboxActivity(body: unknown) {
   return mockH3Event({
     headers: { Accept: 'application/activity+json' },
     method: 'POST',

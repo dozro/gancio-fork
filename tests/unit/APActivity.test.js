@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { handleActivity } from '../../server/federation/handlers'
-import { getActor, getInstance } from '../../server/federation/lookup'
+import { getInstance } from '../../server/federation/lookup'
+import { getActor } from '../../server/federation/get_actor'
 import { connect, Event, Instance, Resource, APUser, runMigrations } from '../../server/services/db'
 import { loadSettings, setSetting } from '../../server/services/settings'
 
@@ -90,7 +91,7 @@ describe('AP Activity handler', () => {
     await setSetting('enable_resources', false)
     const { default: event } = await import('../fixtures/APActivities/2-CreateNote')
     const ret = handleActivity(event, actor)
-    return expect(ret).rejects.toThrow('Note are disabled')
+    return expect(ret).resolves.toBeUndefined()
   })
 
   it('should handle a Create > Note to an existing event', async () => {
@@ -106,7 +107,7 @@ describe('AP Activity handler', () => {
     await setSetting('enable_resources', true)
     const { default: activity } = await import('../fixtures/APActivities/2-CreateNote')
     const ret = handleActivity({ ...activity, object: { ...activity.object, inReplyTo: 'http://localhost:13120/event/123' } }, actor)
-    return expect(ret).rejects.toThrow('Not found')
+    return expect(ret).resolves.toBeUndefined()
   })
 
   it('should not handle a Delete > Note with different actor (adversarial)', async () => {

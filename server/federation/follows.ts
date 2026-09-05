@@ -4,6 +4,7 @@ import { useLogger } from '../lib/logger'
 import { signAndSend } from './sign_and_send'
 import crypto from 'crypto'
 import type { APActivityFollow, APActivityUndo } from './types'
+import type { APUser } from '../services'
 
 const log = useLogger('AP follow')
 

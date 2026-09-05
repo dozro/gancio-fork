@@ -551,7 +551,7 @@ export function eventToAP(event: Event) {
     '@context': [
       'https://schema.org',
       'https://www.w3.org/ns/activitystreams',
-      'https://w3id.org/fep/8a8e',
+      // 'https://w3id.org/fep/8a8e',
       'https://w3id.org/security/v1',
       {
         quote: 'https://w3id.org/fep/044f#quote',

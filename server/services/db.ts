@@ -73,7 +73,7 @@ export async function connect() {
     sequelize = new Sequelize(config.db as Options<AbstractDialect>)
     await sequelize.authenticate()
     log.info('Connection has been established successfully.')
-    sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message, OAuthToken])
+    sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message, OAuthToken, APKey])
   } catch (error) {
     console.error('Unable to connect to the database:', config.db, error)
     process.exit(1)
@@ -605,6 +605,42 @@ export class APUser extends Model<
 
   @HasMany(() => Resource, { foreignKey: 'activitypub_id', sourceKey: 'ap_id' })
   declare resources?: NonAttribute<Resource[]>
+
+  @HasMany(() => APKey, { foreignKey: 'apUserApId', sourceKey: 'ap_id' })
+  declare keys?: NonAttribute<APKey[]>
+}
+
+export const KeyTypeEnum = ['ed25519', 'rsa-v1_5-sha256', 'rsa-pss-sha512'] as const
+export type KeyType = typeof KeyTypeEnum[number]
+
+@Table({
+  tableName: 'ap_keys',
+  timestamps: false
+})
+export class APKey extends Model<
+  InferAttributes<APKey>,
+  InferCreationAttributes<APKey>
+> {
+  @Attribute(DataTypes.STRING)
+  @PrimaryKey
+  declare ap_id: string
+
+  @Attribute(DataTypes.ENUM(...KeyTypeEnum))
+  declare type: KeyType
+
+  @Attribute(DataTypes.BLOB)
+  declare public_key: Uint8Array
+
+  @Attribute({
+    type: DataTypes.STRING,
+    references: { table: 'ap_users', key: 'ap_id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
+  })
+  declare apUserApId: string
+
+  @BelongsTo(() => APUser, { foreignKey: 'apUserApId', targetKey: 'ap_id' })
+  declare APUser: NonAttribute<APUser>
 }
 
 @Table({
