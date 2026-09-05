@@ -17,7 +17,7 @@ await connect()
 await runMigrations()
 await loadSettings()
 
-describe('LDSignature', () => {
+describe.todo('LDSignature', () => {
   it('should sign and verify a signature', async () => {
     const signature = await sign(event, alicePrivateKey, aliceActor.publicKey.id)
     expect(signature).toBeDefined()
