@@ -210,7 +210,7 @@ async function getOutboxPaginated<Outbox = unknown>(
   let outbox: Outbox[] = []
 
   let nextPageUrl = initialUrl
-  let thereIsMoreContent = true
+  let thereIsMoreContent
   let pageCount = 0
 
   // Always get at least the first page, independently of the "soft limit"
