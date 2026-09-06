@@ -225,6 +225,7 @@ export interface APActivityMap {
   Like: APActivityLike
   Accept: APActivityAccept
   Update: APActivityUpdate
+  EchoRequest: APActivityBase
   QuoteRequest: APActivityQuoteRequest
 }
 
