@@ -34,7 +34,8 @@ export default withNuxt([
       '@stylistic/space-before-function-paren': 'off',
       '@stylistic/eol-last': 'off',
       '@stylistic/comma-dangle': ['error', 'only-multiline'],
-      '@stylistic/operator-linebreak': 'off'
+      '@stylistic/operator-linebreak': 'off',
+      '@stylistic/arrow-parens': 'off'
     }
   }
 ])
