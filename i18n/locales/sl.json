@@ -116,7 +116,17 @@
         "instances": "Instanca",
         "follow": "Sledi",
         "import": "Uvozi",
-        "trusted_sources": "Zaupanja vredni federirani viri"
+        "trusted_sources": "Zaupanja vredni federirani viri",
+        "go_back": "Pojdi nazaj",
+        "actors": "Vozel",
+        "no_events_found": "Nismo našli dogodkov",
+        "no_events_found_hint": "Izberi drug datum ali merila",
+        "dark_mode": "Temni način",
+        "publish": "Objavi",
+        "convert_draft": "Pretvori v osnutek",
+        "create_draft": "Ustvari kot osnutek",
+        "save_draft": "Shrani osnutek",
+        "draft": "Osnutek"
     },
     "login": {
         "not_registered": "Niste registrirani?",
@@ -131,7 +141,13 @@
         "list_title": "Seznam",
         "insert_your_address": "Vnesite svoj e-poštni naslov",
         "ical_title": "ics/ical",
-        "email_description": "Dogodke, ki vas zanimajo, lahko pošljemo po e-pošti."
+        "email_description": "Dogodke, ki vas zanimajo, lahko pošljemo po e-pošti.",
+        "filter_title": "Filtriraj",
+        "ical_description": "Računalniki in pametni telefoni so pogosto opremljeni z aplikacijami koledarjev, ki lahko uvozijo oddaljen koledar.",
+        "list_description": "Če imate spletno stran in želite prikazati seznam dogodkov, uporabite naslednjo kodo",
+        "filter_description": "Svoj izvoz lahko filtrirate tukaj po oznakah in kraju ali po vnaprej določeni zbirki kriterijev",
+        "max_height": "Največja višina",
+        "show_more": "Pokaži več"
     },
     "recover": {
         "not_valid_code": "Nekaj je šlo narobe."
