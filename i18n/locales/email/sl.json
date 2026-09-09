@@ -8,7 +8,7 @@
         "content": "Pozdravljeni, vaš račun na <a href='{{{config.baseurl}}}'>{{config.title}}</a> je potrjen. Pišite nam na {{config.admin_email}} za kakršne koli informacije."
     },
     "user_confirm": {
-        "content": "Pozdravljeni, vaš račun na <a href='{{{config.baseurl}}}'>{{config.title}}</a> je bil ustvarjen. <a href='{{{config.baseurl}}}/user_confirm/{{user.recover_code}}'>Potrdite ga in izberite geslo</a>.",
+        "content": "Pozdravljeni, vaš račun na <a href='{{{config.baseurl}}}'>{{config.title}}</a> je bil ustvarjen. <a href='{{{config.baseurl}}}/user_confirm/{{user.recover_code}}'>Potrdite ga in izberite geslo.</a>.",
         "subject": "Zdaj lahko začnete objavljati dogodke"
     },
     "admin_register": {
