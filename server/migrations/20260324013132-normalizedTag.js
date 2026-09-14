@@ -66,9 +66,8 @@ function normalizeTag(tag) {
   })
 }
 
-export async function up({ context: queryInterface }) {
-  await queryInterface.sequelize.sync()
-  await queryInterface.sequelize.transaction(async (transaction) => {
+export function up({ context: queryInterface }) {
+  return queryInterface.sequelize.transaction(async (transaction) => {
     // mock Tag model because its easier to do updates with it than raw queries and is not easy to import from the model in a migration
     const Tag = queryInterface.sequelize.define('Tag', {
       // id: { type: DataTypes.INTEGER, autoIncrement: true, allowNull: true },
