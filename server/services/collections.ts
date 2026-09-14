@@ -15,9 +15,9 @@ export const collectionQuerySchema = z.object({
   show_recurrent: boolish.default(publicSettings.recurrent_event_visible),
   show_multidate: boolish.default(true),
   show_federated: boolish.default(false),
-  limit: z.number().optional(),
+  limit: z.coerce.number().int().optional(),
   include_description: boolish.optional(),
-  page: z.number().optional(),
+  page: z.coerce.number().int().optional(),
   older: boolish.optional(),
   reverse: boolish.optional()
 })
@@ -80,7 +80,7 @@ export async function getCollectionEvents(opts?: unknown): Promise<Event[]> {
 
   // collection is empty if there are no filters
   if (!filters.length) {
-    log.debug('[COLLECTION] This collection has no filter!')
+    log.debug('This collection has no filter!')
     return []
   }
 

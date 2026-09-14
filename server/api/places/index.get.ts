@@ -6,7 +6,7 @@ import { Place, Event } from '~~/server/services'
 import { placeToJSON } from '~~/server/services/places'
 const schema = z.object({
   query: z.string().toLowerCase().optional(),
-  limit: z.coerce.number().min(1).max(100).default(10)
+  limit: z.coerce.number().int().min(1).max(100).default(10)
 })
 
 /**

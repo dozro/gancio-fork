@@ -5,7 +5,7 @@ import { Event, Place, publicSettings, Tag } from '~~/server/services'
 import { eventToAP } from '~~/server/services/events'
 
 const schema = z.object({
-  page: z.coerce.number().gte(1).optional()
+  page: z.coerce.number().int().gte(1).optional()
 })
 
 // https://www.w3.org/TR/activitypub/#outbox

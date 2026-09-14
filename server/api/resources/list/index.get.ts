@@ -9,8 +9,8 @@ import { fn, Op, sql, where } from '@sequelize/core'
 import { jsonPath } from '~~/server/services/db'
 
 const schema = z.object({
-  page: z.coerce.number().min(1).default(1),
-  pageSize: z.coerce.number().min(5).max(50).default(15),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(5).max(50).default(15),
   query: z.string().optional()
 })
 
