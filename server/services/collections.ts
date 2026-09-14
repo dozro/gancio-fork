@@ -15,9 +15,9 @@ export const collectionQuerySchema = z.object({
   show_recurrent: boolish.default(publicSettings.recurrent_event_visible),
   show_multidate: boolish.default(true),
   show_federated: boolish.default(false),
-  limit: z.int().optional(),
+  limit: z.coerce.number().int().optional(),
   include_description: boolish.optional(),
-  page: z.int().optional(),
+  page: z.coerce.number().int().optional(),
   older: boolish.optional(),
   reverse: boolish.optional()
 })
