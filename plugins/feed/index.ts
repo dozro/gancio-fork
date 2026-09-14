@@ -25,14 +25,16 @@ export default ({ log, db, services }: GancioContext): GancioPlugin => ({
   manifest: {
     name: 'Feed',
     author: 'lesion',
+    version: '2.0',
     url: 'https://framagit.org/les/gancio',
     description: 'Get events from a specified ICS feed: you can specify only a single feed, images are not imported from ics, event location are taken as is as are not structured in ICS',
     settings: {
       refresh_minutes: {
         type: 'NUMBER',
-        description: 'Refresh the feed each N minutes, if 0 refreshes only at startup',
+        description: 'Refresh rate (minutes)',
+        hint: 'Refresh the feed each N minutes. Leave 0 to refresh only at startup. Recommendation: 60 minutes.',
         required: true,
-        hint: '60 minutes?'
+        min: 0
       },
       feed_URL: {
         type: 'TEXT',
@@ -47,7 +49,8 @@ export default ({ log, db, services }: GancioContext): GancioPlugin => ({
       },
       add_tag: {
         type: 'TEXT',
-        description: 'Add tag(s) to each imported event (comma-separated)',
+        description: 'Default event tags',
+        hint: 'Add tag(s) to each imported event (comma-separated)',
         required: false
       }
     }

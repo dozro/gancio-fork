@@ -1,47 +1,34 @@
 <script setup>
+import PluginConfigurationModal from './components/PluginConfigurationModal.vue'
 
-const form = ref()
-const loading = ref(false)
-const testLoading = ref(false)
 const dialog = ref(false)
-const valid = ref(true)
-const selectedPlugin = ref({})
+const selectedPlugin = ref()
 
-const { $notify } = useNuxtApp()
-const { data: plugins } = await useFetch('/api/plugins')
-
-async function saveSettings (close = true) {
-  const ret = await form.value.validate()
-  if (!ret) return
-  loading.value = true
-  await $fetch(`/api/plugins/${encodeURIComponent(selectedPlugin.value.name)}/settings`,
-    {
-      method: 'PUT',
-      body: selectedPlugin.value.settingsValue
-    })
-  loading.value = false
-  if (close) {
-    dialog.value = false
-  }
-}
-
-async function testPlugin() {
-  try {
-    testLoading.value = true
-    await $fetch(`/api/plugins/${encodeURIComponent(selectedPlugin.value.name)}/test`,
-      { method: 'POST', body: { settings: selectedPlugin.value.settingsValue } })
-    $notify('common.ok', Statuses.SUCCESS)
-  }
-  catch (e) {
-    console.error(e, typeof e)
-    $notify(e, Statuses.ERROR)
-  }
-  testLoading.value = false
-}
-
-function setOptions(plugin) {
+function openSettings(plugin) {
   selectedPlugin.value = plugin
   dialog.value = true
+}
+
+const { $notify } = useNuxtApp()
+const { data: plugins, refresh } = await useFetch('/api/plugins')
+
+const pluginStateLoading = reactive({})
+
+async function togglePluginEnable(enable, plugin) {
+  pluginStateLoading[plugin.name] = true
+  plugin.settingsValue.enable = enable
+  try {
+    await $fetch(`/api/plugins/${encodeURIComponent(plugin.name)}/toggle?enable=${enable}`, {
+      method: 'PUT'
+    })
+  } catch (err) {
+    console.error(err, typeof err)
+    $notify(err, Statuses.ERROR)
+  } finally {
+    // Refresh to update settings and undo local change in case of error
+    await refresh()
+    pluginStateLoading[plugin.name] = false
+  }
 }
 </script>
 
@@ -50,71 +37,53 @@ function setOptions(plugin) {
   <!-- eslint-disable-next-line vue/no-v-html -->
   <div class="text-subtitle-2 text-medium-emphasis" v-html="$t('admin.plugins_description')" />
 
-  <v-dialog v-if='selectedPlugin.settingsValue' v-model='dialog' max-width='1200px' :fullscreen='$vuetify.display?.mobile'>
-    <v-card>
-      <v-card-title> {{ $t('admin.config_plugin') }} - {{ selectedPlugin.name }}</v-card-title>
-      <v-card-subtitle>{{ selectedPlugin.description }}</v-card-subtitle>
-      <v-card-text>
-        <v-form ref='form' v-model='valid'>
-          <v-row v-for='(setting, name) in selectedPlugin.settings' :key='name' class='mt-2'>
-            <v-col cols="4">
-              <!-- eslint-disable-next-line vue/no-v-html -->
-              <small v-html='setting.hint' />
-            </v-col>
-            <v-col cols="8">
-              <v-text-field
-                v-if='setting.type === "TEXT"' v-model='selectedPlugin.settingsValue[name]'
-                type='text' :label='setting.description'
-                persistent-hint
-                :rules="[setting.required ? $valid.required(name) : true]" />
+  <PluginConfigurationModal
+    v-if="selectedPlugin?.settingsValue"
+    v-model="dialog"
+    :plugin="selectedPlugin"
+    @update="refresh()"
+  />
 
-              <v-text-field
-                v-if='setting.type === "NUMBER"' v-model='selectedPlugin.settingsValue[name]'
-                type='number'
-                :rules="[setting.required ? $valid.required(name) : true]"
-                :label='setting.description' />
+  <div class='my-12'>
+    <template v-for='plugin, idx in plugins' :key='plugin.name'>
+      <v-divider v-if="idx > 0" class="my-4" />
+      <article>
+        <div class="d-flex ga-3 align-center mt-n2">
+          <div class="text-h6">{{ plugin.name }}</div>
+          <v-chip
+            v-if="plugin.version"
+            color="primary"
+            variant="tonal"
+            size="x-small"
+            class="font-weight-semibold whitespace-nowrap"
+            :text="plugin.version"
+          />
+          <v-spacer />
+          <v-switch
+            hide-details
+            class="flex-0-0"
+            :loading="pluginStateLoading[plugin.name]"
+            :model-value="plugin.settingsValue.enable"
+            @update:model-value="togglePluginEnable($event, plugin)"
+          />
+          <v-btn variant="text" icon="mdi-cog" :aria-label="$t('admin.config_plugin')" class="my-n2" @click='openSettings(plugin)'/>
+        </div>
 
-              <v-select
-                v-if='setting.type === "LIST"' v-model='selectedPlugin.settingsValue[name]'
-                :rules="[setting.required ? $valid.required(name) : true]"
-                :items='setting.items'
-                :label='setting.description'
-              />
-              <v-switch v-if='setting.type === "CHECK"' v-model='selectedPlugin.settingsValue[name]' :label='setting.description' />
-            </v-col>
-          </v-row>
-          <v-switch v-model='selectedPlugin.settingsValue["enable"]' :label="$t('common.enable')" color='primary' />
-        </v-form>
-      </v-card-text>
-      <v-card-actions>
-        <v-btn variant="outlined" color='primary' :loading='testLoading' :disabled='testLoading' @click='testPlugin'> {{ $t('common.test') }}</v-btn>
-        <v-spacer />
-        <v-btn variant="outlined" color='warning' @click='dialog = false'> {{ $t('common.close') }}</v-btn>
-        <v-btn
-          variant="outlined" color='primary' :loading='loading' :disabled='!valid || loading'
-          @click='saveSettings'> {{ $t('common.save') }}</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+        <div class="text-subtitle-2 text-medium-emphasis w-sm-75">{{ plugin.description }}</div>
 
-  <div class='d-flex flex-wrap mt-8 ga-4'>
-    <v-card
-      v-for='plugin in plugins'
-      :key='plugin.name'
-      :title='plugin.name'
-      :subtitle='plugin.description'
-      border
-      class='flex-1-1 d-flex flex-column'
-      width=400
-    >
-      <v-spacer />
-      <v-card-actions>
-        <v-icon :icon='plugin.settingsValue?.enable ? "mdi-power-plug" : "mdi-power-plug-off"' :color='plugin.settingsValue?.enable ? "green" : "red"' />
-        <a :href='plugin.url' v-text='plugin.url'/>
-        <v-spacer />
-        <v-btn variant="text" color='primary' @click='setOptions(plugin)'> {{ $t('common.settings') }}</v-btn>
-      </v-card-actions>
-    </v-card>
+        <div class="d-flex flex-wrap align-center gc-4 gr-1 mt-4 text-subtitle-2">
+          <div v-if="plugin.author" class="d-flex align-center ga-1">
+            <v-icon size="small" icon="mdi-at" />
+            <span>{{ plugin.author }}</span>
+          </div>
+          <div v-if="plugin.url" class="d-flex align-center ga-1">
+            <v-icon size="small" icon="mdi-web" />
+            <a :href='plugin.url' target="_blank" v-text='plugin.url.replace(/^https?:\/\//, "")'/>
+          </div>
+        </div>
+      </article>
+    </template>
+
   </div>
 </div>
 </template>

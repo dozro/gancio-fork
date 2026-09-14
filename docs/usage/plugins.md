@@ -7,9 +7,9 @@ import plugins from 'virtual:plugins'
 
 # Plugins
 Plugins allow you to extend Gancio features and integrate it with other services.
-This page is a guide to install plugins, if you want to develop one instead look [here](/dev/plugin).  
+This page is a guide to install plugins, if you want to develop one instead look [here](/dev/plugins).
 __Please note that some plugins are officially supported and distributed along with the release__
-<!-- 
+<!--
 ## Install
 
 To install a plugin you have to:
@@ -32,7 +32,7 @@ cd plugins/gancio-plugin-telegram-bridge
 yarn
 ```
 
-4. **restart gancio**  
+4. **restart gancio**
 __with debian__
 ```
 sudo sytemctl restart gancio

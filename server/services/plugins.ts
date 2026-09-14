@@ -34,9 +34,13 @@ export type GancioPluginManifest = {
       required?: boolean
       hint?: string
       default?: string | number | boolean
+      min?: number // For the NUMBER type
+      max?: number // For the NUMBER type
     }
   }
 }
+
+export type GancioPluginSettingsValues = PluginSettings
 
 type LogType = 'silent' | 'fatal' | 'error' | 'warn' | 'log' | 'info' | 'success' | 'fail' | 'ready' | 'start' | 'box' | 'debug' | 'trace' | 'verbose'
 interface LogFn {
@@ -202,6 +206,10 @@ const pluginController = {
         throw new Error(`Plugin ${pluginName} already loaded`)
       }
 
+      // Register before load because a faulty configuration can make it fail
+      // and it will never again apear in the UI to fix it.
+      pluginController.plugins.push(plugin)
+
       const pluginSettings = publicSettings?.[`plugin_${pluginName}`] as PluginSettings
       if (loadIfEnabled && pluginSettings?.enable && typeof plugin.load === 'function') {
         plugin.settings = pluginSettings // make settings available to plugin instance
@@ -217,8 +225,6 @@ const pluginController = {
         })
         plugin.settings = { ...pluginSettings, enable: false }
       }
-
-      pluginController.plugins.push(plugin)
 
       return plugin
     } catch (err) {

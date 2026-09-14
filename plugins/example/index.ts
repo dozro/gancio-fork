@@ -20,33 +20,37 @@ export default ({ log, publicSettings, services }: GancioContext): GancioPlugin 
     name: 'Example',
     author: 'lesion',
     url: 'https://framagit.org/les/gancio',
+    version: '2.0',
     description: 'An example plugin to show how to create a plugin for Gancio',
     // define your plugin settings schema, this will be used to generate the settings form in the admin panel
     settings: {
       my_plugin_string_setting: {
         type: 'TEXT',
-        description: 'My plugin string setting',
-        required: true,
-        hint: 'My plugin setting support <strong>html too</strong>'
+        description: 'Plain text setting',
+        hint: 'The hint supports <strong>html too</strong>',
+        required: true
       },
       enable_this_feature_in_my_plugin: {
         type: 'CHECK',
-        description: 'My plugin best feature',
+        description: 'Boolean setting',
         hint: 'This feature is super dupe, enable it!'
       },
       min_post: {
         type: 'NUMBER',
-        description: 'it supports number too'
+        description: 'Numeric setting',
+        min: 0, // Optional
+        max: 10 // Optional
       },
       my_default_language: {
-        description: 'My default language',
+        description: 'Choices setting',
+        hint: 'Allow selecting only from a closed list. A default value can be defined.',
         type: 'LIST',
         items: ['it', 'en', 'fr'],
         default: publicSettings?.instance_locale ?? 'en'
       }
     }
-
   },
+
   // when the plugin is enabled, this function is called, you can do some initialization here like
   // starting a Task with services.TaskManager or setting up some data in db, initialize external API connection, etc...
   // settings are available with this.settings, they are automatically updated when the settings are changed in the admin panel
