@@ -1,4 +1,4 @@
-import { DataTypes, col, fn } from '@sequelize/core'
+import { DataTypes } from '@sequelize/core'
 import slugify from 'slugify'
 
 // 8 marzo
@@ -47,7 +47,7 @@ import slugify from 'slugify'
 // tag         | normalizedTag
 // solidarietà | solidarieta
 // Solidarietà | solidarieta
-// 
+//
 // event_tags:
 // eventId | tagTag
 //  1      | solidarietà
@@ -66,9 +66,8 @@ function normalizeTag(tag) {
   })
 }
 
-export async function up({ context: queryInterface }) {
-  await queryInterface.sequelize.transaction(async (transaction) => {
-
+export function up({ context: queryInterface }) {
+  return queryInterface.sequelize.transaction(async (transaction) => {
     // mock Tag model because its easier to do updates with it than raw queries and is not easy to import from the model in a migration
     const Tag = queryInterface.sequelize.define('Tag', {
       // id: { type: DataTypes.INTEGER, autoIncrement: true, allowNull: true },
@@ -97,5 +96,4 @@ export async function up({ context: queryInterface }) {
     // create index
     // await queryInterface.addIndex('tags', ['normalizedTag'], { transaction })
   })
-
 }

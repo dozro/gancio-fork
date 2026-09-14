@@ -12,6 +12,6 @@ export function up ({ context: queryInterface }) {
   })
 }
 
-export function  down ( { context: queryInterface })  {
+export function down ({ context: queryInterface }) {
   return queryInterface.removeColumn('comments', 'apUserApId')
 }

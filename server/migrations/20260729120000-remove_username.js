@@ -9,16 +9,16 @@ import { DataTypes } from '@sequelize/core'
  * Only runs on mariadb dialect; other dialects removed it via
  * the older migration (20191210212618-remove_username.js).
  */
-export async function up({ context: queryInterface }) {
+export function up ({ context: queryInterface }) {
   const dialect = queryInterface.sequelize.dialect.name
   if (dialect === 'mariadb') {
     const sql = queryInterface.queryGenerator.removeColumnQuery('users', 'username')
-    await queryInterface.sequelize.query(sql)
+    return queryInterface.sequelize.query(sql)
   }
 }
 
-export async function down({ context: queryInterface }) {
-  await queryInterface.addColumn('users', 'username', {
+export function down ({ context: queryInterface }) {
+  return queryInterface.addColumn('users', 'username', {
     type: DataTypes.STRING,
     unique: true,
     allowNull: false

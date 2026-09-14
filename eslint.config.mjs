@@ -6,7 +6,6 @@ import stylistic from '@stylistic/eslint-plugin'
 export default withNuxt([
   globalIgnores([
     'wp-plugin/js/',
-    'server/migrations/',
     'docs/.vitepress/cache/',
     'docs/.vitepress/dist/',
     'docs/assets',
@@ -34,9 +33,8 @@ export default withNuxt([
       '@stylistic/brace-style': 'off',
       '@stylistic/space-before-function-paren': 'off',
       '@stylistic/eol-last': 'off',
-      '@stylistic/comma-dangle': ['error', 'never'],
+      '@stylistic/comma-dangle': ['error', 'only-multiline'],
       '@stylistic/operator-linebreak': 'off'
     }
   }
-
 ])

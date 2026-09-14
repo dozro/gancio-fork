@@ -32,8 +32,8 @@ export function up ({ context: queryInterface }) {
         type: DataTypes.DATE
       }
     })
-  }
+}
 
-  export function down (queryInterface, Sequelize) {
-    return queryInterface.dropTable('comments')
-  }
+export function down ({ context: queryInterface }) {
+  return queryInterface.dropTable('comments')
+}

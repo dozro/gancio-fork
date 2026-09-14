@@ -1,7 +1,6 @@
 import { DataTypes } from '@sequelize/core'
 
-export async function up({ context: queryInterface }) {
-
+export function up({ context: queryInterface }) {
   return queryInterface.addColumn('places', 'postal_address',
     { type: DataTypes.JSON, allowNull: true })
   // as we have strings, let's convert to JSON strings:
@@ -21,5 +20,4 @@ export async function up({ context: queryInterface }) {
   //   type: DataTypes.JSON,
   //   allowNull: true,
   // })
-
 }

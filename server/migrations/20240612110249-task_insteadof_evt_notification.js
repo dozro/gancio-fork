@@ -1,8 +1,9 @@
 import { DataTypes } from '@sequelize/core'
 
-export async function up ({ context: queryInterface }) {
-    await queryInterface.dropTable('event_notifications')
-    await queryInterface.createTable('tasks', {
+export function up ({ context: queryInterface }) {
+  return Promise.all([
+    queryInterface.dropTable('event_notifications'),
+    queryInterface.createTable('tasks', {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -45,5 +46,6 @@ export async function up ({ context: queryInterface }) {
         allowNull: false,
         type: DataTypes.DATE
       }
-    })
-  }
+    }),
+  ])
+}
