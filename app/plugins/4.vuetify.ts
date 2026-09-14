@@ -151,6 +151,9 @@ export default defineNuxtPlugin((nuxtApp) => {
         clearable: true,
         variant: 'underlined'
       },
+      VNumberInput: {
+        variant: 'underlined'
+      },
       VCombobox: {
         variant: 'underlined',
         autocomplete: 'off',

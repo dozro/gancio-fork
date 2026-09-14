@@ -84,7 +84,10 @@ export default defineConfig({
   title: 'Gancio',
   description: 'A shared agenda for local communities',
   cleanUrls: true,
-  ignoreDeadLinks: [/\/feed\.xml/],
+  ignoreDeadLinks: [
+    /\/feed\.xml/,
+    /^\/v1\//
+  ],
   markdown: {
     typographer: true,
     config: (md) => {
@@ -158,7 +161,7 @@ export default defineConfig({
         items: [
           { text: 'Code', link: '/dev/code' },
           { text: 'Internationalization', link: '/dev/locales' },
-          { text: 'Plugins', link: '/dev/plugin' },
+          { text: 'Plugins', link: '/dev/plugins' },
           { text: 'API', link: '/dev/api',
             items: sidebarAPI.generateSidebarGroups({
               tags: [

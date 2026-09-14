@@ -22,6 +22,10 @@ import { pluginController, publicSettings } from '~~/server/services'
  *                     type: string
  *                     description: Plugin name.
  *                     example: Example
+ *                   version:
+ *                     type: string
+ *                     description: Plugin version.
+ *                     example: "1.0"
  *                   author:
  *                     type: string
  *                     description: Plugin author.

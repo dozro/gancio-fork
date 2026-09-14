@@ -351,6 +351,7 @@
         "edit_collection": "Edit Collection",
         "delete_collection_confirm": "Are you sure you  want to remove the collection <u>{collection}</u>?",
         "config_plugin": "Plugin configuration",
+        "plugin_test_description": "Test the configuration to verify everything is working",
         "plugins_description": "Plugins are small pieces of code that provide additional features to the main application. They are usually written by developers external to the project that take advantage of the <a href=\"https://gancio.org/dev/plugins\">plugin system</a>, mostly to send events to other platforms and channels.",
         "fallback_image": "Fallback image",
         "header_image": "Header image",

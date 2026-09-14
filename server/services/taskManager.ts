@@ -156,12 +156,13 @@ export class TaskManager {
   }
 
   add({ name = '', repeat = false, repeatDelay = 0, callAtStart = false, retries = [20, 50], method, args = [] }) {
+    const safeRepeatDelay = Math.max(Number(repeatDelay) || 0, 0)
     if (repeat) {
-      log.info(`[TASK] Add ${name} (each ${Duration.fromMillis(repeatDelay * this.interval * 1000).rescale().toHuman({ listStyle: 'long' })})`)
+      log.info(`[TASK] Add ${name} (each ${Duration.fromMillis(safeRepeatDelay * this.interval * 1000).rescale().toHuman({ listStyle: 'long' })})`)
     } else {
       log.info(`[TASK] Add ${name}`)
     }
-    const task = new Task({ name, repeat, repeatDelay, callAtStart, retries, method, args })
+    const task = new Task({ name, repeat, repeatDelay: safeRepeatDelay, callAtStart, retries, method, args })
     this.tasks.push(task)
   }
 

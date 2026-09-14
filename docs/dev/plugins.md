@@ -8,8 +8,9 @@ With plugins you can:
 - expose a CLI command to be used in the terminal
 
 ::: warning
-With v2 we are introducing a new plugin system that is not compatible with the old one, so if you have an old plugin you will need to update it (the basic syntax 
-is pretty the same).
+The v2 of Gancio introduced a new plugin system that is not compatible with the old one, so if you have an old plugin you will need to update it (the basic syntax is pretty much the same).
+
+The documentation for v1 can be found at [Plugins - Gancio](/v1/dev/plugins).
 :::
 
 
@@ -43,6 +44,7 @@ export default ({ log, db, publicSettings, services }: GancioContext): GancioPlu
     author: 'lesion',
     url: 'https://my_plugin_repo',
     description: 'Example plugin',
+    version: '0.1.0',
     settings: {
       my_plugin_string_setting: {
         type: 'TEXT',
@@ -58,7 +60,9 @@ export default ({ log, db, publicSettings, services }: GancioContext): GancioPlu
       },
       min_post: {
         type: 'NUMBER',
-        description: 'it supports number too'
+        description: 'it supports number too',
+        min: 0, // Optional
+        max: 10, // Optional
       },
       my_default_language: {
         description: 'My default language',
@@ -115,7 +119,7 @@ routeAPI(evt: H3Event) {
 ```
 
 This endpoint will be exposed at `<your_instance>/api/plugin/<your_plugin_name>/test`
-  
+
 
 ## Access to DB
 
