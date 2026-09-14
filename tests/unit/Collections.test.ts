@@ -11,6 +11,7 @@ const filters = []
 const { adminUser, editorUser, userUser } = await cleanDatabase(true)
 
 const { default: postCollectionHandler } = await import('../../server/api/collections/index.post')
+const { default: getCollections } = await import('../../server/api/collections/[id].get')
 
 describe('Collection', async () => {
   it('should not create a new collection if not allowed', async () => {
@@ -30,12 +31,11 @@ describe('Collection', async () => {
     collections.push(response)
   })
 
-  //   it('should not have any event when no filters', async () => {
-  //     const response = await fetch('/api/collections/test')
-
-  //     expect(response.status).toBe(200)
-  //     expect(response.data.length).toBe(0)
-  //   })
+  it('should not have any event when no filters', async () => {
+    const event = mockH3Event({ params: { id: 'test' } })
+    const events = await getCollections(event)
+    expect(events).toEqual([])
+  })
 
   //   it('should add a new filter (tag: test) only when allowed', async () => {
   //     let response = await fetchWithAuth('/api/filters', 'POST', { collectionId: collections[0].id, tags: ['test'] }, 'none')
