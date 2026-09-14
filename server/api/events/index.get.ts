@@ -80,7 +80,7 @@ import { enableCors, handleCache } from '~~/server/lib/API'
  *         schema:
  *           type: integer
  *         example: 100
- *       - name: pagination
+ *       - name: page
  *         in: query
  *         description: Pagination.
  *         schema:
