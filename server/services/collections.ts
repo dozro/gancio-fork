@@ -80,7 +80,7 @@ export async function getCollectionEvents(opts?: unknown): Promise<Event[]> {
 
   // collection is empty if there are no filters
   if (!filters.length) {
-    log.debug('[COLLECTION] This collection has no filter!')
+    log.debug('This collection has no filter!')
     return []
   }
 
