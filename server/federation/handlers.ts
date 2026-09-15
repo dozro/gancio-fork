@@ -44,7 +44,7 @@ export function isAPActivity(obj: any): obj is APActivity {
 /**
  * Handles an incoming AP activity by looking up the appropriate handler for the activity type
  */
-export async function handleActivity(activity: APActivityBase, activityActor?: APUser) {
+export async function handleActivity(activity: APActivityBase, activityActor?: APUser, _proofActor?: APUser) {
   if (!isAPActivity(activity)) {
     log.info('activity with wrong `type` or `object` property: %s', activity.type)
     return null
@@ -147,6 +147,11 @@ async function handleCreate(message: APActivityCreate, actor: APUser) {
   //   throw createError({ status: 401, message: 'Create with different actor' })
   // }
 
+  if (typeof obj === 'string') {
+    log.warn(`Create object as string, not yet supported`, message)
+    throw createError({ status: 200, message: 'Create unsupported Object' })
+  }
+
   // an incoming Note could be a reply
   if (obj.type === 'Note') {
     log.debug(`Create Activity with Note type incoming from ${actor.ap_id}`)
@@ -156,9 +161,6 @@ async function handleCreate(message: APActivityCreate, actor: APUser) {
     log.debug(`Create Activity with Event type incoming from ${actor.ap_id}`)
     const event = await handleCreateEvent(message, actor)
     log.info(`Created Event ${event.title} / ${event.slug} (id: ${event.id}) - from ${actor.ap_id}`)
-  } else {
-    log.warn('Create unsupported Object %s => %s', obj?.type, JSON.stringify(obj))
-    throw createError({ status: 200, message: 'Create unsupported Object' })
   }
 }
 
