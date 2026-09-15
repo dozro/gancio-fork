@@ -123,7 +123,7 @@ export async function verifyRFCSignature(event: H3Event, rawBody: string): Promi
   if (created > 0) {
     log.debug('Signature created at %s, now is %s', new Date(created * 1000).toISOString(), new Date().toISOString())
     const now = Date.now()
-    if (created < now - ALLOWED_SIGNATURE_SPAN || created > now + ALLOWED_SIGNATURE_SPAN) {
+    if (created * 1000 < now - ALLOWED_SIGNATURE_SPAN || created * 1000 > now + ALLOWED_SIGNATURE_SPAN) {
       throw new Error('Signature is too old')
     }
   }
