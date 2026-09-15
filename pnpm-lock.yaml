@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@peertube/http-signature':
-        specifier: ^1.7.0
-        version: 1.7.0
       '@sequelize/core':
         specifier: 7.0.0-alpha.48
         version: 7.0.0-alpha.48
@@ -228,6 +225,9 @@ importers:
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
+      json-canonicalize:
+        specifier: ^3.0.0
+        version: 3.0.0
       lint-staged:
         specifier: ^17.0.8
         version: 17.0.8
@@ -6639,6 +6639,10 @@ packages:
 
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
+
+  json-canonicalize@3.0.0:
+    resolution: {integrity: sha512-PW21BtLiKRV7gJcT8jf2X4UNN2AF4c1TYEVug1wAWRQSGBJj7fL+v4NgOkIo54SCBPFDyqzMcOJNhjwywCIBuw==}
+    engines: {node: '>=8.5'}
 
   json-parse-better-errors@1.0.2:
     resolution: {integrity: sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw==}
@@ -16310,9 +16314,13 @@ snapshots:
     transitivePeerDependencies:
       - '@noble/hashes'
 
+  json-canonicalize@3.0.0: {}
+
   jsesc@3.1.0: {}
 
   json-buffer@3.0.1: {}
+
+  json-canonicalize@3.0.0: {}
 
   json-parse-better-errors@1.0.2: {}
 
