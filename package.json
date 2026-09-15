@@ -81,7 +81,6 @@
     "*.{js,ts,vue}": "eslint --max-warnings=0 --no-warn-ignored"
   },
   "dependencies": {
-    "@peertube/http-signature": "^1.7.0",
     "@sequelize/core": "7.0.0-alpha.48",
     "@sequelize/mariadb": "^7.0.0-alpha.47",
     "@sequelize/postgres": "^7.0.0-alpha.47",
@@ -155,6 +154,7 @@
     "happy-dom": "^20.10.6",
     "husky": "^9.1.7",
     "jsdoc-api": "^9.3.5",
+    "json-canonicalize": "^3.0.0",
     "leaflet": "^1.9.4",
     "lint-staged": "^17.0.8",
     "lodash": "^4.17.21",
