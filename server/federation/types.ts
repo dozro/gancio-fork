@@ -15,10 +15,12 @@ export const APActivityBaseSchema = z.object({
   type: APActivityTypeSchema,
   object: z.union([z.string(), z.object({ id: z.string().optional() })]),
   proof: z.object({
-    type: z.string(),
-    created: z.string(),
-    creator: z.string(),
-    signatureValue: z.string()
+    type: z.literal('DataIntegrityProof'),
+    proofPurpose: z.literal('assertionMethod'),
+    cryptosuite: z.literal('eddsa-jcs-2022'),
+    proofValue: z.string(),
+    verificationMethod: z.string(),
+    created: z.string()
   }).optional(),
   actor: z.union([z.string(), z.object({ id: z.string() })]).optional().transform(v => typeof v === 'string' ? v : v?.id),
   to: stringOrArray,
