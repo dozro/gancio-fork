@@ -1,4 +1,3 @@
-import type { H3Event } from 'h3'
 import { canonicalize } from 'json-canonicalize'
 import type { APActivityBase } from './types'
 import { useLogger } from '../lib/logger'
@@ -34,9 +33,9 @@ const algoMap = {
   'ed25519': { name: 'Ed25519' },
   'rsa-pss-sha512': { name: 'RSA-PSS', saltLength: 64 }
 }
-export async function verifyProof(event: H3Event, rawBody: string, activityData: APActivityBase) {
+export async function verifyProof(activityData: APActivityBase) {
   // check if there is a proof to verify
-  if (!activityData.proof) return false
+  if (!activityData.proof) return
   log.warn(activityData.proof)
   const actor = await getActorFromKeyId(activityData.proof.verificationMethod)
   if (!actor || !actor.keys || actor.keys?.length === 0) {
@@ -54,7 +53,7 @@ export async function verifyProof(event: H3Event, rawBody: string, activityData:
     signature = decodeMultibase(activityData.proof.proofValue)
   } catch (error) {
     log.info(error)
-    return false
+    return
   }
 
   const proof: Partial<typeof activityData.proof> = Object.assign({}, activityData.proof)
@@ -68,5 +67,7 @@ export async function verifyProof(event: H3Event, rawBody: string, activityData:
 
   const verified = await crypto.subtle.verify(algoMap[key.type], publicKey, Buffer.from(signature), Buffer.from(data))
   log.info(`Verified with `, activityData.proof.verificationMethod, Buffer.from(signature).toString(), Buffer.from(data).toString(), verified)
-  return verified
+  if (verified) {
+    return actor
+  }
 }

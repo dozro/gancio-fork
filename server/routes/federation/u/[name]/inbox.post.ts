@@ -5,6 +5,7 @@ import { handleActivity } from '~~/server/federation/handlers'
 import { type APActivityBase, APActivityBaseSchema } from '~~/server/federation/types'
 import { defineEventHandler, readRawBody, createError, setResponseStatus, setResponseHeader, getHeader, type H3Event } from 'h3'
 import { publicSettings } from '~~/server/services'
+import { verifyProof } from '~~/server/federation/object_integrity_proof'
 
 export async function verifySignature(event: H3Event, rawBody: string, activityData: APActivityBase) {
   const log = useLogger('AP Verify Signature')
@@ -100,12 +101,20 @@ export default defineEventHandler(async (event) => {
     log.info(e)
     throw e
   })
+
+  const proofActor = await verifyProof(activityData).catch((e) => {
+    log.info(e)
+    throw e
+  })
+
   if (!activityActor) {
     log.warn('No valid signature')
     throw createError({ status: 401 })
   }
+
+  log.info(`Incoming AP activity actor: %s, proof actor: %s`, activityActor.ap_id, proofActor)
   try {
-    await handleActivity(activityData, activityActor)
+    await handleActivity(activityData, activityActor, proofActor)
   } catch (error) {
     log.error('Error handling activity: %s', error)
     throw createError({ status: 500, message: 'Error handling activity' })
