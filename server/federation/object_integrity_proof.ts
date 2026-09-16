@@ -1,5 +1,5 @@
 import { canonicalize } from 'json-canonicalize'
-import type { APActivityBase } from './types'
+import type { APProof } from './types'
 import { useLogger } from '../lib/logger'
 import { decodeMultibase, importPublicKey } from './keys'
 import { getActorFromKeyId } from './lookup'
@@ -33,16 +33,15 @@ const algoMap = {
   'ed25519': { name: 'Ed25519' },
   'rsa-pss-sha512': { name: 'RSA-PSS', saltLength: 64 }
 }
-export async function verifyProof(activityData: APActivityBase) {
-  // check if there is a proof to verify
-  if (!activityData.proof) return
-  log.warn(activityData.proof)
-  const actor = await getActorFromKeyId(activityData.proof.verificationMethod)
+export async function verifyProof(activity: { proof: APProof, signature?: object }) {
+  const actor = await getActorFromKeyId(activity.proof.verificationMethod)
   if (!actor || !actor.keys || actor.keys?.length === 0) {
-    log.debug(`Actor ${activityData.proof.verificationMethod} not found or has no keys`)
+    log.debug(`Actor ${activity.proof.verificationMethod} not found or has no keys`)
     return
   }
-  log.debug(actor.keys)
+  // If both proof and signature are present in a received object,
+  // the linked data signature MUST be removed before the verification of the integrity proof.
+  if (activity?.signature) delete activity.signature
   const key = actor.keys?.[0]
   if (!key) throw new Error('Actor has no public key')
   const spki = key.public_key
@@ -50,23 +49,21 @@ export async function verifyProof(activityData: APActivityBase) {
 
   let signature
   try {
-    signature = decodeMultibase(activityData.proof.proofValue)
+    signature = decodeMultibase(activity.proof.proofValue)
   } catch (error) {
     log.info(error)
     return
   }
 
-  const proof: Partial<typeof activityData.proof> = Object.assign({}, activityData.proof)
-  delete proof.proofValue
-  const obj: APActivityBase = Object.assign({}, activityData)
-  delete obj.proof
+  const proof = (({ proofValue, ...proof }) => proof)(activity.proof)
+  const obj = (({ proof, ...obj }) => obj)(activity)
 
   const proofHash = await crypto.subtle.digest('SHA-256', Buffer.from(canonicalize(proof)))
   const objHash = await crypto.subtle.digest('SHA-256', Buffer.from(canonicalize(obj)))
   const data = Buffer.concat([Buffer.from(proofHash), Buffer.from(objHash)])
 
   const verified = await crypto.subtle.verify(algoMap[key.type], publicKey, Buffer.from(signature), Buffer.from(data))
-  log.info(`Verified with `, activityData.proof.verificationMethod, Buffer.from(signature).toString(), Buffer.from(data).toString(), verified)
+  log.debug(`Verifying with key: %s, result: %s`, activity.proof.verificationMethod, verified)
   if (verified) {
     return actor
   }

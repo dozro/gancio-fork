@@ -10,18 +10,21 @@ export const APActivityTypeSchema = z.enum([
 ])
 export type APActivityType = z.infer<typeof APActivityTypeSchema>
 
+export const APProofSchema = z.object({
+  type: z.literal('DataIntegrityProof'),
+  proofPurpose: z.literal('assertionMethod'),
+  cryptosuite: z.literal('eddsa-jcs-2022'),
+  proofValue: z.string(),
+  verificationMethod: z.string(),
+  created: z.string()
+})
+export type APProof = z.infer<typeof APProofSchema>
+
 export const APActivityBaseSchema = z.object({
   id: z.string().optional(), // id is not mandatory for some activities (i.e. Follow)
   type: APActivityTypeSchema,
   object: z.union([z.string(), z.object({ id: z.string().optional() })]),
-  proof: z.object({
-    type: z.literal('DataIntegrityProof'),
-    proofPurpose: z.literal('assertionMethod'),
-    cryptosuite: z.literal('eddsa-jcs-2022'),
-    proofValue: z.string(),
-    verificationMethod: z.string(),
-    created: z.string()
-  }).optional(),
+  proof: APProofSchema.optional(),
   actor: z.union([z.string(), z.object({ id: z.string() })]).optional().transform(v => typeof v === 'string' ? v : v?.id),
   to: stringOrArray,
   cc: stringOrArray

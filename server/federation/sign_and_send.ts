@@ -12,7 +12,7 @@ export async function signAndSend(object: APActivityBase, inbox: string, method 
   })
 }
 
-export async function _signAndSend(object: APActivityBase | '', inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
+export async function _signAndSend(object: Partial<APActivityBase> | '', inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
   const log = useLogger('sign_and_send')
   log.debug('[FEDI] Sign and %s %s', method, inbox)
 

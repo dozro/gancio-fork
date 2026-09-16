@@ -2,7 +2,7 @@ import { verifyHTTPSignature } from '~~/server/federation/httpsignature'
 import { verifyRFCSignature } from '~~/server/federation/rfcsignature'
 import { useLogger } from '~~/server/lib/logger'
 import { handleActivity } from '~~/server/federation/handlers'
-import { type APActivityBase, APActivityBaseSchema } from '~~/server/federation/types'
+import { type APActivityBase, APActivityBaseSchema, type APProof } from '~~/server/federation/types'
 import { defineEventHandler, readRawBody, createError, setResponseStatus, setResponseHeader, getHeader, type H3Event } from 'h3'
 import { publicSettings } from '~~/server/services'
 import { verifyProof } from '~~/server/federation/object_integrity_proof'
@@ -73,36 +73,12 @@ export default defineEventHandler(async (event) => {
     return
   }
 
-  // this verifies who sent the activity
-
-  // authorship check is required for forwarded objects not owned by the sender actor
-  // const hasEmbeddedObject = typeof activity.object === 'object'
-  // const internalActor = hasEmbeddedObject ? activity.object?.attributedTo : null
-  // const isDifferentActor = activityActor.ap_id !== internalActor
-  // const hasToCheckAuthorship = hasEmbeddedObject && internalActor && isDifferentActor
-  // if (hasToCheckAuthorship) {
-  //   if (!activity.object.signature) {
-  //     throw new Error('Forwarded object missing LD signature')
-  //   }
-
-  //   const actor = await getActor(internalActor)
-  //   const publicKey = actor?.object.publicKey
-  //   if (!publicKey) {
-  //     throw new Error('Forwarded object actor not found')
-  //   }
-  //   const valid = await LDSignature.verify(activity.object, publicKey.publicKeyPem)
-
-  //   if (!valid) {
-  //     throw new Error('Invalid LD signature on forwarded object')
-  //   }
-  // }
-
   const activityActor = await verifySignature(event, rawBody, activityData).catch((e) => {
     log.info(e)
     throw e
   })
 
-  const proofActor = await verifyProof(activityData).catch((e) => {
+  const proofActor = activityData.proof && await verifyProof(activity as { proof: APProof, signature?: object }).catch((e) => {
     log.info(e)
     throw e
   })

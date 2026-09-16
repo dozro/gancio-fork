@@ -63,5 +63,17 @@ describe('Object Integrity Proof', () => {
     mockedGetActorFromKeyId.mockResolvedValueOnce({ ap_id: actor.id, keys: [{ type, public_key: keyData }] })
     ret = await verifyProof(activity)
     expect(ret).toBeUndefined()
+    activity.object.location.latitude = 25.273962
   })
+
+  it('should remove an old signature field', async () => {
+    const { type, keyData } = decodePublicKeyMultibase(actor.assertionMethod[0].publicKeyMultibase)
+    mockedGetActorFromKeyId.mockResolvedValueOnce({ ap_id: actor.id, keys: [{ type, public_key: keyData }] })
+    const ret = await verifyProof({ ...activity, signature: { test: 2 } })
+    expect(ret?.ap_id).toEqual(actor.id)
+  })
+
+  // it('should sign the FEP-8b32', async () => {
+  //   const unsignedActivity = (({ proof, ...other }) => other)(activity)
+  // })
 })
