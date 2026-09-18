@@ -12,6 +12,23 @@ export default defineNuxtPlugin((nuxtApp) => {
       return true
     },
 
+    url: (required = false) => (value: unknown): boolean | string => {
+      if (!value && !required) {
+        return true
+      }
+
+      if (value && typeof value === 'string') {
+        try {
+          const url = new URL(value)
+          if (url.protocol === 'http:' || url.protocol === 'https:') {
+            return true
+          }
+        } catch { /* Invalid url */ }
+      }
+
+      return t('validators.url')
+    },
+
     // confirm: (password: string) => (value: string) => password === value || `Password does not match`,
 
     email: [

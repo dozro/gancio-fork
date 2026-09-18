@@ -13,6 +13,7 @@ export interface ValidationService {
   required: (fieldName: string) => ValidatorFn
   requiredMulti: (fieldName: string) => ValidatorFn
   password: ValidatorFn<string>
+  url: (required?: boolean) => ValidatorFn<string>
   email: ValidatorFn<string>[]
   latitude: ValidatorFn<number>[]
   longitude: ValidatorFn<number>[]

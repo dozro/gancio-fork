@@ -37,7 +37,7 @@ export default ({ log, db, services }: GancioContext): GancioPlugin => ({
         min: 0
       },
       feed_URL: {
-        type: 'TEXT',
+        type: 'URL',
         description: 'ICS feed URL',
         required: true,
         hint: 'Check it before'
