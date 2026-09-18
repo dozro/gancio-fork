@@ -1,6 +1,6 @@
 import { createError, getRouterParam, readBody, defineEventHandler } from 'h3'
 import { requireAdmin } from '~~/server/lib/auth'
-import { pluginController, setSetting } from '~~/server/services'
+import { pluginController } from '~~/server/services'
 
 /**
  * @openapi
@@ -68,16 +68,18 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event)
-  const settingKey = `plugin_${pluginName}`
 
-  // update settings
-  await setSetting(settingKey, body)
-  plugin.settings = body
+  const wasEnabled = plugin.settings?.enable
+
+  if (wasEnabled) {
+    await pluginController.disablePlugin(plugin)
+  }
+
+  await pluginController.setSettings(plugin, body)
 
   // reload plugin with new settings
-  await plugin.unload?.()
-  if (plugin.settings.enable) {
-    await plugin.load()
+  if (wasEnabled) {
+    await pluginController.enablePlugin(plugin)
   }
 
   return { success: true }

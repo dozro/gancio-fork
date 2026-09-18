@@ -3,7 +3,7 @@
 */
 import type { NitroApp } from 'nitropack'
 import { defineNitroPlugin } from 'nitropack/runtime'
-import pluginController from '../services/plugins'
+import { pluginController } from '~~/server/services'
 import { useLogger } from '../lib/logger'
 import { loadSettings, publicSettings } from '../services/settings'
 import { useTaskManager } from '../services/taskManager'

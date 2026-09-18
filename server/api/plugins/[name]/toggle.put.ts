@@ -1,9 +1,7 @@
 import { createError, getRouterParam, getValidatedQuery, defineEventHandler } from 'h3'
 import z from 'zod'
 import { requireAdmin } from '~~/server/lib/auth'
-import { pluginController, setSetting } from '~~/server/services'
-import { getSetting } from '~~/server/services/settings'
-import type { PluginSettings } from '~~/shared/types/settings'
+import { pluginController } from '~~/server/services'
 
 const querySchema = z.object({
   enable: z.stringbool()
@@ -43,7 +41,7 @@ const querySchema = z.object({
  *                   type: boolean
  *                   example: true
  *       400:
- *         description: Plugin name is required.
+ *         description: Plugin name is required or plugin is already enabled
  *       404:
  *         description: Plugin not found.
  *     security:
@@ -61,33 +59,14 @@ export default defineEventHandler(async (event) => {
   }
 
   const plugin = pluginController.getPlugin(pluginName)
-  if (!plugin) {
-    throw createError({ statusCode: 404, message: 'Plugin not found' })
+  if (!plugin) throw createError({ statusCode: 404, message: 'Plugin not found' })
+
+  if (enable === Boolean(plugin.settings?.enable)) {
+    const message = enable ? 'Plugin is already enabled' : 'Plugin is already disabled'
+    throw createError({ statusCode: 400, message })
   }
 
-  const settingKey = `plugin_${pluginName}`
-
-  const oldSettings = ((await getSetting(settingKey)) ?? {}) as PluginSettings
-  const newSettings = { ...oldSettings, enable }
-
-  await plugin.unload?.()
-
-  await setSetting(settingKey, newSettings)
-  plugin.settings = newSettings
-
-  if (enable) {
-    try {
-      await plugin.load()
-    } catch (error) {
-      // Revert enabled flag in settings if something went wrong during load
-      await setSetting(settingKey, oldSettings)
-      plugin.settings = oldSettings
-
-      plugin.unload?.()
-
-      throw error
-    }
-  }
+  await pluginController.togglePlugin(pluginName)
 
   return { success: true }
 })

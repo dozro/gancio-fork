@@ -1,3 +1,5 @@
+import { PluginController } from './plugins'
+
 export { enqueueMail, sendMail } from './sendMail'
 export { secretSettings, publicSettings, publicSettingsLastModified, setSetting, loadSettings } from './settings'
 
@@ -8,10 +10,11 @@ export {
 } from './db'
 
 export { notifyAdmins } from './notifier'
-export { default as pluginController } from './plugins'
 
 export {
   sendEvents, mapEvent, mapEvents,
   getEvents, getLastModified, getMaxLastModifieds,
   calculateEtag
 } from './events'
+
+export const pluginController = new PluginController()
