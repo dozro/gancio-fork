@@ -25,6 +25,6 @@ useHead ({
     <slot />
   </v-main>
   <LazyCoreNotification />
-  <CoreFooter />
+  <LazyCoreFooter hydrate-on-visible />
 </v-app>
 </template>
