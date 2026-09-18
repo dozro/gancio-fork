@@ -95,6 +95,18 @@ async function save() {
               hide-details="auto"
             />
 
+            <v-text-field
+              v-else-if="setting.type === 'URL'"
+              v-model="settingsValues[name]"
+              type="url"
+              variant="outlined"
+              density="comfortable"
+              :rules="[$valid.url(setting.required)]"
+              :clearable="!setting.required"
+              :aria-labelled-by="`plugin-option-${name}`"
+              hide-details="auto"
+            />
+
             <v-number-input
               v-else-if="setting.type === 'NUMBER'" v-model="settingsValues[name]"
               variant="outlined"
@@ -139,6 +151,7 @@ async function save() {
             variant="outlined"
             prepend-icon="mdi-beaker-question-outline"
             class="ms-auto"
+            :disabled="!formValid"
             :loading="testLoading"
             @click="testPlugin"
           >

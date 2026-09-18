@@ -47,7 +47,13 @@ export default ({ log, publicSettings, services }: GancioContext): GancioPlugin 
         type: 'LIST',
         items: ['it', 'en', 'fr'],
         default: publicSettings?.instance_locale ?? 'en'
-      }
+      },
+      url_setting: {
+        type: 'URL',
+        description: 'URL setting',
+        hint: 'The interface will validate this value is a well formed URL',
+        required: true
+      },
     }
   },
 

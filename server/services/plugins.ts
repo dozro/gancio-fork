@@ -40,7 +40,7 @@ export type GancioPluginManifest = {
   description?: string
   settings?: {
     [key: string]: {
-      type?: 'NUMBER' | 'TEXT' | 'CHECK' | 'LIST'
+      type?: 'NUMBER' | 'TEXT' | 'CHECK' | 'LIST' | 'URL'
       items?: string[] // for type LIST, the possible values
       description?: string
       required?: boolean
