@@ -138,12 +138,14 @@
 }
 
 
+figure {
+  margin: 50px auto;
+}
+
 figure > img {
   display: block;
-  margin-left: auto;
-  margin-right: auto;
   border-radius: 8px;
-  /*border: 1px solid var(--vp-c-border);*/
+  border: 1px solid rgba(200,200,200,0.4);
 }
 
 figcaption {
