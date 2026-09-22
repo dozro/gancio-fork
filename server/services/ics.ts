@@ -36,6 +36,8 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ics.Alarm[]) {
       url: `${publicSettings.baseurl}/event/${e.slug || e.id}`,
       status: statusMap[e.status],
       categories: e?.tags?.map(t => t.tag || t) as string[],
+      created: e.createdAt?.getTime(),
+      lastModified: e.updatedAt?.getTime(),
       alarms
     }
 
