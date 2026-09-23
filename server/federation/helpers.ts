@@ -10,6 +10,17 @@ import type { Settings } from '~~/shared/types/settings'
 
 const log = useLogger('federation')
 
+export function sameOrigin(url1: string, url2: string): boolean {
+  try {
+    const u1 = new URL(url1)
+    const u2 = new URL(url2)
+    return u1.origin === u2.origin
+  } catch (e) {
+    log.warn('sameOrigin: invalid URL(s): %s, %s (%s)', url1, url2, e)
+    return false
+  }
+}
+
 function _getUser() {
   const name = publicSettings?.instance_name ?? publicSettings.title
   const baseurl = publicSettings.baseurl
