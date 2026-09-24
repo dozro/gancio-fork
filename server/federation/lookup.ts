@@ -10,17 +10,17 @@ const log = useLogger('federation')
 /**
  * https://swicg.github.io/activitypub-http-signature/#how-to-obtain-a-signature-s-public-key
  */
-export async function getActorFromKeyId(keyId: string, retry: boolean = false, bypassCache: boolean = false): Promise<APUser | undefined> {
+export async function getActorFromKeyId(keyId: string, retry: boolean = false, bypassCache: boolean = false) {
   log.debug(`[FEDI] getActorFromKeyId for ${keyId}`)
   // it should be an URL
   const url = new URL(keyId)
 
   // search it locally
-  let actor: APUser | undefined | null
+  let actor
   if (!bypassCache) {
     actor = await APUser.findOne({ include: [{ model: APKey, where: { ap_id: keyId }, required: true }] })
     if (actor) {
-      return actor
+      return { actor: actor, key: actor.keys![0]! }
     }
   }
 
