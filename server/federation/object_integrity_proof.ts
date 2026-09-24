@@ -1,7 +1,7 @@
 import { canonicalize } from 'json-canonicalize'
 import type { APProof } from './types'
 import { useLogger } from '../lib/logger'
-import { decodeMultibase, importPublicKey } from './keys'
+import { algoMap, decodeMultibase, importCryptoKey } from './keys'
 import { getActorFromKeyId } from './lookup'
 const log = useLogger('Object Integrity Proof')
 
@@ -28,24 +28,17 @@ const log = useLogger('Object Integrity Proof')
 //   return { ...object, proof }
 // }
 
-const algoMap = {
-  'rsa-v1_5-sha256': { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-  'ed25519': { name: 'Ed25519' },
-  'rsa-pss-sha512': { name: 'RSA-PSS', saltLength: 64 }
-}
 export async function verifyProof(activity: { proof: APProof, signature?: object }) {
-  const actor = await getActorFromKeyId(activity.proof.verificationMethod)
-  if (!actor || !actor.keys || actor.keys?.length === 0) {
+  const ret = await getActorFromKeyId(activity.proof.verificationMethod)
+  if (!ret) {
     log.debug(`Actor ${activity.proof.verificationMethod} not found or has no keys`)
     return
   }
+  const { actor, key } = ret
   // If both proof and signature are present in a received object,
   // the linked data signature MUST be removed before the verification of the integrity proof.
   if (activity?.signature) delete activity.signature
-  const key = actor.keys?.[0]
-  if (!key) throw new Error('Actor has no public key')
-  const spki = key.public_key
-  const publicKey = await importPublicKey(spki, algoMap[key.type])
+  const publicKey = await importCryptoKey(key)
 
   let signature
   try {
@@ -55,6 +48,7 @@ export async function verifyProof(activity: { proof: APProof, signature?: object
     return
   }
 
+  // remove proof from ctivity before hashing, as per https://codeberg.org/fediverse/fep/src/branch/main/fep/8b32/fep-8b32.md#proof-verification
   const proof = (({ proofValue, ...proof }) => proof)(activity.proof)
   const obj = (({ proof, ...obj }) => obj)(activity)
 
@@ -65,6 +59,6 @@ export async function verifyProof(activity: { proof: APProof, signature?: object
   const verified = await crypto.subtle.verify(algoMap[key.type], publicKey, Buffer.from(signature), Buffer.from(data))
   log.debug(`Verifying with key: %s, result: %s`, activity.proof.verificationMethod, verified)
   if (verified) {
-    return actor
+    return { actor, key }
   }
 }

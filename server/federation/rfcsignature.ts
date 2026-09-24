@@ -1,10 +1,10 @@
 import crypto, { timingSafeEqual } from 'crypto'
 import { decodeStructuredField, type DictValue, encodeDictValue, type FieldValue } from './http_dict'
-import { importPublicKey } from './keys'
+import { algoMap, importCryptoKey } from './keys'
 import { useLogger } from '../lib/logger'
 import { getActorFromKeyId } from './lookup'
-import type { APUser } from '../services'
 import { type H3Event, getHeader, createError } from 'h3'
+import type { KeyType } from '../services/db'
 
 const log = useLogger('HTTP Message Signature')
 // http signature has to be within an hour of now
@@ -36,7 +36,7 @@ function makeMagicFields(metadata: HttpRequestMetadata, inputValue: DictValue): 
 /**
  * Verify a RFC 9421 signature
  */
-export async function verifyRFCSignature(event: H3Event, rawBody: string): Promise<APUser | undefined> {
+export async function verifyRFCSignature(event: H3Event, rawBody: string) {
   const signatureInput = getHeader(event, 'signature-input')
   if (signatureInput === undefined) return
   const input = decodeStructuredField(signatureInput)
@@ -54,11 +54,13 @@ export async function verifyRFCSignature(event: H3Event, rawBody: string): Promi
 
   log.debug('Key ', sigKey)
 
-  const actor = await getActorFromKeyId(sigKey)
-  if (!actor || !actor.keys || actor.keys?.length === 0) {
+  const ret = await getActorFromKeyId(sigKey)
+  if (!ret) {
     log.debug(`Actor ${sigKey} not found or has no keys`)
     return
   }
+
+  const { actor, key } = ret
 
   const metadata: HttpRequestMetadata = {
     method: event.method,
@@ -127,12 +129,7 @@ export async function verifyRFCSignature(event: H3Event, rawBody: string): Promi
       throw new Error('Signature is too old')
     }
   }
-  const alg = inputValue.params?.get('alg') as 'rsa-v1_5-sha256' | 'ed25519' | 'rsa-pss-sha512' | undefined
-  const algoMap = {
-    'rsa-v1_5-sha256': { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-    'ed25519': { name: 'Ed25519' },
-    'rsa-pss-sha512': { name: 'RSA-PSS', saltLength: 64 }
-  }
+  const alg = inputValue.params?.get('alg') as KeyType | undefined
   if (!alg || !algoMap[alg]) throw new Error(`Incorrect signature type: ${alg}`)
 
   const magicFields = makeMagicFields(metadata, inputValue)
@@ -145,10 +142,7 @@ export async function verifyRFCSignature(event: H3Event, rawBody: string): Promi
 
   log.debug(`Debug magic fields ${data}`)
 
-  log.debug(actor.keys)
-  const spki = actor.keys?.[0]?.public_key
-  if (!spki) throw new Error('Actor has no public key')
-  const publicKey = await importPublicKey(spki, algoMap[alg])
+  const publicKey = await importCryptoKey(key)
   const verified = await crypto.subtle.verify(algoMap[alg], publicKey, Buffer.from(signatureData), Buffer.from(data))
 
   if (!verified) {
@@ -156,7 +150,7 @@ export async function verifyRFCSignature(event: H3Event, rawBody: string): Promi
   }
 
   log.info(`RFC 9421 signature! from ${actor?.ap_id}`)
-  return actor
+  return { actor, key }
 }
 
 // export async function prepareRFCSignature(

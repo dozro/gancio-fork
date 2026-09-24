@@ -1,4 +1,4 @@
-import { APKey, type KeyType } from '../services/db'
+import { APKey, KeyTypeEnum, type KeyType } from '../services/db'
 import type { APActor } from './types'
 import { useLogger } from '../lib/logger'
 const log = useLogger('federation/keys')
@@ -26,6 +26,10 @@ export async function importActorKeys(actor: APActor) {
       if (assertion.type === 'Multikey' && assertion.publicKeyMultibase) {
         log.debug(`create APKey with ap_id: ${assertion.id}`)
         const { type, keyData } = decodePublicKeyMultibase(assertion.publicKeyMultibase)
+        if (!KeyTypeEnum.includes(type)) {
+          log.warn(`Unsupported key type ${type} for assertionMethod with ap_id: ${assertion.id}`)
+          continue
+        }
         const k = await APKey.upsert({
           ap_id: assertion.id,
           type,
@@ -77,20 +81,17 @@ export function decodeBase58(s: string): Uint8Array {
   return Uint8Array.from(out.reverse())
 }
 
-export async function importPublicKey(
-  spkiBuffer: Uint8Array,
-  algorithm: any
-): Promise<CryptoKey> {
-  const binary = new ArrayBuffer(spkiBuffer.byteLength)
-  new Uint8Array(binary).set(spkiBuffer)
-
-  return await crypto.subtle.importKey(
-    'spki',
-    binary,
-    algorithm,
-    false,
-    ['verify']
-  )
+export type algoParam = { name: string, hash?: string, saltLength?: number }
+export const algoMap: { [K in KeyType]: algoParam } = {
+  'rsa-v1_5-sha256': { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+  'ed25519': { name: 'Ed25519' },
+  'rsa-pss-sha512': { name: 'RSA-PSS', saltLength: 64 }
+}
+export async function importCryptoKey(key: APKey): Promise<CryptoKey> {
+  const algorithm = algoMap[key.type]
+  const binary = new ArrayBuffer(key.public_key.byteLength)
+  new Uint8Array(binary).set(key.public_key)
+  return await crypto.subtle.importKey('spki', binary, algorithm, false, ['verify'])
 }
 
 export function decodeMultibase(input: string): Uint8Array {
