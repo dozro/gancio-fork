@@ -46,7 +46,8 @@ const code = computed(() => {
     params.push('maxlength=' + list.maxEvents)
   }
 
-  params.push('sidebar="' + list.sidebar + '"')
+  params.push(`show_more="${list.show_more}"`)
+  params.push(`sidebar="${list.sidebar}"`)
   params.push(`theme="${list.theme}"`)
 
   // eslint-disable-next-line no-useless-escape
