@@ -56,11 +56,11 @@ describe('Object Integrity Proof', () => {
   it('should verify the FEP-8b32 feature', async () => {
     const { type, keyData } = decodePublicKeyMultibase(actor.assertionMethod[0].publicKeyMultibase)
 
-    mockedGetActorFromKeyId.mockResolvedValueOnce({ ap_id: actor.id, keys: [{ type, public_key: keyData }] })
+    mockedGetActorFromKeyId.mockResolvedValueOnce({ actor: { ap_id: actor.id }, key: { type, public_key: keyData } })
     let ret = await verifyProof(activity)
-    expect(ret?.ap_id).toEqual(actor.id)
+    expect(ret?.actor.ap_id).toEqual(actor.id)
     activity.object.location.latitude = 2
-    mockedGetActorFromKeyId.mockResolvedValueOnce({ ap_id: actor.id, keys: [{ type, public_key: keyData }] })
+    mockedGetActorFromKeyId.mockResolvedValueOnce({ actor: { ap_id: actor.id }, key: { type, public_key: keyData } })
     ret = await verifyProof(activity)
     expect(ret).toBeUndefined()
     activity.object.location.latitude = 25.273962
@@ -68,9 +68,9 @@ describe('Object Integrity Proof', () => {
 
   it('should remove an old signature field', async () => {
     const { type, keyData } = decodePublicKeyMultibase(actor.assertionMethod[0].publicKeyMultibase)
-    mockedGetActorFromKeyId.mockResolvedValueOnce({ ap_id: actor.id, keys: [{ type, public_key: keyData }] })
+    mockedGetActorFromKeyId.mockResolvedValueOnce({ actor: { ap_id: actor.id }, key: { type, public_key: keyData } })
     const ret = await verifyProof({ ...activity, signature: { test: 2 } })
-    expect(ret?.ap_id).toEqual(actor.id)
+    expect(ret?.actor.ap_id).toEqual(actor.id)
   })
 
   // it('should sign the FEP-8b32', async () => {
