@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-
+import { getFetchError } from '../../utils/helpers'
 const { $notify, $confirm } = useNuxtApp()
 const { t } = useI18n()
 
@@ -55,7 +55,7 @@ async function createTrustedInstance () {
     refresh()
     dialogAddTrustedSource.value = false
   } catch (e) {
-    $notify(String(e), Statuses.ERROR)
+    $notify(getFetchError(e), Statuses.ERROR)
   }
   loading.value = false
 }

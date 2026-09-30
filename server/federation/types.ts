@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import type { APUser } from '../services'
 
 const stringOrArray = z.union([z.string(), z.array(z.string())]).optional().transform(v => Array.isArray(v) ? v : v ? [v] : [])
 
@@ -10,22 +9,15 @@ export const APActivityTypeSchema = z.enum([
 ])
 export type APActivityType = z.infer<typeof APActivityTypeSchema>
 
-export const APActivityBaseSchema = z.object({
-  id: z.string().optional(), // id is not mandatory for some activities (i.e. Follow)
-  type: APActivityTypeSchema,
-  object: z.union([z.string(), z.object({ id: z.string().optional() })]),
-  proof: z.object({
-    type: z.string(),
-    created: z.string(),
-    creator: z.string(),
-    signatureValue: z.string()
-  }).optional(),
-  actor: z.union([z.string(), z.object({ id: z.string() })]).optional().transform(v => typeof v === 'string' ? v : v?.id),
-  to: stringOrArray,
-  cc: stringOrArray
+export const APProofSchema = z.object({
+  type: z.literal('DataIntegrityProof'),
+  proofPurpose: z.literal('assertionMethod'),
+  cryptosuite: z.literal('eddsa-jcs-2022'),
+  proofValue: z.string(),
+  verificationMethod: z.string(),
+  created: z.string()
 })
-
-export type APActivityBase = z.infer<typeof APActivityBaseSchema>
+export type APProof = z.infer<typeof APProofSchema>
 
 // https://www.w3.org/wiki/ActivityPub/Primer/Actors
 // https://www.w3.org/TR/activitypub/#actors
@@ -60,42 +52,6 @@ export interface APActor {
   }>
 }
 
-export interface APActivityFollow extends APActivityBase {
-  type: 'Follow'
-  object: string
-}
-
-export interface APActivityAnnounce extends APActivityBase {
-  type: 'Announce'
-  object: string | APNote | APEvent
-}
-
-export interface APActivityLike extends APActivityBase {
-  type: 'Like'
-  object: string
-}
-
-export interface APActivityAccept extends APActivityBase {
-  type: 'Accept'
-  object: string
-}
-
-export interface APActivityLike extends APActivityBase {
-  type: 'Like'
-  object: string
-}
-
-export interface APActivityUndo extends APActivityBase {
-  type: 'Undo'
-  object: APActivityFollow | APActivityLike | APActivityAnnounce
-}
-
-export interface APActivityQuoteRequest extends APActivityBase {
-  type: 'QuoteRequest'
-  object: string
-  instrument: string | { id: string }
-}
-
 // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-attachment
 export const APAttachmentSchema = z.object({
   type: z.enum(['Image', 'Video', 'Audio', 'Document', 'Link']),
@@ -115,8 +71,8 @@ export const APNoteSchema = z.object({
   inReplyTo: z.string().optional(),
   url: z.url().optional(),
   content: z.string().optional(),
-  summary: z.string().optional(),
-  published: z.iso.date().optional(),
+  summary: z.string().nullable().optional(),
+  published: z.iso.datetime().nullable().optional(),
   updated: z.iso.date().optional(),
   attachment: z.array(APAttachmentSchema).optional(),
   sensitive: z.boolean().optional(),
@@ -127,25 +83,6 @@ export const APNoteSchema = z.object({
   _misskey_quote: z.string().optional()
 })
 export type APNote = z.infer<typeof APNoteSchema>
-
-export interface APActivityUpdate extends APActivityBase {
-  type: 'Update'
-  object: APEvent | APNote
-}
-
-export interface APActivityCreate extends APActivityBase {
-  type: 'Create'
-  object: APEvent | APNote | string
-}
-
-export interface APActivityDelete extends APActivityBase {
-  type: 'Delete'
-  object: {
-    id?: string
-    type: 'Tombstone' | 'Event' | 'Note'
-    formerType?: 'Tombstone' | 'Event' | 'Note'
-  } | string
-}
 
 // https://www.w3.org/TR/activitystreams-vocabulary/#places
 // https://fediverse.codeberg.page/fep/fep/8a8e/#physical
@@ -183,7 +120,7 @@ export type APLocation = z.infer<typeof APLocationSchema>
 export const EventStatusEnum = ['EventCancelled', 'EventScheduled', 'EventTentative', 'EventMovedOnline', 'EventPostponed', 'EventRescheduled'] as const
 
 // https://fediverse.codeberg.page/fep/fep/8a8e/
-export const APEventSchema = z.object({
+export const APEventSchema = z.looseObject({
   type: z.literal('Event').default('Event'),
   name: z.string().trim(),
   startTime: z.string().refine(v => !isNaN(Date.parse(v))),
@@ -194,45 +131,48 @@ export const APEventSchema = z.object({
   to: z.array(z.string()).optional(),
   cc: z.array(z.string()).optional(),
   url: z.url().optional(),
-  content: z.string().optional(),
-  summary: z.string().optional(),
+  content: z.string().nullable().optional(),
+  summary: z.string().nullable().optional(),
   eventStatus: z.enum(EventStatusEnum).optional().default('EventScheduled'),
   attachment: z.array(APAttachmentSchema).optional(),
   location: z.union([APLocationSchema, z.array(APLocationSchema)]).optional(),
   tag: z.array(APTagSchema).optional(),
   published: z.iso.datetime().optional(),
+  updated: z.iso.datetime().optional(),
   timezone: z.string().optional(),
   signature: z.object().optional().nullable(),
-  updated: z.iso.datetime().optional(),
   interactionPolicy: z.object({
     canQuote: z.object({
-      automaticApproval: z.string().optional(),
-      manualApproval: z.string().optional()
+      automaticApproval: stringOrArray,
+      manualApproval: stringOrArray
     }).optional()
   }).optional()
 }).refine(
-  e => !e.endTime || e.endTime > e.startTime,
+  e => !e.endTime || e.endTime >= e.startTime,
   { message: 'endTime must be after startTime' }
 )
 export type APEvent = z.infer<typeof APEventSchema>
 
-export interface APActivityMap {
-  Follow: APActivityFollow
-  Undo: APActivityUndo
-  Create: APActivityCreate
-  Delete: APActivityDelete
-  Announce: APActivityAnnounce
-  Like: APActivityLike
-  Accept: APActivityAccept
-  Update: APActivityUpdate
-  QuoteRequest: APActivityQuoteRequest
-}
+export const APActivityBaseSchema = z.looseObject({
+  id: z.string().optional(), // id is not mandatory for some activities (i.e. Follow)
+  type: APActivityTypeSchema,
+  object: z.unknown().optional(),
+  proof: APProofSchema.optional(),
+  actor: z.union([z.string(), z.object({ id: z.string() })]).transform(v => typeof v === 'string' ? v : v?.id),
+  attributedTo: z.union([z.string(), z.object({ id: z.string() })]).transform(v => typeof v === 'string' ? v : v?.id).optional(),
+  to: stringOrArray,
+  cc: stringOrArray
+})
 
-export type APActivity = APActivityMap[keyof APActivityMap]
+export type APActivityBase = z.infer<typeof APActivityBaseSchema>
 
-export type APHandlerMap = {
-  [K in APActivityType]: (
-    message: APActivityMap[K],
-    actor: APUser
-  ) => Promise<void>
-}
+export const APActivityUndoSchema = z.object({
+  actor: z.string(),
+  type: z.literal('Undo'),
+  object: z.object({
+    type: z.enum(['Follow', 'Announce', 'Like']),
+    object: z.string()
+  })
+})
+
+export type APActivityUndo = z.infer<typeof APActivityUndoSchema>

@@ -1,7 +1,9 @@
 import { useLogger } from '../lib/logger'
 import { publicSettings } from '~~/server/services/settings'
 import { type APUser, Event } from '~~/server/services/db'
-import type { APActivityLike, APActivityUndo } from './types'
+import type { APActivityBase, APActivityUndo } from './types'
+import type { ActivityHandlerResult } from './handlers'
+
 const log = useLogger('federation:ego')
 
 // module.exports = {
@@ -38,11 +40,25 @@ const log = useLogger('federation:ego')
 //     }
 //   },
 
-export async function handleLike(message: APActivityLike, actor: APUser) {
-  const obj = message.object
-  if (!obj) return
-  let event
+/**
+ { id: 'https://mastodon.cisti.org/users/testme#likes/462437',
+   type: 'Like',
+   object: 'https://test.cisti.org/federation/m/10',
+   actor: 'https://mastodon.cisti.org/users/testme'
+ }
+ */
+export async function handleLike(activity: APActivityBase, actor: APUser): Promise<ActivityHandlerResult> {
+  const obj = activity.object
+  if (!obj || typeof obj != 'string') {
+    return { status: 'ignored', reason: 'Like activity with invalid object' }
+  }
 
+  // activity's actor should be the same as the actor
+  if (activity.actor !== actor.ap_id) {
+    return { status: 'ignored', reason: `Like activity actor mismatch: ${activity.actor} !== ${actor.ap_id}` }
+  }
+
+  let event
   const match = obj.match(`^${publicSettings.baseurl}/federation/m/(.*)`)
   if (match && match.length > 1) {
     event = await Event.findByPk(Number(match[1]))
@@ -59,24 +75,25 @@ export async function handleLike(message: APActivityLike, actor: APUser) {
   }
 
   if (!event) {
-    log.warn(`Like to unknown: ${obj}`)
-    return
-    // throw new Error('Not found')
+    return { status: 'ignored', reason: 'Like to unknown event' }
   }
 
   // check if already liked
   if (event.likes?.includes(actor.ap_id)) {
     log.debug(`${actor.ap_id} already liked ${event.title}`)
-    return
+    return { status: 'ignored', reason: 'Already liked' }
   }
 
   log.info(`${actor.ap_id} like ${event.title} (${event.likes?.length})`)
   await event.update({ likes: [...event?.likes ?? [], actor.ap_id] })
+  return { status: 'accepted' }
 }
 
-export async function handleUnlike(message: APActivityUndo, actor: APUser) {
-  const obj = message.object.object
-  if (!obj) return
+export async function handleUnlike(activity: APActivityUndo, actor: APUser): Promise<ActivityHandlerResult> {
+  const obj = activity.object.object
+  if (!obj) {
+    return { status: 'ignored', reason: 'Invalid unlike activity' }
+  }
 
   let event
 
@@ -96,9 +113,10 @@ export async function handleUnlike(message: APActivityUndo, actor: APUser) {
   }
 
   if (!event) {
-    throw new Error('Not found')
+    return { status: 'ignored', reason: 'Unlike to unknown event' }
   }
 
   log.info(`${actor.ap_id} unlike ${event.title} (${event.likes.length})`)
   await event.update({ likes: event.likes.filter(id => id !== actor.ap_id) })
+  return { status: 'accepted' }
 }

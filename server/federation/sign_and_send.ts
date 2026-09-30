@@ -4,7 +4,7 @@ import { useTaskManager } from '../services/taskManager'
 import { prepareHTTPSignature } from './httpsignature'
 import type { APActivityBase } from './types'
 
-export async function signAndSend(object: APActivityBase, inbox: string, method = 'post') {
+export async function signAndSend(object: Partial<APActivityBase>, inbox: string, method = 'post') {
   useTaskManager().add({
     name: 'SIGN_AND_SEND',
     method: _signAndSend,
@@ -12,7 +12,7 @@ export async function signAndSend(object: APActivityBase, inbox: string, method 
   })
 }
 
-export async function _signAndSend(object: APActivityBase | '', inbox: string, method: 'post' | 'get' = 'post', privkey: string) {
+export async function _signAndSend(object: Partial<APActivityBase> | '', inbox: string, method: 'post' | 'get' = 'post', privkey: string): Promise<unknown | undefined> {
   const log = useLogger('sign_and_send')
   log.debug('[FEDI] Sign and %s %s', method, inbox)
 
@@ -39,7 +39,7 @@ export async function _signAndSend(object: APActivityBase | '', inbox: string, m
 
     const text = await ret.text()
     if (ret.ok) {
-      log.debug(`[FEDI] Signed and verified! ${ret.status} => ${contentType}`)
+      log.debug(`Signed and verified! ${ret.status} => ${contentType}`)
       if (!text) return ''
       try {
         return JSON.parse(text)
@@ -49,11 +49,11 @@ export async function _signAndSend(object: APActivityBase | '', inbox: string, m
       }
     } else {
       const body = JSON.parse(text)
-      log.error('[FEDI] Error in sign and send status [%s]: %s', inbox, body)
+      log.error('Error in sign and send status [%s]: %s', inbox, body)
       throw body
     }
   } catch (e) {
-    log.error('[FEDI] Error in sign and send [%s]: %s', inbox, e?.response?.data?.error ?? e?.response?.statusMessage ?? '' + ' ' + String(e))
+    log.error('Error in sign and send [%s]: %s', inbox, e?.response?.data?.error ?? e?.response?.statusMessage ?? '' + ' ' + String(e))
     throw e
   }
 }

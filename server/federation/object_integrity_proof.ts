@@ -1,3 +1,10 @@
+import { canonicalize } from 'json-canonicalize'
+import type { APProof } from './types'
+import { useLogger } from '../lib/logger'
+import { algoMap, decodeMultibase, importCryptoKey } from './keys'
+import { getActorFromKeyId } from './lookup'
+const log = useLogger('Object Integrity Proof')
+
 // // Object Integrity Proof
 // // https://codeberg.org/fediverse/fep/src/branch/main/fep/8b32/fep-8b32.md
 // // Proof generation
@@ -17,7 +24,41 @@
 //     type: "DataIntegrityProof",
 //     proofPurpose: "assertionMethod",
 //     verificationMethod,
-    
 //   }
 //   return { ...object, proof }
 // }
+
+export async function verifyProof(activity: { proof: APProof, signature?: object }) {
+  const ret = await getActorFromKeyId(activity.proof.verificationMethod)
+  if (!ret) {
+    log.debug(`Actor ${activity.proof.verificationMethod} not found or has no keys`)
+    return
+  }
+  const { actor, key } = ret
+  // If both proof and signature are present in a received object,
+  // the linked data signature MUST be removed before the verification of the integrity proof.
+  if (activity?.signature) delete activity.signature
+  const publicKey = await importCryptoKey(key)
+
+  let signature
+  try {
+    signature = decodeMultibase(activity.proof.proofValue)
+  } catch (error) {
+    log.info(error)
+    return
+  }
+
+  // remove proof from ctivity before hashing, as per https://codeberg.org/fediverse/fep/src/branch/main/fep/8b32/fep-8b32.md#proof-verification
+  const proof = (({ proofValue, ...proof }) => proof)(activity.proof)
+  const obj = (({ proof, ...obj }) => obj)(activity)
+
+  const proofHash = await crypto.subtle.digest('SHA-256', Buffer.from(canonicalize(proof)))
+  const objHash = await crypto.subtle.digest('SHA-256', Buffer.from(canonicalize(obj)))
+  const data = Buffer.concat([Buffer.from(proofHash), Buffer.from(objHash)])
+
+  const verified = await crypto.subtle.verify(algoMap[key.type], publicKey, Buffer.from(signature), Buffer.from(data))
+  log.debug(`Verifying with key: %s, result: %s`, activity.proof.verificationMethod, verified)
+  if (verified) {
+    return { actor, key }
+  }
+}

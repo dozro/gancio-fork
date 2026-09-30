@@ -2,30 +2,29 @@ import { verifyHTTPSignature } from '~~/server/federation/httpsignature'
 import { verifyRFCSignature } from '~~/server/federation/rfcsignature'
 import { useLogger } from '~~/server/lib/logger'
 import { handleActivity } from '~~/server/federation/handlers'
-import { type APActivityBase, APActivityBaseSchema } from '~~/server/federation/types'
+import { APActivityBaseSchema, type APProof } from '~~/server/federation/types'
 import { defineEventHandler, readRawBody, createError, setResponseStatus, setResponseHeader, getHeader, type H3Event } from 'h3'
 import { publicSettings } from '~~/server/services'
+import { verifyProof } from '~~/server/federation/object_integrity_proof'
 
-export async function verifySignature(event: H3Event, rawBody: string, activityData: APActivityBase) {
+/**
+ * Verify the HTTP signature of an incoming ActivityPub request
+ */
+export async function verifySignature(event: H3Event, rawBody: string) {
   const log = useLogger('AP Verify Signature')
   // check signature's type
   const sigHeader = getHeader(event, 'signature')
   if (sigHeader === undefined) return
 
   const signatureInput = getHeader(event, 'signature-input')
-  const authorActorId = activityData.actor
-  if (!authorActorId) {
-    log.warn('No actor field in body')
-    throw createError({ status: 401, message: 'No actor field in body' })
-  }
 
   // draft
   if (sigHeader.includes('(request-target)')) {
-    log.warn('Found HTTP cavage signature')
+    log.debug('Verify legacy HTTP cavage signature')
     return verifyHTTPSignature(event, rawBody)
   // rfc
   } else if (signatureInput !== undefined) {
-    log.warn('Check for RFC Signature')
+    log.debug('Verify RFC Signature - FEP 8b32')
     return verifyRFCSignature(event, rawBody)
   }
 }
@@ -57,55 +56,41 @@ export default defineEventHandler(async (event) => {
   const rawBody = await readRawBody(event)
   if (!rawBody) throw createError({ status: 400, message: 'Empty body' })
 
+  // parse the activity and check if it is a valid AP activity
   let activity: unknown
   try {
     activity = JSON.parse(rawBody.toString())
   } catch {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid JSON body' })
+    throw createError({ status: 400, message: 'Invalid JSON body' })
   }
 
   const { success, data: activityData, error } = APActivityBaseSchema.safeParse(activity)
   if (!success || !activityData) {
     log.warn('Wrong AP activity: %s', error.issues[0]?.message)
-    log.debug(activity)
-    log.debug(error)
-    return
+    log.error(error)
+    log.debug(JSON.stringify(activity, null, ' '))
+    return undefined
   }
 
-  // this verifies who sent the activity
-
-  // authorship check is required for forwarded objects not owned by the sender actor
-  // const hasEmbeddedObject = typeof activity.object === 'object'
-  // const internalActor = hasEmbeddedObject ? activity.object?.attributedTo : null
-  // const isDifferentActor = activityActor.ap_id !== internalActor
-  // const hasToCheckAuthorship = hasEmbeddedObject && internalActor && isDifferentActor
-  // if (hasToCheckAuthorship) {
-  //   if (!activity.object.signature) {
-  //     throw new Error('Forwarded object missing LD signature')
-  //   }
-
-  //   const actor = await getActor(internalActor)
-  //   const publicKey = actor?.object.publicKey
-  //   if (!publicKey) {
-  //     throw new Error('Forwarded object actor not found')
-  //   }
-  //   const valid = await LDSignature.verify(activity.object, publicKey.publicKeyPem)
-
-  //   if (!valid) {
-  //     throw new Error('Invalid LD signature on forwarded object')
-  //   }
-  // }
-
-  const activityActor = await verifySignature(event, rawBody, activityData).catch((e) => {
-    log.info(e)
-    throw e
+  // authentication
+  const verify = await verifySignature(event, rawBody).catch(err => {
+    log.error('Error verifying signature: %s', err)
+    log.debug(JSON.stringify(activity, null, ' '))
+    return undefined
   })
-  if (!activityActor) {
-    log.warn('No valid signature')
-    throw createError({ status: 401 })
-  }
+
+  const proofVerify = activityData.proof && await verifyProof(activity as { proof: APProof, signature?: object })
+
+  // authentication and authorization checks are done in each specific activity handler
+  log.info(`Incoming AP activity from actor: %s, proof actor: %s`, verify?.actor?.ap_id ?? 'none', proofVerify?.actor?.ap_id ?? 'none')
   try {
-    await handleActivity(activityData, activityActor)
+    const ret = await handleActivity(activityData, verify, proofVerify)
+    if (ret.status !== 'accepted') {
+      log.warn('Skipping not accepted activity: %s', ret.reason)
+      log.debug(JSON.stringify(activityData, null, ' '))
+    } else {
+      log.info('Activity accepted: %s', activityData.type)
+    }
   } catch (error) {
     log.error('Error handling activity: %s', error)
     throw createError({ status: 500, message: 'Error handling activity' })

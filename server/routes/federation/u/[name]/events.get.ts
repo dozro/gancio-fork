@@ -16,14 +16,14 @@ export default defineEventHandler(async (event) => {
   const name = getRouterParam(event, 'name')
   if (!name) {
     log.warn(`Bad /events request`)
-    throw createError({ statusCode: 400, statusMessage: 'Bad request' })
+    throw createError({ statusCode: 400, message: 'Bad request' })
   }
 
   if (name !== publicSettings.instance_name) {
     log.debug(`Get unknown actor ${name} (should be ${publicSettings.instance_name}`)
     throw createError({
       statusCode: 404,
-      statusMessage: `No record found for ${name} (are you searching for ${publicSettings.instance_name} ?)`
+      message: `No record found for ${name} (are you searching for ${publicSettings.instance_name} ?)`
     })
   }
 

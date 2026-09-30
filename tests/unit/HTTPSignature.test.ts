@@ -1,19 +1,24 @@
 import { describe, expect, it, vi } from 'vitest'
-import { getActorFromKeyId } from '../../server/federation/lookup'
 import { prepareHTTPSignature, verifyHTTPSignature } from '../../server/federation/httpsignature'
 import { loadSettings, publicSettings, secretSettings } from '../../server/services/settings'
-import { APKey, APUser, connect, runMigrations } from '../../server/services/db'
+import { APKey, APUser } from '../../server/services/db'
 import { decodeStructuredField, encodeStructuredField } from '../../server/federation/http_dict'
 import { mockH3Event } from './utils'
 import { parseHttpKeyValueHeader } from '../../server/lib/http'
-import { decodePublicKeyMultibase, importActorKeys } from '../../server/federation/keys'
+import { decodePublicKeyMultibase, importActorKeys, normalizePublicKeyToSpki } from '../../server/federation/keys'
+import { cleanDatabase } from '../api/setup'
+import { applicationActorId } from '../../server/federation/helpers'
+import type { APActor } from '../../server/federation/types'
+import { getActorFromKeyId } from '../../server/federation/lookup'
 
+// mock the lookup.getActorFromKeyId
 vi.mock('../../server/federation/lookup')
-
 const mockedGetActorFromKeyId = vi.mocked(getActorFromKeyId)
 
-await connect()
-await runMigrations()
+// store the real lookup too
+const realLookup = await vi.importActual<typeof import('../../server/federation/lookup')>('../../server/federation/lookup')
+
+await cleanDatabase(true)
 await loadSettings()
 
 const actor = {
@@ -27,6 +32,28 @@ const actor = {
     }
   }
 }
+
+const Alice = await APUser.create({
+  ap_id: applicationActorId,
+  blocked: false,
+  instanceDomain: publicSettings.instanceDomain,
+  object: {
+    id: applicationActorId,
+    name: 'alice',
+    preferredUsername: 'alice',
+    inbox: 'https://example.com/alice/inbox',
+    outbox: 'https://example.com/alice/outbox',
+    type: 'Person',
+    icon: { url: '' }
+  }
+})
+
+const AliceKey = await APKey.create({
+  apUserApId: Alice.ap_id,
+  ap_id: applicationActorId + '#main-key',
+  type: 'rsa-v1_5-sha256',
+  public_key: normalizePublicKeyToSpki(publicSettings.publicKey),
+})
 
 describe('HTTPS Signature', () => {
   it('should parse HTTP key/value header', () => {
@@ -55,16 +82,15 @@ describe('HTTPS Signature', () => {
   })
 
   it('should accepts valid signature and digest', async () => {
-    const body = { actor: 'https://a.com/u/test', type: 'Create' as const }
+    const body = { actor: applicationActorId, type: 'Create' as const }
 
-    const headers = prepareHTTPSignature(JSON.stringify(body), 'https://a.com/inbox', 'post', secretSettings.privateKey)
-    const event = mockH3Event({ body, headers, url: '/inbox' })
+    const headers = prepareHTTPSignature(JSON.stringify(body), 'https://example.com/alice/inbox', 'post', secretSettings.privateKey)
+    const event = mockH3Event({ body, headers, url: '/alice/inbox' })
 
-    // mockedGetInstance.mockResolvedValue({ domain: 'a.com', blocked: false })
-    mockedGetActorFromKeyId.mockResolvedValue({ ...actor, instance: { blocked: false } })
+    mockedGetActorFromKeyId.mockResolvedValueOnce({ actor: Alice, key: AliceKey })
 
     const ret = await verifyHTTPSignature(event, JSON.stringify(body))
-    expect(ret?.ap_id).toBe(body.actor)
+    expect(ret?.actor.ap_id).toBe(body.actor)
   })
 
   it('should rejects when signature header is missing', async () => {
@@ -117,18 +143,16 @@ describe('HTTPS Signature', () => {
   it('should rejects when actor has no public key', async () => {
     const body = { actor: 'https://a.com/u/test', type: 'Create' }
     const headers = prepareHTTPSignature(JSON.stringify(body),
-      'https://a.com/inbox', 'post', secretSettings.privateKey, actor.object.publicKey.id.replace('#main-key', '#missing-key'))
+      'https://example.com/alice/inbox', 'post', secretSettings.privateKey, actor.object.publicKey.id.replace('#main-key', '#missing-key'))
     const event = mockH3Event({ body, headers })
 
-    mockedGetActorFromKeyId.mockResolvedValue({ object: {}, instance: { blocked: false } })
-
     await expect(verifyHTTPSignature(event, JSON.stringify(body)))
-      .rejects.toThrow('Signing actor has no public key http://localhost:13120/federation/u/relay#missing-key')
+      .rejects.toThrow('Signing actor not found for keyId http://localhost:13120/federation/u/relay#missing-key')
   })
 
   it('should rejects when digest does not match body', async () => {
     const body = { actor: 'https://a.com/u/test', type: 'Create' }
-    const headers = prepareHTTPSignature(JSON.stringify(body), 'https://a.com/inbox', 'post', secretSettings.privateKey)
+    const headers = prepareHTTPSignature(JSON.stringify(body), 'https://example.com/alice/inbox', 'post', secretSettings.privateKey)
 
     const event = mockH3Event({
       body,
@@ -138,7 +162,7 @@ describe('HTTPS Signature', () => {
       }
     })
 
-    mockedGetActorFromKeyId.mockResolvedValue({ ...actor, instance: { blocked: false } })
+    mockedGetActorFromKeyId.mockResolvedValue({ actor: { ...Alice, instance: { blocked: false } }, key: AliceKey })
 
     await expect(verifyHTTPSignature(event, JSON.stringify(body)))
       .rejects.toThrow('Signature mismatch')
@@ -167,31 +191,32 @@ describe('RFC 521a - Representing actor’s public keys', () => {
       object: actor,
       blocked: false
     })
-    const keys = importActorKeys(actor)
-    expect(keys).toBeDefined()
-    await expect(keys).resolves.toHaveLength(3)
 
+    const keys = await importActorKeys(actor as APActor)
+    expect(keys).toBeDefined()
+    expect(keys).toHaveLength(3)
     // check with old public key
-    const a = await APUser.findOne({ include: [{ model: APKey, where: { ap_id: actor.publicKey.id }, required: true }] })
-    expect(a?.keys[0].ap_id).toEqual(actor.publicKey.id)
-    expect(a?.keys[0].type).toEqual('rsa-v1_5-sha256')
-    expect(a?.keys[0].public_key).toBeInstanceOf(Uint8Array)
-    expect(a?.keys[0].public_key.length).toBeGreaterThan(0)
-    expect(a?.keys[0].apUserApId).toEqual(actor.id)
+    let ret = await realLookup.getActorFromKeyId(actor.publicKey.id)
+    // const a = await APUser.findOne({ include: [{ model: APKey, where: { ap_id: actor.publicKey.id }, required: true }] })
+    expect(ret!.key.ap_id).toEqual(actor.publicKey.id)
+    expect(ret!.key.type).toEqual('rsa-v1_5-sha256')
+    expect(ret!.key.public_key).toBeInstanceOf(Uint8Array)
+    expect(ret!.key.public_key.length).toBeGreaterThan(0)
+    expect(ret!.key.apUserApId).toEqual(actor.id)
 
     // check with ed25519
-    const b = await APUser.findOne({ include: [{ model: APKey, where: { ap_id: actor.assertionMethod[0].id }, required: true }] })
-    expect(b?.keys[0].ap_id).toEqual(actor.assertionMethod[0].id)
-    expect(b?.keys[0].type).toEqual('ed25519')
-    expect(b?.keys[0].public_key).toBeInstanceOf(Uint8Array)
-    expect(b?.keys[0].apUserApId).toEqual(actor.id)
+    ret = await realLookup.getActorFromKeyId(actor.assertionMethod[0].id)
+    expect(ret!.key.ap_id).toEqual(actor.assertionMethod[0].id)
+    expect(ret!.key.type).toEqual('ed25519')
+    expect(ret!.key.public_key).toBeInstanceOf(Uint8Array)
+    expect(ret!.key.apUserApId).toEqual(actor.id)
 
     // check with rsa-v1_5-sha256
-    const c = await APUser.findOne({ include: [{ model: APKey, where: { ap_id: actor.assertionMethod[1].id }, required: true }] })
-    expect(c?.keys[0].ap_id).toEqual(actor.assertionMethod[1].id)
-    expect(c?.keys[0].type).toEqual('rsa-v1_5-sha256')
-    expect(c?.keys[0].public_key).toBeInstanceOf(Uint8Array)
-    expect(c?.keys[0].apUserApId).toEqual(actor.id)
+    ret = await realLookup.getActorFromKeyId(actor.assertionMethod[1].id)
+    expect(ret!.key.ap_id).toEqual(actor.assertionMethod[1].id)
+    expect(ret!.key.type).toEqual('rsa-v1_5-sha256')
+    expect(ret!.key.public_key).toBeInstanceOf(Uint8Array)
+    expect(ret!.key.apUserApId).toEqual(actor.id)
   })
 })
 

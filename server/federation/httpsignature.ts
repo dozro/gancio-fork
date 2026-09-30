@@ -1,10 +1,11 @@
 import crypto from 'crypto'
-import { publicSettings } from '../services/settings'
+import { secretSettings } from '../services/settings'
 import { type H3Event, getHeader, createError } from 'h3'
 import { useLogger } from '../lib/logger'
 import { getActorFromKeyId } from './lookup'
-import type { APUser } from '../services'
 import { parseHttpKeyValueHeader } from '../lib/http'
+import { algoMap, importCryptoKey } from './keys'
+import { applicationActorId } from './helpers'
 const log = useLogger('HTTPSignature')
 
 // http signature has to be within an hour of now
@@ -17,8 +18,8 @@ export function prepareHTTPSignature(
   rawBody: string,
   targetUrl: string,
   method: 'post' | 'get' = 'post',
-  privkey: string,
-  keyId: string = `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key`
+  privkey: string = secretSettings.privateKey,
+  keyId: string = `${applicationActorId}#main-key`
 ) {
   const inboxUrl = new URL(targetUrl)
   const signer = crypto.createSign('sha256')
@@ -60,7 +61,7 @@ export function prepareHTTPSignature(
 export async function verifyHTTPSignature(
   event: H3Event,
   rawBody: string
-): Promise<APUser | undefined> {
+) {
   const requiredSigned = ['(request-target)', 'host', 'date']
 
   const signatureHeader = getHeader(event, 'signature')
@@ -126,29 +127,23 @@ export async function verifyHTTPSignature(
     throw createError('Missing signing actor URL in keyId')
   }
 
-  let signedActor = await getActorFromKeyId(signingKeyId)
-  log.debug(`Verifying signature from ${signingKeyId} (actor ${signedActor?.ap_id})`)
-  const publicKeyPem = signedActor?.object?.publicKey?.publicKeyPem
-  if (!publicKeyPem) {
-    throw createError(`Signing actor has no public key ${signingKeyId}`)
+  const ret = await getActorFromKeyId(signingKeyId)
+  if (!ret?.actor || !ret.key) {
+    throw createError(`Signing actor not found for keyId ${signingKeyId}`)
+  }
+  const { actor, key } = ret
+  log.debug(`Verifying signature from ${signingKeyId} (actor ${actor?.ap_id})`)
+  const publicKey = await importCryptoKey(key)
+  const verified = await crypto.subtle.verify(
+    algoMap[key.type],
+    publicKey,
+    Buffer.from(parsedSignature.get('signature') ?? '', 'base64'),
+    Buffer.from(signedHeaders))
+
+  if (!verified) {
+    throw createError('Mismatched signature')
   }
 
-  let publicKey = crypto.createPublicKey(publicKeyPem)
-  const sig = Buffer.from(parsedSignature.get('signature') ?? '', 'base64')
-  const verify = crypto.createVerify('sha256')
-  verify.update(signedHeaders)
-  if (!verify.verify(publicKey, sig)) {
-    signedActor = await getActorFromKeyId(signingKeyId)
-    const publicKeyPem = signedActor?.object?.publicKey?.publicKeyPem
-    if (!publicKeyPem) {
-      throw createError('Signing actor has no public key')
-    }
-    publicKey = crypto.createPublicKey(publicKeyPem)
-    if (!verify.verify(publicKey, sig)) {
-      throw createError('Mismatched signature')
-    }
-  }
-
-  log.debug('Valid signature from %s', signedActor?.ap_id)
-  return signedActor
+  log.debug('Valid signature from %s', actor?.ap_id)
+  return { actor, key }
 }

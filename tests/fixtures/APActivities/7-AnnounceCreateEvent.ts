@@ -3,6 +3,7 @@ export default {
   actor: 'http://localhost:13120/federation/u/relay',
   object: {
     type: 'Create' as const,
+    actor: 'http://localhost:13120/federation/u/relay',
     object: {
       id: 'http://localhost:13120/federation/m/2',
       type: 'Event' as const,

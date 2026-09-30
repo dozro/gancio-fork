@@ -6,12 +6,12 @@ import { type APUser, type Media, Event } from '~~/server/services/db'
 import { eventToAP } from '../services/events'
 import { APContext, getFollowersInbox } from './helpers'
 import { signAndSend } from './sign_and_send'
-import { type APActivityCreate, APEventSchema, type APEvent, type APActivityUpdate } from './types'
-import { createError } from 'h3'
+import { APEventSchema, type APEvent } from './types'
 import { getImageFromURL, sanitizeHTML } from '../helpers'
 import { parseAPLocation } from './places'
 import { findOrCreatePlace } from '../services/places'
 import { findOrCreateTags } from '../services/tags'
+import type { ActivityHandlerResult } from './handlers'
 
 const log = useLogger('Federated Event')
 
@@ -87,24 +87,21 @@ export async function APEventToEvent(APEvent: APEvent, actor: APUser) {
   return { event, tags, place }
 }
 
-export async function handleCreateEvent(message: APActivityCreate, actor: APUser) {
+export async function handleCreateEvent(object: APEvent, actor: APUser): Promise<ActivityHandlerResult> {
   // only trusted actor could send events
   if (!actor.following || !actor.trusted) {
-    log.warn(`APUser not followed or not trusted`)
-    throw createError({ status: 401, message: 'Not followed or not trusted' })
+    return { status: 'ignored', reason: 'Actor not followed or not trusted' }
   }
 
-  const { success, data, error } = APEventSchema.safeParse(message.object)
+  const { success, data, error } = APEventSchema.safeParse(object)
   if (!success) {
-    log.warn('Bad Event format: ', error, message.object)
-    throw createError({ status: 401, message: 'Create unsupported Object' })
+    return { status: 'ignored', reason: 'Bad Event format: ' + String(error) }
   }
 
   const ap_id = data.id
   const exists = await Event.findOne({ where: { ap_id } })
   if (exists) {
-    log.warn(`Avoid creating a duplicated event ${ap_id} - ${publicSettings.baseurl}/event/${exists.slug}`)
-    return exists
+    return { status: 'ignored', reason: `Event ${ap_id} already exists (${publicSettings.baseurl}/event/${exists.slug})` }
   }
 
   // transform APEvent to Event and save to database (in a better world the schema should be the same as APEvent, but for now we just transform it here)
@@ -123,30 +120,28 @@ export async function handleCreateEvent(message: APActivityCreate, actor: APUser
     }
   }
   dbEvent.setTags(dbTags)
-  return dbEvent
+  return { status: 'accepted' }
 }
 
 /**
  * an Update > Event from remote actor
  * we should fail if the actor is different from the original event actor
  */
-export async function handleUpdateEvent(message: APActivityUpdate, actor: APUser) {
-  const { success, data, error } = APEventSchema.safeParse(message.object)
+export async function handleUpdateEvent(message: APEvent, actor: APUser): Promise<ActivityHandlerResult> {
+  const { success, data, error } = APEventSchema.safeParse(message)
   if (!success) {
-    log.warn('Bad Event format: ', error, message.object)
-    throw new Error('Bad Event format')
+    log.debug(error)
+    return { status: 'ignored', reason: 'Bad Event format ' + error }
   }
 
   const ap_id = data.id
   const event = await Event.findOne({ where: { ap_id } })
   if (!event) {
-    log.warn(`Event ${ap_id} not found`)
-    throw new Error(`Event ${ap_id} not found`)
+    return { status: 'ignored', reason: `Event ${ap_id} not found` }
   }
 
   if (event.apUserApId !== actor.ap_id) {
-    log.warn(`Event actor is not the original: ${actor.ap_id} / ${event.apUserApId}`)
-    throw new Error(`Event actor is not the original event actor`)
+    return { status: 'ignored', reason: `Event actor is not the original event actor ${actor.ap_id} !== ${event.apUserApId}` }
   }
 
   // transform APEvent to Event and save to database (in a better world the schema should be the same as APEvent, but for now we just transform it here)
@@ -165,4 +160,5 @@ export async function handleUpdateEvent(message: APActivityUpdate, actor: APUser
     }
   }
   dbEvent.setTags(dbTags)
+  return { status: 'accepted' }
 }
