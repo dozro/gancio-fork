@@ -6,21 +6,24 @@ title: Federation / ActivityPub
 
 Gancio largely follows ActivityPub's server-to-server specification.
 
-
 ## Supported federation protocols and standards
 
 - [ActivityPub](https://www.w3.org/TR/activitypub/) (Server-to-Server)
 - [WebFinger](https://webfinger.net/)
 - [HTTP Signatures](https://datatracker.ietf.org/doc/html/draft-cavage-http-signatures)
+- [HTTP Message Signatures]
 - [NodeInfo](https://nodeinfo.diaspora.software/)
 
 ## Supported FEPs
 
-- [FEP-f1d5: NodeInfo in Fediverse Software](https://codeberg.org/fediverse/fep/src/branch/main/fep/f1d5/fep-f1d5.md)
-- [FEP-67ff: FEDERATION.md](https://codeberg.org/fediverse/fep/src/branch/main/fep/67ff/fep-67ff.md)
-- [FEP-fb2a: Actor metadata](https://codeberg.org/fediverse/fep/src/branch/main/fep/fb2a/fep-fb2a.md)
-- [FEP-2677: Identifying the Application Actor](https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md)
+- [FEP-f1d5: NodeInfo in Fediverse Software](https://fediverse.codeberg.page/fep/fep/f1d5/)
+- [FEP-67ff: FEDERATION.md](https://fediverse.codeberg.page/fep/fep/67ff/)
+- [FEP-fb2a: Actor metadata](https://fediverse.codeberg.page/fep/fep/fb2a/)
+- [FEP-2677: Identifying the Application Actor](https://fediverse.codeberg.page/fep/fep/2677/)
 - [FEP-8a8e: A common approach to using the Event object type](https://fediverse.codeberg.page/fep/fep/8a8e)
+- [FEP-044f: Consent-respecting quote posts](https://fediverse.codeberg.page/fep/fep/044f/)
+- [FEP-521a: Representing actor’s public keys](https://fediverse.codeberg.page/fep/fep/521a/) - inbound only
+- [FEP-8b32: Object Integrity Proofs](https://fediverse.codeberg.page/fep/fep/8b32/) - inbound only
 
 ## ActivityPub
 
