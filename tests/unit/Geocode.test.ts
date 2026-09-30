@@ -1,8 +1,11 @@
-import { $fetchRaw as fetch } from 'nitro-test-utils/e2e'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { setSetting, publicSettings } from '../../server/services'
 import { cleanDatabase } from '../api/setup'
 import { mockH3Event } from './utils'
+import { $fetch } from 'ofetch'
+
+vi.mock('ofetch')
+const mockedFetch = vi.mocked($fetch)
 
 const { default: geocodeHandler } = await import('../../server/api/geocode/index')
 
@@ -20,6 +23,7 @@ describe('Geocoding', () => {
   it('should geocode when enabled', async () => {
     await setSetting('allow_geolocation', true)
     const ret = geocodeHandler(mockH3Event({ query: { q: 'test' } }))
+    mockedFetch.mockResolvedValue([])
     await expect(ret).resolves.toBeDefined()
   })
 })
