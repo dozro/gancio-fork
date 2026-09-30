@@ -4,7 +4,6 @@ import { sanitizeHTML } from '../helpers'
 import { _signAndSend } from './sign_and_send'
 import { Instance, APUser } from '../services/db'
 
-import type { APActor } from './types'
 import { getInstance } from './lookup'
 import { importActorKeys } from './keys'
 
@@ -32,7 +31,7 @@ export async function getActor(actorUrl: string, bypassCache = false): Promise<A
   }
 
   try {
-    const ret: APActor = await _signAndSend('', actorUrl, 'get', secretSettings.privateKey)
+    const ret = await _signAndSend('', actorUrl, 'get', secretSettings.privateKey)
     if (!ret?.id) {
       log.debug('getActor failed for %s', actorUrl)
       return

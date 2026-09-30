@@ -3,12 +3,16 @@ import { _signAndSend, signAndSend } from './sign_and_send'
 import { useLogger } from '../lib/logger'
 import { publicSettings, publicSettingsLastModified, secretSettings } from '~~/server/services/settings'
 import { APUser } from '../services/db'
-import { APActivityTypeSchema } from './types'
+import { APActivityTypeSchema, type APActivityBase } from './types'
 import { handleActivity } from './handlers'
 import emitter from '../lib/emitter'
 import type { Settings } from '~~/shared/types/settings'
 
 const log = useLogger('federation')
+
+export const applicationActorBaseUrl = `${publicSettings.baseurl}/federation/u/`
+export const applicationActorId = `${applicationActorBaseUrl}${publicSettings.instance_name}`
+export const isApplicationActor = (actorId: string) => actorId === applicationActorId
 
 export function sameOrigin(url1: string, url2: string): boolean {
   try {
@@ -19,6 +23,37 @@ export function sameOrigin(url1: string, url2: string): boolean {
     log.warn('sameOrigin: invalid URL(s): %s, %s (%s)', url1, url2, e)
     return false
   }
+}
+
+/**
+ * returns the list of actor ids in the to or cc fields of an activity
+ */
+export function targetsForActivity(activity: APActivityBase): string[] {
+  const targets = new Set<string>()
+  if (activity.to) activity.to.forEach(t => targets.add(t))
+  if (activity.cc) activity.cc.forEach(t => targets.add(t))
+  return [...targets]
+}
+
+/**
+ * there is a public target
+ */
+export function hasPublicTarget(targets: string[]): boolean {
+  return targets.some(target => ['as:Public', 'https://www.w3.org/ns/activitystreams#Public'].includes(target))
+}
+
+export async function dereferenceActivityObject(object: unknown): Promise<unknown | undefined> {
+  if (typeof object !== 'string') {
+    return object
+  }
+
+  // TODO: should probably check if this object is already in database (Note or Event) or cache this
+  const ret = await _signAndSend('', object, 'get', secretSettings.privateKey)
+  if (!ret || typeof ret !== 'object' || !('id' in ret) || typeof ret.id !== 'string' || ret.id !== object) {
+    return undefined
+  }
+
+  return ret
 }
 
 function _getUser() {
@@ -186,10 +221,11 @@ export async function followActor(actor: APUser) {
       continue
     }
 
-    await handleActivity(activity, actor).catch((err) => {
+    const ret = await handleActivity(activity, { actor, key: { ap_id: '' } })
+    if (ret.status !== 'accepted') {
       log.error('Error handling activity %s from %s', activity.type, actor.ap_id)
-      log.error(err)
-    })
+      log.error(ret.reason)
+    }
   }
 }
 

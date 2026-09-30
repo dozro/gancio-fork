@@ -171,6 +171,6 @@ export default defineEventHandler(async (event) => {
   } catch (e) {
     console.error(e)
     log.error('Error adding trusted actor %s', e?.response?.data ?? String(e))
-    throw createError({ statusCode: 404, statusMessage: 'Error adding trusted actor' })
+    throw createError({ status: 404, statusText: 'Error adding trusted actor' })
   }
 })

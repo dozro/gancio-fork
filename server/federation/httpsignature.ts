@@ -1,10 +1,11 @@
 import crypto from 'crypto'
-import { publicSettings } from '../services/settings'
+import { secretSettings } from '../services/settings'
 import { type H3Event, getHeader, createError } from 'h3'
 import { useLogger } from '../lib/logger'
 import { getActorFromKeyId } from './lookup'
 import { parseHttpKeyValueHeader } from '../lib/http'
 import { algoMap, importCryptoKey } from './keys'
+import { applicationActorId } from './helpers'
 const log = useLogger('HTTPSignature')
 
 // http signature has to be within an hour of now
@@ -17,8 +18,8 @@ export function prepareHTTPSignature(
   rawBody: string,
   targetUrl: string,
   method: 'post' | 'get' = 'post',
-  privkey: string,
-  keyId: string = `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key`
+  privkey: string = secretSettings.privateKey,
+  keyId: string = `${applicationActorId}#main-key`
 ) {
   const inboxUrl = new URL(targetUrl)
   const signer = crypto.createSign('sha256')

@@ -1,6 +1,7 @@
 import { APKey, KeyTypeEnum, type KeyType } from '../services/db'
 import type { APActor } from './types'
 import { useLogger } from '../lib/logger'
+import { createPublicKey } from 'node:crypto'
 const log = useLogger('federation/keys')
 
 /**
@@ -15,7 +16,7 @@ export async function importActorKeys(actor: APActor) {
     const k = await APKey.upsert({
       ap_id: actor.publicKey.id,
       type: 'rsa-v1_5-sha256',
-      public_key: decodePemToBinary(actor.publicKey.publicKeyPem),
+      public_key: normalizePublicKeyToSpki(actor.publicKey.publicKeyPem),
       apUserApId: actor.id
     })
     keys.push(k[0])
@@ -43,10 +44,10 @@ export async function importActorKeys(actor: APActor) {
   return keys
 }
 
-export function decodePemToBinary(pem: string): Uint8Array {
-  const lines = pem.split('\n')
-  const base64 = lines.slice(1, -2).join('')
-  return Uint8Array.from(Buffer.from(base64, 'base64'))
+export function normalizePublicKeyToSpki(pem: string): Uint8Array {
+  const keyObject = createPublicKey(pem)
+  const spki = keyObject.export({ format: 'der', type: 'spki' })
+  return new Uint8Array(spki)
 }
 
 // https://datatracker.ietf.org/doc/html/draft-msporny-base58-03
@@ -85,13 +86,13 @@ export type algoParam = { name: string, hash?: string, saltLength?: number }
 export const algoMap: { [K in KeyType]: algoParam } = {
   'rsa-v1_5-sha256': { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
   'ed25519': { name: 'Ed25519' },
-  'rsa-pss-sha512': { name: 'RSA-PSS', saltLength: 64 }
+  'rsa-pss-sha512': { name: 'RSA-PSS', saltLength: 64, hash: 'SHA-512' }
 }
 export async function importCryptoKey(key: APKey): Promise<CryptoKey> {
   const algorithm = algoMap[key.type]
   const binary = new ArrayBuffer(key.public_key.byteLength)
   new Uint8Array(binary).set(key.public_key)
-  return await crypto.subtle.importKey('spki', binary, algorithm, false, ['verify'])
+  return crypto.subtle.importKey('spki', binary, algorithm, false, ['verify'])
 }
 
 export function decodeMultibase(input: string): Uint8Array {

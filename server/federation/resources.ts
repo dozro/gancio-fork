@@ -2,9 +2,11 @@ import linkifyHtml from 'linkify-html'
 import { sanitizeHTML } from '../helpers'
 import { useLogger } from '../lib/logger'
 import { Event, Resource, type APUser } from '../services/db'
-import type { APActivityQuoteRequest, APNote } from './types'
+import type { APActivityBase, APNote } from './types'
 import { _signAndSend, signAndSend } from './sign_and_send'
 import { publicSettings } from '../services/settings'
+import { applicationActorId, hasPublicTarget } from './helpers'
+import type { ActivityHandlerResult } from './handlers'
 
 const log = useLogger('federation:notes')
 
@@ -13,15 +15,13 @@ const log = useLogger('federation:notes')
  * I know this could sounds a little confusing but this is internally called `Resource` to explicitly
  * indicate that this is not a comment but could be another media (image, video, audio, etc.)
  */
-export async function handleCreateNote(message: APNote, actor: APUser) {
+export async function handleCreateNote(message: APNote, targets: string[], actor: APUser): Promise<ActivityHandlerResult> {
   if (!publicSettings.enable_resources) {
-    log.info('Ignore resource as it is disabled in settings')
-    return
+    return { status: 'ignored', reason: 'Resources are disabled in settings' }
   }
 
   // search for related event
   let event
-
   // it's a reply or a quote
   const inReplyTo = message?.inReplyTo ?? message?.quote ?? message?.quoteUri ?? message?._misskey_quote
   if (inReplyTo) {
@@ -43,9 +43,7 @@ export async function handleCreateNote(message: APNote, actor: APUser) {
   }
 
   if (!event) {
-    log.warn('Create Activity for Note object are only supported for events or other local notes')
-    log.warn(message)
-    return
+    return { status: 'ignored', reason: 'Create Activity for Note object are only supported for events or other local notes' }
   }
 
   log.debug(`Reply from ${actor.ap_id} to "${publicSettings.baseurl}/event/${event.slug}"`)
@@ -56,14 +54,17 @@ export async function handleCreateNote(message: APNote, actor: APUser) {
     activitypub_id: message.id,
     apUserApId: actor.ap_id,
     data: message,
-    eventId: event && event.id
+    eventId: event && event.id,
+    hidden: !hasPublicTarget(targets)
   })
+  return { status: 'accepted' }
 }
 
 // https://fediverse.codeberg.page/fep/fep/044f/
 // https://shkspr.mobi/blog/2025/10/getting-started-with-mastodons-quote-posts-technical-implementation-details-for-servers
-export async function handleQuoteRequest(message: APActivityQuoteRequest, actor: APUser) {
-  const quoter_post_id = typeof message.instrument === 'string' ? message.instrument : message.instrument.id
+export async function handleQuoteRequest(message: APActivityBase, actor: APUser): Promise<ActivityHandlerResult> {
+  // APActivityQuoteRequest
+  const quoter_post_id = typeof message.instrument === 'string' ? message.instrument : message?.instrument?.id
   log.debug(`Quote request from ${actor.ap_id} to ${quoter_post_id}`)
 
   // calculate base64 from quoter_post_id, message.id
@@ -83,7 +84,7 @@ export async function handleQuoteRequest(message: APActivityQuoteRequest, actor:
     ],
     'id': `${publicSettings.baseurl}/federation/activity/${crypto.randomUUID()}`,
     'type': 'Accept' as const,
-    'actor': `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`,
+    'actor': applicationActorId,
     'object': {
       id: message.id,
       type: 'QuoteRequest' as const,
@@ -96,31 +97,26 @@ export async function handleQuoteRequest(message: APActivityQuoteRequest, actor:
   log.debug(`Accept quote request: ${JSON.stringify(accept)}`)
 
   await signAndSend(accept, actor.object.inbox)
+  return { status: 'accepted' }
 }
 
 /**
  * Update a resource from AP Note
  * the actor should be the same as the resource's author
  */
-export async function handleUpdateNote(message: APNote, actor: APUser) {
-  if (publicSettings.enable_resources) {
-    log.info('Ignore note as it is disabled in settings')
-    return
+export async function handleUpdateNote(message: APNote, actor: APUser): Promise<ActivityHandlerResult> {
+  if (!publicSettings.enable_resources) {
+    return { status: 'ignored', reason: 'Resources are disabled in settings' }
   }
 
   const resource = await Resource.findOne({ where: { activitypub_id: message?.id, apUserApId: actor.ap_id } })
   if (!resource) {
-    log.warn('Note not found')
-    return
+    return { status: 'ignored', reason: 'Note not found' }
   }
 
   message.content = sanitizeHTML(linkifyHtml(message.content || '', { target: '_blank', render: { email: ctx => ctx.content } }))
-
-  await resource.update({
-    data: message
-  })
-
-  log.debug('Note updated!')
+  await resource.update({ data: message })
+  return { status: 'accepted' }
 }
 
 export async function handleDeleteNote(message: APNote, actor: APUser) {

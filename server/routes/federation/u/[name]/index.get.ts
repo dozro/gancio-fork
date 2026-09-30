@@ -1,5 +1,6 @@
 // import { APUser } from "~/server/utils/sequelize"
 import { defineEventHandler, sendRedirect, getRouterParam, setHeader, createError } from 'h3'
+import { applicationActorId } from '~~/server/federation/helpers'
 import { useLogger } from '~~/server/lib/logger'
 import { preferHTML } from '~~/server/lib/negotiator'
 import { publicSettings } from '~~/server/services'
@@ -7,21 +8,21 @@ import { publicSettings } from '~~/server/services'
 export default defineEventHandler(async (event) => {
   const log = useLogger('federation actor')
   if (preferHTML(event)) {
-    log.debug('[FEDI] Get actor but prefer text/html, redirect to homepage')
-    sendRedirect(event, '/', 302)
+    log.debug('Get actor but prefer text/html, redirect to homepage')
+    return sendRedirect(event, '/', 302)
   }
 
   const name = getRouterParam(event, 'name')
   if (!name) {
     log.warn(`[FEDI] Bad request`)
-    throw createError({ statusCode: 400, statusMessage: 'Bad request' })
+    throw createError({ status: 400, message: 'Bad request' })
   }
 
   if (name !== publicSettings.instance_name) {
-    log.debug(`[FEDI] Get unknown actor ${name} (should be ${publicSettings.instance_name}`)
+    log.debug(`Get unknown actor ${name} (should be ${publicSettings.instance_name})`)
     throw createError({
-      statusCode: 404,
-      statusMessage: `No record found for ${name} (are you searching for ${publicSettings.instance_name} ?)`
+      status: 404,
+      message: `No record found for ${name} (are you searching for ${publicSettings.instance_name} ?)`
     })
   }
 
@@ -46,16 +47,16 @@ export default defineEventHandler(async (event) => {
         indexable: 'toot:indexable'
       }
     ],
-    'id': `${publicSettings.baseurl}/federation/u/${name}`,
+    'id': applicationActorId,
     'type': 'Application',
     'summary': publicSettings.description,
     'name': publicSettings.title,
     'preferredUsername': name,
-    'inbox': `${publicSettings.baseurl}/federation/u/${name}/inbox`,
-    'outbox': `${publicSettings.baseurl}/federation/u/${name}/outbox`,
+    'inbox': `${applicationActorId}/inbox`,
+    'outbox': `${applicationActorId}/outbox`,
     'manuallyApprovesFollowers': false,
-    'upcomingEvents': `${publicSettings.baseurl}/federation/u/${name}/events`,
-    'endpoints': { sharedInbox: `${publicSettings.baseurl}/federation/u/${name}/inbox` },
+    'upcomingEvents': `${applicationActorId}/events`,
+    'endpoints': { sharedInbox: `${applicationActorId}/inbox` },
     'discoverable': true,
     'indexable': true,
     'attachment': [
@@ -76,10 +77,10 @@ export default defineEventHandler(async (event) => {
       url: publicSettings.baseurl + '/headerimage.png'
     },
     'publicKey': {
-      id: `${publicSettings.baseurl}/federation/u/${name}#main-key`,
-      owner: `${publicSettings.baseurl}/federation/u/${name}`,
+      id: `${applicationActorId}#main-key`,
+      owner: applicationActorId,
       publicKeyPem: publicSettings.publicKey
     },
-    'url': `${publicSettings.baseurl}/federation/u/${name}`
+    'url': applicationActorId
   }
 })
