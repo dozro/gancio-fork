@@ -3,6 +3,7 @@
  */
 
 import { DateTime } from 'luxon'
+import type { FetchError } from 'ofetch'
 
 export function mediaURL(event: EventAPI, type?: string, format = '.jpg') {
   const settings = useState<Settings>('settings')
@@ -122,4 +123,8 @@ export function useAttributesFromEvents(events: EventAPI[]) {
   attributes.push({ key: 'today', dates: new Date(), highlight: { fillMode: 'outline' } })
 
   return attributes
+}
+
+export function getFetchError(e: FetchError) {
+  return e?.data?.statusMessage ?? e?.statusMessage ?? e?.statusText ?? String(e)
 }
