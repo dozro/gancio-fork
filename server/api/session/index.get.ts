@@ -1,5 +1,6 @@
 import { eventHandler } from 'h3'
 import { getLegacyUserSession, getUserSession } from '~~/server/lib/session'
+import { User } from '~~/server/services'
 
 /**
  * @openapi
@@ -26,5 +27,6 @@ export default eventHandler(async (event) => {
     user = await getLegacyUserSession(event)
   }
 
-  return user
+  // check if user exists and is enabled
+  if (user) return User.findByPk(user.id, { where: { is_active: true }, attributes: ['id', 'email', 'role'], raw: true })
 })
