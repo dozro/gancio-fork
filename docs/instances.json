@@ -632,5 +632,23 @@
     "summary": "A shared agenda by and for the belgian trans* community",
     "timezone": "Europe/Brussels",
     "handler": "relay@queerleven.be"
+  },
+  {
+    "name": "Sottosuolo",
+    "url": "https://sottosuolo.ch",
+    "logo": "https://sottosuolo.ch/logo.png",
+    "place": "(Alpi meridionali, Switzerland)",
+    "summary": "Agenda condivisa del sottosuolo autogestito del sud delle Alpi.",
+    "timezone": "Europe/Rome",
+    "handler": null
+  },
+  {
+    "name": "Fuori.org",
+    "url": "https://fuori.org",
+    "logo": "http://fuori.org/logo.png",
+    "place": "(Belluno, Italy)",
+    "summary": "Agenda condivisa per Belluno e dintorni",
+    "timezone": "Europe/Rome",
+    "handler": "Fuori.org@fuori.org"
   }
 ]
