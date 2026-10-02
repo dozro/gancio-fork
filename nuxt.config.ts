@@ -35,7 +35,12 @@ export default defineNuxtConfig({
     '~/assets/css/main.css',
     '@mdi/font/css/materialdesignicons.css'
   ],
-  modules: ['@nuxt/eslint', '@nuxtjs/i18n', (!isTest && '@nuxtjs/sitemap'), '@nuxt/hints'],
+  modules: [
+    '@nuxt/eslint',
+    '@nuxtjs/i18n',
+    (!isTest && '@nuxtjs/sitemap'),
+    '@nuxt/hints'
+  ],
   sitemap: {
     cacheMaxAgeSeconds: 3600, // 1 hour
 
@@ -88,9 +93,6 @@ export default defineNuxtConfig({
     transpile: ['vuetify', '@vue-leaflet/vue-leaflet']
   },
   vite: {
-    esbuild: {
-      sourcemap: !isBuild
-    },
     optimizeDeps: {
       include: ['lodash/debounce', 'luxon', 'linkifyjs', 'mitt', 'v-calendar', '@vue/devtools-core',
         '@vue/devtools-kit', '@tiptap/vue-3', '@tiptap/starter-kit', '@vueuse/core', '@vue-leaflet/vue-leaflet']
