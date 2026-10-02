@@ -45,6 +45,10 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ICalAlarmData[
         }
       }
 
+      let media
+      if (e.media)
+        media = e.media.map((m) => `${publicSettings.baseurl}/media/${m.url}`)
+
       cal.createEvent({
         id: `${e.id}@${publicSettings.hostname}`,
         start: start,
@@ -58,6 +62,7 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ICalAlarmData[
         url: `${publicSettings.baseurl}/event/${e.slug || e.id}`,
         status: statusMap[e.status as EventStatus],
         categories: e?.tags?.map(t => ({ name: t.tag })),
+        attachments: media,
         created: e.createdAt,
         lastModified: e.updatedAt,
         alarms
