@@ -22,7 +22,11 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ICalAlarmData[
   }
   const cal = ical({
     method: ICalCalendarMethod.PUBLISH,
-    scale: 'GREGORIAN'
+    scale: 'GREGORIAN',
+    name: publicSettings.title,
+    description: publicSettings.description,
+    source: `${publicSettings.baseurl}/feed/ics`,
+    url: publicSettings.baseurl
   })
   cal.ttl(3600)
 
