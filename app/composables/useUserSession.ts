@@ -7,7 +7,7 @@ import type { UserSession } from '~~/server/lib/session'
  */
 export function useUserSession() {
   const serverEvent = import.meta.server ? useRequestEvent() : null
-  const sessionState = useState<{ user: UserSession } | null>('nuxt-session', () => null)
+  const sessionState = useState<UserSession | null>('nuxt-session', () => null)
   const authReadyState = useState('nuxt-auth-ready', () => false)
 
   const clear = async () => {
@@ -26,7 +26,7 @@ export function useUserSession() {
   }
 
   const fetch = async () => {
-    sessionState.value = await useRequestFetch()<{ user: UserSession }>('/api/session', {
+    sessionState.value = await useRequestFetch()<UserSession>('/api/session', {
       headers: {
         accept: 'application/json'
       },
