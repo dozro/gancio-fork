@@ -650,5 +650,14 @@
     "summary": "Agenda condivisa per Belluno e dintorni",
     "timezone": "Europe/Rome",
     "handler": "Fuori.org@fuori.org"
+  },
+  {
+    "name": "Vamos Juntes",
+    "url": "https://vamosjuntes.com.ar",
+    "logo": "https://vamosjuntes.com.ar/logo.png",
+    "place": "(Córdoba, Argentina)",
+    "summary": "La Agenda Comunitaria de Córdoba Capital",
+    "timezone": "America/Argentina/Buenos_Aires",
+    "handler": "relay@vamosjuntes.com.ar"
   }
 ]
