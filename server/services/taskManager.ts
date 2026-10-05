@@ -195,7 +195,7 @@ export class TaskManager {
 
     // only keep tasks that are either repeating or have retries left
     // completed tasks are removed from the queue
-    this.tasks = this.tasks.filter(t => t.repeat || (t.retries?.length && t.processInNTick > 0))
+    this.tasks = this.tasks.filter(t => t.repeat || (t.retries?.length || t.processInNTick > 0))
 
     return Promise.allSettled(tasks)
   }
