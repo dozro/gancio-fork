@@ -25,16 +25,29 @@ export function useTaskManager() {
   return instance
 }
 
+type TaskArgs = {
+  name: string
+  repeat?: boolean
+  repeatDelay?: number
+  callAtStart?: boolean
+  retries?: number[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  method: (...args: any[]) => Promise<unknown> | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  args?: any[]
+}
 export class Task {
   name: string
-  method: () => Promise<undefined> | null
-  args: unknown[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  method: (...args: any[]) => Promise<unknown> | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  args: any[]
   repeat: boolean
   retries?: number[]
   repeatDelay: number
   processInNTick: number
 
-  constructor({ name = '', repeat = false, repeatDelay = 0, callAtStart = false, retries = [10, 50], method, args = [] }) {
+  constructor({ name = '', repeat = false, repeatDelay = 0, callAtStart = false, retries = [10, 50], method, args = [] }: TaskArgs) {
     this.name = name
     this.method = method
     this.args = args
@@ -43,17 +56,17 @@ export class Task {
     this.repeatDelay = repeatDelay
     this.processInNTick = callAtStart ? 1 : repeatDelay
     // retries on repeatable task only
-    this.retries = repeat ? retries : []
+    this.retries = !repeat ? retries : []
   }
 
-  handleError(e) {
-    log.error(`TASK ERROR [${this?.name}]: ${e} ${e.stack}`)
+  handleError(e: unknown) {
+    log.error(`TASK ERROR [${this?.name}]: ${e} ${(e && typeof e === 'object' && 'stack' in e) && e?.stack}`)
     if (!this.repeat) {
       this.processInNTick = this.retries?.shift() ?? 0
       if (this.processInNTick) {
         log.info(`Error in ${this.name}: retring in `, Duration.fromMillis(this.processInNTick * 1000).rescale().toHuman({ listStyle: 'long' }))
       } else {
-        log.info('This was the last try processing this task')
+        log.debug(`This was the last try processing ${this.name}`)
       }
     }
   }
@@ -66,15 +79,16 @@ export class Task {
     log.info(`Process ${this.name}`)
     this.processInNTick = this.repeatDelay
     try {
-      const ret = this.method.apply(this, this.args)
+      const ret = this.method(...this.args)
       if (ret && typeof ret.catch === 'function') {
-        ret.catch(this.handleError.bind(this))
+        ret.catch(e => this.handleError(e))
+        log.debug(`Process ${this.name}, ${this.retries?.length} retries left`)
         return ret
       }
+      log.debug(`Process ${this.name} done`)
       return ret
     } catch (e) {
-      log.error(e)
-      this.handleError(e)
+      return this.handleError(e)
     }
   }
 }
@@ -155,7 +169,7 @@ export class TaskManager {
     }
   }
 
-  add({ name = '', repeat = false, repeatDelay = 0, callAtStart = false, retries = [20, 50], method, args = [] }) {
+  add({ name = '', repeat = false, repeatDelay = 0, callAtStart = false, retries = [20, 50], method, args = [] }: TaskArgs) {
     const safeRepeatDelay = Math.max(Number(repeatDelay) || 0, 0)
     if (repeat) {
       log.info(`[TASK] Add ${name} (each ${Duration.fromMillis(safeRepeatDelay * this.interval * 1000).rescale().toHuman({ listStyle: 'long' })})`)
@@ -181,7 +195,7 @@ export class TaskManager {
 
     // only keep tasks that are either repeating or have retries left
     // completed tasks are removed from the queue
-    this.tasks = this.tasks.filter(t => t.repeat || (t.retries?.length && t.processInNTick > 0))
+    this.tasks = this.tasks.filter(t => t.repeat || (t.retries?.length || t.processInNTick > 0))
 
     return Promise.allSettled(tasks)
   }
