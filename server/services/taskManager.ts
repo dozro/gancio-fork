@@ -56,7 +56,7 @@ export class Task {
     this.repeatDelay = repeatDelay
     this.processInNTick = callAtStart ? 1 : repeatDelay
     // retries on repeatable task only
-    this.retries = repeat ? retries : []
+    this.retries = !repeat ? retries : []
   }
 
   handleError(e: unknown) {
