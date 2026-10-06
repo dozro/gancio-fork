@@ -1,23 +1,33 @@
 <script setup lang="ts">
-import debounce from 'lodash/debounce'
+import { useDebounceFn } from '@vueuse/core'
 import useIsSearchingCalendar from '@/composables/useIsSearchingCalendar'
 
 const settings = useState<Settings>('settings')
 const route = useRoute()
 
 const { params, pending } = useEvents()
-const onSearchChanged = debounce((value) => {
+const onSearchChanged = useDebounceFn((value) => {
   params.value.query = value || undefined
-  navigateTo({ query: { query: params.value.query } })
+  navigateTo({ query: { query: String(params.value.query) } })
 }, 500)
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections', { query: { pin: true } })
 
 const show_search = computed(() => route?.name === 'index')
 const show_calendar = computed(() => !settings.value?.hide_calendar && route?.name === 'index')
-const show_collections_bar = computed(() => ['index', 'collection-name'].includes(route?.name))
+const show_collections_bar = computed(() => ['index', 'collection-name'].includes(String(route?.name)))
 const isCalendarDisabled = computed(oldValue => pending.value ? oldValue : !!params.value.query)
 const isSearchingDates = useIsSearchingCalendar()
+
+const selectedCollectionId = computed(() => {
+  if (route?.name === 'collection-name') {
+    const collectionName = route.params.name as string
+    const collection = collections.value?.find(c => c.name === collectionName)
+    return collection?.id
+  }
+  return undefined
+})
+
 </script>
 
 <template>
@@ -67,11 +77,12 @@ const isSearchingDates = useIsSearchingCalendar()
       <v-btn
         v-for="collection in collections"
         :key="collection.id"
+        :active="selectedCollectionId === collection.id"
         class="mr-2 mt-2 bg-transparent-semi"
         size='small'
         variant="outlined"
         color="primary"
-        :to="`/collection/${encodeURIComponent(collection.name)}`"
+        :to="selectedCollectionId === collection.id ? '/' : `/collection/${encodeURIComponent(collection.name)}`"
       >
         {{ collection.name }}
       </v-btn>
