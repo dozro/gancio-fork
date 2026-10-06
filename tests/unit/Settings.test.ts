@@ -1,14 +1,13 @@
 import { describe, it, expect, vi } from 'vitest'
-import { cleanDatabase } from '../api/setup'
 import { loadSettings } from '../../server/services'
 import { getUser } from '../../server/lib/getUser'
-import { mockH3Event } from './utils'
+import { mockH3Event, loadTestUsers } from './utils'
 import handler from '../../server/api/settings/index.put'
 
 vi.mock('../../server/lib/getUser')
 const mockedGetUser = vi.mocked(getUser)
 
-const { adminUser, userUser } = await cleanDatabase(true)
+const { adminUser, userUser } = await loadTestUsers()
 
 describe('Settings', () => {
   it('should load settings', async () => {

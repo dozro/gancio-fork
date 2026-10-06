@@ -4,6 +4,8 @@ import { IncomingMessage, ServerResponse } from 'node:http'
 import { createEvent } from 'h3'
 import type { IncomingHttpHeaders } from 'node:http2'
 import { Socket } from 'node:net'
+import type Sequelize from '@sequelize/core'
+import { User } from '../../server/services/db'
 
 type MockH3EventOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -49,6 +51,77 @@ export function mockInboxActivity(body: unknown) {
   })
 }
 
+export async function cleanDatabase(db: Sequelize) {
+  try {
+    await Promise.allSettled([
+      db.query(`DELETE FROM events`),
+      db.query('DELETE FROM ap_users'),
+      db.query('DELETE FROM events'),
+      db.query('DELETE FROM event_tags'),
+      db.query('DELETE FROM resources'),
+      db.query('DELETE FROM instances'),
+      db.query('DELETE FROM settings'),
+      db.query('DELETE FROM announcements'),
+      db.query('DELETE FROM oauth_tokens'),
+      db.query('DELETE FROM users'),
+      db.query('DELETE FROM tags'),
+      db.query('DELETE FROM places'),
+      db.query('DELETE FROM filters'),
+      db.query('DELETE FROM collections'),
+      db.query('DELETE FROM notifications'),
+      db.query('DELETE FROM tasks')
+    ])
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+let adminUser: User
+let editorUser: User
+let userUser: User
+let anotherUser: User
+
+export async function loadTestUsers() {
+  if (adminUser && editorUser && userUser && anotherUser) {
+    return { adminUser, editorUser, userUser, anotherUser }
+  }
+
+  let user = await User.upsert({
+    email: 'admin',
+    password: 'password',
+    role: 'admin',
+    is_active: true
+  })
+  adminUser = user[0]
+
+  user = await User.upsert({
+    email: 'editor',
+    password: 'password',
+    role: 'editor',
+    is_active: true
+  })
+  editorUser = user[0]
+
+  user = await User.upsert({
+    email: 'user',
+    password: 'password',
+    role: 'user',
+    is_active: true
+  })
+  userUser = user[0]
+
+  user = await User.upsert({
+    email: 'another',
+    password: 'password',
+    role: 'user',
+    is_active: true
+  })
+  anotherUser = user[0]
+  return { adminUser, editorUser, userUser, anotherUser }
+}
+
 export function now() {
   return DateTime.now().toUnixInteger()
 }
+
+export const admin = JSON.stringify({ email: 'admin', password: 'password', grant_type: 'password', client_id: 'self' })

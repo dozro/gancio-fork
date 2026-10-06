@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { mockH3Event } from './utils'
+import { mockH3Event, cleanDatabase } from './utils'
 import handler from '../../server/routes/federation/u/[name]/outbox.get'
-import { cleanDatabase } from '../api/setup'
+import { connect } from '../../server/services'
 
-await cleanDatabase()
+const db = await connect()
+await cleanDatabase(db)
 
 describe('Outbox', () => {
   it('should return total items', async () => {

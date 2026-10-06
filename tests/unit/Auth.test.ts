@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { cleanDatabase } from '../api/setup'
-import { mockH3Event } from './utils'
+import { mockH3Event, cleanDatabase } from './utils'
+import { connect } from '../../server/services'
 
 const admin = JSON.stringify({ email: 'admin', password: 'password' })
 const wrong_credentials = JSON.stringify({ email: 'admin', password: 'wrong' })
@@ -14,7 +14,8 @@ const { default: handleLoginToken } = await import('../../server/api/login/token
 const { default: handleRegister } = await import('../../server/api/user/register.post')
 
 describe('Authentication / Authorization', async () => {
-  await cleanDatabase()
+  const db = await connect()
+  await cleanDatabase(db)
   it('should not return an user when not authenticated', async () => {
     const evt = mockH3Event({ headers: { cookie: '' } })
     const ret = handlerUser(evt)

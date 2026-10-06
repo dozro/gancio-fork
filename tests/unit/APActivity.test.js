@@ -2,19 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { handleActivity } from '../../server/federation/handlers'
 import { getActorFromKeyId, getInstance } from '../../server/federation/lookup'
 import { getActor } from '../../server/federation/get_actor'
-import { connect, Event, Instance, Resource, APUser, runMigrations, APKey } from '../../server/services/db'
+import { Event, Instance, Resource, APUser, APKey } from '../../server/services/db'
 import { loadSettings, publicSettings, setSetting } from '../../server/services/settings'
 import { applicationActorId } from '../../server/federation/helpers'
 import { normalizePublicKeyToSpki } from '../../server/federation/keys'
 
-// SETUP
-const db = await connect()
-await runMigrations()
 await loadSettings()
-await db.query('DELETE FROM events')
-await db.query('DELETE FROM resources')
-await db.query('DELETE FROM instances')
-await db.query('DELETE FROM ap_users')
 await Instance.create({
   domain: 'localhost:13120',
   applicationActor: 'http://localhost:13120/federation/u/relay',
@@ -54,7 +47,7 @@ await actor.update({ trusted: true, following: true })
 const verify = await getActorFromKeyId(`${applicationActorId}#main-key`)
 if (!actor) throw new Error('Actor not found')
 
-describe('AP Activity handler', () => {
+describe('AP Activity handler', async () => {
   it('should handle a Create > Event activity from a trusted actor', async () => {
     const { default: event } = await import('../fixtures/APActivities/0-CreateEvent')
     const ret = await handleActivity(event, verify)

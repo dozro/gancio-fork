@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mockH3Event } from './utils'
-import { connect } from '../../server/services/db'
 import handler from '../../server/routes/federation/u/[name]/index.get'
-
-await connect()
 
 describe('AP', () => {
   it('should redirect to / on html as accepted content type', async () => {

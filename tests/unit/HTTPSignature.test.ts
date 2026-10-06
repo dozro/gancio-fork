@@ -6,10 +6,11 @@ import { decodeStructuredField, encodeStructuredField } from '../../server/feder
 import { mockH3Event } from './utils'
 import { parseHttpKeyValueHeader } from '../../server/lib/http'
 import { decodePublicKeyMultibase, importActorKeys, normalizePublicKeyToSpki } from '../../server/federation/keys'
-import { cleanDatabase } from '../api/setup'
 import { applicationActorId } from '../../server/federation/helpers'
 import type { APActor } from '../../server/federation/types'
 import { getActorFromKeyId } from '../../server/federation/lookup'
+
+await loadSettings()
 
 // mock the lookup.getActorFromKeyId
 vi.mock('../../server/federation/lookup')
@@ -17,9 +18,6 @@ const mockedGetActorFromKeyId = vi.mocked(getActorFromKeyId)
 
 // store the real lookup too
 const realLookup = await vi.importActual<typeof import('../../server/federation/lookup')>('../../server/federation/lookup')
-
-await cleanDatabase(true)
-await loadSettings()
 
 const actor = {
   ap_id: 'https://a.com/u/test',

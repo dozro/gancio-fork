@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { cleanDatabase } from '../api/setup'
-import { mockH3Event, now } from './utils'
-import { Event } from '../../server/services'
+import { mockH3Event, now, cleanDatabase } from './utils'
+import { connect, Event } from '../../server/services'
 import { findOrCreateTags } from '../../server/services/tags'
 
-await cleanDatabase()
+const db = await connect()
+await cleanDatabase(db)
+
 describe('Tags', () => {
   it('should normalize tags with accents, hashtags, trim, etc..', async () => {
     const { normalizeTag } = await import('../../server/services/tags')
