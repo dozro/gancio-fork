@@ -18,18 +18,18 @@ if (!event.value || error.value) {
 const canonicalUrl = computed(() => `${settings.value.baseurl}/event/${event.value?.slug || event.value?.id}`)
 
 useHead({
-  title: `${settings.value.title} - ${event.value.title}`,
+  title: `${event.value.title} - ${settings.value.title}`,
   meta: [
     { property: 'og:title', content: event.value.title },
     { property: 'og:description', content: event.value?.plain_description ?? '' },
-    { property: 'og:title', content: event.value.title },
+    { name: 'description', content: event.value?.plain_description ?? '' },
     { property: 'og:url', content: canonicalUrl },
     { property: 'og:type', content: 'event' },
     { property: 'og:image', content: mediaURL(event.value) },
     { property: 'og:image:alt', content: mediaURL(event.value, 'alt') },
     { property: 'og:site_name', content: settings.value.title },
-    { property: 'twitter:card', content: 'summary ' },
-    { property: 'twitter:image', content: mediaURL(event.value) },
+    { name: 'twitter:card', content: 'summary ' },
+    { name: 'twitter:image', content: mediaURL(event.value) },
     { property: 'profile:username', content: `@${settings.value.instance_name}@${settings.value.hostname}` }
     // { property: 'og:updated_time'},
     // { property: 'og:updated_time' },
