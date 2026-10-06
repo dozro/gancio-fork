@@ -22,7 +22,7 @@ useHead({
   meta: [
     { property: 'og:title', content: event.value.title },
     { property: 'og:description', content: event.value?.plain_description ?? '' },
-    { property: 'og:title', content: event.value.title },
+    { name: 'description', content: event.value?.plain_description ?? '' },
     { property: 'og:url', content: canonicalUrl },
     { property: 'og:type', content: 'event' },
     { property: 'og:image', content: mediaURL(event.value) },
