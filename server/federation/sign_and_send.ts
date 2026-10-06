@@ -8,7 +8,8 @@ export async function signAndSend(object: Partial<APActivityBase>, inbox: string
   useTaskManager().add({
     name: 'SIGN_AND_SEND',
     method: _signAndSend,
-    args: [object, inbox, method, secretSettings.privateKey]
+    args: [object, inbox, method, secretSettings.privateKey],
+    retries: [1, 5, 10, 30]
   })
 }
 
