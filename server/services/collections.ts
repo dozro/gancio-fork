@@ -85,7 +85,7 @@ export async function getCollectionEvents(opts?: unknown): Promise<Event[]> {
   }
 
   // init stardard filter
-  const where: WhereOptions<Event> = {
+  const where: WhereOptions<Event> = [{
     // do not include parent recurrent event
     recurrent: SQL_NULL,
 
@@ -106,7 +106,7 @@ export async function getCollectionEvents(opts?: unknown): Promise<Event[]> {
 
     // include recurrent events?
     ...(!args.show_recurrent && { parentId: null })
-  }
+  }]
 
   let replacements: Record<string, unknown> = {}
   const conditions: WhereOptions<Event> = []
@@ -125,15 +125,16 @@ export async function getCollectionEvents(opts?: unknown): Promise<Event[]> {
   })
 
   if (negatedConditions.length) {
-    where[Op.not] = negatedConditions
+    where.push({ [Op.not]: negatedConditions })
   }
 
   if (conditions.length) {
-    where[Op.or] = conditions
+    where.push({ [Op.or]: conditions })
   }
 
   return Event.findAll({
     where,
+    logging: console.log,
     attributes: {
       exclude: [
         'likes', 'boost', 'userId', 'createdAt',
