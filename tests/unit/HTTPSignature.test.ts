@@ -1,15 +1,17 @@
 import { describe, expect, it, vi } from 'vitest'
 import { prepareHTTPSignature, verifyHTTPSignature } from '../../server/federation/httpsignature'
 import { loadSettings, publicSettings, secretSettings } from '../../server/services/settings'
-import { APKey, APUser } from '../../server/services/db'
+import { APKey, APUser, connect } from '../../server/services/db'
 import { decodeStructuredField, encodeStructuredField } from '../../server/federation/http_dict'
-import { mockH3Event } from './utils'
+import { cleanDatabase, mockH3Event } from './utils'
 import { parseHttpKeyValueHeader } from '../../server/lib/http'
 import { decodePublicKeyMultibase, importActorKeys, normalizePublicKeyToSpki } from '../../server/federation/keys'
 import { applicationActorId } from '../../server/federation/helpers'
 import type { APActor } from '../../server/federation/types'
 import { getActorFromKeyId } from '../../server/federation/lookup'
 
+const db = await connect()
+await cleanDatabase(db)
 await loadSettings()
 
 // mock the lookup.getActorFromKeyId

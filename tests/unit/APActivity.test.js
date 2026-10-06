@@ -2,12 +2,16 @@ import { describe, expect, it } from 'vitest'
 import { handleActivity } from '../../server/federation/handlers'
 import { getActorFromKeyId, getInstance } from '../../server/federation/lookup'
 import { getActor } from '../../server/federation/get_actor'
-import { Event, Instance, Resource, APUser, APKey } from '../../server/services/db'
+import { Event, Instance, Resource, APUser, APKey, connect } from '../../server/services/db'
 import { loadSettings, publicSettings, setSetting } from '../../server/services/settings'
 import { applicationActorId } from '../../server/federation/helpers'
 import { normalizePublicKeyToSpki } from '../../server/federation/keys'
+import { cleanDatabase } from './utils'
 
+const db = await connect()
+await cleanDatabase(db)
 await loadSettings()
+
 await Instance.create({
   domain: 'localhost:13120',
   applicationActor: 'http://localhost:13120/federation/u/relay',
