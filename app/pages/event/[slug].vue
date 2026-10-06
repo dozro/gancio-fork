@@ -28,8 +28,8 @@ useHead({
     { property: 'og:image', content: mediaURL(event.value) },
     { property: 'og:image:alt', content: mediaURL(event.value, 'alt') },
     { property: 'og:site_name', content: settings.value.title },
-    { property: 'twitter:card', content: 'summary ' },
-    { property: 'twitter:image', content: mediaURL(event.value) },
+    { name: 'twitter:card', content: 'summary ' },
+    { name: 'twitter:image', content: mediaURL(event.value) },
     { property: 'profile:username', content: `@${settings.value.instance_name}@${settings.value.hostname}` }
     // { property: 'og:updated_time'},
     // { property: 'og:updated_time' },
