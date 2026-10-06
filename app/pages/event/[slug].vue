@@ -18,7 +18,7 @@ if (!event.value || error.value) {
 const canonicalUrl = computed(() => `${settings.value.baseurl}/event/${event.value?.slug || event.value?.id}`)
 
 useHead({
-  title: `${settings.value.title} - ${event.value.title}`,
+  title: `${event.value.title} - ${settings.value.title}`,
   meta: [
     { property: 'og:title', content: event.value.title },
     { property: 'og:description', content: event.value?.plain_description ?? '' },
