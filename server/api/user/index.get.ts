@@ -35,6 +35,5 @@ import { requireUser } from '~~/server/lib/auth'
  *       - Users
  */
 export default defineEventHandler(async (event) => {
-  const user = await requireUser(event)
-  return user
+  return requireUser(event)
 })

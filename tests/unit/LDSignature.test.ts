@@ -3,7 +3,7 @@ import { verify, sign } from '../../server/federation/ldsignature'
 import { APUser, connect, Event, runMigrations } from '../../server/services/db'
 import { loadSettings } from '../../server/services/settings'
 import { buildEventActivity } from '../../server/federation/events'
-import { now } from '../api/setup'
+import { now } from './utils'
 import { handleActivity } from '../../server/federation/handlers'
 import { getActor } from '../../server/federation/get_actor'
 

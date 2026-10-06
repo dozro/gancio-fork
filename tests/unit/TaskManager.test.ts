@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
 import { Task } from '../../server/services/taskManager'
-// const { adminUser, editUser, userUser } = await cleanDatabase(true)
 
 describe('TaskManager', () => {
   describe('Task', () => {

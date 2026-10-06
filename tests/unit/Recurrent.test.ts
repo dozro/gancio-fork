@@ -1,15 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
-import { cleanDatabase } from '../api/setup'
-import { mockH3Event, now } from './utils'
-import { Event, getEvents, setSetting } from '../../server/services'
+import { mockH3Event, now, cleanDatabase } from './utils'
+import { connect, Event, getEvents, setSetting } from '../../server/services'
 // import { getUser } from '../../server/lib/getUser'
 import { createRecurrentOccurrence } from '../../server/services/recurrent'
 
 vi.mock('../../server/lib/getUser')
 // const mockedGetUser = vi.mocked(getUser)
 
-await cleanDatabase(true)
-// let event_id: number
+const db = await connect()
+await cleanDatabase(db)
 
 const { default: handleEvent } = await import('../../server/api/events/index.post')
 // const { default: patchHandler } = await import('../../server/api/events/[id]/index.patch')

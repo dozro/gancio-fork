@@ -1,6 +1,5 @@
-import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { setSetting, publicSettings } from '../../server/services'
-import { cleanDatabase } from '../api/setup'
 import { mockH3Event } from './utils'
 import { $fetch } from 'ofetch'
 
@@ -10,10 +9,6 @@ const mockedFetch = vi.mocked($fetch)
 const { default: geocodeHandler } = await import('../../server/api/geocode/index')
 
 describe('Geocoding', () => {
-  beforeAll(async () => {
-    await cleanDatabase(true)
-  })
-
   it('should not be enabled by default', async () => {
     expect(publicSettings.allow_geolocation).toBe(false)
     const ret = geocodeHandler(mockH3Event({ query: { q: 'test' } }))

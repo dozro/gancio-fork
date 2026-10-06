@@ -1,15 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
-import { cleanDatabase } from '../api/setup'
-import { mockH3Event, now } from './utils'
+import { mockH3Event, now, loadTestUsers } from './utils'
 import { getEvents, publicSettings, setSetting } from '../../server/services'
-import { getUser } from '../../server/lib/getUser'
 import { DateTime } from 'luxon'
 import { eventToAP, upsertEvent } from '../../server/services/events'
 
+import { getUser } from '../../server/lib/getUser'
 vi.mock('../../server/lib/getUser')
 const mockedGetUser = vi.mocked(getUser)
 
-const { adminUser, editorUser, userUser, anotherUser } = await cleanDatabase(true)
+const { adminUser, editorUser, userUser, anotherUser } = await loadTestUsers()
 let event_id: number
 
 const { default: handleEvent } = await import('../../server/api/events/index.post')

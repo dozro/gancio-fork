@@ -1,17 +1,22 @@
-import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { mockH3Event, now } from './utils'
-import { cleanDatabase } from '../api/setup'
+import { describe, expect, it, vi } from 'vitest'
+import { mockH3Event, cleanDatabase, loadTestUsers } from './utils'
 import { getUser } from '../../server/lib/getUser'
+import { connect } from '../../server/services/db'
+import type { Collection } from '../../server/services'
 
+const db = await connect()
+await cleanDatabase(db)
 vi.mock('../../server/lib/getUser')
 const mockedGetUser = vi.mocked(getUser)
 
-const collections = []
+const collections: Collection[] = []
 const filters = []
-const { adminUser, editorUser, userUser } = await cleanDatabase(true)
+const { adminUser } = await loadTestUsers()
 
 const { default: postCollectionHandler } = await import('../../server/api/collections/index.post')
-const { default: getCollections } = await import('../../server/api/collections/[id].get')
+const { default: getCollection } = await import('../../server/api/collections/[id].get')
+const { default: getCollections } = await import('../../server/api/collections/index.get')
+const { default: addFilter } = await import('../../server/api/filters/index.post')
 
 describe('Collection', async () => {
   it('should not create a new collection if not allowed', async () => {
@@ -33,47 +38,48 @@ describe('Collection', async () => {
 
   it('should not have any event when no filters', async () => {
     const event = mockH3Event({ params: { id: 'test' } })
-    const events = await getCollections(event)
+    const events = await getCollection(event)
     expect(events).toEqual([])
   })
 
-  //   it('should add a new filter (tag: test) only when allowed', async () => {
-  //     let response = await fetchWithAuth('/api/filters', 'POST', { collectionId: collections[0].id, tags: ['test'] }, 'none')
-  //     expect(response.status).toBe(401)
+  it('should add a new filter (tag: test) only when allowed', async () => {
+    const evt = mockH3Event({ body: { collectionId: collections[0].id, tags: ['test'] } })
+    let ret = addFilter(evt)
+    await expect(ret).rejects.toHaveProperty('message', 'Unauthorized')
 
-  //     response = await fetchWithAuth('/api/filters', 'POST', { collectionId: collections[0].id, tags: ['test'] })
+    mockedGetUser.mockResolvedValueOnce(adminUser)
+    ret = await addFilter(evt)
+    expect(ret).toHaveProperty('tags', ['test'])
+    filters.push(ret?.id)
+  })
 
-  //     expect(response.status).toBe(200)
+  it('should not have any event when no filters', async () => {
+    const event = mockH3Event({ params: { id: 'test' }, query: { limit: '1' } })
+    const events = await getCollection(event)
+    expect(events).toEqual([])
+  })
 
-  //     expect(response.data.id).toBeDefined()
-  //     filters.push(response.data.id)
-  //   })
+  it('shoud get collection\'s filters using withFilters parameter', async () => {
+    mockedGetUser.mockResolvedValueOnce(adminUser)
+    const evt = mockH3Event({ query: { withFilters: 'true' } })
 
-  //   it('shoud get collection\'s filters using withFilters parameter', async () => {
-  //     let response = await fetchWithAuth('/api/collections?withFilters=true')
+    let ret = await getCollections(evt)
+    expect(ret.length).toBe(1)
+    expect(ret[0].filters.length).toBe(1)
+    expect(ret[0].filters[0].tags.length).toBe(1)
+    expect(ret[0].filters[0].tags[0]).toBe('test')
 
-  //     expect(response.status).toBe(200)
-  //     expect(response.data.length).toBe(1)
-  //     expect(response.data[0].name).toBe('test')
-  //     expect(response.data[0].filters.length).toBe(1)
-  //     expect(response.data[0].filters[0].tags.length).toBe(1)
-  //     expect(response.data[0].filters[0].tags[0]).toBe('test')
+    ret = await getCollections(mockH3Event({}))
+    expect(ret[0]?.filters).toBeUndefined()
 
-  //     response = await fetchWithAuth('/api/collections')
-  //     expect(response.status).toBe(200)
-  //     expect(response.data[0]?.filters).toBeUndefined()
+    ret = await getCollections(mockH3Event({ query: { withFilters: 'false' } }))
+    expect(ret[0]?.filters).toBeUndefined()
+  })
 
-  //     response = await fetchWithAuth('/api/collections?withFilters=false')
-  //     expect(response.status).toBe(200)
-  //     expect(response.data[0]?.filters).toBeUndefined()
-  //   })
-
-  //   it('should get collection events', async () => {
-  //     const response = await fetch(`/api/collections/test`)
-  //     expect(response.status).toBe(200)
-
-  //     // expect(await response.json()).toBe(1)
-  //   })
+  // it('should get collection events', async () => {
+  //   const ret = await getCollection(mockH3Event({ params: { id: 'test' } }))
+  //   expect(ret).toBe(1)
+  // })
 
   //   // it('should remove filter', async () => {
   //   //   await request(app)

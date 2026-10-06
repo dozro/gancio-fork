@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { parseIcsData } from '../../server/services/icsparser'
 
-import { mockH3Event } from './utils'
-import { cleanDatabase } from '../api/setup'
-await cleanDatabase()
+import { mockH3Event, cleanDatabase } from './utils'
+import { connect } from '../../server/services'
+
+const db = await connect()
+await cleanDatabase(db)
 const { default: feedHandler } = await import('../../server/routes/feed/[format]')
 
 // const base_url = 'http://localhost:13120'

@@ -1,4 +1,4 @@
-import { defineEventHandler, getQuery, getValidatedRouterParams, createError } from 'h3'
+import { defineEventHandler, getQuery, getValidatedRouterParams, createError, setHeader } from 'h3'
 
 import { exportICS } from '~~/server/services/ics'
 import { exportFeed } from '~~/server/services/rss'
@@ -35,6 +35,7 @@ export default defineEventHandler(async (evt) => {
     case 'ics':
       return exportICS(evt, events)
     case 'json':
+      setHeader(evt, 'Content-Type', 'application/json')
       return mapEvents(events)
     // case 'json-ld':
     //   return mapEventsJSONLD(events)

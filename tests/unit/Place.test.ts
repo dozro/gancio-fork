@@ -1,13 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
-import { now, cleanDatabase } from '../api/setup'
 import { getUser } from '../../server/lib/getUser'
-import { mockH3Event } from './utils'
+import { mockH3Event, now, loadTestUsers } from './utils'
 import { findOrCreatePlace } from '../../server/services/places'
 
 let place_id: number
 vi.mock('../../server/lib/getUser')
 const mockedGetUser = vi.mocked(getUser)
-const { adminUser, editUser, userUser } = await cleanDatabase(true)
+const { adminUser, editorUser, userUser } = await loadTestUsers()
 const { default: eventPlaceHandler } = await import('../../server/api/events/place/[place]')
 const { default: createEventHandler } = await import('../../server/api/events/index.post')
 const { default: placesHandler } = await import('../../server/api/places/index.get')
@@ -47,7 +46,7 @@ describe('Place', async () => {
     let ret = placeList(mockH3Event({}))
     await expect(ret).rejects.toHaveProperty('statusCode', 401)
 
-    mockedGetUser.mockResolvedValueOnce(editUser)
+    mockedGetUser.mockResolvedValueOnce(editorUser)
     ret = placeList(mockH3Event({}))
     await expect(ret).rejects.toHaveProperty('statusCode', 401)
 
