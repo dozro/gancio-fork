@@ -8,7 +8,7 @@ import type { EventAPI, Media } from '~~/shared/types/generic'
 import { type H3Event, createError } from 'h3'
 import { createHash } from 'crypto'
 import { Place, Tag, Event, Message, User, RecurrentSchema, type EventStatus } from './db'
-import { publicSettings, secretSettings } from './settings'
+import { publicSettings } from './settings'
 import type { UserSession } from '../lib/session'
 import { EventStatusEnum, PostalAddressSchema, type APAttachment, type APEvent, type APLocation, type APTag } from '../federation/types'
 import { PlaceToAP } from '../federation/places'
@@ -22,7 +22,6 @@ import { addressToString } from '../../shared/utils/addressToString'
 import { findOrCreateTags, normalizeTag } from './tags'
 import type { Settings } from '~~/shared/types/settings'
 import { createRecurrent } from './recurrent'
-import { sign } from '../federation/ldsignature'
 import { notifyEvent } from './notifier'
 import type { IntermediateRepresentation } from 'linkifyjs'
 
@@ -300,15 +299,15 @@ export async function upsertEvent(payload: unknown, user?: InferAttributes<User>
   if (event?.recurrent && event.is_visible) {
     await createRecurrent()
   } else {
-    // sign Event if federation is enabled
-    if (publicSettings.enable_federation) {
-      try {
-        event.ld_signature = await sign(eventToAP(event), secretSettings.privateKey, `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key`)
-        await event.save({ silent: true })
-      } catch (e) {
-        log.warn('Error signing Event ', e)
-      }
-    }
+    // TODO: sign / proof Event if federation is enabled
+    // if (publicSettings.enable_federation) {
+    //   try {
+    //     event.ld_signature = await sign(eventToAP(event), secretSettings.privateKey, `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}#main-key`)
+    //     await event.save({ silent: true })
+    //   } catch (e) {
+    //     log.warn('Error signing Event ', e)
+    //   }
+    // }
     // send notifications
     notifyEvent(isNewEvent ? 'Create' : 'Update', event.id)
   }
