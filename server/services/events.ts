@@ -501,7 +501,7 @@ export function eventToAP(event: Event) {
   const summary = `<p>${event.place?.name ?? ''} ${datetime}</p>${event?.description ?? ''}`
 
   let attachment: APAttachment[] = []
-  let location: APLocation[] = []
+  let location: APLocation | APLocation[] = []
 
   if (event.online_locations?.length) {
     location = event.online_locations.map(url => ({
@@ -568,7 +568,8 @@ export function eventToAP(event: Event) {
     'endTime': endTime,
     'displayEndTime': event.end_datetime ? true : false,
     ...(event.ld_signature ? { signature: event.ld_signature } : {}),
-    location,
+    // mobilizon does not support array as location so we try our best
+    'location': location.length === 1 ? location[0] : location,
     attachment,
     tag,
     'timezone': publicSettings.instance_timezone,
