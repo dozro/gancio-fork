@@ -2,19 +2,32 @@
 # check the build.sh script
 FROM  --platform=$BUILDPLATFORM node:24-alpine AS builder
 WORKDIR /app
+
+# Set pnpm home and store path for consistent caching
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
 RUN corepack enable
+RUN apk add --no-cache git coreutils jq
+
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN apk add --no-cache git coreutils jq && \
-  pnpm install --frozen-lockfile
+
+# Use a cache mount for the pnpm store
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
+
 COPY . .
 RUN npm run build:prod
 
 # prepare production dependencies for the final image for each platform
 FROM node:24-alpine AS deps
 WORKDIR /app
+
 RUN corepack enable
-COPY --from=builder /app/.pack/package.json /app/pnpm-workspace.yaml ./
-RUN pnpm install
+COPY --from=builder /app/.pack/package.json /app/pnpm-workspace.yaml  ./
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --prod
 
 # using the same build to create the npm package
 # and export it as the only output artifact

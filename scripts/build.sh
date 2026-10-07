@@ -28,8 +28,12 @@ cp -R .output/ "$STAGING_DIR/"
 echo "Copying static resources...(mail templates, rss template, opensearch template, i18n email locales)"
 cp -ra ./server/static "$STAGING_DIR/server/static/"
 cp -ra ./server/migrations "$STAGING_DIR/server/migrations/"
-cp -ra ./plugins "$STAGING_DIR/plugins/"
 cp -ra ./i18n "$STAGING_DIR/i18n/"
+
+echo "Building plugins"
+pnpm build:plugins
+cp -ra ./.dist/plugins "$STAGING_DIR/plugins/"
+
 
 echo "Building CLI"
 pnpm build:cli

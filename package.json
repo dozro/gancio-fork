@@ -52,6 +52,7 @@
     "cli": "tsx --tsconfig server/tsconfig.json server/cli",
     "build": "nuxi build",
     "build:cli": "tsup",
+    "build:plugins": "npx tsup \"plugins/*/index.ts\" --out-dir .dist/plugins --format esm",
     "build:wc": "cd webcomponents; pnpm run build:lib; cp dist/* ../wp-plugin/js/; cp dist/* ../public/; cp dist/* ../docs/assets/js/;",
     "dev": "NODE_OPTIONS='--trace-warnings' nuxi dev",
     "postinstall": "nuxi prepare || true",

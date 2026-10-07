@@ -12,10 +12,10 @@ importers:
         specifier: 7.0.0-alpha.48
         version: 7.0.0-alpha.48
       '@sequelize/mariadb':
-        specifier: ^7.0.0-alpha.47
+        specifier: ^7.0.0-alpha.48
         version: 7.0.0-alpha.48
       '@sequelize/postgres':
-        specifier: ^7.0.0-alpha.47
+        specifier: ^7.0.0-alpha.48
         version: 7.0.0-alpha.48
       '@sequelize/sqlite3':
         specifier: 7.0.0-alpha.48
