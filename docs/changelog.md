@@ -1,6 +1,62 @@
 # Changelog
 
+
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+# [2.0.0-beta.6](https://framagit.org/les/gancio/compare/v2.0.0-beta.5...v2.0.0-beta.6) (2026-10-07)
+
+### Features
+
+* **ActivityPub:** initial support for displayEndTime from fep-8a8e ([ce46f83](https://framagit.org/les/gancio/commits/ce46f832a3336c06346df06a9ed87fb5b642cf4d))
+* allow to build and test locally a release ([ca434ec](https://framagit.org/les/gancio/commits/ca434eccdb9611661e25eb0b9c74ccdbc3d83079))
+* implement/test inbound FEP-521a ([3f8f5a2](https://framagit.org/les/gancio/commits/3f8f5a24e79fede2e0eee5d028d4c05d9f32af5a))
+* move smtp settings into its own section ([d7efd25](https://framagit.org/les/gancio/commits/d7efd25218bf3998b9b11db06b4720b56a66576b))
+* plugin improvements ([781db77](https://framagit.org/les/gancio/commits/781db7737a6f24ba7789575208456880756a8904))
+* **plugins:** migrate the webhook plugin to v2 ([acb5910](https://framagit.org/les/gancio/commits/acb59107df0df65f037245449e8641aaecbdbb1b))
+
+
+### Bug Fixes
+
+* add basic meta description ([a3c7b63](https://framagit.org/les/gancio/commits/a3c7b632d14977604ac51c5decdbdb187150366c))
+* add forgotten share_more in export webcomponent code ([14611e6](https://framagit.org/les/gancio/commits/14611e6bf4dd17a9e2c527b9cc9e4c62754a29cc))
+* add query parameter to GET collection API ([ade7dee](https://framagit.org/les/gancio/commits/ade7dee1aa135b88acbb29979c9e141e1b41ffb8))
+* always check for user is_active each session ([780639a](https://framagit.org/les/gancio/commits/780639a0b171a04e8934e9ac4a27cf8a997e7e65))
+* **AP:** reject invalid JSON body inbox ([70b7718](https://framagit.org/les/gancio/commits/70b7718f29632617410015b61d7de03bed024673))
+* build plugins in js as node does not support native TS loading from node_modules ([d3e2935](https://framagit.org/les/gancio/commits/d3e2935ffc960334928ee17548491426b28683c8))
+* cleanup db in vitest setup and global test utils, fix [#734](https://framagit.org/les/gancio/issues/734) ([e1e24a8](https://framagit.org/les/gancio/commits/e1e24a82f09752fcb04251704cb24e5c371438b3))
+* cleanup types ([e4a5f4c](https://framagit.org/les/gancio/commits/e4a5f4cd2a797c66257667341ef759d277d82b7a))
+* collection should be deselectable fix [#741](https://framagit.org/les/gancio/issues/741) ([29121be](https://framagit.org/les/gancio/commits/29121be1bb243462d743fea150e291892d2f7deb))
+* collection sql conditions ([b983f7e](https://framagit.org/les/gancio/commits/b983f7e182ebbd2e936c518c6c436ffd3c1a8362))
+* disable outbound LDSignature (deprecated) ([1cdaee7](https://framagit.org/les/gancio/commits/1cdaee753082e7d66fb6edc822624eac15bc200b))
+* empty event fields not saved correctly ([4a2128d](https://framagit.org/les/gancio/commits/4a2128d4969d28358eeb92accb3c54bad31e60ca))
+* event calendar doesn't show dates when editing ([d496b58](https://framagit.org/les/gancio/commits/d496b5891a26f9245ab94b0f857466497bd469df))
+* fallbackimage in prod ([970662f](https://framagit.org/les/gancio/commits/970662ffc456e4fd16c0e0bc6c5597e97f04c09e))
+* force int in numeric api parameters ([819ecb2](https://framagit.org/les/gancio/commits/819ecb2c66fd283238594445c003795ce3aa6a45))
+* HTTP Message Signature time creation check ([2b4bf2e](https://framagit.org/les/gancio/commits/2b4bf2e3f17f8fafb91b90ab5f46e3fedf4e4123))
+* improve AP types + add proof field ([e787d2f](https://framagit.org/les/gancio/commits/e787d2f7a0a886936e2fdfe16b7c3d02574c6c70))
+* lazy load admin panel alert ([d45ee4a](https://framagit.org/les/gancio/commits/d45ee4a9ff60a42ac0dff5ca4e09ea0385d502c5))
+* limit on place api ([db69479](https://framagit.org/les/gancio/commits/db69479b1d11ef7f24e031cc2c66bb79448ab4eb))
+* list recurrent events in place and tag views ([7b8cbd8](https://framagit.org/les/gancio/commits/7b8cbd8aad934c4532d1cf07422edab22405457d))
+* migration's async code sequence ([1f20892](https://framagit.org/les/gancio/commits/1f208923745dedbab5ea35ce6e3d7efe9444d909))
+* old bad collection migration ([13293ec](https://framagit.org/les/gancio/commits/13293ecd2d504333136f2f9b795316ea2bce0c88))
+* outbox and event colletions pagination ([5c4d867](https://framagit.org/les/gancio/commits/5c4d8676f925f60ac993db18f8382ee5da9bdcd0))
+* plugins settingsValue are not initialized by default ([da9e31c](https://framagit.org/les/gancio/commits/da9e31c57887eb25ad55a1aed879cc5bc8f8edb1))
+* **plugins:** plugins can't access their settings and other issues with events ([b809b35](https://framagit.org/les/gancio/commits/b809b351c89243bcbf4062eb39c4f8fb690bc35a))
+* proof types based on FEP ([f24f568](https://framagit.org/les/gancio/commits/f24f568a77b12ccf2871af166564a2b06a2bfac2))
+* put event title first in event page metadata ([bd9cf9e](https://framagit.org/les/gancio/commits/bd9cf9ed5e283facfe2fac77e2094307ed31fd95))
+* query parameter should be corced to number ([a6e61e5](https://framagit.org/les/gancio/commits/a6e61e5a6fb71e59de91503ac0945f5264ca5961))
+* redirect to html event when coming from federation ([97060e7](https://framagit.org/les/gancio/commits/97060e7ab14e8decca6bb9be06c965a797bbac3e))
+* remove unused username column from users table ([3cd4c97](https://framagit.org/les/gancio/commits/3cd4c9766b8c17780839a90b1ca3e31ce7e16c51))
+* require admin role to untrust an AP actor ([ba12cfa](https://framagit.org/les/gancio/commits/ba12cfa2313f3459e80abc5086581bbbe77eb055))
+* retries AP signAndSend on failure ([3ab1249](https://framagit.org/les/gancio/commits/3ab1249d34c2fd54a30c0ddfce7b0fa509313315))
+* set undefined to `fallback_image` setting when this parameter is not set in API endpoint ([f68229d](https://framagit.org/les/gancio/commits/f68229db67222cf4450e4022109959f20b19ba69))
+* skip LDSignature test ([05d9d0e](https://framagit.org/les/gancio/commits/05d9d0e2b779b8cce797515a374d2452d5877de3))
+* stop leaking user emails ([66489cc](https://framagit.org/les/gancio/commits/66489ccb5d3bca62bf4ac9e1e688cf2e6a436b24))
+* the last retry on task with errors ([5f25d66](https://framagit.org/les/gancio/commits/5f25d66d1d5f740bf0e2272fb0eaaa5b57f7bc4a))
+* twitter meta key is `name` not `property` ([20ff219](https://framagit.org/les/gancio/commits/20ff219c96cfc6aa9468fe52bb6f1f1847f16a1c))
+* **ui:** trusted sources not appearing in footer ([e7f4ae6](https://framagit.org/les/gancio/commits/e7f4ae6dbc59f1a86b68f8e45cb2afd9da9e45d6))
+* use a single location in AP represantation if possible ([1fdcc26](https://framagit.org/les/gancio/commits/1fdcc263d6f9ffbddee102510325a01fbe969479))
+
 
 ## [2.0.0-beta.5](https://framagit.org/les/gancio/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2026-07-06)
 
