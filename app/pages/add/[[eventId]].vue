@@ -57,7 +57,7 @@ async function publish() {
   await done(true)
 }
 
-async function done(publish) {
+async function done(publish: boolean) {
   const evt = event.value
   if (loading.value) {
     return
@@ -73,7 +73,7 @@ async function done(publish) {
 
   const formData = new FormData()
 
-  formData.append('is_visible', publish)
+  formData.append('is_visible', String(publish))
 
   if (evt?.media?.[0]) {
     const media: Media = evt.media[0]
