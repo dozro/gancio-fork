@@ -1,4 +1,22 @@
+PRODUCTION=${1:-"false"}
 VERSION=$(npm pkg get version | xargs echo)
+
+if [ "$PRODUCTION" = "false" ]; then
+  echo "Test mode: building docker image for local testing only"
+  docker buildx build \
+    -t cisti/gancio:test \
+    --load .
+
+  docker buildx build \
+    --target artifact \
+    --output type=local,dest=./releases \
+    .
+
+  echo "Test the image with `docker run --rm -it cisti/gancio:test`"
+  echo "Test the package with `npm install -g ./releases/gancio-$VERSION.tgz`"
+  exit 0
+fi
+
 DATE=$(date "+%d %B %Y")
 npm pkg set date="$DATE"
 
