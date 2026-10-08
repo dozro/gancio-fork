@@ -24,6 +24,7 @@ export default {
   'pt-BR': 'Português (Brasil)',
   'ro': 'Românesc',
   'ru': 'Russian, Русский',
+  'sc': 'Sardu',
   'se': 'davvisámegiella, Sámi (north)',
   'sl': 'Slovenski',
   'sk': 'Slovak',
