@@ -15,10 +15,10 @@ export function up ({ context: queryInterface }) {
         allowNull: false
       },
       apUserApId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         references: { table: 'ap_users', key: 'ap_id' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       }
     })
-  }
+}
