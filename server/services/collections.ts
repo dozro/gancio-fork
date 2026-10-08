@@ -134,7 +134,6 @@ export async function getCollectionEvents(opts?: unknown): Promise<Event[]> {
 
   return Event.findAll({
     where,
-    logging: console.log,
     attributes: {
       exclude: [
         'likes', 'boost', 'userId', 'createdAt',
