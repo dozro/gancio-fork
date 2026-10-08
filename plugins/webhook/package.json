@@ -1,5 +1,6 @@
 {
   "name": "gancio-plugin-webhook",
+  "type": "module",
   "version": "1.0.0",
   "description": "Webhook plugin for Gancio",
   "main": "index.js",
