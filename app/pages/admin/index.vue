@@ -49,7 +49,7 @@ const menuItems = computed<SettingsMenuItem[]>(() => [
 <template>
 <v-container>
   <!-- admin alert -->
-  <LazyAdminSetupAlert v-if="isAdmin" />
+  <AdminSetupAlert v-if="isAdmin" />
 
   <div class="mt-md-4 mb-8">
     <CoreSettings :menu-items="menuItems" :title="$t('common.admin')" query-param="view">
