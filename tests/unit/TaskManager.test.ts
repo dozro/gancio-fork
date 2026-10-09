@@ -75,5 +75,42 @@ describe('TaskManager', () => {
       expect(task.processInNTick).toBe(2)
       expect(task.retries).toEqual([3])
     })
+
+    it('does not retry when a non-repeating task succeeds', async () => {
+      const method = vi.fn().mockResolvedValue(true)
+      const task = new Task({
+        name: 'succeeds',
+        method,
+        retries: [2, 3]
+      })
+      await task.process()
+      await task.process()
+      await task.process()
+      expect(method).toHaveBeenCalledTimes(1)
+      expect(task.completed).toBe(true)
+      expect(task.retries).toEqual([2, 3])
+    })
+
+    it('retries a failed task and completes when it succeeds', async () => {
+      const method = vi.fn()
+        .mockRejectedValueOnce(new Error('boom'))
+        .mockResolvedValueOnce(true)
+
+      const task = new Task({
+        name: 'retry-then-succeed',
+        method,
+        retries: [2, 3]
+      })
+
+      await expect(task.process()).rejects.toThrow('boom')
+      expect(task.processInNTick).toBe(2)
+      expect(task.retries).toEqual([3])
+      expect(task.completed).toBe(false)
+
+      await task.process()
+      await task.process()
+      expect(method).toHaveBeenCalledTimes(2)
+      expect(task.completed).toBe(true)
+    })
   })
 })

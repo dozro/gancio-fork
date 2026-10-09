@@ -46,6 +46,7 @@ export class Task {
   retries?: number[]
   repeatDelay: number
   processInNTick: number
+  completed: boolean = false
 
   constructor({ name = '', repeat = false, repeatDelay = 0, callAtStart = false, retries = [10, 50], method, args = [] }: TaskArgs) {
     this.name = name
@@ -72,6 +73,7 @@ export class Task {
   }
 
   process() {
+    if (this.completed) return
     this.processInNTick--
     if (this.processInNTick > 0) {
       return
@@ -80,11 +82,17 @@ export class Task {
     this.processInNTick = this.repeatDelay
     try {
       const ret = this.method(...this.args)
-      if (ret && typeof ret.catch === 'function') {
-        ret.catch(e => this.handleError(e))
-        log.debug(`Process ${this.name}, ${this.retries?.length} retries left`)
-        return ret
+      if (ret && typeof ret.then === 'function') {
+        return ret.then(result => {
+          if (!this.repeat) this.completed = true
+          log.debug(`Process ${this.name} done`)
+          return result
+        }).catch(e => {
+          this.handleError(e)
+          throw e
+        })
       }
+      if (!this.repeat) this.completed = true
       log.debug(`Process ${this.name} done`)
       return ret
     } catch (e) {
@@ -195,7 +203,7 @@ export class TaskManager {
 
     // only keep tasks that are either repeating or have retries left
     // completed tasks are removed from the queue
-    this.tasks = this.tasks.filter(t => t.repeat || (t.retries?.length || t.processInNTick > 0))
+    this.tasks = this.tasks.filter(t => t.repeat || (!t.completed && (t.retries?.length || t.processInNTick > 0)))
 
     return Promise.allSettled(tasks)
   }
