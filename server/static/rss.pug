@@ -10,18 +10,17 @@ rss(version='2.0' xmlns:atom="http://www.w3.org/2005/Atom")
             item
                 if (event.media && event.media.length)
                   <enclosure url="#{settings.baseurl}/media/#{event.media[0].url}" type='image/jpeg' length="#{event.media[0].size||1}"></enclosure>
-                title [#{unixFormat(event.start_datetime,"yyyy-MM-dd")}] #{event.title} @ #{event.place && event.place.name}
+                title [#{unixFormat(event.start_datetime,"yyyy-MM-dd")}] #{event.title} @  #{event.place ? event.place.name : (event.online_locations && event.online_locations.length) ? 'online' : ''}
                 link #{settings.baseurl}/event/#{event.slug || event.id}
                 each tag in event.tags
                   category #{tag.tag || tag}
                 description
                     | <![CDATA[
                     | <h3>#{event.title}</h3>
-                    if (event.place)
-                      if (event.place.name === 'online')
-                        | <strong>online - <a href="#{event.online_locations[0]}">#{event.online_locations[0]}</a></strong>
-                      else
-                        | <strong>#{event.place.name} - #{event.place.address}</strong>
+                    if (event.place && event.place.name && event.place.address)
+                      | <strong>#{event.place.name} - #{event.place.address}</strong>
+                    each online_location in event.online_locations
+                      | <strong>online - <a href="#{online_location}">#{online_location}</a></strong>
                     | <br/><small>(#{unixFormat(event.start_datetime,"EEEE, d MMMM HH:mm")})</small><br/>
                     if (event.media && event.media.length)
                         | <img alt="#{event.media[0].name || ''}" src="#{settings.baseurl}/media/#{event.media[0].url}"/>
