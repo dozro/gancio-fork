@@ -21,12 +21,16 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ics.Alarm[]) {
   }
   const eventsMap = events.map((e) => {
     const tmpStart = DateTime.fromSeconds(e.start_datetime, { zone: 'UTC' })
+    const end_datetime = e?.end_datetime ?? e.start_datetime + publicSettings.open_ended_event_default_duration * 60 * 60
+    const tmpEnd = DateTime.fromSeconds(end_datetime, { zone: 'UTC' })
     const start: [number, number, number, number, number] = [tmpStart.year, tmpStart.month, tmpStart.day, tmpStart.hour, tmpStart.minute]
+    const end: [number, number, number, number, number] = [tmpEnd.year, tmpEnd.month, tmpEnd.day, tmpEnd.hour, tmpEnd.minute]
 
-    const location = e?.place ? (e.place?.name !== 'online' ? `${e.place?.name} - ${e.place?.address}` : `${e.place?.name} - ${e?.online_locations?.[0]}`) : ''
+    const location = e?.place ? `${e.place?.name} - ${e.place?.address}` : e.online_locations?.length ? e?.online_locations?.[0] : ''
     const ret: ics.EventAttributes = {
       uid: `${e.id}@${publicSettings.hostname}`,
       start,
+      end,
       startInputType: 'utc',
       endInputType: 'utc',
       title: e.title,
@@ -34,7 +38,7 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ics.Alarm[]) {
       htmlContent: e.description && e.description.replace(/\n/g, '<br>'),
       location,
       url: `${publicSettings.baseurl}/event/${e.slug || e.id}`,
-      status: statusMap[e.status],
+      status: statusMap[e.status as EventStatus],
       categories: e?.tags?.map(t => t.tag || t) as string[],
       created: e.createdAt?.getTime(),
       lastModified: e.updatedAt?.getTime(),
@@ -43,12 +47,6 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ics.Alarm[]) {
 
     if (e.place?.latitude && e.place?.longitude) {
       ret.geo = { lat: e.place.latitude, lon: e.place.longitude }
-    }
-
-    if (e.end_datetime && e.ap_object?.displayEndTime !== false) {
-      const tmpEnd = DateTime.fromSeconds(e.end_datetime, { zone: 'UTC' })
-      const end = [tmpEnd.year, tmpEnd.month, tmpEnd.day, tmpEnd.hour, tmpEnd.minute]
-      ret.end = end
     }
 
     return ret
