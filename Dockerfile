@@ -13,8 +13,8 @@ RUN apk add --no-cache git coreutils jq
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Use a cache mount for the pnpm store
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store,sharing=locked \
+    pnpm install --frozen-lockfile --store-dir=/pnpm/store
 
 COPY . .
 RUN npm run build:prod
@@ -26,8 +26,8 @@ WORKDIR /app
 RUN corepack enable
 COPY --from=builder /app/.pack/package.json /app/pnpm-workspace.yaml  ./
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --prod
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store,sharing=locked \
+    pnpm install --prod --store-dir=/pnpm/store
 
 # using the same build to create the npm package
 # and export it as the only output artifact
@@ -47,6 +47,7 @@ ENV NODE_ENV=production
 USER node
 WORKDIR /app
 
+RUN mkdir -p /app/data && chown -R node:node /app/data
 COPY --chown=node --from=builder /app/.pack/ .
 COPY --chown=node --from=deps /app/node_modules/ ./node_modules/
 
