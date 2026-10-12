@@ -60,17 +60,17 @@ const isCancelled = computed(() => event.status === 'EventCancelled')
       <v-icon icon="mdi-map-marker" />
       <nuxt-link
         class='place p-location text-body-2 text-md-body-1'
-        :to='`/place/${event.place.id}/${encodeURIComponent(event.place.name)}`'
+        :to='`/place/${event.place!.id}/${encodeURIComponent(event.place!.name)}`'
         itemprop="location" itemscope itemtype="https://schema.org/Place">
-        <span itemprop='name'>{{ event.place.name }}</span>
+        <span itemprop='name'>{{ event.place!.name }}</span>
       </nuxt-link>
-      <div class='d-none' itemprop='address'>{{ event.place.address }}</div>
+      <div class='d-none' itemprop='address'>{{ event.place!.address }}</div>
     </div>
     <div v-else-if='isOnline'>
       <v-icon icon="mdi-web" class='mr-2' />
       <nuxt-link
         class='place p-location text-body-2 text-md-body-1'
-        :to='`/place/online`'
+        :to='event.online_locations![0]'
         itemprop="location" itemscope itemtype="https://schema.org/Place">
         <span itemprop='name'>online</span>
       </nuxt-link>

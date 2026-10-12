@@ -163,8 +163,7 @@ async function report() {
           <div v-else-if='isOnline' class="p-location h-adr">
             <v-icon icon="mdi-web" />
             <nuxt-link
-              class="vcard ml-2 p-name text-decoration-none text-uppercase"
-              :to="`/place/online`">
+              class="vcard ml-2 p-name text-decoration-none text-uppercase">
               <span itemprop="name">online</span>
             </nuxt-link>
           </div>
