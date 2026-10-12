@@ -20,7 +20,7 @@ const { data: places } = await useFetch('/api/places', { params: { query: search
 
 const selectablePlaces = computed(() => {
   // select matched places without online
-  const ret: (PlaceAPI & { props?: { prependIcon?: string, color?: string } })[] = places?.value?.filter(place => place.name?.toLowerCase() !== 'online') ?? []
+  const ret: (PlaceAPI & { props?: { prependIcon?: string, color?: string } })[] = places?.value ?? []
 
   // add online if allowed
   if (settings.value.allow_online_event) {
