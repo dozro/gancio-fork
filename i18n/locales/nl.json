@@ -111,7 +111,14 @@
         "show_download_media_hint": "Toon een download media knop in de evenementpagina",
         "allow_event_without_end_time": "Sta evenementen zonder eindtijd toe",
         "show_download_media": "Toon download media actie",
-        "place_description": "Indien je een fout in de locatie of adres hebt gemaakt, kan je dit aanpassen.<br/>Het adres zal aangepast worden voor alle huidige en verlopen evenementen geassocieerd met deze locatie."
+        "place_description": "Indien je een fout in de locatie of adres hebt gemaakt, kan je dit aanpassen.<br/>Het adres zal aangepast worden voor alle huidige en verlopen evenementen geassocieerd met deze locatie.",
+        "edit_user": "Gebruiker bewerken",
+        "user_update_ok": "Gebruiker bijgewerkt",
+        "page_remove_ok": "Pagina verplaatst",
+        "enable_moderation": "Moderatie inschakelen",
+        "enable_report": "Rapporteren van evenement inschakelen",
+        "unblock_user": "Gebruiker deblokkeren",
+        "trusted_sources_label_default": "Andere locaties"
     },
     "ordinal": {
         "1": "eerste",
@@ -242,7 +249,15 @@
         "past_events": "Vorige Evenementen",
         "pages": "Pagina's",
         "dark_mode": "Donkere modus",
-        "publish": "Publiceer"
+        "publish": "Publiceer",
+        "enabled": "Ingeschakeld",
+        "go_back": "Ga terug",
+        "trusted_sources": "Vertrouwde bronnen in de fediverse",
+        "no_events_found_hint": "Selecteer verschillende datums of criteria",
+        "convert_draft": "Naar concept omzetten",
+        "create_draft": "Als concept aanmaken",
+        "save_draft": "Concept opslaan",
+        "draft": "Concept"
     },
     "login": {
         "not_registered": "Niet geregistreerd?",
@@ -309,7 +324,7 @@
         "updated": "Evenement bijgewerkt",
         "recurrent_1w_days": "Elke {days}",
         "recurrent_1m_days": "Dag {days} van elke maand",
-        "recurrent_1m_ordinal": "Elke {n} {days} van elke maand",
+        "recurrent_1m_ordinal": "Elke {n} {days} van de maand",
         "recurrent_2m_days": "Dag {days} om de twee maanden",
         "recurrent_2w_days": "Elke {days} om de twee weken",
         "recurrent_2m_ordinal": "Elke {n} {days} om de maand",
@@ -340,7 +355,15 @@
         "each_year": "Elk jaar",
         "follow_me_description": "Eén manier om op de hoogte te blijven van de evenementen die hier op {title} gepubliceerd worden,\nis het account <u>{account}</u> op de fediverse te volgen, bijvoorbeeld via Mastodon, en via daar eventueel zaken aan een evenement toevoegen.<br/><br/>\nIndien je nog nooit van Mastodon en de fediverse hebt gehoord, raden we aan om <a href='https://www.savjee.be/videos/simply-explained/mastodon-and-fediverse-explained/'>dit artikel</a> te lezen.<br/><br/>Geen hier je instantie in (e.g. mastodon.social)",
         "recurrent_1y_days": "{months} {days} elk jaar",
-        "recurrent_1y_ordinal": "Jaarlijks, de {n} {days} in {months}"
+        "recurrent_1y_ordinal": "Jaarlijks, de {n} {days} in {months}",
+        "cancel_description": "Dit evenement zou voor iedereen zichtbaar zijn als geannuleerd.",
+        "cancelled": "Dit evenement is geannuleerd",
+        "postponed": "Uitgesteld",
+        "moved_onlined": "Naar online verplaatst",
+        "rescheduled": "Verplaatst",
+        "tentative": "Voorlopig",
+        "reannounce": "Opnieuw aankondigen",
+        "reannounce_description": "Moeten we op opnieuw dit evenement in de fediverse aankondigen (boosten)?"
     },
     "confirm": {
         "title": "Gebruiker beoordelen",
