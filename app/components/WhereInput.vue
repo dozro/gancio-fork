@@ -5,18 +5,24 @@ Choose event location
 import { refDebounced } from '@vueuse/core'
 const settings = useState<Settings>('settings')
 const event = defineModel<EventAPI>('event', { type: Object, required: true })
+
+// initialize place
 if (!event.value?.place) {
-  event.value.place = { name: '', address: '' }
+  if (event.value.online_locations?.length) {
+    event.value.place = { name: 'online', address: '' }
+  } else {
+    event.value.place = { name: '', address: '' }
+  }
 }
 const whereInputAdvancedDialog = ref(false)
 
 // should I ask for address (only on new places)
-const disableAddress = computed(() => event.value?.place?.id)
+const disableAddress = computed(() => !!event.value?.place?.id)
 const isOnLine = computed(() => settings.value.allow_online_event && 'online' === event?.value?.place?.name)
 
-const search = ref('')
+const search = ref(event.value.place.name)
 const searchDebounced = refDebounced(search, 200)
-const { data: places } = await useFetch('/api/places', { params: { query: searchDebounced } })
+const { data: places } = useLazyFetch('/api/places', { params: { query: searchDebounced }, server: false })
 
 const selectablePlaces = computed(() => {
   // select matched places without online
@@ -46,11 +52,16 @@ function selectPlace(place: PlaceAPI) {
 }
 
 const address = ref()
+const online_locations = ref()
 function selectFirst () {
   const items = selectablePlaces.value
   if (items?.[0]) {
     selectPlace(items[0])
-    nextTick(address.value.focus)
+    if (!disableAddress.value && !isOnLine.value) {
+      nextTick(address.value.focus)
+    } else {
+      nextTick(online_locations.value.focus)
+    }
   }
 }
 
@@ -74,11 +85,18 @@ function selectFirst () {
       return-object
       :items="selectablePlaces"
       item-title='name'
-      item-subtitle='address'
       @keydown.enter.prevent="selectFirst"
       @keydown.tab.prevent="selectFirst"
       @update:model-value="selectPlace"
-    />
+    >
+      <template #item="{ props, item }">
+        <v-list-item
+          v-bind="props"
+          :title="item.raw.name"
+          :subtitle="item.raw.address"
+        />
+      </template>
+    </v-combobox>
   </v-col>
 
   <!-- address -->
@@ -96,6 +114,7 @@ function selectFirst () {
 
   <v-col v-if="settings.allow_online_event" cols="12" :md="isOnLine?8:3">
     <v-combobox
+      ref="online_locations"
       v-model="event.online_locations" class="mr-4"
       prepend-icon="mdi-link" :hint="$t('event.online_locations_help')"
       :label="$t('event.online_locations')"
