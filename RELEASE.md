@@ -6,10 +6,10 @@ The process of building the project is as follows:
 This script will build the project and create:
 
 - a docker image named `cisti/gancio:test`  
-you can test it by running `docker run -it --rm cisti/gancio:test`
+you can test it by running 'mkdir -p ./data && sudo chown 1000:1000 ./data && docker run -v ./data:/app/data -it --rm cisti/gancio:test`
 
 - an npm package in the `releases` folder  
-you can install it by running `npm install -g ./releases/gancio-<version>.tgz`
+you can install it by running 'npm install -g ./releases/gancio-<version>.tgz' and then just 'gancio'
 
 # Release process
 

@@ -12,8 +12,8 @@ if [ "$PRODUCTION" = "false" ]; then
     --output type=local,dest=./releases \
     .
 
-  echo "Test the image with `docker run --rm -it cisti/gancio:test`"
-  echo "Test the package with `npm install -g ./releases/gancio-$VERSION.tgz`"
+  echo "Test the image with 'mkdir -p ./data && sudo chown 1000:1000 ./data && docker run -v ./data:/app/data -it --rm cisti/gancio:test'"
+  echo "Test the package with 'npm install -g ./releases/gancio-$VERSION.tgz' and then 'gancio'"
   exit 0
 fi
 
