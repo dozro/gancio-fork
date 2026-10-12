@@ -74,7 +74,8 @@ export function useTime() {
 
   function when(event: EventAPI) {
     const cy = currentYear()
-    const addTimezone = event?.ap_id || event?.place?.name === 'online'
+    const addTimezone = event?.ap_id || event?.online_locations?.length
+    const showEndTime = event?.end_datetime && event.displayEndTime !== false
 
     const start = dt(event?.start_datetime ?? 0)
     let timeStr = start.toLocaleString({
@@ -84,7 +85,7 @@ export function useTime() {
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-      ...(addTimezone && { timeZoneName: 'short' })
+      ...(addTimezone && !showEndTime && { timeZoneName: 'shortGeneric' })
     })
 
     if (event?.end_datetime && event.displayEndTime !== false) {
@@ -96,10 +97,15 @@ export function useTime() {
           weekday: 'long',
           ...(cy !== end.year && { year: 'numeric' }),
           month: 'short',
-          day: '2-digit'
+          day: '2-digit',
+          ...(addTimezone && { timeZoneName: 'shortGeneric' })
         })}`
       } else if (end.diff(start, 'minutes').minutes > 0) {
-        timeStr += `-${end.toLocaleString({ hour: '2-digit', minute: '2-digit' })}`
+        timeStr += `-${end.toLocaleString({
+          hour: '2-digit',
+          minute: '2-digit',
+          ...(addTimezone && { timeZoneName: 'shortGeneric' })
+        })}`
       }
     }
 
