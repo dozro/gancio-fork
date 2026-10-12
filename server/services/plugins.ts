@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs/promises'
 import { existsSync } from 'fs'
-import { runtimeResolve } from '../services/config'
+import { get as getConfig, runtimeResolve } from '../services/config'
 import * as db from './db'
 import { useLogger } from '../lib/logger'
 import { type H3Event, createError, getRouterParam } from 'h3'
@@ -273,7 +273,7 @@ export class PluginController {
       // import module
       const rawPlugin = await import(pluginPath)
       if (!rawPlugin?.default || typeof rawPlugin.default !== 'function') {
-        log.warn(`Plugin at ${pluginPath} does not export a default function`)
+        log.warn(`Plugin at ${pluginPath} does not export a default function, check the syntax at https://gancio.org/dev/plugins`)
         throw new Error(`Plugin at ${pluginPath} does not export a default function`)
       }
       const plugin: GancioPlugin = rawPlugin.default({
@@ -333,11 +333,18 @@ export class PluginController {
   * search for all installed plugins, load enabled ones
   */
   async initialize(loadIfEnabled = true) {
-    // const config = getConfig()
-    const pluginsPath = runtimeResolve('../plugins')
+    const config = getConfig()
+    const pluginsPaths: Set<string> = new Set()
+    pluginsPaths.add(runtimeResolve('../plugins'))
+    pluginsPaths.add(config.plugins_path)
 
-    log.debug(`Initializing plugins from: ${pluginsPath}`)
+    log.debug(`Initializing default plugins from: ${[...pluginsPaths]}`)
 
+    return [...pluginsPaths].map(pluginPath => this.initializePluginsFromPath(pluginPath, loadIfEnabled))
+  }
+
+  async initializePluginsFromPath(pluginsPath: string, loadIfEnabled: boolean) {
+    // read system plugins path
     const dirs = await fs.readdir(pluginsPath).catch(() => {
       log.warn(`Plugins path does not exist: ${pluginsPath}`)
       return []
@@ -356,7 +363,7 @@ export class PluginController {
       } else if (existsSync(pluginPath) && (pluginPath.endsWith('.js') || pluginPath.endsWith('.ts'))) {
         return this.initPlugin(pluginPath, loadIfEnabled)
       } else {
-        log.warn(`No valid entry point found for plugin in ${pluginPath}, skipping`)
+        log.warn(`No valid entry point found for plugin in ${pluginPath}, tried with ${indexTsPath}, ${indexJsPath}, ${pluginPath}`)
         return Promise.reject(new Error(`No valid entry point found for plugin in ${pluginPath}`))
       }
     }))
