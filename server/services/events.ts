@@ -272,7 +272,7 @@ export async function upsertEvent(payload: unknown, user?: InferAttributes<User>
   if (event) {
     event = await event.update({
       ...eventPayload,
-      ...(place?.id != null && { placeId: place.id }),
+      placeId: place?.id ?? null,
       media
     }).catch((e) => {
       throw createError({ statusCode: 500, message: e.message })
@@ -280,7 +280,7 @@ export async function upsertEvent(payload: unknown, user?: InferAttributes<User>
   } else {
     event = await Event.create({
       ...eventPayload,
-      ...(place?.id != null && { placeId: place.id }),
+      placeId: place?.id,
       media
     }).catch((e) => {
       throw createError({ statusCode: 500, message: e.message })
@@ -516,7 +516,7 @@ export function eventToAP(event: Event) {
     }))
   }
 
-  if (event.place && event.place?.name !== 'online') {
+  if (event.place) {
     location.push(PlaceToAP(event.place))
   }
 

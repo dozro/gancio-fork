@@ -308,12 +308,12 @@ export class Event extends Model<
     type: DataTypes.INTEGER.UNSIGNED,
     references: { table: 'places', key: 'id' },
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE'
+    onDelete: 'SET NULL'
   })
-  declare placeId?: CreationOptional<number>
+  declare placeId?: CreationOptional<number> | null
 
   @BelongsTo(() => Place, { foreignKey: 'placeId' })
-  declare place: NonAttribute<Place>
+  declare place?: NonAttribute<Place>
 
   @BelongsToMany(() => Tag, { through: 'event_tags', inverse: { as: 'events' } })
   declare tags: NonAttribute<Tag[]>
@@ -322,7 +322,7 @@ export class Event extends Model<
     type: DataTypes.STRING,
     references: { table: 'ap_users', key: 'ap_id' },
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE'
+    onDelete: 'SET NULL'
   })
   declare apUserApId: CreationOptional<string>
 

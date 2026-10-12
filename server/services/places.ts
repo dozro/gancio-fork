@@ -4,7 +4,7 @@ import { Place, Event } from './db'
 const log = useLogger('federation:places')
 
 export async function findOrCreatePlace(body: CreationAttributes<Place> | { id?: number }) {
-  if (body?.id != null) {
+  if (body?.id) {
     const place = await Place.findByPk(body.id)
     if (!place) {
       throw new Error('Place not found')
@@ -12,13 +12,16 @@ export async function findOrCreatePlace(body: CreationAttributes<Place> | { id?:
     return place
   }
 
-  if (body?.ap_id) {
+  // this is an AP place
+  if ('ap_id' in body && body.ap_id) {
     const place = await Place.findOne({ where: { ap_id: body.ap_id } })
     if (place) {
       return place
     }
   }
 
+  // type guard
+  if (!('name' in body)) return
   const name = body.name.trim()
   const address = body.address && body.address.trim()
   if (!name || (!address && name?.toLocaleLowerCase() !== 'online')) {
@@ -37,7 +40,7 @@ export async function findOrCreatePlace(body: CreationAttributes<Place> | { id?:
     }).catch((e) => {
       console.error(e)
       console.error(e?.errors)
-      return
+      return null
     })
   }
   if (!place) return
