@@ -14,7 +14,7 @@ function formatDatetime(timestamp, type = 'long', addTimezone = false) {
 }
 
 export function when(event) {
-  const addTimezone = event.ap_id || event.place.name === 'online'
+  const addTimezone = event.ap_id || !event.place
   if (event.multidate) {
     return formatDatetime(event.start_datetime, 'long', addTimezone) + ' - ' +
       formatDatetime(event.end_datetime, 'long', addTimezone)

@@ -61,7 +61,7 @@ describe('Location', () => {
   it('should parse a Virtual Location', async () => {
     const location = await loadJSON('../fixtures/APLocation/virtual-location.json')
     const { place, online_locations } = await parseAPLocation({ location })
-    expect(place.name).toBe('online')
+    expect(place).toBeUndefined()
     expect(online_locations.length).toBe(1)
     expect(online_locations[0]).toBe('https://virtual.location.org')
   })

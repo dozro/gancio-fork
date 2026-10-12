@@ -49,7 +49,7 @@ const openAssignAuthor = ref(false)
 const showModeration = computed(() => settings.value.enable_moderation && (event?.value?.is_mine || user?.value?.role === 'admin' || user?.value?.role === 'editor'))
 const canEdit = computed(() => event?.value?.is_mine || user?.value?.role === 'admin' || user?.value?.role === 'editor')
 const hasOnlineLocations = computed(() => event?.value?.online_locations?.length)
-
+const isOnline = computed(() => !event.value?.place && event.value?.online_locations?.length)
 const share = useShare()
 const shareEvent = () => share.value?.({ url: canonicalUrl.value, title: document.title })
 
@@ -156,9 +156,16 @@ async function report() {
               :to="`/place/${event?.place?.id}/${encodeURIComponent(event?.place?.name)}`">
               <span itemprop="name">{{ event?.place?.name }}</span>
             </nuxt-link>
-            <div v-if='event?.place?.name !== "online"' class="font-weight-light p-street-address" itemprop="address">
-              {{ event?.place?.address }}
+            <div class="font-weight-light p-street-address" itemprop="address">
+              {{ event.place?.address }}
             </div>
+          </div>
+          <div v-else-if='isOnline' class="p-location h-adr">
+            <v-icon icon="mdi-web" />
+            <nuxt-link
+              class="vcard ml-2 p-name text-decoration-none text-uppercase">
+              <span itemprop="name">online</span>
+            </nuxt-link>
           </div>
           <!-- <a class="d-block" v-if="event.ap_object?.url" :href="event.ap_object?.url">{{ event.ap_object?.url }}</a> -->
           <a v-if="event?.original_url" :href="event?.original_url">{{ event.original_url }}</a>

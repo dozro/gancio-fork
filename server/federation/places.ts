@@ -9,9 +9,9 @@ import type { Place } from '../services/db'
   * @link https://www.w3.org/TR/activitystreams-vocabulary/#places
   * @link https://fediverse.codeberg.page/fep/fep/8a8e/#location
   */
-export async function parseAPLocation(APEvent: APEvent) {
+export async function parseAPLocation(APEvent: APEvent): Promise<{ place?: CreationAttributes<Place>, online_locations?: string[] }> {
   const log = useLogger('federation:places')
-  let place: CreationAttributes<Place>
+  let place: CreationAttributes<Place> | undefined = undefined
 
   if (!APEvent?.location) {
     log.warn(`Event "${APEvent?.name}" has no location field`)
@@ -24,10 +24,14 @@ export async function parseAPLocation(APEvent: APEvent) {
   const location = locations.find(location => location?.type !== 'VirtualLocation')
 
   // get the list of online locations
-  let online_locations = locations.filter(location => location?.type === 'VirtualLocation' && location?.url).map(location => location.url)
+  const online_locations = new Set(locations.flatMap(location => location.type === 'VirtualLocation' && location.url ? [location.url] : []))
 
   // online locations could be in attachments too
-  online_locations = online_locations.concat(APEvent?.attachment?.filter(a => a?.type === 'Link').map(a => a?.href).filter(a => a && !online_locations.includes(a)) ?? [])
+  APEvent?.attachment?.forEach(a => {
+    if (a.type === 'Link' && a?.href) {
+      online_locations.add(a.href)
+    }
+  })
 
   // we have a physical place
   if (location) {
@@ -44,37 +48,24 @@ export async function parseAPLocation(APEvent: APEvent) {
       ...(!isNaN(latitude) && !isNaN(longitude) && { latitude, longitude })
     }
     // no physical but at least virtual location
-  } else if (online_locations.length) {
-    place = {
-      name: 'online'
-    }
-    // nothing...
-  } else {
-    log.warn(`No Physical nor Virtual location: ${JSON.stringify(APEvent.location)}`)
-    throw new Error('No Physical nor Virtual location')
-  }
-
-  // the `address` field could be Text, PostalAddress we do support the name as a fallback
-  const address = location?.address
-  if (address) {
-    if (typeof address === 'string') {
-      place.address = address
-    } else if (address?.streetAddress || address?.addressLocality || address?.addressCountry || address?.addressRegion) {
-      place.postal_address = address
-      place.address = [address?.streetAddress, address?.addressLocality, address?.addressRegion, address?.addressCountry]
-        .filter(part => part).join(', ')
+    // the `address` field could be Text, PostalAddress we do support the name as a fallback
+    const address = location?.address
+    if (address) {
+      if (typeof address === 'string') {
+        place.address = address
+      } else if (address?.streetAddress || address?.addressLocality || address?.addressCountry || address?.addressRegion) {
+        place.postal_address = address
+        place.address = [address?.streetAddress, address?.addressLocality, address?.addressRegion, address?.addressCountry]
+          .filter(part => part).join(', ')
+      } else {
+        log.warn(`Event "${APEvent?.name}" has bad address: ${JSON.stringify(address)}`)
+      }
     } else {
-      log.warn(`Event "${APEvent?.name}" has bad address: ${JSON.stringify(address)}`)
+      place.address = place.name
     }
-  } else {
-    place.address = place.name
   }
 
-  if (!place) {
-    throw new Error('Place not found nor created')
-  }
-
-  return { place, online_locations }
+  return { place, online_locations: [...online_locations] }
 }
 
 /**

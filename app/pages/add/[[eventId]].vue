@@ -65,7 +65,8 @@ async function done(publish: boolean) {
 
   const formValidation = await form.value.validate()
   if (!formValidation.valid) {
-    console.error('validation error!')
+    $notify(formValidation.errors[0].errorMessages[0], Statuses.ERROR)
+    console.error('validation error!', formValidation)
     return
   }
 
