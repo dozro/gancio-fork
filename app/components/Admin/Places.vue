@@ -19,9 +19,7 @@ const headers = [
   { value: 'actions', title: t('common.actions'), align: 'end', width: 130 }
 ]
 
-const { data: places, refresh } = await useFetch('/api/places/list', {
-  transform: places => places.filter(place => place.name?.toLowerCase() !== 'online')
-})
+const { data: places, refresh } = await useFetch('/api/places/list')
 
 function editPlace(item: PlaceAPI) {
   newPlace.value = null
