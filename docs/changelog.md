@@ -1,7 +1,23 @@
 # Changelog
 
-
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [2.0.0-beta.7](https://framagit.org/les/gancio/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2026-10-13)
+
+
+### Features
+
+* add Sardu! ([6202bd4](https://framagit.org/les/gancio/commit/6202bd457df07fd5c4cd5e6e2b607982f6ca4ddf))
+
+
+### Bug Fixes
+
+* be sure to do not retry a completed task ([59750ff](https://framagit.org/les/gancio/commit/59750fff5d3c637a43d0b8bf00e3895009b3db81))
+* display events as online on no place and online_locations ([1ed0a0c](https://framagit.org/les/gancio/commit/1ed0a0cc413380f4501c6c2efd74b2054d19383a))
+* lazy fetch setup alert in admin page ([63c693c](https://framagit.org/les/gancio/commit/63c693c137e5d2928f3d48c8e30892ce6660613f))
+* load plugins from custom plugins_path too ([2be0e0f](https://framagit.org/les/gancio/commit/2be0e0f9bcd081409cd1c5fda7557568a99691c4))
+* RELEASE script test suggestions ([3460865](https://framagit.org/les/gancio/commit/3460865bbf74dc838f18b6aa1ab06f4811de8765))
+* remove old `online` place association ([1ce6522](https://framagit.org/les/gancio/commit/1ce65229d036dc481d0f9d1fc58b0916d14b8781))
 
 # [2.0.0-beta.6](https://framagit.org/les/gancio/compare/v2.0.0-beta.5...v2.0.0-beta.6) (2026-10-07)
 
