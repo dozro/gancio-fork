@@ -8,22 +8,25 @@ rss(version='2.0' xmlns:atom="http://www.w3.org/2005/Atom")
         description #{settings.description}
         each event in events
             item
-                if (event.media && event.media.length)
-                  <enclosure url="#{settings.baseurl}/media/#{event.media[0].url}" type='image/jpeg' length="#{event.media[0].size||1}"></enclosure>
+              - const media = event.media || []
+              - const tags = event.tags || []
+              - const onlineLocations = event.online_locations || []
+                if (media.length)
+                  <enclosure url="#{settings.baseurl}/media/#{media[0].url}" type='image/jpeg' length="#{media[0].size||1}"></enclosure>
                 title [#{unixFormat(event.start_datetime,"yyyy-MM-dd")}] #{event.title} @  #{event.place ? event.place.name : (event.online_locations && event.online_locations.length) ? 'online' : ''}
                 link #{settings.baseurl}/event/#{event.slug || event.id}
-                each tag in event.tags
+                each tag in tags
                   category #{tag.tag || tag}
                 description
                     | <![CDATA[
                     | <h3>#{event.title}</h3>
                     if (event.place && event.place.name && event.place.address)
                       | <strong>#{event.place.name} - #{event.place.address}</strong>
-                    each online_location in event.online_locations
+                    each online_location in onlineLocations
                       | <strong>online - <a href="#{online_location}">#{online_location}</a></strong>
                     | <br/><small>(#{unixFormat(event.start_datetime,"EEEE, d MMMM HH:mm")})</small><br/>
-                    if (event.media && event.media.length)
-                        | <img alt="#{event.media[0].name || ''}" src="#{settings.baseurl}/media/#{event.media[0].url}"/>
+                    if (media.length)
+                        | <img alt="#{media[0].name || ''}" src="#{settings.baseurl}/media/#{media[0].url}"/>
                     | !{event.description}
                     | ]]>
                 pubDate= new Date(event.updatedAt).toUTCString()
