@@ -45,7 +45,6 @@ export default ({ log, db, services }: GancioContext): GancioPlugin => ({
       include_past: {
         type: 'CHECK',
         description: 'Include events in the past',
-        required: true
       },
       add_tag: {
         type: 'TEXT',
