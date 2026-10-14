@@ -79,6 +79,7 @@ async function save() {
           <v-col :cols="setting.type === 'CHECK' ? 9 : 12" sm="8">
             <div :id="`plugin-option-${name}`" class="text-subtitle-2 font-weight-bold">
               {{ setting.description }}
+              <template v-if="setting.required">*</template>
             </div>
             <!-- eslint-disable-next-line vue/no-v-html -->
             <div v-if="setting.hint" class="text-body-2 font-weight-normal mt-1" v-html="setting.hint" />

@@ -17,6 +17,8 @@ import { getEvents, upsertEvent } from './events'
 import { getUser } from '../lib/getUser'
 import { isRole, requireAdmin, requireRole, requireUser } from '../lib/auth'
 import type { Handler } from 'mitt'
+import type { ZodType } from 'zod'
+import z from 'zod'
 
 const log = useLogger('plugins')
 const PLUGIN_SETTINGS_PREFIX = 'plugin_'
@@ -30,6 +32,18 @@ const PLUGIN_EVENTS_MAPPING: [keyof EventType, string][] = [
 // To store the associated event functions bound to the plugin
 type EventListenerRecord = [keyof EventType, Handler]
 
+type GancioPluginSettingType = 'NUMBER' | 'TEXT' | 'CHECK' | 'LIST' | 'URL'
+type GancioPluginSetting = {
+  type?: GancioPluginSettingType
+  description?: string
+  hint?: string
+  required?: boolean
+  default?: string | number | boolean
+  items?: string[] // for type LIST, the possible values
+  min?: number // For the NUMBER type
+  max?: number // For the NUMBER type
+}
+
 export type GancioPluginManifest = {
   /** name of plugin, this is a key and must be unique */
   name: string
@@ -39,16 +53,7 @@ export type GancioPluginManifest = {
   /** a small plugin description, support html */
   description?: string
   settings?: {
-    [key: string]: {
-      type?: 'NUMBER' | 'TEXT' | 'CHECK' | 'LIST' | 'URL'
-      items?: string[] // for type LIST, the possible values
-      description?: string
-      required?: boolean
-      hint?: string
-      default?: string | number | boolean
-      min?: number // For the NUMBER type
-      max?: number // For the NUMBER type
-    }
+    [key: string]: GancioPluginSetting
   }
 }
 
@@ -91,6 +96,24 @@ export type GancioPlugin = {
   onEventUpdate?: (event: EventAPI) => Promise<void> | void
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } & Record<string, any> // allow plugins to have custom properties/methods
+
+const PLUGIN_SETTINGS_VALIDATORS_MAP: Record<GancioPluginSettingType, (setting: GancioPluginSetting) => ZodType> = {
+  NUMBER: setting => {
+    let validator = z.number()
+    if (typeof setting.min === 'number') {
+      validator = validator.min(setting.min)
+    }
+    if (typeof setting.max === 'number') {
+      validator = validator.max(setting.max)
+    }
+    return validator
+  },
+  TEXT: () => z.string(),
+  CHECK: () => z.boolean().optional(),
+  LIST: (setting) => z.literal(setting.items ?? []),
+  URL: () => z.url(),
+
+}
 
 export class PluginController {
   plugins: GancioPlugin[] = []
@@ -152,6 +175,8 @@ export class PluginController {
     const testSettings = settings ?? this.getSettings(plugin)
     log.debug(`Testing plugin "${name}" with settings:`, testSettings)
 
+    this.#validateSettings(plugin, testSettings)
+
     return plugin.onTest(testSettings)
   }
 
@@ -193,15 +218,16 @@ export class PluginController {
     log.info(`Settings for plugin "${name}":`, oldSettings)
 
     const newSettings = { ...oldSettings, enable: true }
-    await this.setSettings(plugin, newSettings, { allowEnable: true })
+    await this.#setSettingsRaw(plugin, newSettings)
 
     try {
+      this.#validateSettings(plugin)
       await plugin.load()
       this.#attachEvents(plugin)
     } catch (error) {
       log.error(`Error during load of ${name}:`, error)
       // Revert enabled flag in settings if something went wrong during load
-      await this.setSettings(plugin, oldSettings, { allowEnable: true })
+      await this.#setSettingsRaw(plugin, oldSettings)
       throw error
     }
   }
@@ -221,7 +247,7 @@ export class PluginController {
 
     const oldSettings = this.getSettings(plugin)
     const newSettings = { ...oldSettings, enable: false }
-    await this.setSettings(plugin, newSettings, { allowEnable: true })
+    await this.#setSettingsRaw(plugin, newSettings)
   }
 
   #attachEvents(plugin: GancioPlugin) {
@@ -248,19 +274,70 @@ export class PluginController {
     this.#pluginsEvents.set(name, [])
   }
 
+  #validateSettings(plugin: GancioPlugin, settings?: PluginSettings): void {
+    if (plugin.manifest.settings) {
+      const schema = this.#createValidationSchema(plugin.manifest.settings)
+      try {
+        schema.parse(settings || plugin.settings)
+      } catch (e) {
+        if (e instanceof z.ZodError) {
+          const field = String(e.issues[0]?.path[0] ?? '')
+          const message = `${e.issues[0]?.message} (${field})`
+          throw createError({ statusCode: 400, message })
+        } else {
+          throw createError({ statusCode: 400, message: String(e) })
+        }
+      }
+    }
+  }
+
+  #createValidationSchema(settingsManifest: NonNullable<GancioPluginManifest['settings']>) {
+    const schema: Record<string, ZodType> = {}
+    let hasRequiredField = false
+
+    for (const [key, setting] of Object.entries(settingsManifest)) {
+      const getFieldSchema = setting.type && (setting.type in PLUGIN_SETTINGS_VALIDATORS_MAP)
+        ? PLUGIN_SETTINGS_VALIDATORS_MAP[setting.type]
+        : PLUGIN_SETTINGS_VALIDATORS_MAP.TEXT
+
+      let settingSchema = getFieldSchema(setting)
+      if (setting.required) {
+        hasRequiredField = true
+      } else {
+        settingSchema = settingSchema.optional()
+      }
+      if (setting.default !== undefined) {
+        settingSchema = settingSchema.default(setting.default)
+      }
+      schema[key] = settingSchema
+    }
+
+    return hasRequiredField
+      ? z.object(schema)
+      : z.object(schema).optional()
+  }
+
   getSettings(plugin: GancioPlugin): PluginSettings {
     const settingKey = PLUGIN_SETTINGS_PREFIX + plugin.manifest.name
     return (getSetting(settingKey) ?? {}) as PluginSettings
   }
 
-  async setSettings(plugin: GancioPlugin, newSettings: PluginSettings, { allowEnable = false } = {}): Promise<void> {
+  async setSettings(
+    plugin: GancioPlugin,
+    newSettings: PluginSettings
+  ): Promise<void> {
     const finalSettings = {
       ...newSettings,
-      enable: allowEnable ? newSettings.enable : this.getSettings(plugin)?.enable
+      enable: this.getSettings(plugin)?.enable,
     }
+    this.#validateSettings(plugin, finalSettings)
+    return this.#setSettingsRaw(plugin, finalSettings)
+  }
+
+  async #setSettingsRaw(plugin: GancioPlugin, newSettings: PluginSettings): Promise<void> {
     const settingKey = PLUGIN_SETTINGS_PREFIX + plugin.manifest.name
-    await setSetting(settingKey, finalSettings)
-    plugin.settings = finalSettings
+    await setSetting(settingKey, newSettings)
+    plugin.settings = newSettings
   }
 
   /**
@@ -315,7 +392,7 @@ export class PluginController {
         plugin.settings = pluginSettings // make settings available to plugin instance
         await this.#enablePlugin(plugin)
       } else if (pluginSettings?.enable) {
-        await this.setSettings(plugin, { ...pluginSettings, enable: false }, { allowEnable: true })
+        await this.#setSettingsRaw(plugin, { ...pluginSettings, enable: false })
       }
 
       return plugin
