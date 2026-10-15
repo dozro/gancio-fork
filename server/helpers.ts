@@ -12,6 +12,7 @@ import { createReadStream } from 'fs'
 import { stat } from 'fs/promises'
 import { handleCache } from './lib/API'
 import type { Media } from './services'
+import type { ZodError } from 'zod'
 
 const window = new JSDOM('').window
 const domPurify = DOMPurify(window)
@@ -123,7 +124,14 @@ export async function serveFile(event: H3Event, path: string) {
   if (await handleCache(event, s)) return
   return sendStream(event, createReadStream(path))
 }
-
+/** get the first zod error as string */
+export function getFirstZodError (e: ZodError): string {
+  const firstIssue = e.issues?.[0]
+  if (!firstIssue) return ''
+  const field = String(firstIssue.path[0])
+  const message = firstIssue.message
+  return `${message} (${field})`
+}
 /**
  * Import events from url
  * It does supports ICS and H-EVENT
