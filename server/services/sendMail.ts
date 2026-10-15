@@ -5,6 +5,7 @@ import { useLogger } from '../lib/logger'
 import { publicSettings } from './settings'
 import { useTaskManager } from './taskManager'
 import { runtimeResolve } from './config'
+import type { SmtpSettings } from '~~/shared/types/settings'
 const log = useLogger('mail')
 
 /**
@@ -32,7 +33,13 @@ export function enqueueMail(addresses: string | string[], template: string, loca
 }
 
 type emailTemplates = 'register' | 'confirm' | 'user_confirm' | 'recover' | 'admin_register' | 'event_confirm' | 'test'
-export async function sendMail(addresses: string | string[], template: emailTemplates, locals?: object, locale?: string, bcc?: boolean) {
+export async function sendMail(
+  addresses: string | string[],
+  template: emailTemplates,
+  locals?: object,
+  locale?: string,
+  bcc?: boolean,
+  smtpSettings: SmtpSettings | undefined = publicSettings.smtp) {
   // this hack is needed because there are more standards to indicate language code
   // https://framagit.org/les/gancio/-/issues/539#note_2198016
   const localeMapOverride = {
@@ -44,7 +51,7 @@ export async function sendMail(addresses: string | string[], template: emailTemp
   locale = localeMapOverride?.[locale] ?? locale
   log.info(`Send ${template} email to ${addresses} with locale ${locale}`)
 
-  const from = `"${settings?.smtp?.from || '📅 ' + settings.title}" <${settings.admin_email}>`
+  const from = `"${smtpSettings?.from || '📅 ' + settings.title}" <${settings.admin_email}>`
   const email = new Email({
     views: {
       root: runtimeResolve('./static/emails')
@@ -74,7 +81,7 @@ export async function sendMail(addresses: string | string[], template: emailTemp
       locales: Object.keys(locales).map(l => localeMapOverride?.[l] ?? l)
     },
 
-    transport: settings.smtp // || {}
+    transport: smtpSettings
   })
 
   const opt = {
