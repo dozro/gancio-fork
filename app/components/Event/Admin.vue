@@ -7,6 +7,8 @@ const settings = useState<Settings>('settings')
 const { isAdmin } = useAuth()
 const { $confirm, $notify } = useNuxtApp()
 
+const isExternalEvent = computed<boolean>(() => Boolean(event?.original_url))
+
 async function disableAuthor() {
   const ret = await $confirm('event.disable_author_confirm')
   if (!ret) {
@@ -85,13 +87,18 @@ async function reannounce() {
     @click="toggle(false)" />
 
   <v-list-item
-    v-if="isScheduled"
+    v-if="isScheduled && !isExternalEvent"
     prepend-icon="mdi-calendar-remove"
     :title="$t('common.cancel')"
     @click="updateStatus('EventCancelled')" />
 
   <!-- Edit event -->
-  <v-list-item :to="`/add/${event.id}`" prepend-icon='mdi-calendar-edit' :title="$t('common.edit')" />
+  <v-list-item
+    v-if="!isExternalEvent"
+    :to="`/add/${event.id}`"
+    prepend-icon='mdi-calendar-edit'
+    :title="$t('common.edit')"
+  />
 
   <!-- Clone -->
   <v-list-item
@@ -99,7 +106,8 @@ async function reannounce() {
     :title="$t('common.clone')" />
 
   <!-- Remove -->
-  <v-list-item v-if="!event.parentId" prepend-icon='mdi-delete' :title="$t('common.remove')" @click="remove(false)" />
+  <v-list-item
+    v-if="!isExternalEvent && !event.parentId" prepend-icon='mdi-delete' :title="$t('common.remove')" @click="remove(false)" />
 
   <!-- Moderation -->
   <v-list-item
@@ -117,7 +125,7 @@ async function reannounce() {
 
   <!-- Assign to user -->
   <v-list-item
-    v-if="event.is_anon && isAdmin"
+    v-if="event.is_anon && isAdmin && !isExternalEvent"
     prepend-icon='mdi-clipboard-account'
     :title="$t('event.assign_to_user')" @click="$emit('openAssignAuthor')" />
 
@@ -138,7 +146,12 @@ async function reannounce() {
     <!--   :title="$t(`common.${event.parent.is_visible ? 'pause' : 'start'}`)" @click="toggle(true)" /> -->
 
     <!-- Edit event -->
-    <v-list-item :to="`/add/${event.parentId}`" prepend-icon='mdi-calendar-edit' :title="$t('common.edit')" />
+    <v-list-item
+      v-if="!isExternalEvent"
+      :to="`/add/${event.parentId}`"
+      prepend-icon='mdi-calendar-edit'
+      :title="$t('common.edit')"
+    />
 
     <!-- Remove -->
     <v-list-item prepend-icon='mdi-delete-forever' :title="$t('common.remove')" @click="remove(true)" />
