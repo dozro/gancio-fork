@@ -57,7 +57,7 @@ import z from 'zod'
 const config = getConfig()
 const log = useLogger('sequelize')
 
-export let sequelize: Sequelize | undefined
+let sequelize: Sequelize | undefined
 
 export async function connect() {
   if (sequelize) {
