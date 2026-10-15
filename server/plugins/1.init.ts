@@ -7,10 +7,13 @@ import { pluginController } from '~~/server/services'
 import { useLogger } from '../lib/logger'
 import { loadSettings, publicSettings } from '../services/settings'
 import { useTaskManager } from '../services/taskManager'
-import { connect, runMigrations } from '../services/db'
+import { disconnect, connect, runMigrations } from '../services/db'
 import { useCreateDirectoryStructure } from '../services/directories'
 
-export default defineNitroPlugin(async (_nitroApp: NitroApp) => {
+export default defineNitroPlugin(async (nitroApp: NitroApp) => {
+  nitroApp.hooks.hook('close', async () => {
+    await disconnect()
+  })
   const isTest = process.env.VITEST === 'true'
 
   const log = useLogger('init')

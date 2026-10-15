@@ -103,6 +103,21 @@ export async function runMigrations() {
   }
 }
 
+export async function disconnect() {
+  if (!sequelize) {
+    return
+  }
+
+  log.info('Closing database connection')
+
+  const connection = sequelize
+  sequelize = undefined
+
+  await connection.close()
+
+  log.info('Database connection closed')
+}
+
 export function jsonPath(expression: string, path: ReadonlyArray<string | number>) {
   // Sequelize complains JSON access is not supported in sqlite3, but in fact it is.
   return sequelize?.dialect.name === 'sqlite3'
