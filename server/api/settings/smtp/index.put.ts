@@ -1,13 +1,13 @@
-import { defineEventHandler, createError, readBody } from 'h3'
-import { sendMail, publicSettings, setSetting } from '~~/server/services'
+import { defineEventHandler, readBody } from 'h3'
+import { publicSettings, setSetting } from '~~/server/services'
 import { requireAdmin } from '~~/server/lib/auth'
 
 /**
  * @openapi
- * /api/settings/test_smtp:
- *   post:
+ * /api/settings/smtp:
+ *   put:
  *     summary: Set SMTP
- *     description: Set SMTP settings and send a test email. Admin role is required.
+ *     description: Set SMTP settings. Admin role is required.
  *     requestBody:
  *       required: true
  *       content:
@@ -52,21 +52,20 @@ import { requireAdmin } from '~~/server/lib/auth'
  *                 example: true
  *     responses:
  *       200:
- *         description: SMTP setting set and test email sent.
- *       400:
- *         description: Email could not be sent.
+ *         description: SMTP setting set.
+ *       401:
+ *         description: Unauthorized
  *     security:
  *       - bearerAuth: []
  *     tags:
  *       - Settings
  */
+
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
   const setting = await readBody(event)
-  await setSetting('smtp', setting)
-  try {
-    sendMail(publicSettings.admin_email, 'test')
-  } catch (e) {
-    throw createError({ statusCode: 400, statusMessage: String(e) })
+  if (!setting?.auth?.pass) {
+    setting.auth.pass = publicSettings.smtp?.auth?.pass
   }
+  return setSetting('smtp', setting)
 })

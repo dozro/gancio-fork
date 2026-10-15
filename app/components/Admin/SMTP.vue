@@ -1,28 +1,18 @@
 <script setup lang="ts">
-import type { SmtpSettings } from '~~/shared/types/settings'
 
 const settings = useState<Settings>('settings')
 const defaultSenderName = computed(() => '📅 ' + settings.value.title)
 
 const loading = ref(false)
 const isValid = ref(true)
-const hasChanged = ref(false)
 const { $notify } = useNuxtApp()
 
 const { data: storedSmtpConfig, refresh } = await useFetch('/api/settings/smtp')
-const smtp = ref<SmtpSettings>({ ...storedSmtpConfig.value, auth: {} })
-
-watch(storedSmtpConfig, (newValue) => {
-  smtp.value = { ...(newValue || {}), auth: {} }
-})
-
+const smtp = ref<SmtpSettings>({ ...storedSmtpConfig.value })
 const admin_email = manageSetting('admin_email')
 
 async function done (testing: boolean) {
-  const tmpSMTP = JSON.parse(JSON.stringify(smtp.value))
-  if (!tmpSMTP.auth.user) {
-    delete tmpSMTP.auth
-  }
+  const tmpSMTP = structuredClone(smtp.value)
 
   // override past `ignoreTLS` smtp setting
   tmpSMTP.ignoreTLS = false
@@ -47,12 +37,12 @@ async function done (testing: boolean) {
   try {
     loading.value = true
     if (testing) {
-      await $fetch('/api/settings/test_smtp', { method: 'POST', body: tmpSMTP })
+      await $fetch('/api/settings/smtp/test', { method: 'POST', body: tmpSMTP })
       $notify('admin.smtp_test_success', Statuses.SUCCESS, { admin_email: admin_email.value })
     } else {
-      await $fetch('/api/settings', { method: 'PUT', body: { key: 'smtp', value: tmpSMTP } })
-      hasChanged.value = false
+      await $fetch('/api/settings/smtp', { method: 'PUT', body: tmpSMTP })
       refresh()
+      $notify('common.ok', Statuses.SUCCESS)
     }
   } catch (e) {
     $notify(e, Statuses.ERROR)
@@ -64,11 +54,12 @@ async function done (testing: boolean) {
 </script>
 <template>
 <div class="d-flex flex-column ga-2">
+  <!-- eslint-disable-next-line vue/no-v-html -->
   <div class="text-subtitle-2 text-medium-emphasis mt-2" v-html="$t('admin.smtp_description')"/>
 
   <v-divider class="my-4" />
 
-  <v-form v-model="isValid" @change="hasChanged = true">
+  <v-form v-model="isValid">
     <div>
       <v-row>
         <v-col cols sm="6">
@@ -161,7 +152,7 @@ async function done (testing: boolean) {
     <v-btn :loading="loading" :disabled="loading || !isValid" variant="outlined" prepend-icon="mdi-email-search-outline" @click="done(true)">
       {{$t('admin.smtp_test_button')}}
     </v-btn>
-    <v-btn color="primary" :loading="loading" :disabled="!hasChanged" @click="done(false)">{{$t("common.save")}}</v-btn>
+    <v-btn color="primary" :loading="loading" :disabled="!isValid" @click="done(false)">{{$t("common.save")}}</v-btn>
   </div>
 </div>
 </template>
