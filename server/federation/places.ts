@@ -40,12 +40,12 @@ export async function parseAPLocation(APEvent: APEvent): Promise<{ place?: Creat
       throw new Error('Location must have at least a name')
     }
 
-    const latitude = Number(location.latitude)
-    const longitude = Number(location.longitude)
+    const latitude = location.latitude
+    const longitude = location.longitude
     place = {
       name: location?.name,
       ...(location?.id && { ap_id: location.id }),
-      ...(!isNaN(latitude) && !isNaN(longitude) && { latitude, longitude })
+      ...(latitude && longitude && { latitude, longitude })
     }
     // no physical but at least virtual location
     // the `address` field could be Text, PostalAddress we do support the name as a fallback
