@@ -15,7 +15,7 @@ if (!event.value || error.value) {
   })
 }
 
-const canonicalUrl = computed(() => `${settings.value.baseurl}/event/${event.value?.slug || event.value?.id}`)
+const canonicalUrl = computed(() => event.value?.original_url || `${settings.value.baseurl}/event/${event.value?.slug || event.value?.id}`)
 
 useHead({
   title: `${event.value.title} - ${settings.value.title}`,
