@@ -4,7 +4,7 @@ import { signAndSend } from './sign_and_send'
 import crypto from 'crypto'
 import type { APActivityBase, APActivityUndo } from './types'
 import type { APUser } from '../services'
-import { applicationActorId, isApplicationActor } from './helpers'
+import { getApplicationActorId, isApplicationActor } from './helpers'
 import type { ActivityHandlerResult } from './handlers'
 
 const log = useLogger('AP follow')
@@ -16,7 +16,7 @@ export async function handleFollow(activity: APActivityBase, actor: APUser): Pro
     return { status: 'ignored', reason: 'Follow Activity with non string object not supported' }
   }
   if (!isApplicationActor(activity.object)) {
-    log.warn(`Following the wrong actor: ${activity.object} instead of ${applicationActorId} (could be a wrong config.baseurl)`)
+    log.warn(`Following the wrong actor: ${activity.object} instead of ${getApplicationActorId()} (could be a wrong config.baseurl)`)
     return { status: 'ignored', reason: 'Actor not found' }
   }
 
@@ -31,7 +31,7 @@ export async function handleFollow(activity: APActivityBase, actor: APUser): Pro
     '@context': 'https://www.w3.org/ns/activitystreams',
     'id': `${publicSettings.baseurl}/federation/${guid}`,
     'type': 'Accept' as const,
-    'actor': applicationActorId,
+    'actor': getApplicationActorId(),
     'object': activity
   }
   await signAndSend(message, actor.object.inbox)
@@ -44,7 +44,7 @@ export async function handleUnfollow(undoActivity: APActivityUndo, actor: APUser
   const actorToUnfollow = undoActivity.object.object // Undo > Follow > object > object is the actor to unfollow
   // can unfollow only the application actor
   if (!isApplicationActor(actorToUnfollow)) {
-    return { status: 'ignored', reason: `Unfollowing wrong user: ${actorToUnfollow} instead of ${applicationActorId}` }
+    return { status: 'ignored', reason: `Unfollowing wrong user: ${actorToUnfollow} instead of ${getApplicationActorId()}` }
   }
 
   if (undoActivity.actor !== actor.ap_id) {

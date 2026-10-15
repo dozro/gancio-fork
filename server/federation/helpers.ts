@@ -10,9 +10,9 @@ import type { Settings } from '~~/shared/types/settings'
 
 const log = useLogger('federation')
 
-export const applicationActorBaseUrl = `${publicSettings.baseurl}/federation/u/`
-export const applicationActorId = `${applicationActorBaseUrl}${publicSettings.instance_name}`
-export const isApplicationActor = (actorId: string) => actorId === applicationActorId
+export const getApplicationActorBaseURL = () => `${publicSettings.baseurl}/federation/u/`
+export const getApplicationActorId = () => `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`
+export const isApplicationActor = (actorId: string) => actorId === getApplicationActorId()
 
 export function sameOrigin(url1: string, url2: string): boolean {
   try {

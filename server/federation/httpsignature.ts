@@ -5,7 +5,7 @@ import { useLogger } from '../lib/logger'
 import { getActorFromKeyId } from './lookup'
 import { parseHttpKeyValueHeader } from '../lib/http'
 import { algoMap, importCryptoKey } from './keys'
-import { applicationActorId } from './helpers'
+import { getApplicationActorId } from './helpers'
 const log = useLogger('HTTPSignature')
 
 // http signature has to be within an hour of now
@@ -19,7 +19,7 @@ export function prepareHTTPSignature(
   targetUrl: string,
   method: 'post' | 'get' = 'post',
   privkey: string = secretSettings.privateKey,
-  keyId: string = `${applicationActorId}#main-key`
+  keyId: string = `${getApplicationActorId()}#main-key`
 ) {
   const inboxUrl = new URL(targetUrl)
   const signer = crypto.createSign('sha256')

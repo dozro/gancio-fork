@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
-import { applicationActorId } from '~~/server/federation/helpers'
+import { getApplicationActorId } from '~~/server/federation/helpers'
 import { handleCache } from '~~/server/lib/API'
 import { getMaxLastModifieds, publicSettings, publicSettingsLastModified } from '~~/server/services'
 
@@ -11,7 +11,7 @@ export default defineEventHandler(async (evt) => {
       ...publicSettings.enable_federation
         ? [{
             rel: 'https://www.w3.org/ns/activitystreams#Application',
-            href: applicationActorId
+            href: getApplicationActorId()
           }]
         : []
     ]

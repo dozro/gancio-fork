@@ -1,6 +1,6 @@
 // import { APUser } from "~/server/utils/sequelize"
 import { defineEventHandler, sendRedirect, getRouterParam, setHeader, createError } from 'h3'
-import { applicationActorId } from '~~/server/federation/helpers'
+import { getApplicationActorId } from '~~/server/federation/helpers'
 import { useLogger } from '~~/server/lib/logger'
 import { preferHTML } from '~~/server/lib/negotiator'
 import { publicSettings } from '~~/server/services'
@@ -26,6 +26,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const applicationActorId = getApplicationActorId()
   setHeader(event, 'Content-Type', 'application/activity+json; charset=utf-8')
 
   return {

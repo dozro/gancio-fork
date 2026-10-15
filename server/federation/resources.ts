@@ -5,7 +5,7 @@ import { Event, Resource, type APUser } from '../services/db'
 import type { APActivityBase, APNote } from './types'
 import { _signAndSend, signAndSend } from './sign_and_send'
 import { publicSettings } from '../services/settings'
-import { applicationActorId, hasPublicTarget } from './helpers'
+import { getApplicationActorId, hasPublicTarget } from './helpers'
 import type { ActivityHandlerResult } from './handlers'
 
 const log = useLogger('federation:notes')
@@ -84,7 +84,7 @@ export async function handleQuoteRequest(message: APActivityBase, actor: APUser)
     ],
     'id': `${publicSettings.baseurl}/federation/activity/${crypto.randomUUID()}`,
     'type': 'Accept' as const,
-    'actor': applicationActorId,
+    'actor': getApplicationActorId(),
     'object': {
       id: message.id,
       type: 'QuoteRequest' as const,

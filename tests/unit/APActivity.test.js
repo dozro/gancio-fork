@@ -4,13 +4,15 @@ import { getActorFromKeyId, getInstance } from '../../server/federation/lookup'
 import { getActor } from '../../server/federation/get_actor'
 import { Event, Instance, Resource, APUser, APKey, connect } from '../../server/services/db'
 import { loadSettings, publicSettings, setSetting } from '../../server/services/settings'
-import { applicationActorId } from '../../server/federation/helpers'
+import { getApplicationActorId } from '../../server/federation/helpers'
 import { normalizePublicKeyToSpki } from '../../server/federation/keys'
 import { cleanDatabase } from './utils'
 
 const db = await connect()
 await cleanDatabase(db)
 await loadSettings()
+
+const applicationActorId = getApplicationActorId()
 
 await Instance.create({
   domain: 'localhost:13120',

@@ -6,7 +6,7 @@ import { decodeStructuredField, encodeStructuredField } from '../../server/feder
 import { cleanDatabase, mockH3Event } from './utils'
 import { parseHttpKeyValueHeader } from '../../server/lib/http'
 import { decodePublicKeyMultibase, importActorKeys, normalizePublicKeyToSpki } from '../../server/federation/keys'
-import { applicationActorId } from '../../server/federation/helpers'
+import { getApplicationActorId } from '../../server/federation/helpers'
 import type { APActor } from '../../server/federation/types'
 import { getActorFromKeyId } from '../../server/federation/lookup'
 
@@ -14,6 +14,7 @@ const db = await connect()
 await cleanDatabase(db)
 await loadSettings()
 
+const applicationActorId = getApplicationActorId()
 // mock the lookup.getActorFromKeyId
 vi.mock('../../server/federation/lookup')
 const mockedGetActorFromKeyId = vi.mocked(getActorFromKeyId)
