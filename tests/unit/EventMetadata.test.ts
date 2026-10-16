@@ -1,8 +1,8 @@
-import { describe, expect, it, vi, beforeAll } from 'vitest'
+import { describe, expect, it, vi, beforeAll, afterAll } from 'vitest'
 import { mockH3Event, now, loadTestUsers } from './utils'
 import { EventMetadata } from '../../server/services'
 import { eventToAP, mapEvent, upsertEvent } from '../../server/services/events'
-import { Event } from '../../server/services/db'
+import { Event, Place, Tag } from '../../server/services/db'
 import { MAX_METADATA_PER_EVENT, findEventsByMetadata } from '../../server/services/metadata'
 
 import { getUser } from '../../server/lib/getUser'
@@ -17,6 +17,7 @@ const { default: deleteHandler } = await import('../../server/api/events/[id]/me
 const { default: searchHandler } = await import('../../server/api/events/metadata.get')
 
 let eventId: number
+let placeId: number
 
 function put(id: number, body: unknown) {
   return putHandler(mockH3Event({ method: 'PUT', params: { id: String(id) }, body }))
@@ -28,11 +29,17 @@ function get(id: number) {
 
 describe('Event metadata', () => {
   beforeAll(async () => {
-    const { event } = await upsertEvent({
+    const { event, place } = await upsertEvent({
       title: 'metadata event', place_name: 'metadata place',
       place_address: 'address', start_datetime: now() + 1000, end_datetime: now() + 2000
     }, userUser)
     eventId = event.id
+    placeId = place!.id
+  })
+
+  // do not leave the place around for other test files
+  afterAll(async () => {
+    await Place.destroy({ where: { id: placeId } })
   })
 
   it('should not allow anonymous users', async () => {
@@ -129,8 +136,9 @@ describe('Event metadata', () => {
   })
 
   it('should not expose metadata in public representations', async () => {
-    const event = await Event.findByPk(eventId, { include: [{ all: true }] })
-    expect(event).toBeTruthy()
+    // even when metadata are loaded they should not be exposed
+    const event = await Event.findByPk(eventId, { include: [Tag, Place, 'metadata'] })
+    expect(event?.metadata?.length).toBeGreaterThan(0)
     expect(JSON.stringify(mapEvent(event!))).not.toContain('test:sync')
     expect(JSON.stringify(eventToAP(event!))).not.toContain('test:sync')
   })
