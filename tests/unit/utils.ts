@@ -58,6 +58,7 @@ export async function cleanDatabase(db: Sequelize) {
       db.query('DELETE FROM ap_users'),
       db.query('DELETE FROM events'),
       db.query('DELETE FROM event_tags'),
+      db.query('DELETE FROM event_metadata'),
       db.query('DELETE FROM resources'),
       db.query('DELETE FROM instances'),
       db.query('DELETE FROM settings'),

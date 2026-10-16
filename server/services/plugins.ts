@@ -14,6 +14,7 @@ import { findOrCreateTags } from './tags'
 import type { EventType } from '../lib/emitter'
 import emitter from '../lib/emitter'
 import { getEvents, upsertEvent } from './events'
+import { findEventsByMetadata, getEventMetadata, removeEventMetadata, setEventMetadata } from './metadata'
 import { getUser } from '../lib/getUser'
 import { isRole, requireAdmin, requireRole, requireUser } from '../lib/auth'
 import type { Handler } from 'mitt'
@@ -74,6 +75,10 @@ export interface GancioContext {
     findOrCreateTags: typeof findOrCreateTags
     upsertEvent: typeof upsertEvent
     getEvents: typeof getEvents
+    getEventMetadata: typeof getEventMetadata
+    setEventMetadata: typeof setEventMetadata
+    removeEventMetadata: typeof removeEventMetadata
+    findEventsByMetadata: typeof findEventsByMetadata
     getUser: typeof getUser
     requireAdmin: typeof requireAdmin
     isRole: typeof isRole
@@ -363,6 +368,10 @@ export class PluginController {
           findOrCreateTags,
           upsertEvent,
           getEvents,
+          getEventMetadata,
+          setEventMetadata,
+          removeEventMetadata,
+          findEventsByMetadata,
           requireAdmin,
           requireRole,
           requireUser,

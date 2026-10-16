@@ -5,7 +5,7 @@ export { secretSettings, publicSettings, publicSettingsLastModified, setSetting,
 
 export {
   connect,
-  User, Event, Tag, Place, APUser, Notification, Announcement,
+  User, Event, EventMetadata, Tag, Place, APUser, Notification, Announcement,
   Message, Page, Filter, Collection, Resource, Instance, type Media
 } from './db'
 
