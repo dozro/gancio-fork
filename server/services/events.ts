@@ -67,7 +67,7 @@ export const eventQuerySchema = z.object({
 }))
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-export async function getEvents(opts?: EventQueryType, user?: User): Promise<Event[]> {
+export async function getEvents(opts?: unknown, user?: User): Promise<Event[]> {
   const args = eventQuerySchema.parse(opts)
 
   const andConditions: WhereOptions<Event> = [
