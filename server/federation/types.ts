@@ -107,7 +107,7 @@ export type APTag = z.infer<typeof APTagSchema>
 // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-place
 export const APLocationSchema = z.object({
   type: z.enum(['Place', 'VirtualLocation']),
-  name: z.string().optional(),
+  name: z.string(),
   id: z.string().optional(),
   url: z.url().optional(),
   latitude: z.coerce.number().nullable().optional(),
