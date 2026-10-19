@@ -421,7 +421,9 @@
         "enable_federation_quoting": "Permet citar les activitats des del fedivers",
         "enable_federation_quoting_help": "Les usuàries del fedivers podran citar activitats d'aquesta instància",
         "unblock_user": "Desbloca usuària",
-        "hidden": "Amagades"
+        "hidden": "Amagades",
+        "open_ended_event_default_duration": "Duració interna per defecte",
+        "open_ended_event_default_duration_hint": "Duració per defecte de les activitats. Aquest valor es fa servir internament per mostrar activitats amb només data d'inici, que pot ser que encara estiguin succeïnt."
     },
     "auth": {
         "not_confirmed": "Encara no s'ha confirmat…",
