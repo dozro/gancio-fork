@@ -73,7 +73,7 @@ export async function connect() {
     sequelize = new Sequelize(config.db as Options<AbstractDialect>)
     await sequelize.authenticate()
     log.info('Connection has been established successfully.')
-    sequelize.addModels([Announcement, Place, Event, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message, OAuthToken, APKey])
+    sequelize.addModels([Announcement, Place, Event, EventMetadata, Tag, User, Instance, APUser, Setting, Collection, Filter, Resource, Page, Notification, Message, OAuthToken, APKey])
   } catch (error) {
     console.error('Unable to connect to the database:', config.db, error)
     process.exit(1)
@@ -350,6 +350,9 @@ export class Event extends Model<
   @HasMany(() => Resource, { foreignKey: 'eventId', sourceKey: 'id' })
   declare resources: NonAttribute<Resource[]>
 
+  @HasMany(() => EventMetadata, { foreignKey: 'eventId', sourceKey: 'id' })
+  declare metadata: NonAttribute<EventMetadata[]>
+
   // the mixins Sequelize automatically provides
   declare setTags: BelongsToManySetAssociationsMixin<Tag, string>
   declare setPlace: BelongsToSetAssociationMixin<Place, number>
@@ -392,6 +395,50 @@ export class Event extends Model<
       event.slug = slug
     }
   }
+}
+
+/** private key/value metadata of an event, never shown in the UI, exported or federated */
+@Table({
+  tableName: 'event_metadata',
+  timestamps: true,
+  indexes: [
+    { name: 'event_metadata_event_id_key', fields: ['eventId', 'key'], unique: true },
+    { name: 'event_metadata_key', fields: ['key'] }
+  ]
+})
+export class EventMetadata extends Model<
+  InferAttributes<EventMetadata>,
+  InferCreationAttributes<EventMetadata>
+> {
+  @Attribute(DataTypes.INTEGER.UNSIGNED)
+  @PrimaryKey
+  @AutoIncrement
+  declare readonly id: CreationOptional<number>
+
+  @CreatedAt
+  declare readonly createdAt: CreationOptional<Date>
+
+  @UpdatedAt
+  declare readonly updatedAt: CreationOptional<Date>
+
+  @Attribute(DataTypes.STRING)
+  @NotNull
+  declare key: string
+
+  @Attribute(DataTypes.TEXT)
+  declare value: string | null
+
+  @Attribute({
+    type: DataTypes.INTEGER.UNSIGNED,
+    allowNull: false,
+    references: { table: 'events', key: 'id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
+  })
+  declare eventId: number
+
+  @BelongsTo(() => Event, { foreignKey: 'eventId', targetKey: 'id' })
+  declare event?: NonAttribute<Event>
 }
 
 @Table({

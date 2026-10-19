@@ -278,6 +278,14 @@ components:
       enum: [EventCancelled,EventScheduled,EventTentative,EventMovedOnline,EventPostponed,EventRescheduled]
       description: Event status.
       example: EventScheduled
+    EventMetadata:
+      type: object
+      description: Private key/value metadata of an event, never shown in the UI nor federated.
+      additionalProperties:
+        type: string
+      example:
+        feed:uid: 1234@example.org
+        myapp:sync: done
     FilterCreation:
       type: object
       properties:

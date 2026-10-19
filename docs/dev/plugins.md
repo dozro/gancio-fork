@@ -143,6 +143,29 @@ const event = await db.Event.findOne({
 - requireUser
 - getUser
 - isRole
+- getEventMetadata
+- setEventMetadata
+- removeEventMetadata
+- findEventsByMetadata
+
+## Event metadata
+
+Events can have private key/value metadata (strings only), useful to store e.g. a stable identity key of an imported event or a sync state.
+Metadata are never shown in the UI, exported or federated. Use a prefix for your keys (e.g. `myplugin:uid`) to avoid collisions with other plugins or API clients.
+
+```ts
+// set (or update) a key, a `null` value removes the key
+await services.setEventMetadata(event.id, { 'myplugin:uid': uid })
+
+// get all metadata of an event as an object
+const metadata = await services.getEventMetadata(event.id)
+
+// find an event by metadata
+const [found] = await services.findEventsByMetadata('myplugin:uid', uid)
+const existingEvent = found && await db.Event.findByPk(found.eventId)
+```
+
+The same metadata are available to API clients via `/api/events/{id}/metadata` and `/api/events/metadata`, see the [API](/dev/api) section.
 
 ## React to events
 
