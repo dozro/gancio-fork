@@ -35,7 +35,7 @@ export const boolish = z.preprocess((v) => {
 }, z.boolean())
 
 export const eventQuerySchema = z.object({
-  start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
+  start: z.coerce.number().default(() => DateTime.local().toUnixInteger()),
   end: z.coerce.number().optional(),
   query: z.string().optional(),
   tags: z.preprocess((val) => {
@@ -49,25 +49,25 @@ export const eventQuerySchema = z.object({
     if (typeof val === 'number') return [val]
     return []
   }, z.array(z.coerce.number().int())).optional(),
-  show_recurrent: boolish.prefault(publicSettings.recurrent_event_visible).optional(),
-  show_multidate: boolish.prefault(true).optional(),
-  show_federated: boolish.prefault(publicSettings.federated_events_in_home).optional(),
+  show_recurrent: boolish.default(() => publicSettings.recurrent_event_visible),
+  show_multidate: boolish.default(true),
+  show_federated: boolish.default(() => publicSettings.federated_events_in_home),
   max: z.coerce.number().int().optional(),
   page: z.coerce.number().int().optional(),
   older: boolish.optional(),
   reverse: boolish.optional(),
   mine: boolish.optional(),
   ap_user_id: z.string().optional(),
-  include_unconfirmed: boolish.default(false).optional(),
-  include_parent: boolish.default(false).optional(),
-  include_description: boolish.default(false).optional()
+  include_unconfirmed: boolish.default(false),
+  include_parent: boolish.default(false),
+  include_description: boolish.default(false)
 }).transform(o => ({
   ...o,
   ...(o.max && { limit: o.max })
 }))
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-export async function getEvents(opts?: EventQueryType, user?: User): Promise<Event[]> {
+export async function getEvents(opts?: unknown, user?: User): Promise<Event[]> {
   const args = eventQuerySchema.parse(opts)
 
   const andConditions: WhereOptions<Event> = [
@@ -94,7 +94,10 @@ export async function getEvents(opts?: EventQueryType, user?: User): Promise<Eve
       ...(!args.show_recurrent && { parentId: null }),
 
       // include parent event
-      ...(!args.include_parent && { recurrent: SQL_NULL })
+      ...(!args.include_parent && { recurrent: SQL_NULL }),
+
+      // include federated
+      ...(!args.show_federated && { ap_id: null })
     }
   ]
 
@@ -501,7 +504,7 @@ export function eventToAP(event: Event) {
   const summary = `<p>${event.place?.name ?? ''} ${datetime}</p>${event?.description ?? ''}`
 
   let attachment: APAttachment[] = []
-  let location: APLocation | APLocation[] = []
+  let location: APLocation[] = []
 
   if (event.online_locations?.length) {
     location = event.online_locations.map(url => ({

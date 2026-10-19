@@ -1,6 +1,6 @@
 import { defineEventHandler, getQuery } from 'h3'
-import { getEvents, mapEvents } from '~~/server/services/events'
-import { Event, publicSettings } from '~~/server/services'
+import { getEvents, getMaxLastModifieds, mapEvents } from '~~/server/services/events'
+import { Event, publicSettings, publicSettingsLastModified } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
 import { getCollectionEvents } from '~~/server/services/collections'
 import { enableCors, handleCache } from '~~/server/lib/API'
@@ -115,8 +115,12 @@ export default defineEventHandler(async (event) => {
   enableCors(event)
   const opt = getQuery(event)
   let events
-  if (await handleCache(event, Event)) return
-
+  const lastModified = getMaxLastModifieds([
+    await Event.max('updatedAt') as Date | undefined,
+    publicSettingsLastModified['federated_events_in_home'],
+    publicSettingsLastModified['collection_in_home']
+  ])
+  if (await handleCache(event, lastModified)) return
   if (publicSettings.collection_in_home && !(opt.tags || opt.places || opt.query)) {
     log.debug('get collection events', publicSettings.collection_in_home)
     events = await getCollectionEvents({ name: publicSettings.collection_in_home, ...opt })
