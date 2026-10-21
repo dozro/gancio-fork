@@ -662,13 +662,13 @@ export class APUser extends Model<
 
   declare setInstance: BelongsToSetAssociationMixin<Instance, number>
 
-  @HasMany(() => Event, { foreignKey: 'apUserApId', sourceKey: 'ap_id' })
+  @HasMany(() => Event, { foreignKey: 'apUserApId', sourceKey: 'ap_id', inverse: { as: 'APUser' } })
   declare events?: NonAttribute<Event[]>
 
-  @HasMany(() => Resource, { foreignKey: 'activitypub_id', sourceKey: 'ap_id' })
+  @HasMany(() => Resource, { foreignKey: 'apUserApId', sourceKey: 'ap_id', inverse: { as: 'APUser' } })
   declare resources?: NonAttribute<Resource[]>
 
-  @HasMany(() => APKey, { foreignKey: 'apUserApId', sourceKey: 'ap_id' })
+  @HasMany(() => APKey, { foreignKey: 'apUserApId', sourceKey: 'ap_id', inverse: { as: 'APUser' } })
   declare keys?: NonAttribute<APKey[]>
 }
 
