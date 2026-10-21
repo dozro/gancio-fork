@@ -1,0 +1,1 @@
+./releases/gancio-2.0.0-beta.7.tgz.sig
