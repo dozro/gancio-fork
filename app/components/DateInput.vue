@@ -1,19 +1,27 @@
 <script setup lang='ts'>
 
+import type { WatchIgnorableReturn } from '@vueuse/core'
+
 import { DateTime } from 'luxon'
+import { _ } from 'lodash'
+import { watchIgnorable } from '@vueuse/core'
+
 const time = useTime()
 const { isAdmin } = useAuth()
 const { attributes, events } = useEvents()
 const { theme } = useAppTheme()
 const settings = useState<Settings>('settings')
-const { t } = useI18n()
+const { locale, t } = useI18n()
+
 const event = defineModel<EventAPI>('event', { type: Object, required: true })
 
-if (!event.value.recurrent) {
-  event.value.recurrent = {}
+const tz = settings.value.instance_timezone
+const dtOpts = {
+  zone: tz,
+  locale: locale.value || settings.value.instance_locale,
 }
+const today = DateTime.now().setZone(tz).startOf('day')
 const initialCalendarPage = useInitialCalendarPage()
-
 const frequencies = [
   { value: '1w', text: t('event.each_week') },
   { value: '2w', text: t('event.each_2w') },
@@ -21,33 +29,139 @@ const frequencies = [
   { value: '1y', text: t('event.each_year') }
 ]
 
-const eventIsMultidate = computed(() => time.isMultiDate(event.value.start_datetime, event.value.end_datetime))
-const type = ref(eventIsMultidate.value ? 'multidate' : 'normal')
-
-const selectedDates = ref<{ start?: Date, end?: Date } | null>({
-  start: event.value.start_datetime ? new Date(event.value.start_datetime * 1000) : undefined,
-  end: event.value.end_datetime ? new Date(event.value.end_datetime * 1000) : undefined
+// Component state
+interface ComponentState {
+  type: 'normal' | 'multidate' | 'recurrent'
+  // If editing an existing instance of a recurring event, the type cannot be
+  // changed.
+  frozenType: boolean
+  recurrentFreq: '1w' | '2w' | '1m' | '1y'
+  recurrentType: string
+  startDate: number
+  endDate: number
+  startTime: string
+  endTime: string
+}
+const state = ref<ComponentState>({
+  type: 'normal',
+  frozenType: false,
+  recurrentFreq: null,
+  recurrentType: null,
+  startDate: null,
+  endDate: null,
+  startTime: null,
+  endTime: null,
 })
 
-const selectedStartTime = ref<string | null>(event.value.start_datetime ? time.unixFormat(event.value.start_datetime, 'HH:mm') : null)
-const selectedEndTime = ref<string | null>(event.value.end_datetime ? time.unixFormat(event.value.end_datetime, 'HH:mm') : null)
+// Pre-declare variables so they can be referenced below.
+let stateWatcher: WatchIgnorableReturn = undefined
+let modelWatcher: WatchIgnorableReturn = undefined
 
+// The watchIgnorable avoids an infinite loop between watchers.
+stateWatcher = watchIgnorable(
+  () => Object.values(state.value),
+  () => modelWatcher.ignoreUpdates(resetModel),
+  resetModel,
+  { deep: true, flush: 'post' },
+)
+modelWatcher = watchIgnorable(
+  event,
+  () => stateWatcher.ignoreUpdates(resetState),
+  { flush: 'post', immediate: true },
+)
+
+// Reset the internal state to match the model.
+function resetState() {
+  const ev = event.value
+  const st = state.value
+  const evType = !_.isEmpty(ev.recurrent) ?
+    'recurrent' :
+    time.isMultiDate(ev.start_datetime, ev.end_datetime) ?
+      'multidate' :
+      'normal'
+
+  st.type = evType
+  st.frozenType = !!ev.parentId
+  if (evType == 'recurrent') {
+    st.recurrentFreq = ev.recurrent.frequency
+    st.recurrentType = ev.recurrent.type
+  }
+  // DatePicker will ignore the seconds after midnight
+  if (ev.start_datetime) {
+    st.startDate = ev.start_datetime * 1000
+    st.startTime = DateTime.fromSeconds(ev.start_datetime, dtOpts)
+      .toFormat('HH:mm')
+  } else {
+    st.startDate = st.startTime = null
+  }
+  if (ev.end_datetime) {
+    st.endDate = ev.end_datetime * 1000
+    st.endTime = DateTime.fromSeconds(ev.end_datetime, dtOpts)
+      .toFormat('HH:mm')
+  } else {
+    st.endDate = st.endTime = null
+  }
+}
+
+// Reset the model to match the internal state.
+function resetModel() {
+  const ev = event.value
+  const st = state.value
+  const evType = st.type
+  if (evType == 'recurrent') {
+    ev.recurrent ??= {}
+    ev.recurrent.frequency = st.recurrentFreq
+    ev.recurrent.type = st.recurrentType
+  }
+  const startDate = st.startDate
+  const startTime = st.startTime
+  if (startDate && startTime) {
+    const startDateDT = DateTime.fromMillis(startDate, dtOpts)
+    const startTimeDT = DateTime.fromISO(startTime, dtOpts)
+    ev.start_datetime = startDateDT.set({
+      hour: startTimeDT.hour,
+      minute: startTimeDT.minute,
+      second: 0,
+    }).toUnixInteger()
+  } else {
+    ev.start_datetime = null
+  }
+  const endDate = st.endDate
+  const endTime = st.endTime
+  if (endDate && endTime) {
+    const endDateDT = DateTime.fromMillis(endDate, dtOpts)
+    const endTimeDT = DateTime.fromISO(endTime, dtOpts)
+    ev.end_datetime = endDateDT.set({
+      hour: endTimeDT.hour,
+      minute: endTimeDT.minute,
+      second: 0,
+    }).toUnixInteger()
+  } else {
+    ev.end_datetime = null
+  }
+}
 const todayEvents = computed(() => {
-  if (!events.value || !selectedDates.value?.start) {
-    console.error('no selected date')
+  const startDate = state.value.startDate
+  const endDate = state.value.endDate || startDate
+  if (!events.value || !startDate) {
     return []
   }
-  const startOfDay = DateTime.fromJSDate(selectedDates.value.start).startOf('day').toSeconds()
-  const endOfDay = DateTime.fromJSDate(selectedDates.value.end ? selectedDates.value.end : selectedDates.value.start).endOf('day').toSeconds()
+  const startOfDay = DateTime.fromMillis(startDate, dtOpts)
+    .startOf('day').toSeconds()
+  const endOfDay = DateTime.fromMillis(endDate, dtOpts)
+    .endOf('day').toSeconds()
 
-  return events?.value?.filter(e => e.id !== event.value.id && e.start_datetime >= startOfDay && e.start_datetime <= endOfDay)
+  return events?.value?.filter(
+    (e) => e.id !== event.value.id &&
+      e.start_datetime >= startOfDay && e.start_datetime <= endOfDay)
 })
 
 const whenPatterns = computed(() => {
-  if (!event.value.recurrent) return []
-  if (typeof selectedDates.value?.start === 'undefined') return []
-  const date = DateTime.fromJSDate(selectedDates.value.start)
-  const freq = event.value.recurrent.frequency
+  if (state.value.type != 'recurrent' || !state.value.startDate) {
+    return []
+  }
+  const date = DateTime.fromMillis(state.value.startDate, dtOpts)
+  const freq = state.value.recurrentFreq
   const weekDay = date.toFormat('EEEE')
   if (freq === '1w' || freq === '2w') {
     return t(`event.recurrent_${freq}_days`, { days: weekDay }).toUpperCase()
@@ -81,29 +195,22 @@ const whenPatterns = computed(() => {
   return []
 })
 
-// update event start/end datetime when dates or times change
-watch([selectedDates, selectedStartTime, selectedEndTime], ([dates, startTime, endTime]) => {
-  // if no date or time is selected, reset datetime fields
-  if (!startTime || !dates?.start) {
-    event.value.start_datetime = 0
-    event.value.end_datetime = undefined
-    return
-  }
-
-  event.value.start_datetime = time.fromDateAndTime(dates.start, startTime)
-  event.value.end_datetime = endTime ? time.fromDateAndTime(dates?.end ? dates.end : dates.start, endTime) : undefined
-})
-
 // normalize DatePicker input
 const pickDates = computed({
-  get: () => type.value === 'multidate' ? selectedDates.value : selectedDates.value?.start,
-  set: (dates: Date | { start?: Date, end?: Date } | null) => {
-    if (dates instanceof Date) {
-      selectedDates.value = { start: dates, end: undefined }
+  get: () => {
+    return state.value.type !== 'multidate' ?
+      state.value.startDate :
+        { start: state.value.startDate, end: state.value.endDate }
+  },
+  set: (dates: number | { start?: number, end?: number } | null) => {
+    if (_.isNumber(dates) || !dates) {
+      state.value.startDate = dates
+      state.value.endDate = dates
     } else {
-      selectedDates.value = dates
+      state.value.startDate = dates.start
+      state.value.endDate = dates.end
     }
-  }
+  },
 })
 </script>
 
@@ -111,8 +218,8 @@ const pickDates = computed({
 <v-col cols="12">
   <div class="text-center">
     <v-btn-toggle
-      v-if="!event.parentId"
-      v-model="type"
+      v-model="state.type"
+      :disabled="state.frozenType"
       class="flex-wrap flex-row"
       variant='outlined'
       color="primary"
@@ -123,10 +230,10 @@ const pickDates = computed({
       <v-btn v-if="settings.allow_recurrent_event" value="recurrent" label="recurrent">{{ t('event.recurrent') }}</v-btn>
     </v-btn-toggle>
 
-    <p>{{ t(`event.${type}_description`) }}</p>
+    <p>{{ t(`event.${state.type}_description`) }}</p>
     <v-btn-toggle
-      v-if="type === 'recurrent' && event?.recurrent"
-      v-model="event.recurrent.frequency"
+      v-if="state.type === 'recurrent'"
+      v-model="state.recurrentFreq"
       class="v-col-6 flex-column flex-sm-row"
       color="primary"
     >
@@ -135,15 +242,16 @@ const pickDates = computed({
 
     <div class="mx-auto d-block mt-3">
       <DatePicker
-        v-model='pickDates'
+        v-model.number="pickDates"
+        :timezone="tz"
         :rules="[$valid.required('common.when')]"
-        class='mx-auto'
+        class="mx-auto"
         :is-dark="theme.current?.value?.dark"
-        :is-range="type === 'multidate'"
+        :is-range="state.type === 'multidate'"
         :locale="$i18n.locale"
         :attributes="attributes"
         is-inline
-        :min-date="!isAdmin ? new Date() : undefined"
+        :min-date="!isAdmin ? today.toMillis() : undefined"
         :initial-page="pickDates ? undefined : initialCalendarPage"
         is-expanded
       />
@@ -151,11 +259,11 @@ const pickDates = computed({
 
   </div>
 
-  <div v-if="type === 'recurrent'" class="text-center mb-2">
-    <span v-if="event.recurrent?.frequency !== '1m' && event.recurrent?.frequency !== '2m'">{{ whenPatterns }}</span>
+  <div v-if="state.type === 'recurrent'" class="text-center mb-2">
+    <span v-if="state.recurrentFreq !== '1m' && state.recurrentFreq !== '2m'">{{ whenPatterns }}</span>
     <v-btn-toggle
       v-else
-      v-model="event.recurrent.type"
+      v-model="state.recurrentType"
       class="mt-1 flex-column flex-sm-row"
     >
       <v-btn
@@ -171,7 +279,7 @@ const pickDates = computed({
 
     <v-col class="col-12 col-sm-6">
       <v-text-field
-        v-model='selectedStartTime'
+        v-model='state.startTime'
         :label="t('event.from')"
         :rules="[$valid.required('event.from')]"
         prepend-icon='mdi-clock-time-four-outline'
@@ -182,8 +290,8 @@ const pickDates = computed({
     <v-col class="col-12 col-sm-6">
       <!-- :disabled="!value.fromHour" -->
       <v-text-field
-        v-model='selectedEndTime'
-        :rules="[settings.allow_event_without_end_time && type !== 'multidate' ? true : $valid.required('event.due')]"
+        v-model='state.endTime'
+        :rules="[settings.allow_event_without_end_time && state.type !== 'multidate' ? true : $valid.required('event.due')]"
         :label="t('event.due')"
         prepend-icon='mdi-clock-time-eight-outline' type='time' />
     </v-col>
