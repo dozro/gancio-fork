@@ -1,8 +1,8 @@
 import { defineEventHandler, setHeader } from 'h3'
 import fs from 'fs/promises'
-import path from 'path'
 import { publicSettings, publicSettingsLastModified } from '../services/settings'
 import { handleCache } from '../lib/API'
+import { absolutizePath } from '../services/config'
 
 /**
  * return a custom css
@@ -15,8 +15,7 @@ export default defineEventHandler(async (event) => {
   let custom_css = publicSettings.custom_css
   let lastModified = publicSettingsLastModified.custom_css || new Date(0)
   try {
-    // TODO: check if this is ok in production and in docker
-    const filePath = path.resolve('./custom.css')
+    const filePath = absolutizePath('./custom.css')
     const stat = await fs.stat(filePath)
     custom_css += await fs.readFile(filePath, 'utf8')
     if (stat.mtime > lastModified) {
