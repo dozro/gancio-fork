@@ -63,6 +63,21 @@ async function readableWebToNodeStream(webStream) {
   })
 }
 
+/** be sure to resolve a path inside a specified rootPath
+ * so resolveInside('/opt/gancio/uploads', '../../etc/passwd') throw an exception
+*/
+export function safeResolvePath(rootPath: string, untrustedRelativePath: string) {
+  const root = path.resolve(rootPath)
+  const resolved = path.resolve(root, untrustedRelativePath)
+  const relative = path.relative(root, resolved)
+
+  if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    throw new Error('Path traversal detected')
+  }
+
+  return resolved
+}
+
 export async function getImageFromURL(url: string, name: string, focalpoint?: [number, number]): Promise<Media> {
   log.debug(`getImageFromURL ${url}`)
 
