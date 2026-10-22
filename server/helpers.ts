@@ -63,6 +63,52 @@ async function readableWebToNodeStream(webStream) {
   })
 }
 
+/** be sure to resolve a path inside a specified rootPath
+ * so resolveInside('/opt/gancio/uploads', '../../etc/passwd') throw an exception
+*/
+export function safeResolvePath(rootPath: string, untrustedRelativePath: string) {
+  const root = path.resolve(rootPath)
+  const resolved = path.resolve(root, untrustedRelativePath)
+  const relative = path.relative(root, resolved)
+
+  if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    throw new Error('Path traversal detected')
+  }
+
+  return resolved
+}
+
+/**
+ * used to copy local images on cloned events
+ * note that we cannot use copyFile because we need
+ * image information in any case (height/width/size)
+ * */
+export async function getImageFromLocalURL(imagePath: string, name: string, focalpoint?: [number, number]): Promise<Media> {
+  // create a new random name
+  const filename = crypto.randomBytes(16).toString('hex') + '.jpg'
+
+  const originalFilename = safeResolvePath(config.upload_path, imagePath)
+  const newFilename = path.resolve(config.upload_path, filename)
+
+  const originalThumbFilename = safeResolvePath(path.resolve(config.upload_path, 'thumb'), imagePath)
+  const newThumbFilename = path.resolve(config.upload_path, 'thumb', filename)
+
+  // copy the original image into the new one
+  const info = await sharp(originalFilename).jpeg({ mozjpeg: true }).toFile(newFilename)
+  // copy the thumb
+  await sharp(originalThumbFilename).jpeg({ quality: 95, mozjpeg: true }).toFile(newThumbFilename)
+
+  // get the information
+  return {
+    name,
+    url: filename,
+    ...(info?.height && ({ height: info.height })),
+    ...(info?.width && ({ width: info.width })),
+    ...(info?.size && ({ size: info.size })),
+    focalpoint
+  }
+}
+
 export async function getImageFromURL(url: string, name: string, focalpoint?: [number, number]): Promise<Media> {
   log.debug(`getImageFromURL ${url}`)
 
