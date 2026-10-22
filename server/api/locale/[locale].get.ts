@@ -5,6 +5,7 @@ import { getMaxLastModifieds, publicSettings } from '~~/server/services'
 import { runtimeResolve, get as getConfig } from '~~/server/services/config'
 import path from 'path'
 import { readFile, stat } from 'fs/promises'
+import { safeResolvePath } from '~~/server/helpers'
 
 const localeStorage = runtimeResolve('../i18n/locales')
 const customUserLocaleStorage = getConfig().user_locale
@@ -14,7 +15,7 @@ async function statLocale(storage: string, locale: string) {
 }
 
 async function getLocale(storage: string, locale: string) {
-  const localePath = path.resolve(storage, locale + '.json')
+  const localePath = safeResolvePath(storage, locale + '.json')
   const localeContent = await readFile(localePath, 'utf-8')
   return JSON.parse(localeContent)
 }

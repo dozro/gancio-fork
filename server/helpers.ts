@@ -53,7 +53,7 @@ export function sanitizeHTML(html: string) {
 //   return req.accepts('html', 'application/activity+json', 'application/ld+json') === 'html'
 // },
 
-async function readableWebToNodeStream(webStream) {
+async function readableWebToNodeStream(webStream: ReadableStream) {
   const reader = webStream.getReader()
   return new Readable({
     async read() {
@@ -122,7 +122,7 @@ export async function getImageFromURL(url: string, name: string, focalpoint?: [n
   ]
 
   const response = await fetch(url)
-  if (!response.ok) {
+  if (!response.ok || !response.body) {
     throw new Error(`Failed to fetch image: ${response.statusText}`)
   }
   const srcStream = await readableWebToNodeStream(response.body)

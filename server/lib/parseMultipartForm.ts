@@ -4,6 +4,7 @@ import path from 'path'
 import sharp from 'sharp'
 import { useLogger } from './logger'
 import { z } from 'zod'
+import type { Media } from '../services'
 const log = useLogger('parseMultipartForm')
 
 export const multipartFileSchema = z.object({
@@ -49,7 +50,7 @@ export async function parseMultipartFormData(event: H3Event) {
   return fields
 }
 
-export async function saveUploadedImage(image: MultiPartData, dest: string) {
+export async function saveUploadedImage(image: MultiPartData, dest: 'custom_logo' | 'custom_header_image' | 'custom_fallback_image') {
   const config = getConfig()
   const baseImgPath = path.resolve(config.upload_path, dest)
 

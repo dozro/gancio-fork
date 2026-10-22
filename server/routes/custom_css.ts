@@ -13,13 +13,11 @@ import { handleCache } from '../lib/API'
 export default defineEventHandler(async (event) => {
   // custom css from admin panel settings
   let custom_css = publicSettings.custom_css
-  let stat = null
   let lastModified = publicSettingsLastModified.custom_css || new Date(0)
-
   try {
     // TODO: check if this is ok in production and in docker
     const filePath = path.resolve('./custom.css')
-    stat = await fs.stat(filePath)
+    const stat = await fs.stat(filePath)
     custom_css += await fs.readFile(filePath, 'utf8')
     if (stat.mtime > lastModified) {
       lastModified = stat.mtime
