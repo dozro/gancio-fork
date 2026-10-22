@@ -14,7 +14,7 @@ import { EventStatusEnum, PostalAddressSchema, type APAttachment, type APEvent, 
 import { PlaceToAP } from '../federation/places'
 import { handleCache } from '../lib/API'
 import { findOrCreatePlace, placeToJSON } from './places'
-import { getImageFromURL, sanitizeHTML } from '../helpers'
+import { getImageFromLocalURL, getImageFromURL, sanitizeHTML } from '../helpers'
 import linkifyHtml from 'linkify-html'
 import { multipartFileSchema, saveUploadedEventImage } from '../lib/parseMultipartForm'
 import { focalPointSchema, jsonCodec } from '../lib/validator'
@@ -350,14 +350,26 @@ export async function getEventBySlugOrId(slug_or_id?: string) {
  * This method return the media to set to an event, based on the request payload:
  * in case a remote url is specified, this will be downloaded and the related Media is returned
  * in case an image is uploaded, the image is saved and the related Media is returned
- * in case a local url is specified this is probably a PUT so undefined is returned to avoid an update of that field
+ * in case a local url is specified:
+ *  - if this is an edit/PUT undefined is returned to avoid an update of that field
+ *  - if this is coming from a clone, copy the original image and thumb getting the info
  * in case there is no url a null is returned to remove any media from the event
  */
 export async function setEventMedia(eventPayload: EventAPIType): Promise<Media | undefined | null> {
   if (eventPayload.image || eventPayload.image_url) {
     const focalpoint = eventPayload.image_focalpoint
     if (!eventPayload.image && eventPayload.image_url) {
-      if (!/^https?:\/\//.test(eventPayload.image_url)) return undefined
+      // this is a local image_url (edit or clone)
+      if (!/^https?:\/\//.test(eventPayload.image_url)) {
+        // if we have an id this is an edit so do not touch the media
+        if (eventPayload.id) return undefined
+        // here we have a local image incoming from a clone
+        return getImageFromLocalURL(
+          eventPayload.image_url,
+          eventPayload.image_name || eventPayload.title,
+          focalpoint
+        )
+      }
       return getImageFromURL(
         eventPayload.image_url,
         eventPayload.image_name || eventPayload.title,
