@@ -2,7 +2,7 @@ PRODUCTION=${1:-"false"}
 VERSION=$(npm pkg get version | xargs echo)
 
 if [ "$PRODUCTION" = "false" ]; then
-  echo "Test mode: building docker image for local testing only"
+	echo "Test mode: building docker image for local testing only (image cisti/gancio:test)"
   docker buildx build \
     -t cisti/gancio:test \
     --load .
@@ -12,7 +12,7 @@ if [ "$PRODUCTION" = "false" ]; then
     --output type=local,dest=./releases \
     .
 
-  echo "Test the image with 'mkdir -p ./data && sudo chown 1000:1000 ./data && docker run -v ./data:/app/data -it --rm cisti/gancio:test'"
+  echo "Test the image with 'mkdir -p ./data && sudo chown 1000:1000 ./data && docker run  -p 13120:13120 -v ./data:/app/data -it --rm cisti/gancio:test'"
   echo "Test the package with 'npm install -g ./releases/gancio-$VERSION.tgz' and then 'gancio'"
   exit 0
 fi
