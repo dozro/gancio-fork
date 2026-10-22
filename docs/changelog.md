@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.8](https://framagit.org/les/gancio/compare/v2.0.0-beta.7...v2.0.0-beta.8) (2026-10-22)
+
+
+### Features
+
+* private event metadata for API clients and plugins ([ea03156](https://framagit.org/les/gancio/commit/ea03156de13a74bbb8cb77c5ffa9e343a98ecc20)), closes [#716](https://framagit.org/les/gancio/issues/716)
+* some improvements for external events coming from federation ([537baeb](https://framagit.org/les/gancio/commit/537baeb29da48d1d30129f8528be79c00177afb2))
+
+
+### Bug Fixes
+
+* **AP:** compute actor application id live ([7976525](https://framagit.org/les/gancio/commit/79765258b1bd7989a701944a6c8df2b283e2c74f))
+* apply Postel's law to APLocation parser ([c16571d](https://framagit.org/les/gancio/commit/c16571d385950077a219ce724c8302a46d7314c7)), closes [#751](https://framagit.org/les/gancio/issues/751)
+* APUser duplicated association ([39df056](https://framagit.org/les/gancio/commit/39df056da13810450ef2a212ae7444ccf452dccf))
+* cleanup runtime zod default ([3c39831](https://framagit.org/les/gancio/commit/3c39831f884261ae443b7fa5aeaf3f16c68ea2b1))
+* close db connection on close / hot reload ([4d0da4a](https://framagit.org/les/gancio/commit/4d0da4a3b2e2a728fa57300da89632d8aef1ccae))
+* consider publicSettingsLastModified in cache evaluation ([f1ab546](https://framagit.org/les/gancio/commit/f1ab546a407c047d8a6878a6550d04e46c35f720))
+* copy image from cloned event ([434a29e](https://framagit.org/les/gancio/commit/434a29eefeeafa50372834b50d437116d90042a1))
+* more defensive rss template, probably fix [#748](https://framagit.org/les/gancio/issues/748) ([3ac8828](https://framagit.org/les/gancio/commit/3ac882881a94b13d8e762b5c4905bb16e72fc55a))
+* **plugins:** validate plugin settings before enabling ([7fcc171](https://framagit.org/les/gancio/commit/7fcc1713cb8ef96cc6fba714459a41817a4ee7ce))
+* resolve custom.css/js path in prod too ([847d962](https://framagit.org/les/gancio/commit/847d962f973ac59b95d69661df3fba283db82c48))
+
 ## [2.0.0-beta.7](https://framagit.org/les/gancio/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2026-10-13)
 
 
