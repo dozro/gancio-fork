@@ -1,6 +1,6 @@
 # Custom Javascript <badge type='info'>Since 1.19.0</badge> <badge type='danger'>BETA</badge>
 
-You can integrate some javascript code that will be loaded for each user in `Admin > Theme > Custom JS`
+You can integrate some javascript code that will be loaded for each user in `Admin > Theme > Custom JS` or  writing a `custom.js` file.
 
 Don't imagine you can accomplish miracles because the templates are not designed to be easily modified,
 but don't be afraid to [open an issue](https://framagit.org/les/gancio/-/issues) or even better a PR to add some usage examples to this page.
