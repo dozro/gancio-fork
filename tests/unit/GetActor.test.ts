@@ -8,6 +8,7 @@ const mockedSignAndSend = vi.mocked(_signAndSend)
 
 const { getActor } = await import('../../server/federation/get_actor')
 const { importActorKeys } = await import('../../server/federation/keys')
+const { getInstance } = await import('../../server/federation/lookup')
 
 // remote documents by URL
 let documents: Record<string, object | undefined> = {}
@@ -15,8 +16,8 @@ mockedSignAndSend.mockImplementation(async (_object, url) => documents[url])
 
 const person = (id: string, name: string) => ({ id, type: 'Person', name, inbox: `${id}/inbox` })
 
-const domains = ['trusted.example', 'evil.example', 'old.example', 'new.example']
-await Instance.bulkCreate(domains.map(domain => ({ domain, name: domain, blocked: false, data: '' })))
+const domains = ['trusted.example', 'evil.example', 'old.example', 'new.example', 'blocked.example']
+await Instance.bulkCreate(domains.map(domain => ({ domain, name: domain, blocked: domain === 'blocked.example', data: '' })))
 
 describe('getActor', () => {
   afterAll(async () => {
@@ -53,5 +54,23 @@ describe('getActor', () => {
     // a key of another origin or of another owner
     expect(await importActorKeys(withKey('https://evil.example/key', carol))).toHaveLength(0)
     expect(await importActorKeys(withKey(`${carol}#other-key`, 'https://trusted.example/users/mallory'))).toHaveLength(0)
+  })
+
+  it('should neither fetch nor unblock blocked actors and instances', async () => {
+    const dave = 'https://trusted.example/users/dave'
+    await APUser.create({ ap_id: dave, object: person(dave, 'Dave') as APActor, instanceDomain: 'trusted.example', blocked: true })
+    documents = {
+      [dave]: person(dave, 'Dave'),
+      'https://blocked.example/users/eve': person('https://blocked.example/users/eve', 'Eve')
+    }
+    mockedSignAndSend.mockClear()
+
+    await getActor(dave, true)
+    expect(await getActor('https://blocked.example/users/eve', true)).toBeUndefined()
+    expect(mockedSignAndSend).not.toHaveBeenCalled()
+    expect((await APUser.findByPk(dave))?.blocked).toBe(true)
+
+    // a forced refresh does not unblock an instance (and does not fetch it)
+    expect((await getInstance('https://blocked.example/users/eve', true)).blocked).toBe(true)
   })
 })

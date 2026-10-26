@@ -13,6 +13,13 @@ const log = useLogger('federation')
 // force an update of the actor if it is older than 1 week
 const MAX_TTL = 60 * 60 * 24 * 7 // 1 week
 
+// blocked actors and actors of blocked instances are never fetched
+async function isBlocked(actorUrl: string) {
+  const actor = await APUser.findByPk(actorUrl)
+  const instance = await Instance.findByPk(new URL(actorUrl).host)
+  return Boolean(actor?.blocked || instance?.blocked)
+}
+
 /**
  * Get an Actor from a URL using GET HTTP Signature.
  * @param actorUrl - The URL of the Actor to get.
@@ -32,6 +39,11 @@ export async function getActor(actorUrl: string, bypassCache = false): Promise<A
   }
 
   try {
+    if (await isBlocked(actorUrl)) {
+      log.debug('getActor: %s is blocked', actorUrl)
+      return fedi_user
+    }
+
     let ret = await _signAndSend('', actorUrl, 'get', secretSettings.privateKey) as APActor | undefined
     if (!ret?.id) {
       log.debug('getActor failed for %s', actorUrl)
@@ -42,6 +54,10 @@ export async function getActor(actorUrl: string, bypassCache = false): Promise<A
     // when the id is elsewhere (e.g. a moved instance) ask its origin, that has to return the same id (as mastodon does)
     if (!isSameOrigin(ret.id, actorUrl)) {
       const id = ret.id
+      if (await isBlocked(id)) {
+        log.debug('getActor: %s is blocked', id)
+        return
+      }
       ret = await _signAndSend('', id, 'get', secretSettings.privateKey) as APActor | undefined
       if (ret?.id !== id) {
         log.warn('getActor: %s returned an actor of another origin (%s) not confirmed by its origin', actorUrl, id)
@@ -62,8 +78,8 @@ export async function getActor(actorUrl: string, bypassCache = false): Promise<A
         ([fedi_user] = await APUser.upsert({
           ap_id: ret.id,
           object: { ...ret, summary: sanitizeHTML(ret?.summary ?? '') },
-          instanceDomain: instance.domain ?? new URL(ret.id).origin,
-          blocked: false
+          // `blocked` is not set: refreshing an actor does not unblock it
+          instanceDomain: instance.domain ?? new URL(ret.id).origin
         }))
 
         await importActorKeys(ret)
