@@ -39,6 +39,11 @@ export async function verifySignature(event: H3Event, rawBody: string) {
 export default defineEventHandler(async (event) => {
   const log = useLogger('AP inbox')
 
+  // before anything else: verifying the signature could fetch remote actors
+  if (!publicSettings.enable_federation) {
+    throw createError({ statusCode: 404, statusMessage: 'Federation disabled' })
+  }
+
   // check destination inbox
   const destActorName = event.context?.params?.name
   if (!destActorName) {

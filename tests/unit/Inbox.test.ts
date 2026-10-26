@@ -1,8 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { mockH3Event } from './utils'
+import { setSetting } from '../../server/services'
 import handler from '../../server/routes/federation/u/[name]/inbox.post'
 
 describe('Inbox', () => {
+  it('should reject everything when federation is disabled', async () => {
+    await setSetting('enable_federation', false)
+    const evt = mockH3Event({ headers: { Accept: 'application/activity+json' }, method: 'POST', params: { name: 'relay' } })
+    const ret = handler(evt)
+    await expect(ret).rejects.toHaveProperty('statusCode', 404)
+    await expect(ret).rejects.toHaveProperty('statusMessage', 'Federation disabled')
+    await setSetting('enable_federation', true)
+  })
+
   it('should reject empty actor', async () => {
     const evt = mockH3Event({ headers: { Accept: 'application/activity+json' }, method: 'POST' })
     const ret = handler(evt)
