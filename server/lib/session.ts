@@ -1,14 +1,15 @@
 import { type H3Event, useSession, type SessionConfig, getCookie, getHeader, createError } from 'h3'
 import { OAuthToken, User, type UserRole } from '../services/db'
-import { isBuild } from '../services/config'
+import { isBuild, get as getConfig } from '../services/config'
 import { verifyJwtToken } from './jwt'
 
+const config = getConfig()
 export type UserSession = { id: number, email: string, role: UserRole }
 
 const sessionOptions: SessionConfig = {
   maxAge: 60 * 60 * 24 * 365,
   name: 'nuxt-session',
-  password: process.env.SESSION_PASSWORD!,
+  password: config.session_password!,
   cookie: {
     httpOnly: true,
     sameSite: 'lax',

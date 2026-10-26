@@ -7,6 +7,14 @@
         "content": "Hallo, du hast die Wiederherstellung deines Passworts angefordert {{config.title}}. <a href='{{{config.baseurl}}}/recover/{{user.recover_code}}'>Klicke hier</a>, um zu bestätigen.",
         "subject": "Passwortwiederherstellung"
     },
+    "change_email": {
+        "content": "Hallo, du möchtest diese Adresse für dein Konto auf {{config.title}} verwenden. <a href='{{{config.baseurl}}}/change_email/{{token}}'>Klicke hier</a>, um zu bestätigen. Der Link ist einen Tag gültig. Falls du das nicht angefordert hast, ignoriere diese E-Mail.",
+        "subject": "Bestätige deine neue E-Mail-Adresse"
+    },
+    "email_changed": {
+        "content": "Hallo, die E-Mail-Adresse deines Kontos auf <a href='{{{config.baseurl}}}'>{{config.title}}</a> wurde in {{new_email}} geändert. Falls du das nicht angefordert hast, schreib uns an {{config.admin_email}}.",
+        "subject": "Deine E-Mail-Adresse wurde geändert"
+    },
     "user_confirm": {
         "content": "Hallo, dein Account auf <a href='{{{config.baseurl}}}'>{{config.title}}</a> wurde erstellt. <a href='{{{config.baseurl}}}/user_confirm/{{user.recover_code}}'>Bestätige ihn und wähle ein Kennwort.</a>.",
         "subject": "Du kannst jetzt damit beginnen, Events zu veröffentlichen"

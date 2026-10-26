@@ -309,6 +309,12 @@
         "update_confirm": "Willst du deine Änderung speichern?",
         "password_updated": "Passwort geändert.",
         "change_password": "Passwort ändern",
+        "change_email": "E-Mail-Adresse ändern",
+        "new_email": "Neue E-Mail-Adresse",
+        "change_email_sent": "Wir haben einen Bestätigungslink an die neue Adresse geschickt: Deine E-Mail-Adresse ändert sich, sobald du ihn öffnest.",
+        "confirm_email_change": "Neue E-Mail-Adresse bestätigen",
+        "confirm_email_change_description": "Drücke den Button, um diese Adresse für dein Konto zu verwenden.",
+        "email_changed": "Deine E-Mail-Adresse wurde geändert.",
         "remove_account_confirm": "Du bist dabei, dein Konto endgültig zu löschen",
         "remove_account": "Durch Drücken der folgenden Schaltfläche wird dein Konto als nutzende Person gelöscht. Die von dir veröffentlichten Ereignisse werden nicht veröffentlicht.",
         "danger_section": "Gefährlicher Bereich"
