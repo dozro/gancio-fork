@@ -1,6 +1,6 @@
 import { useLogger } from '../lib/logger'
 import { secretSettings } from '../services/settings'
-import { sanitizeHTML } from '../helpers'
+import { isSameOrigin, sanitizeHTML } from '../helpers'
 import { _signAndSend } from './sign_and_send'
 import { Instance, APUser } from '../services/db'
 
@@ -12,14 +12,6 @@ const log = useLogger('federation')
 
 // force an update of the actor if it is older than 1 week
 const MAX_TTL = 60 * 60 * 24 * 7 // 1 week
-
-function isSameOrigin(a: string, b: string) {
-  try {
-    return new URL(a).origin === new URL(b).origin
-  } catch {
-    return false
-  }
-}
 
 /**
  * Get an Actor from a URL using GET HTTP Signature.
