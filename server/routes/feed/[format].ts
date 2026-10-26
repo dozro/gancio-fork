@@ -16,8 +16,11 @@ import { handleCache } from '~~/server/lib/API'
 export default defineEventHandler(async (evt) => {
   const log = useLogger('feed events')
   const { format } = await getValidatedRouterParams(evt, formatSchema.parse)
-
   const opt = getQuery(evt)
+  // Export description by default
+  if (opt.include_description == null) {
+    opt.include_description = true
+  }
 
   if (await handleCache(evt, Event)) return
 
