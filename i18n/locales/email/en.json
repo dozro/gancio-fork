@@ -15,6 +15,14 @@
         "subject": "Password recovery",
         "content": "Hi, you requested a password recovery on {{config.title}}. <a href='{{{config.baseurl}}}/recover/{{user.recover_code}}'>Click here</a> to confirm."
     },
+    "change_email": {
+        "subject": "Confirm your new e-mail",
+        "content": "Hi, you requested to use this address for your account on {{config.title}}. <a href='{{{config.baseurl}}}/change_email/{{token}}'>Click here</a> to confirm. The link is valid for one day, ignore this e-mail if you did not request it."
+    },
+    "email_changed": {
+        "subject": "Your e-mail has been changed",
+        "content": "Hi, the e-mail of your account on <a href='{{{config.baseurl}}}'>{{config.title}}</a> has been changed to {{new_email}}. If you did not request it, write to us at {{config.admin_email}}."
+    },
     "admin_register": {
         "subject": "New registration",
         "content": "{{user.email}} has requested registration on {{config.title}}: <br/><pre>{{user.description}}</pre><br/> Confirm it <a href='{{{config.baseurl}}}/admin'>here</a>."

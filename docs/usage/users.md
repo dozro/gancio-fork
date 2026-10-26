@@ -7,7 +7,7 @@ After loggin-in, an user can access the backoffice, consisting in:
 https://[website_URL]/admin?tab=settings
 - **My Events**: a section where to find the list of the their own events  
 https://[website_URL]/my_events
-- **Options**: a section where to find the option to delete their own account and to recover their password  
+- **Options**: a section where to find the option to change their e-mail (confirmed through a link sent to the new address), to delete their own account and to recover their password  
 https://[website_URL]/settings
 
 

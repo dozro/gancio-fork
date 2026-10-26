@@ -32,7 +32,7 @@ export function enqueueMail(addresses: string | string[], template: string, loca
   })
 }
 
-type emailTemplates = 'register' | 'confirm' | 'user_confirm' | 'recover' | 'admin_register' | 'event_confirm' | 'test'
+type emailTemplates = 'register' | 'confirm' | 'user_confirm' | 'recover' | 'admin_register' | 'event_confirm' | 'test' | 'change_email' | 'email_changed'
 export async function sendMail(
   addresses: string | string[],
   template: emailTemplates,

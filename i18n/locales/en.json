@@ -414,6 +414,12 @@
         "update_confirm": "Do you want to save your modification?",
         "change_password": "Change your password",
         "password_updated": "Password changed.",
+        "change_email": "Change your e-mail",
+        "new_email": "New e-mail",
+        "change_email_sent": "We sent a confirmation link to the new address: your e-mail will change once you open it.",
+        "confirm_email_change": "Confirm your new e-mail",
+        "confirm_email_change_description": "Press the button to use this address for your account.",
+        "email_changed": "Your e-mail has been changed.",
         "danger_section": "Dangerous section",
         "remove_account": "By pressing the following button your user account will be deleted. Events you published won't be.",
         "remove_account_confirm": "You are about to permanently delete your account"
