@@ -15,6 +15,7 @@ import { PlaceToAP } from '../federation/places'
 import { handleCache } from '../lib/API'
 import { findOrCreatePlace, placeToJSON } from './places'
 import { getImageFromLocalURL, getImageFromURL, sanitizeHTML } from '../helpers'
+import { SafeFetchError, describeSafeFetchError } from '../lib/safeFetch'
 import linkifyHtml from 'linkify-html'
 import { multipartFileSchema, saveUploadedEventImage } from '../lib/parseMultipartForm'
 import { focalPointSchema, jsonCodec } from '../lib/validator'
@@ -374,7 +375,12 @@ export async function setEventMedia(eventPayload: EventAPIType): Promise<Media |
         eventPayload.image_url,
         eventPayload.image_name || eventPayload.title,
         focalpoint
-      )
+      ).catch((e) => {
+        log.warn('Cannot get image from %s: %s', eventPayload.image_url, String(e))
+        // any other error comes from processing the image
+        const reason = e instanceof SafeFetchError ? describeSafeFetchError(e) : 'Not a valid image'
+        throw createError({ statusCode: 400, message: `Cannot get image from image_url: ${reason}` })
+      })
     } else if (eventPayload.image) {
       return saveUploadedEventImage(
         eventPayload.image,

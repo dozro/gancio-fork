@@ -2,10 +2,10 @@ import { get as getConfig } from './services/config'
 import sharp from 'sharp'
 import path from 'path'
 import crypto from 'crypto'
-import { Readable } from 'node:stream'
 import { JSDOM } from 'jsdom'
 import DOMPurify from 'dompurify'
 import { useLogger } from './lib/logger'
+import { ensureOk, safeFetch } from './lib/safeFetch'
 import { type H3Event, createError, setHeader, sendStream } from 'h3'
 import mime from 'mime-types'
 import { createReadStream } from 'fs'
@@ -53,16 +53,6 @@ export function sanitizeHTML(html: string) {
 //   return req.accepts('html', 'application/activity+json', 'application/ld+json') === 'html'
 // },
 
-async function readableWebToNodeStream(webStream: ReadableStream) {
-  const reader = webStream.getReader()
-  return new Readable({
-    async read() {
-      const { done, value } = await reader.read()
-      this.push(done ? null : value)
-    }
-  })
-}
-
 /** be sure to resolve a path inside a specified rootPath
  * so resolveInside('/opt/gancio/uploads', '../../etc/passwd') throw an exception
 */
@@ -109,24 +99,22 @@ export async function getImageFromLocalURL(imagePath: string, name: string, foca
   }
 }
 
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024
+
 export async function getImageFromURL(url: string, name: string, focalpoint?: [number, number]): Promise<Media> {
   log.debug(`getImageFromURL ${url}`)
 
+  const response = ensureOk(await safeFetch(url, { maxSize: MAX_IMAGE_SIZE }))
+
   const filename = crypto.randomBytes(16).toString('hex')
-  const sharpStream = sharp({ failOn: 'error' })
+  const image = sharp(response.body, { failOn: 'error' })
   const promises = [
-    sharpStream.clone().rotate().resize(500, null, { withoutEnlargement: true }).jpeg({ mozjpeg: true })
+    image.clone().rotate().resize(500, null, { withoutEnlargement: true }).jpeg({ mozjpeg: true })
       .toFile(path.resolve(config.upload_path, 'thumb', filename + '.jpg')),
-    sharpStream.clone().rotate().resize(1200, null, { withoutEnlargement: true })
+    image.clone().rotate().resize(1200, null, { withoutEnlargement: true })
       .jpeg({ quality: 95, mozjpeg: true }).toFile(path.resolve(config.upload_path, filename + '.jpg'))
   ]
 
-  const response = await fetch(url)
-  if (!response.ok || !response.body) {
-    throw new Error(`Failed to fetch image: ${response.statusText}`)
-  }
-  const srcStream = await readableWebToNodeStream(response.body)
-  srcStream.pipe(sharpStream)
   return Promise.all(promises)
     .then((res) => {
       const info = res[1]

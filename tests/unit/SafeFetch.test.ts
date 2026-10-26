@@ -1,0 +1,116 @@
+import { describe, expect, it, vi, afterAll } from 'vitest'
+import http from 'node:http'
+import os from 'node:os'
+import type { AddressInfo } from 'node:net'
+import { mockH3Event, loadTestUsers } from './utils'
+import { isPublicAddress, safeFetch } from '../../server/lib/safeFetch'
+import { publicSettings, setSetting } from '../../server/services'
+
+import { getUser } from '../../server/lib/getUser'
+vi.mock('../../server/lib/getUser')
+const mockedGetUser = vi.mocked(getUser)
+
+const { userUser } = await loadTestUsers()
+const { default: icsURLHandler } = await import('../../server/api/ics-import/url.post')
+
+// a local server to test redirects, limits and timeouts
+const server = http.createServer((req, res) => {
+  switch (req.url) {
+    case '/ok': return res.end('ok')
+    case '/redirect': return res.writeHead(302, { Location: '/ok' }).end()
+    case '/redirect-internal': return res.writeHead(302, { Location: 'http://127.0.0.2/ok' }).end()
+    case '/redirect-port': return res.writeHead(302, { Location: 'http://127.0.0.1:6379/' }).end()
+    case '/redirect-loop': return res.writeHead(302, { Location: '/redirect-loop' }).end()
+    case '/big': return res.end('x'.repeat(2048))
+    case '/slow': return // never answers
+    default: return res.writeHead(404).end()
+  }
+})
+await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+const port = (server.address() as AddressInfo).port
+const base = `http://127.0.0.1:${port}`
+
+// allow only the local test server
+const onlyTestServer = { allowedList: `127.0.0.1:${port}` }
+
+const anonEventsAllowed = publicSettings.allow_anon_event
+
+describe('Safe fetch', () => {
+  afterAll(async () => {
+    server.closeAllConnections()
+    server.close()
+    await setSetting('allow_anon_event', anonEventsAllowed)
+  })
+
+  it('should allow only public addresses', () => {
+    const notPublic = [
+      '127.0.0.1', '10.1.2.3', '172.17.0.2', '192.168.1.1', '100.64.0.1', '169.254.169.254',
+      '::1', '::ffff:127.0.0.1', 'fd12:3456::1', 'fe80::1', '2001:db8::1'
+    ]
+    for (const address of notPublic) {
+      expect(isPublicAddress(address), address).toBe(false)
+    }
+    for (const address of ['93.184.216.34', '2606:4700::1111']) {
+      expect(isPublicAddress(address), address).toBe(true)
+    }
+  })
+
+  it('should refuse internal targets', async () => {
+    const refused: Record<string, string> = {
+      'http://127.0.0.1/': 'Address not allowed',
+      'http://localhost/': 'Address not allowed for localhost', // resolved by DNS
+      [base + '/ok']: 'Port not allowed',
+      'file:///etc/passwd': 'Protocol not allowed'
+    }
+    for (const [url, message] of Object.entries(refused)) {
+      await expect(safeFetch(url, { allowedList: '' }), url).rejects.toThrow(message)
+    }
+
+    // public addresses of this machine
+    const spy = vi.spyOn(os, 'networkInterfaces').mockReturnValue({
+      eth0: [{ address: '93.184.216.34', netmask: '255.255.255.0', family: 'IPv4', mac: '00:00:00:00:00:00', internal: false, cidr: '93.184.216.34/24' }]
+    })
+    await expect(safeFetch('http://93.184.216.34/', { allowedList: '' })).rejects.toThrow('Address not allowed: 93.184.216.34')
+    spy.mockRestore()
+  })
+
+  it('should allow only the listed private addresses and ports', async () => {
+    expect((await safeFetch(base + '/ok', onlyTestServer)).body.toString()).toBe('ok')
+    // by host name, without checking the resolved addresses
+    expect((await safeFetch(`http://localhost:${port}/ok`, { allowedList: `localhost:${port}` })).body.toString()).toBe('ok')
+
+    // without a port only the default ports are allowed
+    await expect(safeFetch(base + '/ok', { allowedList: '127.0.0.1' })).rejects.toThrow('Port not allowed')
+    // a single not allowed address refuses the host (localhost resolves to ::1 too)
+    await expect(safeFetch(`http://localhost:${port}/ok`, onlyTestServer)).rejects.toThrow('Address not allowed for localhost')
+    // IPv6 and subnets
+    await expect(safeFetch(`http://[::1]:${port}/ok`, { allowedList: `[fd00::/8]:${port}` })).rejects.toThrow('Address not allowed')
+  })
+
+  it('should check every redirect', async () => {
+    expect((await safeFetch(base + '/redirect', onlyTestServer)).body.toString()).toBe('ok')
+    await expect(safeFetch(base + '/redirect-internal', onlyTestServer)).rejects.toThrow('Address not allowed: 127.0.0.2')
+    await expect(safeFetch(base + '/redirect-port', onlyTestServer)).rejects.toThrow('Redirect to another port not allowed: 6379')
+    await expect(safeFetch(base + '/redirect-loop', onlyTestServer)).rejects.toThrow('Too many redirects')
+  })
+
+  it('should limit response size and time', async () => {
+    await expect(safeFetch(base + '/big', { ...onlyTestServer, maxSize: 1024 })).rejects.toHaveProperty('reason', 'too_large')
+    await expect(safeFetch(base + '/slow', { ...onlyTestServer, timeout: 50 })).rejects.toHaveProperty('reason', 'timeout')
+  })
+
+  it('should not allow anonymous ICS import from URL when anonymous events are disabled', async () => {
+    await setSetting('allow_anon_event', false)
+    mockedGetUser.mockResolvedValueOnce(undefined)
+    const ret = icsURLHandler(mockH3Event({ method: 'POST', body: { url: 'https://example.org/calendar.ics' } }))
+    await expect(ret).rejects.toHaveProperty('statusCode', 401)
+  })
+
+  it('should not tell if an ICS URL is not allowed or does not exist', async () => {
+    for (const url of ['http://127.0.0.1/calendar.ics', 'http://does-not-exist.invalid/calendar.ics']) {
+      mockedGetUser.mockResolvedValueOnce(userUser)
+      const ret = icsURLHandler(mockH3Event({ method: 'POST', body: { url } }))
+      await expect(ret, url).rejects.toHaveProperty('message', 'URL not allowed or not reachable')
+    }
+  })
+})

@@ -64,6 +64,7 @@ export const ConfigSchema = z.object({
   upload_path: z.string().transform(absolutizePath),
   plugins_path: z.string().transform(absolutizePath),
   hidden_service: z.string().optional().default(''),
+  allowed_private_addresses: z.string().optional().default(''),
   proxy: ProxySchema,
   session_password: z.string().optional()
 })
@@ -119,6 +120,8 @@ const defaultConfig: Config = {
   plugins_path: process.env.PLUGINS_PATH || 'plugins',
   // TODO
   hidden_service: process.env.ALLOW_ACCESS_TO_HIDDEN_SERVICE || '',
+  // exceptions to the public address check of outgoing requests, see server/lib/safeFetch.ts
+  allowed_private_addresses: process.env.GANCIO_ALLOWED_PRIVATE_ADDRESSES || '',
   // TODO
   proxy: {
     protocol: process.env.PROXY_PROTOCOL || '',

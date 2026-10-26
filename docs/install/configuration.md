@@ -56,6 +56,18 @@ list of strings you can override.
 Note that a restart is needed when you change user_locale's content.
 :::
 
+## Allowed private addresses
+Gancio fetches URLs given by users (e.g. importing an ICS from a URL or the image of an event) only from
+public addresses on the default ports, so that nobody can use your instance to reach your internal network.  
+If you need exceptions (e.g. your DNS resolves public names to internal addresses), list host names,
+IP addresses or subnets, comma separated and with an optional port. Without a port only the default ports are allowed.  
+`"allowed_private_addresses": "localhost:13120,192.168.1.0/24,[fd00::1]:8080"`  
+or with the `GANCIO_ALLOWED_PRIVATE_ADDRESSES` environment variable.
+
+::: danger
+Listed targets become reachable by anyone able to make your instance fetch a URL.
+:::
+
 <!--
 ## Proxy
 Proxy outward request from gancio.
