@@ -44,6 +44,7 @@ COPY --from=pack /artifacts/ /
 FROM  node:24-alpine AS prod
 ENV GANCIO_DATA=/app/data
 ENV NODE_ENV=production
+ENV NODE_USE_ENV_PROXY=1
 USER node
 WORKDIR /app
 

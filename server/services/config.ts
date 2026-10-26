@@ -10,20 +10,6 @@ export const isTest = process.env.VITEST == 'true'
 
 const PortSchema = z.coerce.number().int().positive()
 
-export const ProxyAuthSchema = z.object({
-  username: z.string().optional().default(''),
-  password: z.string().optional().default('')
-})
-
-export const ProxySchema = z.object({
-  protocol: z.string().optional().default(''),
-  hostname: z.string().optional().default(''),
-  host: z.string().optional().default(''),
-  port: z.string().optional().default(''),
-  auth: ProxyAuthSchema,
-  headers: z.record(z.string(), z.string()).optional().default({})
-})
-
 const DialectSchema = z.enum(['sqlite', 'sqlite3', 'mariadb', 'postgresql', 'postgres'])
   .default('sqlite3')
   .transform(t => t === 'sqlite' ? 'sqlite3' : (t === 'postgresql' ? 'postgres' : t))
@@ -65,7 +51,6 @@ export const ConfigSchema = z.object({
   plugins_path: z.string().transform(absolutizePath),
   hidden_service: z.string().optional().default(''),
   allowed_private_addresses: z.string().optional().default(''),
-  proxy: ProxySchema,
   session_password: z.string().optional()
 })
 
@@ -122,18 +107,6 @@ const defaultConfig: Config = {
   hidden_service: process.env.ALLOW_ACCESS_TO_HIDDEN_SERVICE || '',
   // exceptions to the public address check of outgoing requests, see server/lib/safeFetch.ts
   allowed_private_addresses: process.env.GANCIO_ALLOWED_PRIVATE_ADDRESSES || '',
-  // TODO
-  proxy: {
-    protocol: process.env.PROXY_PROTOCOL || '',
-    hostname: process.env.PROXY_HOSTNAME || '',
-    host: process.env.PROXY_HOST || '',
-    port: process.env.PROXY_PORT || '',
-    auth: {
-      username: process.env.PROXY_USERNAME || '',
-      password: process.env.PROXY_PASSWORD || ''
-    },
-    headers: process.env.PROXY_HEADERS ? JSON.parse(process.env.PROXY_HEADERS) : {}
-  },
   admin_email: process.env.ADMIN_EMAIL || '',
   smtp: {
     host: process.env.SMTP_HOST || '',

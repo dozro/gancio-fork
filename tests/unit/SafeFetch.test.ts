@@ -30,15 +30,25 @@ await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
 const port = (server.address() as AddressInfo).port
 const base = `http://127.0.0.1:${port}`
 
+// a fake proxy answering by itself, to see which requests go through it
+const proxy = http.createServer((req, res) => res.end(`proxied ${req.url}`))
+await new Promise<void>(resolve => proxy.listen(0, '127.0.0.1', resolve))
+const proxyURL = `http://localhost:${(proxy.address() as AddressInfo).port}`
+
 // allow only the local test server
 const onlyTestServer = { allowedList: `127.0.0.1:${port}` }
+
+// no proxy, unless a test enables it
+vi.stubEnv('NODE_USE_ENV_PROXY', '0')
 
 const anonEventsAllowed = publicSettings.allow_anon_event
 
 describe('Safe fetch', () => {
   afterAll(async () => {
-    server.closeAllConnections()
-    server.close()
+    for (const s of [server, proxy]) {
+      s.closeAllConnections()
+      s.close()
+    }
     await setSetting('allow_anon_event', anonEventsAllowed)
   })
 
@@ -85,6 +95,22 @@ describe('Safe fetch', () => {
     await expect(safeFetch(`http://localhost:${port}/ok`, onlyTestServer)).rejects.toThrow('Address not allowed for localhost')
     // IPv6 and subnets
     await expect(safeFetch(`http://[::1]:${port}/ok`, { allowedList: `[fd00::/8]:${port}` })).rejects.toThrow('Address not allowed')
+  })
+
+  it('should check targets also through a proxy', async () => {
+    vi.stubEnv('NODE_USE_ENV_PROXY', '1')
+    vi.stubEnv('HTTP_PROXY', proxyURL)
+    try {
+      // the proxy is reached even if it is on a private address
+      const ret = await safeFetch('http://93.184.216.34/ok', { allowedList: '' })
+      expect(ret.body.toString()).toBe('proxied http://93.184.216.34/ok')
+
+      // internal targets are refused before reaching the proxy, also when resolved by DNS
+      await expect(safeFetch('http://127.0.0.1/', { allowedList: '' })).rejects.toThrow('Address not allowed: 127.0.0.1')
+      await expect(safeFetch('http://localhost/', { allowedList: '' })).rejects.toThrow('Address not allowed for localhost')
+    } finally {
+      vi.stubEnv('NODE_USE_ENV_PROXY', '0')
+    }
   })
 
   it('should check every redirect', async () => {

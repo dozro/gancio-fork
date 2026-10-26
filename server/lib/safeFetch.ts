@@ -162,6 +162,11 @@ export type SafeFetchResponse = {
   body: Buffer
 }
 
+// as node does for its global agents (built-in proxy support), our own agents use the proxy from the environment
+function useEnvProxy() {
+  return process.env.NODE_USE_ENV_PROXY === '1' || process.execArgv.includes('--use-env-proxy')
+}
+
 function effectivePort(url: URL) {
   return url.port || (url.protocol === 'https:' ? '443' : '80')
 }
@@ -209,6 +214,9 @@ export async function safeFetch(input: string, options: SafeFetchOptions = {}): 
 
   for (let redirects = 0; ; redirects++) {
     checkURL(url, allowed)
+    if (useEnvProxy()) {
+      await checkProxiedTarget(url, allowed)
+    }
     const response = await request(url, { method, headers: options.headers, body, maxSize, deadline, allowed })
 
     const location = response.headers.location
@@ -254,6 +262,14 @@ function checkURL(url: URL, allowed: AllowedEntry[]) {
   if (net.isIP(host) && !isAllowedTarget(host, url, allowed)) {
     throw new SafeFetchError(`Address not allowed: ${host}`, 'unreachable')
   }
+}
+
+// through a proxy our lookup is not used: run it before, except for onion addresses that only Tor resolves
+function checkProxiedTarget(url: URL, allowed: AllowedEntry[]) {
+  if (url.hostname.endsWith('.onion') && getConfig().hidden_service === 'true') return
+  const host = url.hostname.replace(/^\[(.*)\]$/, '$1')
+  return new Promise<void>((resolve, reject) => createLookup(url, allowed)(host, { all: true }, err =>
+    err ? reject(err instanceof SafeFetchError ? err : new SafeFetchError(err.message, 'unreachable')) : resolve()))
 }
 
 // resolve the hostname and refuse the connection if any of its addresses is not allowed
@@ -305,8 +321,8 @@ function request(url: URL, opts: RequestOptions): Promise<SafeFetchResponse> {
         ...(opts.body !== undefined && { 'Content-Length': String(Buffer.byteLength(opts.body)) })
       },
       lookup: createLookup(url, opts.allowed),
-      // do not reuse pooled connections: they could have been opened without our address check
-      agent: false
+      // not the global agent: its pooled connections could have been opened without our address check
+      agent: new (url.protocol === 'https:' ? https.Agent : http.Agent)({ proxyEnv: useEnvProxy() ? process.env : undefined })
     }, (res) => {
       const tooLarge = new SafeFetchError('Response too large', 'too_large', opts.maxSize)
       if (Number(res.headers['content-length']) > opts.maxSize) {

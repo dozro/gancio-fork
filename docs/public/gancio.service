@@ -8,6 +8,7 @@ User=gancio
 WorkingDirectory=/opt/gancio
 ExecStart=gancio
 Restart=always
+Environment=NODE_USE_ENV_PROXY=1
 
 [Install]
 WantedBy=multi-user.target

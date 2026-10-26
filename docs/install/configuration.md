@@ -68,24 +68,14 @@ or with the `GANCIO_ALLOWED_PRIVATE_ADDRESSES` environment variable.
 Listed targets become reachable by anyone able to make your instance fetch a URL.
 :::
 
-<!--
 ## Proxy
-Proxy outward request from gancio.
-Look [here](https://www.npmjs.com/package/https-proxy-agent) for options.
-Note: `hostname` option takes precedence over `host`.
-
-```json
-"proxy": {
-    "protocol": "http:",
-    "hostname": "",
-    "host": "127.0.0.1",
-    "port": "8118",
-    "auth": {
-      "username": "user",
-      "password": "password"
-    },
-    "headers": {
-      "X-Proxy-Header": "example"
-    }
-}
-```-->
+Outgoing requests go through an HTTP(S) proxy with the
+[built-in proxy support](https://nodejs.org/api/http.html#built-in-proxy-support) of Node.js.
+These variables must be set in the environment of the process (not in .env):
+```sh
+NODE_USE_ENV_PROXY=1
+HTTP_PROXY=http://proxy.example.com:3128
+HTTPS_PROXY=http://proxy.example.com:3128
+NO_PROXY=localhost,.internal.example.com
+```
+The docker image and the systemd unit already set `NODE_USE_ENV_PROXY=1`, set it to `0` to disable the proxy.
