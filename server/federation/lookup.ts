@@ -1,5 +1,5 @@
-import { ofetch } from 'ofetch'
 import { _signAndSend } from './sign_and_send'
+import { ensureOk, safeFetch } from '../lib/safeFetch'
 import { useLogger } from '../lib/logger'
 import { APKey, APUser, Instance } from '../services/db'
 import { getActor } from './get_actor'
@@ -33,8 +33,14 @@ export async function getActorFromKeyId(keyId: string, retry: boolean = false, b
   }
 }
 
+// nodeinfo URLs come from remote instances
+async function fetchJSON(url: string) {
+  const ret = ensureOk(await safeFetch(url, { headers: { Accept: 'application/json' }, anyPort: true }))
+  return JSON.parse(ret.body.toString('utf8'))
+}
+
 export async function getNodeInfo(instance_url: string): Promise<{ applicationActor: APUser, nodeInfo: object } | undefined> {
-  let nodeInfo = await ofetch(`${instance_url}/.well-known/nodeinfo`, { headers: { Accept: 'application/json' } })
+  let nodeInfo = await fetchJSON(`${instance_url}/.well-known/nodeinfo`)
     .catch(e => {
       log.debug('Node %s does not support nodeInfo', instance_url)
       throw e
@@ -50,7 +56,7 @@ export async function getNodeInfo(instance_url: string): Promise<{ applicationAc
     if (applicationActor) {
       log.debug('application actor url: ', applicationActor)
     }
-    nodeInfo = await ofetch(supportedVersion?.href)
+    nodeInfo = await fetchJSON(supportedVersion?.href)
     log.debug('getNodeInfo "%s", applicationActor: %s, nodeInfo: %s', instance_url, applicationActor?.href, nodeInfo)
 
     if (nodeInfo) {

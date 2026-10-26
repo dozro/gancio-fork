@@ -154,7 +154,11 @@ export type SafeFetchOptions = {
   maxRedirects?: number
   /** exceptions to the public address check, by default from `GANCIO_ALLOWED_PRIVATE_ADDRESSES` */
   allowedList?: string
+  /** allow any port (e.g. federation), by default only the default ports */
+  anyPort?: boolean
 }
+
+type Policy = { allowed: AllowedEntry[], anyPort: boolean }
 
 export type SafeFetchResponse = {
   status: number
@@ -172,26 +176,26 @@ function effectivePort(url: URL) {
 }
 
 // `port` is empty for the default port of the protocol
-function isDefaultPort(url: URL) {
-  return url.port === ''
+function isAllowedPort(url: URL, policy: Policy) {
+  return policy.anyPort || url.port === ''
 }
 
 // an exception lifts the address check, and the port check too only for the port it specifies
-function isAllowedPortFor(entry: AllowedEntry, url: URL) {
-  return entry.port ? entry.port === effectivePort(url) : isDefaultPort(url)
+function isAllowedPortFor(entry: AllowedEntry, url: URL, policy: Policy) {
+  return entry.port ? entry.port === effectivePort(url) : isAllowedPort(url, policy)
 }
 
 // host names listed as exception skip the address check (e.g. split DNS)
-function isAllowedHost(url: URL, allowed: AllowedEntry[]) {
-  return allowed.some(e => e.host === url.hostname.toLowerCase() && isAllowedPortFor(e, url))
+function isAllowedHost(url: URL, policy: Policy) {
+  return policy.allowed.some(e => e.host === url.hostname.toLowerCase() && isAllowedPortFor(e, url, policy))
 }
 
-function isAllowedTarget(address: string, url: URL, allowed: AllowedEntry[]) {
+function isAllowedTarget(address: string, url: URL, policy: Policy) {
   const type = net.isIP(address) === 4 ? 'ipv4' : 'ipv6'
-  if (allowed.some(e => e.subnet?.check(address, type) && isAllowedPortFor(e, url))) {
+  if (policy.allowed.some(e => e.subnet?.check(address, type) && isAllowedPortFor(e, url, policy))) {
     return true
   }
-  return isDefaultPort(url) && isPublicAddress(address) && !isOwnAddress(address)
+  return isAllowedPort(url, policy) && isPublicAddress(address) && !isOwnAddress(address)
 }
 
 /**
@@ -205,7 +209,10 @@ export async function safeFetch(input: string, options: SafeFetchOptions = {}): 
     timeout = 10000,
     maxRedirects = 3
   } = options
-  const allowed = parseAllowedList(options.allowedList ?? getConfig().allowed_private_addresses ?? '')
+  const policy: Policy = {
+    allowed: parseAllowedList(options.allowedList ?? getConfig().allowed_private_addresses ?? ''),
+    anyPort: options.anyPort ?? false
+  }
 
   const deadline = Date.now() + timeout
   let method = options.method ?? 'GET'
@@ -213,11 +220,11 @@ export async function safeFetch(input: string, options: SafeFetchOptions = {}): 
   let url = parseURL(input)
 
   for (let redirects = 0; ; redirects++) {
-    checkURL(url, allowed)
+    checkURL(url, policy)
     if (useEnvProxy()) {
-      await checkProxiedTarget(url, allowed)
+      await checkProxiedTarget(url, policy)
     }
-    const response = await request(url, { method, headers: options.headers, body, maxSize, deadline, allowed })
+    const response = await request(url, { method, headers: options.headers, body, maxSize, deadline, policy })
 
     const location = response.headers.location
     if (response.status < 300 || response.status >= 400 || !location) {
@@ -249,38 +256,38 @@ function parseURL(input: string, base?: URL) {
   }
 }
 
-function checkURL(url: URL, allowed: AllowedEntry[]) {
+function checkURL(url: URL, policy: Policy) {
   if (url.protocol !== 'http:' && url.protocol !== 'https:') {
     throw new SafeFetchError(`Protocol not allowed: ${url.protocol}`, 'invalid_url')
   }
-  if (isAllowedHost(url, allowed)) return
-  if (!isDefaultPort(url) && !allowed.some(e => e.port === url.port)) {
+  if (isAllowedHost(url, policy)) return
+  if (!isAllowedPort(url, policy) && !policy.allowed.some(e => e.port === url.port)) {
     throw new SafeFetchError(`Port not allowed: ${url.port}`, 'invalid_url')
   }
   // IP literals are not resolved, so the lookup below does not check them
   const host = url.hostname.replace(/^\[(.*)\]$/, '$1')
-  if (net.isIP(host) && !isAllowedTarget(host, url, allowed)) {
+  if (net.isIP(host) && !isAllowedTarget(host, url, policy)) {
     throw new SafeFetchError(`Address not allowed: ${host}`, 'unreachable')
   }
 }
 
 // through a proxy our lookup is not used: run it before, except for onion addresses that only Tor resolves
-function checkProxiedTarget(url: URL, allowed: AllowedEntry[]) {
+function checkProxiedTarget(url: URL, policy: Policy) {
   if (url.hostname.endsWith('.onion') && getConfig().hidden_service === 'true') return
   const host = url.hostname.replace(/^\[(.*)\]$/, '$1')
-  return new Promise<void>((resolve, reject) => createLookup(url, allowed)(host, { all: true }, err =>
+  return new Promise<void>((resolve, reject) => createLookup(url, policy)(host, { all: true }, err =>
     err ? reject(err instanceof SafeFetchError ? err : new SafeFetchError(err.message, 'unreachable')) : resolve()))
 }
 
 // resolve the hostname and refuse the connection if any of its addresses is not allowed
-function createLookup(url: URL, allowed: AllowedEntry[]): net.LookupFunction {
-  const allowAll = isAllowedHost(url, allowed)
+function createLookup(url: URL, policy: Policy): net.LookupFunction {
+  const allowAll = isAllowedHost(url, policy)
   return (hostname, options, callback) => {
     dns.lookup(hostname, { ...options, all: true }, (err, addresses) => {
       if (err) {
         return callback(err, '', 0)
       }
-      if (!addresses.length || (!allowAll && addresses.some(a => !isAllowedTarget(a.address, url, allowed)))) {
+      if (!addresses.length || (!allowAll && addresses.some(a => !isAllowedTarget(a.address, url, policy)))) {
         return callback(new SafeFetchError(`Address not allowed for ${hostname}`, 'unreachable'), '', 0)
       }
       if (options.all) {
@@ -297,7 +304,7 @@ type RequestOptions = {
   body?: string
   maxSize: number
   deadline: number
-  allowed: AllowedEntry[]
+  policy: Policy
 }
 
 function request(url: URL, opts: RequestOptions): Promise<SafeFetchResponse> {
@@ -320,7 +327,7 @@ function request(url: URL, opts: RequestOptions): Promise<SafeFetchResponse> {
         ...opts.headers,
         ...(opts.body !== undefined && { 'Content-Length': String(Buffer.byteLength(opts.body)) })
       },
-      lookup: createLookup(url, opts.allowed),
+      lookup: createLookup(url, opts.policy),
       // not the global agent: its pooled connections could have been opened without our address check
       agent: new (url.protocol === 'https:' ? https.Agent : http.Agent)({ proxyEnv: useEnvProxy() ? process.env : undefined })
     }, (res) => {

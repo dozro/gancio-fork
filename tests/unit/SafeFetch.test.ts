@@ -4,7 +4,9 @@ import os from 'node:os'
 import type { AddressInfo } from 'node:net'
 import { mockH3Event, loadTestUsers } from './utils'
 import { isPublicAddress, safeFetch } from '../../server/lib/safeFetch'
+import { generateKeyPairSync } from 'node:crypto'
 import { publicSettings, setSetting } from '../../server/services'
+import { _signAndSend } from '../../server/federation/sign_and_send'
 
 import { getUser } from '../../server/lib/getUser'
 vi.mock('../../server/lib/getUser')
@@ -95,6 +97,19 @@ describe('Safe fetch', () => {
     await expect(safeFetch(`http://localhost:${port}/ok`, onlyTestServer)).rejects.toThrow('Address not allowed for localhost')
     // IPv6 and subnets
     await expect(safeFetch(`http://[::1]:${port}/ok`, { allowedList: `[fd00::/8]:${port}` })).rejects.toThrow('Address not allowed')
+  })
+
+  it('should allow any port only when asked, still checking addresses', async () => {
+    await expect(safeFetch(base + '/ok', { allowedList: '', anyPort: true })).rejects.toThrow('Address not allowed: 127.0.0.1')
+    expect((await safeFetch(base + '/ok', { allowedList: '127.0.0.1', anyPort: true })).body.toString()).toBe('ok')
+  })
+
+  it('should refuse internal inboxes and actors in federation', async () => {
+    const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048, privateKeyEncoding: { type: 'pkcs8', format: 'pem' }, publicKeyEncoding: { type: 'spki', format: 'pem' } })
+    await expect(_signAndSend({ type: 'Accept' }, 'http://127.0.0.1:13120/inbox', 'post', privateKey))
+      .rejects.toThrow('Address not allowed: 127.0.0.1')
+    await expect(_signAndSend('', 'http://localhost/actor', 'get', privateKey))
+      .rejects.toThrow('Address not allowed for localhost')
   })
 
   it('should check targets also through a proxy', async () => {

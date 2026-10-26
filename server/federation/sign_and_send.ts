@@ -1,6 +1,7 @@
 import { useLogger } from '../lib/logger'
 import { secretSettings } from '../services/settings'
 import { useTaskManager } from '../services/taskManager'
+import { safeFetch } from '../lib/safeFetch'
 import { prepareHTTPSignature } from './httpsignature'
 import type { APActivityBase } from './types'
 
@@ -20,26 +21,28 @@ export async function _signAndSend(object: Partial<APActivityBase> | '', inbox: 
   const body = JSON.stringify(object)
   const httpSignatureHeaders = prepareHTTPSignature(body, inbox, method, privkey)
   try {
-    const ret = await fetch(inbox, {
+    // the inbox or actor URL comes from remote actors
+    const ret = await safeFetch(inbox, {
       headers: {
         ...httpSignatureHeaders,
         'Content-Type': 'application/activity+json',
         'Accept': 'application/activity+json'
       },
-      method,
-      ...(method === 'post' ? { body } : {})
+      method: method === 'post' ? 'POST' : 'GET',
+      ...(method === 'post' ? { body } : {}),
+      // federated instances could use any port
+      anyPort: true
     })
 
-    const contentType = ret.headers.get('content-type')
+    const contentType = ret.headers['content-type']
+    const text = ret.body.toString('utf8')
     // check if content-type is json
     if (!contentType?.includes('json')) {
-      const body = await ret.text()
-      log.info(`[FEDI] Error in sign and send, wrong content-type returned: ${contentType} - status: ${ret.status} - body: ${body}`)
+      log.info(`[FEDI] Error in sign and send, wrong content-type returned: ${contentType} - status: ${ret.status} - body: ${text}`)
       return
     }
 
-    const text = await ret.text()
-    if (ret.ok) {
+    if (ret.status >= 200 && ret.status < 300) {
       log.debug(`Signed and verified! ${ret.status} => ${contentType}`)
       if (!text) return ''
       try {
