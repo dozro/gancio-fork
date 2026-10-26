@@ -11,6 +11,7 @@ vitest:
   script:
     - corepack enable
     - pnpm install --frozen-lockfile
+    - pnpm check:api-docs
     - pnpm test
 
 # Only build & push Docker images on tags or protected branches.

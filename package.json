@@ -69,6 +69,7 @@
     "analyze": "nuxt build --analyze",
     "check:circular": "madge --circular --extensions ts,js,vue --ts-config server/tsconfig.madge.json server",
     "check:i18n": "i18n-check -s en --locales i18n/locales -f i18next --only invalidKeys",
+    "check:api-docs": "node scripts/checkApiDocs.js",
     "prepare": "husky || true",
     "docs:dev": "./scripts/docs.sh dev",
     "docs:build": "./scripts/docs.sh build",
