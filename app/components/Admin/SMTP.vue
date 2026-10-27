@@ -12,7 +12,7 @@ const smtp = ref<SmtpSettings>({ ...storedSmtpConfig.value })
 const admin_email = manageSetting('admin_email')
 
 async function done (testing: boolean) {
-  const tmpSMTP = structuredClone(smtp.value)
+  const tmpSMTP = JSON.parse(JSON.stringify(smtp.value))
 
   // override past `ignoreTLS` smtp setting
   tmpSMTP.ignoreTLS = false
