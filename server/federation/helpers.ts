@@ -14,17 +14,6 @@ export const getApplicationActorBaseURL = () => `${publicSettings.baseurl}/feder
 export const getApplicationActorId = () => `${publicSettings.baseurl}/federation/u/${publicSettings.instance_name}`
 export const isApplicationActor = (actorId: string) => actorId === getApplicationActorId()
 
-export function sameOrigin(url1: string, url2: string): boolean {
-  try {
-    const u1 = new URL(url1)
-    const u2 = new URL(url2)
-    return u1.origin === u2.origin
-  } catch (e) {
-    log.warn('sameOrigin: invalid URL(s): %s, %s (%s)', url1, url2, e)
-    return false
-  }
-}
-
 /**
  * returns the list of actor ids in the to or cc fields of an activity
  */

@@ -10,7 +10,8 @@ import { _signAndSend } from './sign_and_send'
 
 import { getActor } from './get_actor'
 import { type APActivityUndo, APActivityUndoSchema, type APActivityBase, APActivityBaseSchema, APNoteSchema, APEventSchema } from './types'
-import { dereferenceActivityObject, sameOrigin, targetsForActivity } from './helpers'
+import { dereferenceActivityObject, targetsForActivity } from './helpers'
+import { isSameOrigin } from '../helpers'
 
 const log = useLogger('APHandlers')
 
@@ -177,7 +178,7 @@ async function handleCreate(activity: APActivityBase, actor: APUser): Promise<Ac
       return { status: 'ignored', reason: `Create activity with unknown owner: ${ownerId}` }
     }
   }
-  if (!sameOrigin(ownerId, actor.ap_id)) {
+  if (!isSameOrigin(ownerId, actor.ap_id)) {
     return { status: 'ignored', reason: `Create activity with different actor: ${eventOrNote.attributedTo} !== ${actor.ap_id}` }
   }
 
@@ -226,8 +227,7 @@ async function handleDelete(message: APActivityBase, actor?: APUser): Promise<Ac
   // or a remote event
   const event = await Event.findOne({ where: { ap_id } })
   if (event) {
-    if (actor?.ap_id !== event.apUserApId)
-    {
+    if (actor?.ap_id !== event.apUserApId) {
       return { status: 'ignored', reason: `Delete activity actor mismatch: ${actor?.ap_id} !== ${event.apUserApId}` }
     }
     log.debug(`Deleting event ${event.ap_id}`)
