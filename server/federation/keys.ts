@@ -2,7 +2,20 @@ import { APKey, KeyTypeEnum, type KeyType } from '../services/db'
 import type { APActor } from './types'
 import { useLogger } from '../lib/logger'
 import { createPublicKey } from 'node:crypto'
+import { isSameOrigin } from '../helpers'
 const log = useLogger('federation/keys')
+
+/**
+ * A key can be imported only from the actor it belongs to: same origin and owned by the actor (when specified)
+ * -> https://framagit.org/les/gancio/-/work_items/766
+ */
+function isActorKey(keyId: string, owner: string | undefined, actor: APActor) {
+  if (!isSameOrigin(keyId, actor.id) || (owner && owner !== actor.id)) {
+    log.warn(`Key ${keyId} does not belong to actor ${actor.id}`)
+    return false
+  }
+  return true
+}
 
 /**
  * Imports keys from an actor
@@ -11,7 +24,7 @@ const log = useLogger('federation/keys')
  */
 export async function importActorKeys(actor: APActor) {
   const keys: APKey[] = []
-  if (actor.publicKey) {
+  if (actor.publicKey && isActorKey(actor.publicKey.id, actor.publicKey.owner, actor)) {
     log.debug(`create APKey with ap_id: ${actor.publicKey.id}`)
     const k = await APKey.upsert({
       ap_id: actor.publicKey.id,
@@ -24,7 +37,7 @@ export async function importActorKeys(actor: APActor) {
 
   if (actor.assertionMethod && Array.isArray(actor.assertionMethod)) {
     for (const assertion of actor.assertionMethod) {
-      if (assertion.type === 'Multikey' && assertion.publicKeyMultibase) {
+      if (assertion.type === 'Multikey' && assertion.publicKeyMultibase && isActorKey(assertion.id, assertion.controller, actor)) {
         log.debug(`create APKey with ap_id: ${assertion.id}`)
         const { type, keyData } = decodePublicKeyMultibase(assertion.publicKeyMultibase)
         if (!KeyTypeEnum.includes(type)) {

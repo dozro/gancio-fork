@@ -145,6 +145,14 @@ export async function getImageFromURL(url: string, name: string, focalpoint?: [n
     })
 }
 
+export function isSameOrigin(a: string, b: string) {
+  try {
+    return new URL(a).origin === new URL(b).origin
+  } catch {
+    return false
+  }
+}
+
 export function isHiddenService(domain: string) {
   const pattern = /^(http:\/\/)?[a-zA-Z0-9]+\.(onion|i2p)\/?$/
   return pattern.test(domain)

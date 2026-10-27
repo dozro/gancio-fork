@@ -64,13 +64,11 @@ export async function getInstance(actor_url: string, force = false) {
   const url = new URL(actor_url)
   const domain = url.host
   const instance_url = `${url.protocol}//${url.host}`
-  let instance
-  if (!force) {
-    instance = await Instance.findByPk(domain)
-    if (instance) {
-      log.debug('Use cached instance: %s', instance.name)
-      return instance
-    }
+  const instance = await Instance.findByPk(domain)
+  // blocked instances are never refreshed: it would unblock them
+  if (instance && (!force || instance.blocked)) {
+    log.debug('Use cached instance: %s', instance.name)
+    return instance
   }
 
   try {
