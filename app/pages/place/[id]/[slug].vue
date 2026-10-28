@@ -38,26 +38,35 @@ useHead(() => {
 
   <!-- Events -->
   <section class='events mt-sm-4 mt-2'>
-    <v-lazy
-      v-for='(event, idx) in data.events' :key='event.id'
-      class='event' :model-value='idx<9'
-      :options="{ threshold: .5, rootMargin: '500px' }"
+    <div
+      v-for='(event, idx) of data.events'
+      :key='event.id'
+      class='event'
     >
-      <!-- :class="{ 'theme--dark': is_dark }"> -->
-      <EventCard :event='event' :lazy='idx>9' :hide-thumbs="settings.hide_thumbs" />
-    </v-lazy>
+      <LazyEventCard
+        :hydrate-on-visible="{ rootMargin: '500px' }"
+        :event='event'
+        :lazy="idx>9"
+        :hide-thumbs="settings.hide_thumbs"
+      />
+    </div>
   </section>
 
   <!-- Past Events -->
   <h2 v-if="data?.pastEvents.length" class='mt-14 mb-3'>{{$t('common.past_events')}}</h2>
   <section v-if="data?.pastEvents.length" class="events">
-    <v-lazy
-      v-for='(event, idx) in data.pastEvents' :key='event.id'
-      class='event' :model-value='idx<9'
-      :options="{ threshold: .5, rootMargin: '500px' }">
-      <!-- :class="{ 'theme--dark': is_dark }"> -->
-      <EventCard :event='event' :lazy='idx>9' :hide-thumbs="settings.hide_thumbs" />
-    </v-lazy>
+    <div
+      v-for='event of data.pastEvents'
+      :key='event.id'
+      class='event'
+    >
+      <LazyEventCard
+        lazy
+        :hydrate-on-visible="{ rootMargin: '500px' }"
+        :event='event'
+        :hide-thumbs="settings.hide_thumbs"
+      />
+    </div>
   </section>
 
 </v-container>

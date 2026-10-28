@@ -15,7 +15,7 @@ useHead({
   ]
 })
 
-const { data: events } = await useFetch<Event[]>(`/api/collections/${encodeURIComponent(route.params.name)}`)
+const { data: events } = await useFetch<EventAPI[]>(`/api/collections/${encodeURIComponent(route.params.name)}`)
 
 </script>
 <template>
@@ -25,15 +25,18 @@ const { data: events } = await useFetch<Event[]>(`/api/collections/${encodeURICo
 
   <!-- Events -->
   <div class="mb-2 events">
-    <v-lazy
-      v-for='(event, idx) in events'
+    <div
+      v-for='(event, idx) of events'
       :key='event.id'
-      class='event v-card'
-      :model-value='idx<9'
-      :options="{ threshold: .5, rootMargin: '500px' }"
+      class='event'
     >
-      <EventCard :event='event' :lazy='idx>9' :hide-thumbs="settings.hide_thumbs" />
-    </v-lazy>
+      <LazyEventCard
+        :hydrate-on-visible="{ rootMargin: '500px' }"
+        :event='event'
+        :lazy="idx>9"
+        :hide-thumbs="settings.hide_thumbs"
+      />
+    </div>
   </div>
 </v-container>
 </template>
