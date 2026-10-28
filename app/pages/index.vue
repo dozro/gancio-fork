@@ -67,12 +67,18 @@ const { data: announcements } = await useFetch<Announcement[]>('/api/announcemen
 
   <!-- Events -->
   <section class='events mt-sm-4 mt-2'>
-    <v-lazy
-      v-for='(event, idx) in visibleEvents' :key='event.id'
-      class='event' :model-value='idx<9'
-      :options="{ threshold: .5, rootMargin: '500px' }">
-      <EventCard :event='event' :lazy='idx>9' :hide-thumbs="settings.hide_thumbs" />
-    </v-lazy>
+    <div
+      v-for="(event, idx) of visibleEvents"
+      :key="event.id"
+      class="event"
+    >
+      <LazyEventCard
+        :hydrate-on-visible="{ rootMargin: '500px' }"
+        :event="event"
+        :lazy="idx>3"
+        :hide-thumbs="settings.hide_thumbs"
+      />
+    </div>
 
     <div v-if="!visibleEvents?.length" class="d-flex flex-column align-center ga-2 my-8 my-sm-12">
       <span class="text-h4 text-medium-emphasis">{{ $t('common.no_events_found') }}</span>

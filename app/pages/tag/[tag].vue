@@ -4,7 +4,7 @@ const settings = useState<Settings>('settings')
 const route = useRoute()
 const tagName = route.params.tag as string
 const { showRecurrent } = useShowRecurrent()
-const { data, error } = await useFetch<Tag>(`/api/events/tag/${encodeURIComponent(tagName)}`, { query: { show_recurrent: showRecurrent } })
+const { data, error } = await useFetch(`/api/events/tag/${encodeURIComponent(tagName)}`, { query: { show_recurrent: showRecurrent } })
 
 if (!data.value || error.value) {
   throw createError({
@@ -36,20 +36,18 @@ useHead(() => {
 
   <!-- Events -->
   <section class='events mt-sm-4 mt-2'>
-    <v-lazy
-      v-for='(event, idx) in data.events'
+    <div
+      v-for='(event, idx) of data.events'
       :key='event.id'
       class='event'
-      :model-value='idx<9'
-      :options="{ threshold: .5, rootMargin: '500px' }"
     >
-      <!-- :class="{ 'theme--dark': is_dark }"> -->
-      <EventCard
+      <LazyEventCard
+        :hydrate-on-visible="{ rootMargin: '500px' }"
         :event='event'
-        :lazy='idx>9'
+        :lazy="idx>9"
         :hide-thumbs="settings.hide_thumbs"
       />
-    </v-lazy>
+    </div>
   </section>
 
   <!-- Old Events -->
@@ -58,20 +56,18 @@ useHead(() => {
     class='mt-14 mb-3'
   >{{$t('common.past_events')}}</h2>
   <section class='events mt-sm-4 mt-2'>
-    <v-lazy
-      v-for='(event, idx) in data.pastEvents'
+    <div
+      v-for='event of data.pastEvents'
       :key='event.id'
       class='event'
-      :model-value='idx<9'
-      :options="{ threshold: .5, rootMargin: '500px' }"
     >
-      <!-- :class="{ 'theme--dark': is_dark }"> -->
-      <EventCard
+      <LazyEventCard
+        lazy
+        :hydrate-on-visible="{ rootMargin: '500px' }"
         :event='event'
-        :lazy='idx>9'
         :hide-thumbs="settings.hide_thumbs"
       />
-    </v-lazy>
+    </div>
   </section>
 </v-container>
 </template>
