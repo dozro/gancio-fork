@@ -16,18 +16,19 @@ const { locale, t } = useI18n()
 const event = defineModel<EventAPI>('event', { type: Object, required: true })
 
 const tz = settings.value.instance_timezone
-const dtOpts = {
+const dtOpts = computed(() => ({
   zone: tz,
   locale: locale.value || settings.value.instance_locale,
-}
+}))
+
 const today = DateTime.now().setZone(tz).startOf('day')
 const initialCalendarPage = useInitialCalendarPage()
-const frequencies = [
+const frequencies = computed(() => [
   { value: '1w', text: t('event.each_week') },
   { value: '2w', text: t('event.each_2w') },
   { value: '1m', text: t('event.each_month') },
   { value: '1y', text: t('event.each_year') }
-]
+])
 
 // Component state
 interface ComponentState {
@@ -89,14 +90,14 @@ function resetState() {
   // DatePicker will ignore the seconds after midnight
   if (ev.start_datetime) {
     st.startDate = ev.start_datetime * 1000
-    st.startTime = DateTime.fromSeconds(ev.start_datetime, dtOpts)
+    st.startTime = DateTime.fromSeconds(ev.start_datetime, dtOpts.value)
       .toFormat('HH:mm')
   } else {
     st.startDate = st.startTime = null
   }
   if (ev.end_datetime) {
     st.endDate = ev.end_datetime * 1000
-    st.endTime = DateTime.fromSeconds(ev.end_datetime, dtOpts)
+    st.endTime = DateTime.fromSeconds(ev.end_datetime, dtOpts.value)
       .toFormat('HH:mm')
   } else {
     st.endDate = st.endTime = null
@@ -116,8 +117,8 @@ function resetModel() {
   const startDate = st.startDate
   const startTime = st.startTime
   if (startDate && startTime) {
-    const startDateDT = DateTime.fromMillis(startDate, dtOpts)
-    const startTimeDT = DateTime.fromISO(startTime, dtOpts)
+    const startDateDT = DateTime.fromMillis(startDate, dtOpts.value)
+    const startTimeDT = DateTime.fromISO(startTime, dtOpts.value)
     ev.start_datetime = startDateDT.set({
       hour: startTimeDT.hour,
       minute: startTimeDT.minute,
@@ -129,8 +130,8 @@ function resetModel() {
   const endDate = st.endDate
   const endTime = st.endTime
   if (endDate && endTime) {
-    const endDateDT = DateTime.fromMillis(endDate, dtOpts)
-    const endTimeDT = DateTime.fromISO(endTime, dtOpts)
+    const endDateDT = DateTime.fromMillis(endDate, dtOpts.value)
+    const endTimeDT = DateTime.fromISO(endTime, dtOpts.value)
     ev.end_datetime = endDateDT.set({
       hour: endTimeDT.hour,
       minute: endTimeDT.minute,
@@ -142,13 +143,13 @@ function resetModel() {
 }
 const todayEvents = computed(() => {
   const startDate = state.value.startDate
-  const endDate = state.value.endDate || startDate
+  const endDate = state.value.endDate
   if (!events.value || !startDate) {
     return []
   }
-  const startOfDay = DateTime.fromMillis(startDate, dtOpts)
+  const startOfDay = DateTime.fromMillis(startDate, dtOpts.value)
     .startOf('day').toSeconds()
-  const endOfDay = DateTime.fromMillis(endDate, dtOpts)
+  const endOfDay = DateTime.fromMillis(endDate ?? startDate, dtOpts.value)
     .endOf('day').toSeconds()
 
   return events?.value?.filter(
@@ -160,9 +161,9 @@ const whenPatterns = computed(() => {
   if (state.value.type != 'recurrent' || !state.value.startDate) {
     return []
   }
-  const date = DateTime.fromMillis(state.value.startDate, dtOpts)
+  const date = DateTime.fromMillis(state.value.startDate, dtOpts.value)
   const freq = state.value.recurrentFreq
-  const weekDay = date.toFormat('EEEE')
+  const weekDay = date.toFormat('EEEE', dtOpts.value)
   if (freq === '1w' || freq === '2w') {
     return t(`event.recurrent_${freq}_days`, { days: weekDay }).toUpperCase()
   } else if (freq === '1m' || freq === '2m') {
