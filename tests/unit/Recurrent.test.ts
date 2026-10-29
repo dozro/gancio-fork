@@ -44,6 +44,35 @@ describe('Recurrent Events', () => {
     expect(response).toHaveProperty('id')
   })
 
+  it('should reject 1w recurrent event without type', async () => {
+    await setSetting('allow_recurrent_event', true)
+    const event = mockH3Event({
+      method: 'POST',
+      body: {
+        title: 'test title', place_name: 'place name',
+        place_address: 'address', tags: ['test'], start_datetime: now() + 1000,
+        recurrent: JSON.stringify({ frequency: '1w' })
+      }
+    })
+    const response = handleEvent(event)
+    await expect(response).rejects.toHaveProperty('statusCode', 400)
+    await expect(response).rejects.toHaveProperty('message', '`type` is required for weekly frequency')
+  })
+
+  it('should accept 1m recurrent event without type', async () => {
+    await setSetting('allow_recurrent_event', true)
+    const event = mockH3Event({
+      method: 'POST',
+      body: {
+        title: 'test title', place_name: 'place name',
+        place_address: 'address', tags: ['test'], start_datetime: now() + 1000,
+        recurrent: JSON.stringify({ frequency: '1m' })
+      }
+    })
+    const response = await handleEvent(event)
+    expect(response).toHaveProperty('id')
+  })
+
   it('should check the show_recurrent settings in que', async () => {
     const event = await Event.create({
       title: 'test second title',

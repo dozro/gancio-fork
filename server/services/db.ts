@@ -215,9 +215,12 @@ export type LDSignature = {
  * this is the v1 recurrent type
  */
 export const RecurrentSchema = z.object({
-  frequency: z.enum(['1w', '2w', '1m', '2m', '1y']),
-  type: z.enum(['ordinal', '-1', '1', '2', '3', '4'])
+  frequency: z.enum(['1w', '2w', '1m', '1y']),
+  type: z.enum(['ordinal', '-1', '1', '2', '3', '4']).optional()
 })
+  .refine(data => !(data.frequency === '1w' && data.type === undefined),
+    { message: '`type` is required for weekly frequency' })
+
 export type Recurrent = z.infer<typeof RecurrentSchema>
 
 @Table({
