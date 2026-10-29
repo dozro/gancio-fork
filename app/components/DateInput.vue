@@ -3,8 +3,8 @@
 import type { WatchIgnorableReturn } from '@vueuse/core'
 
 import { DateTime } from 'luxon'
-import { _ } from 'lodash'
 import { watchIgnorable } from '@vueuse/core'
+import type { Recurrent } from '~~/server/services/db'
 
 const time = useTime()
 const { isAdmin } = useAuth()
@@ -36,36 +36,32 @@ interface ComponentState {
   // If editing an existing instance of a recurring event, the type cannot be
   // changed.
   frozenType: boolean
-  recurrentFreq: '1w' | '2w' | '1m' | '1y'
-  recurrentType: string
-  startDate: number
-  endDate: number
-  startTime: string
-  endTime: string
+  recurrentFreq?: Recurrent['frequency']
+  recurrentType?: Recurrent['type']
+  startDate: number | null
+  endDate: number | null
+  startTime: string | null
+  endTime: string | null
 }
 const state = ref<ComponentState>({
   type: 'normal',
   frozenType: false,
-  recurrentFreq: null,
-  recurrentType: null,
+  recurrentFreq: undefined,
+  recurrentType: undefined,
   startDate: null,
   endDate: null,
   startTime: null,
-  endTime: null,
+  endTime: null
 })
 
-// Pre-declare variables so they can be referenced below.
-let stateWatcher: WatchIgnorableReturn = undefined
-let modelWatcher: WatchIgnorableReturn = undefined
-
 // The watchIgnorable avoids an infinite loop between watchers.
-stateWatcher = watchIgnorable(
+const stateWatcher: WatchIgnorableReturn = watchIgnorable(
   () => Object.values(state.value),
   () => modelWatcher.ignoreUpdates(resetModel),
-  resetModel,
-  { deep: true, flush: 'post' },
+  { deep: true, flush: 'post' }
 )
-modelWatcher = watchIgnorable(
+
+const modelWatcher: WatchIgnorableReturn = watchIgnorable(
   event,
   () => stateWatcher.ignoreUpdates(resetState),
   { flush: 'post', immediate: true },
@@ -75,7 +71,7 @@ modelWatcher = watchIgnorable(
 function resetState() {
   const ev = event.value
   const st = state.value
-  const evType = !_.isEmpty(ev.recurrent) ?
+  const evType = ev.recurrent ?
     'recurrent' :
     time.isMultiDate(ev.start_datetime, ev.end_datetime) ?
       'multidate' :
@@ -84,8 +80,8 @@ function resetState() {
   st.type = evType
   st.frozenType = !!ev.parentId
   if (evType == 'recurrent') {
-    st.recurrentFreq = ev.recurrent.frequency
-    st.recurrentType = ev.recurrent.type
+    st.recurrentFreq = ev?.recurrent?.frequency
+    st.recurrentType = ev?.recurrent?.type
   }
   // DatePicker will ignore the seconds after midnight
   if (ev.start_datetime) {
@@ -110,9 +106,7 @@ function resetModel() {
   const st = state.value
   const evType = st.type
   if (evType == 'recurrent') {
-    ev.recurrent ??= {}
-    ev.recurrent.frequency = st.recurrentFreq
-    ev.recurrent.type = st.recurrentType
+    ev.recurrent = { frequency: st.recurrentFreq!, type: st.recurrentType! }
   }
   const startDate = st.startDate
   const startTime = st.startTime
@@ -203,8 +197,8 @@ const pickDates = computed({
       state.value.startDate :
         { start: state.value.startDate, end: state.value.endDate }
   },
-  set: (dates: number | { start?: number, end?: number } | null) => {
-    if (_.isNumber(dates) || !dates) {
+  set: (dates: number | { start: number, end: number | null } | null) => {
+    if (typeof dates === 'number' || !dates) {
       state.value.startDate = dates
       state.value.endDate = dates
     } else {
@@ -235,7 +229,9 @@ const pickDates = computed({
     <v-btn-toggle
       v-if="state.type === 'recurrent'"
       v-model="state.recurrentFreq"
-      class="v-col-6 flex-column flex-sm-row"
+      class="flex-wrap flex-row"
+      variant='outlined'
+      mandatory
       color="primary"
     >
       <v-btn v-for="f in frequencies" :key="f.value" :value="f.value">{{ f.text }}</v-btn>
@@ -264,10 +260,13 @@ const pickDates = computed({
   </div>
 
   <div v-if="state.type === 'recurrent'" class="text-center mb-2">
-    <span v-if="state.recurrentFreq !== '1m' && state.recurrentFreq !== '2m'">{{ whenPatterns }}</span>
+    <span v-if="typeof whenPatterns === 'string'">{{ whenPatterns }}</span>
     <v-btn-toggle
       v-else
       v-model="state.recurrentType"
+      variant="outlined"
+      color="primary"
+      mandatory
       class="mt-1 flex-column flex-sm-row"
     >
       <v-btn
