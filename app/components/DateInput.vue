@@ -241,20 +241,23 @@ const pickDates = computed({
     </v-btn-toggle>
 
     <div class="mx-auto d-block mt-3">
-      <DatePicker
-        v-model.number="pickDates"
-        :timezone="tz"
-        :rules="[$valid.required('common.when')]"
-        class="mx-auto"
-        :is-dark="theme.current?.value?.dark"
-        :is-range="state.type === 'multidate'"
-        :locale="$i18n.locale"
-        :attributes="attributes"
-        is-inline
-        :min-date="!isAdmin ? today.toMillis() : undefined"
-        :initial-page="pickDates ? undefined : initialCalendarPage"
-        is-expanded
-      />
+      <v-input
+        :model-value="pickDates"
+        :rules="[$valid.required('common.date')]">
+        <DatePicker
+          v-model.number="pickDates"
+          :timezone="tz"
+          class="mx-auto"
+          :is-dark="theme.current?.value?.dark"
+          :is-range="state.type === 'multidate'"
+          :locale="$i18n.locale"
+          :attributes="attributes"
+          is-inline
+          :min-date="!isAdmin ? today.toMillis() : undefined"
+          :initial-page="pickDates ? undefined : initialCalendarPage"
+          is-expanded
+        />
+      </v-input>
     </div>
 
   </div>
