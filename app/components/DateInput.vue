@@ -3,8 +3,8 @@
 import type { WatchIgnorableReturn } from '@vueuse/core'
 
 import { DateTime } from 'luxon'
-import { _ } from 'lodash'
 import { watchIgnorable } from '@vueuse/core'
+import type { Recurrent } from '~~/server/services/db'
 
 const time = useTime()
 const { isAdmin } = useAuth()
@@ -16,18 +16,19 @@ const { locale, t } = useI18n()
 const event = defineModel<EventAPI>('event', { type: Object, required: true })
 
 const tz = settings.value.instance_timezone
-const dtOpts = {
+const dtOpts = computed(() => ({
   zone: tz,
   locale: locale.value || settings.value.instance_locale,
-}
+}))
+
 const today = DateTime.now().setZone(tz).startOf('day')
 const initialCalendarPage = useInitialCalendarPage()
-const frequencies = [
+const frequencies = computed(() => [
   { value: '1w', text: t('event.each_week') },
   { value: '2w', text: t('event.each_2w') },
   { value: '1m', text: t('event.each_month') },
   { value: '1y', text: t('event.each_year') }
-]
+])
 
 // Component state
 interface ComponentState {
@@ -35,36 +36,32 @@ interface ComponentState {
   // If editing an existing instance of a recurring event, the type cannot be
   // changed.
   frozenType: boolean
-  recurrentFreq: '1w' | '2w' | '1m' | '1y'
-  recurrentType: string
-  startDate: number
-  endDate: number
-  startTime: string
-  endTime: string
+  recurrentFreq?: Recurrent['frequency']
+  recurrentType?: Recurrent['type']
+  startDate: number | null
+  endDate: number | null
+  startTime: string | null
+  endTime: string | null
 }
 const state = ref<ComponentState>({
   type: 'normal',
   frozenType: false,
-  recurrentFreq: null,
-  recurrentType: null,
+  recurrentFreq: undefined,
+  recurrentType: undefined,
   startDate: null,
   endDate: null,
   startTime: null,
-  endTime: null,
+  endTime: null
 })
 
-// Pre-declare variables so they can be referenced below.
-let stateWatcher: WatchIgnorableReturn = undefined
-let modelWatcher: WatchIgnorableReturn = undefined
-
 // The watchIgnorable avoids an infinite loop between watchers.
-stateWatcher = watchIgnorable(
+const stateWatcher: WatchIgnorableReturn = watchIgnorable(
   () => Object.values(state.value),
   () => modelWatcher.ignoreUpdates(resetModel),
-  resetModel,
-  { deep: true, flush: 'post' },
+  { deep: true, flush: 'post' }
 )
-modelWatcher = watchIgnorable(
+
+const modelWatcher: WatchIgnorableReturn = watchIgnorable(
   event,
   () => stateWatcher.ignoreUpdates(resetState),
   { flush: 'post', immediate: true },
@@ -74,7 +71,7 @@ modelWatcher = watchIgnorable(
 function resetState() {
   const ev = event.value
   const st = state.value
-  const evType = !_.isEmpty(ev.recurrent) ?
+  const evType = ev.recurrent ?
     'recurrent' :
     time.isMultiDate(ev.start_datetime, ev.end_datetime) ?
       'multidate' :
@@ -83,20 +80,20 @@ function resetState() {
   st.type = evType
   st.frozenType = !!ev.parentId
   if (evType == 'recurrent') {
-    st.recurrentFreq = ev.recurrent.frequency
-    st.recurrentType = ev.recurrent.type
+    st.recurrentFreq = ev?.recurrent?.frequency
+    st.recurrentType = ev?.recurrent?.type
   }
   // DatePicker will ignore the seconds after midnight
   if (ev.start_datetime) {
     st.startDate = ev.start_datetime * 1000
-    st.startTime = DateTime.fromSeconds(ev.start_datetime, dtOpts)
+    st.startTime = DateTime.fromSeconds(ev.start_datetime, dtOpts.value)
       .toFormat('HH:mm')
   } else {
     st.startDate = st.startTime = null
   }
   if (ev.end_datetime) {
     st.endDate = ev.end_datetime * 1000
-    st.endTime = DateTime.fromSeconds(ev.end_datetime, dtOpts)
+    st.endTime = DateTime.fromSeconds(ev.end_datetime, dtOpts.value)
       .toFormat('HH:mm')
   } else {
     st.endDate = st.endTime = null
@@ -109,15 +106,13 @@ function resetModel() {
   const st = state.value
   const evType = st.type
   if (evType == 'recurrent') {
-    ev.recurrent ??= {}
-    ev.recurrent.frequency = st.recurrentFreq
-    ev.recurrent.type = st.recurrentType
+    ev.recurrent = { frequency: st.recurrentFreq!, type: st.recurrentType! }
   }
   const startDate = st.startDate
   const startTime = st.startTime
   if (startDate && startTime) {
-    const startDateDT = DateTime.fromMillis(startDate, dtOpts)
-    const startTimeDT = DateTime.fromISO(startTime, dtOpts)
+    const startDateDT = DateTime.fromMillis(startDate, dtOpts.value)
+    const startTimeDT = DateTime.fromISO(startTime, dtOpts.value)
     ev.start_datetime = startDateDT.set({
       hour: startTimeDT.hour,
       minute: startTimeDT.minute,
@@ -129,8 +124,8 @@ function resetModel() {
   const endDate = st.endDate
   const endTime = st.endTime
   if (endDate && endTime) {
-    const endDateDT = DateTime.fromMillis(endDate, dtOpts)
-    const endTimeDT = DateTime.fromISO(endTime, dtOpts)
+    const endDateDT = DateTime.fromMillis(endDate, dtOpts.value)
+    const endTimeDT = DateTime.fromISO(endTime, dtOpts.value)
     ev.end_datetime = endDateDT.set({
       hour: endTimeDT.hour,
       minute: endTimeDT.minute,
@@ -142,13 +137,13 @@ function resetModel() {
 }
 const todayEvents = computed(() => {
   const startDate = state.value.startDate
-  const endDate = state.value.endDate || startDate
+  const endDate = state.value.endDate
   if (!events.value || !startDate) {
     return []
   }
-  const startOfDay = DateTime.fromMillis(startDate, dtOpts)
+  const startOfDay = DateTime.fromMillis(startDate, dtOpts.value)
     .startOf('day').toSeconds()
-  const endOfDay = DateTime.fromMillis(endDate, dtOpts)
+  const endOfDay = DateTime.fromMillis(endDate ?? startDate, dtOpts.value)
     .endOf('day').toSeconds()
 
   return events?.value?.filter(
@@ -160,9 +155,9 @@ const whenPatterns = computed(() => {
   if (state.value.type != 'recurrent' || !state.value.startDate) {
     return []
   }
-  const date = DateTime.fromMillis(state.value.startDate, dtOpts)
+  const date = DateTime.fromMillis(state.value.startDate, dtOpts.value)
   const freq = state.value.recurrentFreq
-  const weekDay = date.toFormat('EEEE')
+  const weekDay = date.toFormat('EEEE', dtOpts.value)
   if (freq === '1w' || freq === '2w') {
     return t(`event.recurrent_${freq}_days`, { days: weekDay }).toUpperCase()
   } else if (freq === '1m' || freq === '2m') {
@@ -202,8 +197,8 @@ const pickDates = computed({
       state.value.startDate :
         { start: state.value.startDate, end: state.value.endDate }
   },
-  set: (dates: number | { start?: number, end?: number } | null) => {
-    if (_.isNumber(dates) || !dates) {
+  set: (dates: number | { start: number, end: number | null } | null) => {
+    if (typeof dates === 'number' || !dates) {
       state.value.startDate = dates
       state.value.endDate = dates
     } else {
@@ -234,36 +229,44 @@ const pickDates = computed({
     <v-btn-toggle
       v-if="state.type === 'recurrent'"
       v-model="state.recurrentFreq"
-      class="v-col-6 flex-column flex-sm-row"
+      class="flex-wrap flex-row"
+      variant='outlined'
+      mandatory
       color="primary"
     >
       <v-btn v-for="f in frequencies" :key="f.value" :value="f.value">{{ f.text }}</v-btn>
     </v-btn-toggle>
 
     <div class="mx-auto d-block mt-3">
-      <DatePicker
-        v-model.number="pickDates"
-        :timezone="tz"
-        :rules="[$valid.required('common.when')]"
-        class="mx-auto"
-        :is-dark="theme.current?.value?.dark"
-        :is-range="state.type === 'multidate'"
-        :locale="$i18n.locale"
-        :attributes="attributes"
-        is-inline
-        :min-date="!isAdmin ? today.toMillis() : undefined"
-        :initial-page="pickDates ? undefined : initialCalendarPage"
-        is-expanded
-      />
+      <v-input
+        :model-value="pickDates"
+        :rules="[$valid.required('common.date')]">
+        <DatePicker
+          v-model.number="pickDates"
+          :timezone="tz"
+          class="mx-auto"
+          :is-dark="theme.current?.value?.dark"
+          :is-range="state.type === 'multidate'"
+          :locale="$i18n.locale"
+          :attributes="attributes"
+          is-inline
+          :min-date="!isAdmin ? today.toMillis() : undefined"
+          :initial-page="pickDates ? undefined : initialCalendarPage"
+          is-expanded
+        />
+      </v-input>
     </div>
 
   </div>
 
   <div v-if="state.type === 'recurrent'" class="text-center mb-2">
-    <span v-if="state.recurrentFreq !== '1m' && state.recurrentFreq !== '2m'">{{ whenPatterns }}</span>
+    <span v-if="typeof whenPatterns === 'string'">{{ whenPatterns }}</span>
     <v-btn-toggle
       v-else
       v-model="state.recurrentType"
+      variant="outlined"
+      color="primary"
+      mandatory
       class="mt-1 flex-column flex-sm-row"
     >
       <v-btn

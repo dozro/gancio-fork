@@ -241,7 +241,8 @@
         "rescheduled": "Rescheduled",
         "tentative": "Tentative",
         "reannounce": "Reannounce",
-        "reannounce_description": "Should we reannounce (boost) this event to the federation?"
+        "reannounce_description": "Should we reannounce (boost) this event to the federation?",
+        "date": "Date"
     },
     "admin": {
         "place_description": "If you have gotten the place or address wrong, you can change it.<br/>All current and past events associated with this place will change address.",
