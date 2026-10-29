@@ -68,7 +68,7 @@ export function useTime() {
       .set({ hour: hours, minute: minutes, second: 0, millisecond: 0 }).toUnixInteger()
   }
 
-  function isMultiDate(start: number, end?: number) {
+  function isMultiDate(start: number, end?: number | null) {
     return end && !dt(end).hasSame(dt(start), 'day')
   }
 
