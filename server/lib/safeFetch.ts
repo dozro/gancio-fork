@@ -239,6 +239,12 @@ export async function safeFetch(input: string, options: SafeFetchOptions = {}): 
     if (next.port && effectivePort(next) !== effectivePort(url)) {
       throw new SafeFetchError(`Redirect to another port not allowed: ${next.port}`, 'unreachable')
     }
+    // credentials and signatures belong to the origin they were made for (as fetch does)
+    if (next.origin !== url.origin) {
+      for (const name of ['authorization', 'cookie', 'signature', 'digest']) {
+        headers.delete(name)
+      }
+    }
     url = next
     // as fetch does, 303 (and 301/302 after a POST) are followed with a GET without body
     if (response.status === 303 || (method === 'POST' && [301, 302].includes(response.status))) {
