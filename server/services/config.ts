@@ -106,7 +106,8 @@ const defaultConfig: Config = {
   // TODO
   hidden_service: process.env.ALLOW_ACCESS_TO_HIDDEN_SERVICE || '',
   // exceptions to the public address check of outgoing requests, see server/lib/safeFetch.ts
-  allowed_private_addresses: process.env.GANCIO_ALLOWED_PRIVATE_ADDRESSES || '',
+  // while developing allow the local instance (e.g. to import a local ICS)
+  allowed_private_addresses: !isBuild && !isTest ? '127.0.0.1:13120,localhost:13120' : process.env.GANCIO_ALLOWED_PRIVATE_ADDRESSES || '',
   admin_email: process.env.ADMIN_EMAIL || '',
   smtp: {
     host: process.env.SMTP_HOST || '',
