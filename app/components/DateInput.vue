@@ -160,18 +160,19 @@ const whenPatterns = computed(() => {
   const date = DateTime.fromMillis(state.value.startDate, dtOpts.value)
   const freq = state.value.recurrentFreq
   const weekDay = date.toFormat('EEEE', dtOpts.value)
+  const month = date.toFormat('MMMM', dtOpts.value)
   if (freq === '1w' || freq === '2w') {
     return t(`event.recurrent_${freq}_days`, { days: weekDay }).toUpperCase()
-  } else if (freq === '1m' || freq === '2m') {
+  } else if (freq === '1m' || freq === '1y') {
     const n = Math.floor((date.day - 1) / 7) + 1
 
     const patterns: { label: string, key: 'ordinal' | number }[] = [
-      { label: t(`event.recurrent_${freq}_days`, { days: date.day }), key: 'ordinal' }
+      { label: t(`event.recurrent_${freq}_days`, { days: date.day, months: month }), key: 'ordinal' }
     ]
 
     if (n < 5) {
       patterns.push({
-        label: t(`event.recurrent_${freq}_ordinal`, { n: t(`ordinal.${n}`), days: weekDay }),
+        label: t(`event.recurrent_${freq}_ordinal`, { n: t(`ordinal.${n}`), days: weekDay, months: month }),
         key: n
       })
     }
@@ -180,7 +181,7 @@ const whenPatterns = computed(() => {
     const lastWeek = date.endOf('month').day - date.day < 7
     if (lastWeek) {
       patterns.push({
-        label: t(`event.recurrent_${freq}_ordinal`, { n: t('ordinal.-1'), days: weekDay }),
+        label: t(`event.recurrent_${freq}_ordinal`, { n: t('ordinal.-1'), days: weekDay, months: month }),
         key: -1
       })
     }
