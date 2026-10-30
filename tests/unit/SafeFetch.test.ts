@@ -1,12 +1,12 @@
 import { describe, expect, it, vi, afterAll } from 'vitest'
 import http from 'node:http'
-import os from 'node:os'
 import type { AddressInfo } from 'node:net'
 import { mockH3Event, loadTestUsers } from './utils'
 import { isPublicAddress, safeFetch } from '../../server/lib/safeFetch'
 import { generateKeyPairSync } from 'node:crypto'
 import { publicSettings, setSetting } from '../../server/services'
 import { _signAndSend } from '../../server/federation/sign_and_send'
+import { get as getConfig } from '../../server/services/config'
 
 import { getUser } from '../../server/lib/getUser'
 vi.mock('../../server/lib/getUser')
@@ -78,12 +78,12 @@ describe('Safe fetch', () => {
       await expect(safeFetch(url, { allowedList: '' }), url).rejects.toThrow(message)
     }
 
-    // public addresses of this machine
-    const spy = vi.spyOn(os, 'networkInterfaces').mockReturnValue({
-      eth0: [{ address: '93.184.216.34', netmask: '255.255.255.0', family: 'IPv4', mac: '00:00:00:00:00:00', internal: false, cidr: '93.184.216.34/24' }]
-    })
-    await expect(safeFetch('http://93.184.216.34/', { allowedList: '' })).rejects.toThrow('Address not allowed: 93.184.216.34')
-    spy.mockRestore()
+    // the public address of this instance on other ports than the default ones
+    const config = getConfig()
+    const baseurl = config.baseurl
+    config.baseurl = 'https://93.184.216.34'
+    await expect(safeFetch('http://93.184.216.34:5432/', { allowedList: '', anyPort: true })).rejects.toThrow('Address not allowed: 93.184.216.34')
+    config.baseurl = baseurl
   })
 
   it('should allow only the listed private addresses and ports', async () => {

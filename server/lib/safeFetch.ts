@@ -2,7 +2,6 @@ import http from 'node:http'
 import https from 'node:https'
 import dns from 'node:dns'
 import net from 'node:net'
-import os from 'node:os'
 import { get as getConfig } from '../services/config'
 
 // fetch user supplied URLs without reaching internal services -> https://framagit.org/les/gancio/-/work_items/764
@@ -53,15 +52,14 @@ export function isPublicAddress(address: string) {
 }
 
 /**
- * true if the address is a public address of this machine: services listening on it (e.g. the database)
- * could be reachable from here even if a firewall protects them from outside.
- * The addresses `baseurl` resolves to are not considered: behind a CDN they are shared by many other websites.
+ * The addresses of this instance (`baseurl`): requests to them never leave the machine, so services listening there
+ * (e.g. the Portainer API) could be reachable even if a firewall protects them from outside.
+ * They are allowed only on the default ports, served by the instance itself (e.g. to import an image of its own events).
  */
-export function isOwnAddress(address: string) {
-  // private addresses of this machine are blocked anyway, unless explicitly allowed
-  return isPublicAddress(address) && Object.values(os.networkInterfaces())
-    .flat()
-    .some(iface => iface?.address === address)
+async function getOwnAddresses() {
+  const host = new URL(getConfig().baseurl).hostname.replace(/^\[(.*)\]$/, '$1')
+  const addresses = await dns.promises.lookup(host, { all: true }).catch(() => [])
+  return addresses.map(a => a.address)
 }
 
 /**
@@ -158,7 +156,7 @@ export type SafeFetchOptions = {
   anyPort?: boolean
 }
 
-type Policy = { allowed: AllowedEntry[], anyPort: boolean }
+type Policy = { allowed: AllowedEntry[], anyPort: boolean, ownAddresses: string[] }
 
 export type SafeFetchResponse = {
   status: number
@@ -195,7 +193,8 @@ function isAllowedTarget(address: string, url: URL, policy: Policy) {
   if (policy.allowed.some(e => e.subnet?.check(address, type) && isAllowedPortFor(e, url, policy))) {
     return true
   }
-  return isAllowedPort(url, policy) && isPublicAddress(address) && !isOwnAddress(address)
+  const isOwnAddressOnOtherPort = url.port !== '' && policy.ownAddresses.includes(address)
+  return isAllowedPort(url, policy) && isPublicAddress(address) && !isOwnAddressOnOtherPort
 }
 
 /**
@@ -211,7 +210,9 @@ export async function safeFetch(input: string, options: SafeFetchOptions = {}): 
   } = options
   const policy: Policy = {
     allowed: parseAllowedList(options.allowedList ?? getConfig().allowed_private_addresses ?? ''),
-    anyPort: options.anyPort ?? false
+    anyPort: options.anyPort ?? false,
+    // needed only when other ports than the default ones are allowed
+    ownAddresses: options.anyPort ? await getOwnAddresses() : []
   }
 
   const deadline = Date.now() + timeout
