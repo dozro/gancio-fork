@@ -106,7 +106,9 @@ function resetModel() {
   const st = state.value
   const evType = st.type
   if (evType == 'recurrent') {
-    ev.recurrent = { frequency: st.recurrentFreq!, type: st.recurrentType! }
+    ev.recurrent = { frequency: st.recurrentFreq, type: st.recurrentType }
+  } else {
+    ev.recurrent = undefined
   }
   const startDate = st.startDate
   const startTime = st.startTime
