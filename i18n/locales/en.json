@@ -127,7 +127,8 @@
         "convert_draft": "Convert to draft",
         "create_draft": "Create as draft",
         "save_draft": "Save draft",
-        "draft": "Draft"
+        "draft": "Draft",
+        "date": "Date"
     },
     "login": {
         "description": "By logging in you can publish new events.",
@@ -241,8 +242,7 @@
         "rescheduled": "Rescheduled",
         "tentative": "Tentative",
         "reannounce": "Reannounce",
-        "reannounce_description": "Should we reannounce (boost) this event to the federation?",
-        "date": "Date"
+        "reannounce_description": "Should we reannounce (boost) this event to the federation?"
     },
     "admin": {
         "place_description": "If you have gotten the place or address wrong, you can change it.<br/>All current and past events associated with this place will change address.",

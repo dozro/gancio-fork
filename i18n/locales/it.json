@@ -119,7 +119,8 @@
         "pages": "Pagine",
         "pin": "Fissa",
         "contact_user": "Contatta utente",
-        "trusted_sources": "Fonti federate attendibili"
+        "trusted_sources": "Fonti federate attendibili",
+        "date": "Data"
     },
     "login": {
         "description": "Entrando puoi pubblicare nuovi eventi.",
@@ -221,8 +222,8 @@
         "message_hint": "Puoi inviare un messaggio a chi amministra e opzionalmente a chi ha inviato l'evento.",
         "message": "Messaggio",
         "message_author_hint": "Scrivi un messaggio per chi amministra",
-        "recurrent_1y_days": "{months} {days} ogni anno",
-        "recurrent_1y_ordinal": "I {n} {days} in {months} ogni anno",
+        "recurrent_1y_days": "Il giorno {days} {months} ogni anno",
+        "recurrent_1y_ordinal": "{n} {days} di {months} ogni anno",
         "each_year": "Ogni anno",
         "online_locations_fallback_urls": "Link di fallback"
     },
