@@ -73,7 +73,7 @@
   --vp-custom-block-font-size: 18px;
   /*--vp-c-bg: rgba(255, 62, 62, 0.1);*/
   /*--vp-c-bg-alt: #f9f2ec;   /* sidebar, code blocks, etc. */
-  
+
 }
 
 .v-application { background: transparent !important; }
@@ -139,7 +139,7 @@
 
 
 figure {
-  margin: 50px auto;
+  margin: 24px auto;
 }
 
 figure > img {

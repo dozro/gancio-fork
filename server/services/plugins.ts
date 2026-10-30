@@ -426,7 +426,11 @@ export class PluginController {
 
     log.debug(`Initializing default plugins from: ${[...pluginsPaths]}`)
 
-    return [...pluginsPaths].map(pluginPath => this.initializePluginsFromPath(pluginPath, loadIfEnabled))
+    const plugins = await Promise.all(
+      [...pluginsPaths].map(path => this.initializePluginsFromPath(path, loadIfEnabled))
+    )
+
+    return plugins.flat()
   }
 
   async initializePluginsFromPath(pluginsPath: string, loadIfEnabled: boolean) {

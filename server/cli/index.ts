@@ -4,7 +4,7 @@ import { hideBin } from 'yargs/helpers'
 import { connect, runMigrations } from '../services/db'
 import usersCLI from './users'
 import settingsCLI from './settings'
-// import pluginsCLI from './plugins'
+import pluginsCLI from './plugins'
 import { fileURLToPath } from 'url'
 import { isBuild } from '../services/config'
 
@@ -46,7 +46,7 @@ yarg
   })
   .command(['users'], 'Manage users', usersCLI)
   .command(['settings'], 'Manage settings', settingsCLI)
-  // .command(['plugins'], 'Manage plugins', pluginsCLI)
+  .command(['plugins'], 'Manage plugins', pluginsCLI)
   .help('h')
   .alias('h', 'help')
   .epilog('Made with ❤ by underscore hacklab - https://gancio.org')

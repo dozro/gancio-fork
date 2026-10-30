@@ -7,7 +7,6 @@ async function list() {
     console.error('Error initializing plugins:', err)
     return []
   })
-  console.log()
   // also filter out rejected plugins
   for (const pluginResult of plugins) {
     if (pluginResult.status === 'rejected') {
@@ -16,7 +15,7 @@ async function list() {
     }
     const plugin = pluginResult.value
     if (!plugin) continue
-    console.log(`[${plugin.manifest.name}]\r\n > ${plugin.manifest.description}`)
+    console.log(`\r\n[${plugin.manifest.name}]\r\n${plugin.manifest.description}\r\n`)
   }
   console.log()
   await db.close()
