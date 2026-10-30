@@ -1,6 +1,6 @@
 # Debian installation
 
-You will need node.js (>= 24.5) to install Gancio.
+You will need node.js (>= 24.14) to install Gancio.
 
 1. Install Node.js
 ```bash

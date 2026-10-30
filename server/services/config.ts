@@ -4,6 +4,7 @@ import fs from 'fs'
 import { z } from 'zod'
 import { randomBytes } from 'crypto'
 import { fileURLToPath } from 'url'
+import http from 'node:http'
 
 export const isBuild = process.env.NODE_ENV === 'production'
 export const isTest = process.env.VITEST == 'true'
@@ -121,6 +122,32 @@ const defaultConfig: Config = {
   session_password: process.env.NUXT_SESSION_PASSWORD || process.env.SESSION_PASSWORD
 }
 
+type LegacyProxy = { protocol?: string, hostname?: string, host?: string, port?: string | number, auth?: { username?: string, password?: string } }
+
+/**
+ * DEPRECATED: to be removed with its call in `get()`.
+ * Outgoing requests use the standard HTTP_PROXY / HTTPS_PROXY / NO_PROXY variables with NODE_USE_ENV_PROXY=1,
+ * read by node at startup: the legacy `proxy` configuration (`config.json` or PROXY_* variables) is mapped to them.
+ */
+function setupLegacyProxy(proxy: LegacyProxy = {}) {
+  const env = process.env
+  const host = proxy.hostname || proxy.host || env.PROXY_HOSTNAME || env.PROXY_HOST
+  if (!host || env.NODE_USE_ENV_PROXY === '0') return
+
+  const protocol = (proxy.protocol || env.PROXY_PROTOCOL || 'http').replace(/:$/, '')
+  const port = proxy.port || env.PROXY_PORT
+  const username = proxy.auth?.username || env.PROXY_AUTH_USERNAME || env.PROXY_USERNAME
+  const password = proxy.auth?.password || env.PROXY_AUTH_PASSWORD || env.PROXY_PASSWORD || ''
+  const auth = username ? `${encodeURIComponent(username)}:${encodeURIComponent(password)}@` : ''
+  const url = `${protocol}://${auth}${host}${port ? `:${port}` : ''}`
+
+  console.warn('The `proxy` configuration (PROXY_* variables) is deprecated: use HTTP_PROXY / HTTPS_PROXY with NODE_USE_ENV_PROXY=1')
+  env.HTTP_PROXY ||= url
+  env.HTTPS_PROXY ||= url
+  env.NODE_USE_ENV_PROXY = '1'
+  http.setGlobalProxyFromEnv(env)
+}
+
 /**
  * this loads the configuration in `config.json`
  * and merge it with the ENV vars incoming from `.env` or from
@@ -144,6 +171,7 @@ export function get(): Config {
     config = ConfigSchema.parse({ ...defaultConfig, ...configuration })
     process.env.NITRO_HOST = config.server.host
     process.env.NITRO_PORT = String(config.server.port)
+    setupLegacyProxy((configuration as { proxy?: LegacyProxy }).proxy)
     //
     if (!config.session_password) {
       console.warn('No session password set, generating a random one and saving it to config.json')
