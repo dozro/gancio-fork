@@ -239,7 +239,10 @@ const pickDates = computed({
     >
       <v-btn v-for="f in frequencies" :key="f.value" :value="f.value">{{ f.text }}</v-btn>
     </v-btn-toggle>
-
+    <v-input
+      :model-value="state.recurrentFreq"
+      :rules="[$valid.required('event.recurrent')]"
+    />
     <div class="mx-auto d-block mt-3">
       <v-input
         :model-value="pickDates"
@@ -264,21 +267,26 @@ const pickDates = computed({
 
   <div v-if="state.type === 'recurrent'" class="text-center mb-2">
     <span v-if="typeof whenPatterns === 'string'">{{ whenPatterns }}</span>
-    <v-btn-toggle
-      v-else
-      v-model="state.recurrentType"
-      variant="outlined"
-      color="primary"
-      mandatory
-      class="mt-1 flex-column flex-sm-row"
-    >
-      <v-btn
-        v-for="whenPattern in whenPatterns"
-        :key="whenPattern.key"
-        :value="whenPattern.key"
-        size='small'
-      >{{ whenPattern.label }}</v-btn>
-    </v-btn-toggle>
+    <template v-else>
+      <v-btn-toggle
+        v-model="state.recurrentType"
+        variant="outlined"
+        color="primary"
+        mandatory
+        class="mt-1 flex-column flex-sm-row"
+      >
+        <v-btn
+          v-for="whenPattern in whenPatterns"
+          :key="whenPattern.key"
+          :value="whenPattern.key"
+          size='small'
+        >{{ whenPattern.label }}</v-btn>
+      </v-btn-toggle>
+      <v-input
+        :model-value="state.recurrentType"
+        :rules="[$valid.required('event.recurrent')]"
+      />
+    </template>
   </div>
 
   <v-row class="mt-3 col-md-6 mx-auto datePicker">
