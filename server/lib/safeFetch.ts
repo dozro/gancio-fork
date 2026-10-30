@@ -218,14 +218,14 @@ export async function safeFetch(input: string, options: SafeFetchOptions = {}): 
   let method = options.method ?? 'GET'
   let body = options.body
   let url = parseURL(input)
-
+  const headers = new Headers(options.headers)
+  headers.delete('host')
   for (let redirects = 0; ; redirects++) {
     checkURL(url, policy)
     if (useEnvProxy()) {
       await checkProxiedTarget(url, policy)
     }
-    const response = await request(url, { method, headers: options.headers, body, maxSize, deadline, policy })
-
+    const response = await request(url, { method, headers, body, maxSize, deadline, policy })
     const location = response.headers.location
     if (response.status < 300 || response.status >= 400 || !location) {
       return response
@@ -300,7 +300,7 @@ function createLookup(url: URL, policy: Policy): net.LookupFunction {
 
 type RequestOptions = {
   method: 'GET' | 'POST'
-  headers?: Record<string, string>
+  headers?: Headers
   body?: string
   maxSize: number
   deadline: number
@@ -319,14 +319,14 @@ function request(url: URL, opts: RequestOptions): Promise<SafeFetchResponse> {
       clearTimeout(timer)
       reject(e instanceof SafeFetchError ? e : new SafeFetchError(e.message, 'unreachable'))
     }
-
+    const headers = new Headers(opts.headers)
+    headers.set('User-Agent', `Gancio`)
+    if (opts.body !== undefined) {
+      headers.set('Content-Length', String(Buffer.byteLength(opts.body)))
+    }
     const req = (url.protocol === 'https:' ? https : http).request(url, {
       method: opts.method,
-      headers: {
-        'User-Agent': 'Gancio',
-        ...opts.headers,
-        ...(opts.body !== undefined && { 'Content-Length': String(Buffer.byteLength(opts.body)) })
-      },
+      headers: Object.fromEntries(headers),
       lookup: createLookup(url, opts.policy),
       // not the global agent: its pooled connections could have been opened without our address check
       agent: new (url.protocol === 'https:' ? https.Agent : http.Agent)({ proxyEnv: useEnvProxy() ? process.env : undefined })
