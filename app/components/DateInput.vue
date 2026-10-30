@@ -106,7 +106,9 @@ function resetModel() {
   const st = state.value
   const evType = st.type
   if (evType == 'recurrent') {
-    ev.recurrent = { frequency: st.recurrentFreq!, type: st.recurrentType! }
+    ev.recurrent = { frequency: st.recurrentFreq, type: st.recurrentType }
+  } else {
+    ev.recurrent = undefined
   }
   const startDate = st.startDate
   const startTime = st.startTime
@@ -158,18 +160,19 @@ const whenPatterns = computed(() => {
   const date = DateTime.fromMillis(state.value.startDate, dtOpts.value)
   const freq = state.value.recurrentFreq
   const weekDay = date.toFormat('EEEE', dtOpts.value)
+  const month = date.toFormat('MMMM', dtOpts.value)
   if (freq === '1w' || freq === '2w') {
     return t(`event.recurrent_${freq}_days`, { days: weekDay }).toUpperCase()
-  } else if (freq === '1m' || freq === '2m') {
+  } else if (freq === '1m' || freq === '1y') {
     const n = Math.floor((date.day - 1) / 7) + 1
 
     const patterns: { label: string, key: 'ordinal' | number }[] = [
-      { label: t(`event.recurrent_${freq}_days`, { days: date.day }), key: 'ordinal' }
+      { label: t(`event.recurrent_${freq}_days`, { days: date.day, months: month }), key: 'ordinal' }
     ]
 
     if (n < 5) {
       patterns.push({
-        label: t(`event.recurrent_${freq}_ordinal`, { n: t(`ordinal.${n}`), days: weekDay }),
+        label: t(`event.recurrent_${freq}_ordinal`, { n: t(`ordinal.${n}`), days: weekDay, months: month }),
         key: n
       })
     }
@@ -178,7 +181,7 @@ const whenPatterns = computed(() => {
     const lastWeek = date.endOf('month').day - date.day < 7
     if (lastWeek) {
       patterns.push({
-        label: t(`event.recurrent_${freq}_ordinal`, { n: t('ordinal.-1'), days: weekDay }),
+        label: t(`event.recurrent_${freq}_ordinal`, { n: t('ordinal.-1'), days: weekDay, months: month }),
         key: -1
       })
     }
@@ -236,7 +239,10 @@ const pickDates = computed({
     >
       <v-btn v-for="f in frequencies" :key="f.value" :value="f.value">{{ f.text }}</v-btn>
     </v-btn-toggle>
-
+    <v-input
+      :model-value="state.recurrentFreq"
+      :rules="[$valid.required('event.recurrent')]"
+    />
     <div class="mx-auto d-block mt-3">
       <v-input
         :model-value="pickDates"
@@ -261,21 +267,26 @@ const pickDates = computed({
 
   <div v-if="state.type === 'recurrent'" class="text-center mb-2">
     <span v-if="typeof whenPatterns === 'string'">{{ whenPatterns }}</span>
-    <v-btn-toggle
-      v-else
-      v-model="state.recurrentType"
-      variant="outlined"
-      color="primary"
-      mandatory
-      class="mt-1 flex-column flex-sm-row"
-    >
-      <v-btn
-        v-for="whenPattern in whenPatterns"
-        :key="whenPattern.key"
-        :value="whenPattern.key"
-        size='small'
-      >{{ whenPattern.label }}</v-btn>
-    </v-btn-toggle>
+    <template v-else>
+      <v-btn-toggle
+        v-model="state.recurrentType"
+        variant="outlined"
+        color="primary"
+        mandatory
+        class="mt-1 flex-column flex-sm-row"
+      >
+        <v-btn
+          v-for="whenPattern in whenPatterns"
+          :key="whenPattern.key"
+          :value="whenPattern.key"
+          size='small'
+        >{{ whenPattern.label }}</v-btn>
+      </v-btn-toggle>
+      <v-input
+        :model-value="state.recurrentType"
+        :rules="[$valid.required('event.recurrent')]"
+      />
+    </template>
   </div>
 
   <v-row class="mt-3 col-md-6 mx-auto datePicker">
