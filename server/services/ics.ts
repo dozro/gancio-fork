@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import ics from 'ics'
+import type { ICalAlarmData, ICalLocation } from 'ical-generator'
+import ical, { ICalCalendarMethod, ICalEventStatus } from 'ical-generator'
 import { type H3Event, setHeader, createError } from 'h3'
 import type { Event, EventStatus } from './db'
 import { htmlToText } from 'html-to-text'
@@ -8,55 +9,58 @@ import { publicSettings } from './settings'
 /**
  * Send an ics of specified events (optionally with reminders)
  * @param {Event[]} events array of events from sequelize
- * @param {*} alarms https://github.com/adamgibbons/ics#attributes (alarms)
+ * @param {*} alarms https://sebbo2002.github.io/ical-generator/develop/reference/classes/ICalAlarm.html (alarms)
  */
-export function exportICS(evt: H3Event, events: Event[], alarms?: ics.Alarm[]) {
-  const statusMap: Record<EventStatus, ics.EventStatus> = {
-    EventCancelled: 'CANCELLED',
-    EventTentative: 'TENTATIVE',
-    EventScheduled: 'CONFIRMED',
-    EventMovedOnline: 'CONFIRMED',
-    EventPostponed: 'TENTATIVE',
-    EventRescheduled: 'CONFIRMED'
+export function exportICS(evt: H3Event, events: Event[], alarms?: ICalAlarmData[]) {
+  const statusMap: Record<EventStatus, ICalEventStatus> = {
+    EventCancelled: ICalEventStatus.CANCELLED,
+    EventTentative: ICalEventStatus.TENTATIVE,
+    EventScheduled: ICalEventStatus.CONFIRMED,
+    EventMovedOnline: ICalEventStatus.CONFIRMED,
+    EventPostponed: ICalEventStatus.TENTATIVE,
+    EventRescheduled: ICalEventStatus.CONFIRMED
   }
-  const eventsMap = events.map((e) => {
-    const tmpStart = DateTime.fromSeconds(e.start_datetime, { zone: 'UTC' })
-    const end_datetime = e?.end_datetime ?? e.start_datetime + publicSettings.open_ended_event_default_duration * 60 * 60
-    const tmpEnd = DateTime.fromSeconds(end_datetime, { zone: 'UTC' })
-    const start: [number, number, number, number, number] = [tmpStart.year, tmpStart.month, tmpStart.day, tmpStart.hour, tmpStart.minute]
-    const end: [number, number, number, number, number] = [tmpEnd.year, tmpEnd.month, tmpEnd.day, tmpEnd.hour, tmpEnd.minute]
-
-    const location = e?.place ? `${e.place?.name} - ${e.place?.address}` : e.online_locations?.length ? e?.online_locations?.[0] : ''
-    const ret: ics.EventAttributes = {
-      uid: `${e.id}@${publicSettings.hostname}`,
-      start,
-      end,
-      startInputType: 'utc',
-      endInputType: 'utc',
-      title: e.title,
-      description: htmlToText(e.description),
-      htmlContent: e.description && e.description.replace(/\n/g, '<br>'),
-      location,
-      url: `${publicSettings.baseurl}/event/${e.slug || e.id}`,
-      status: statusMap[e.status as EventStatus],
-      categories: e?.tags?.map(t => t.tag || t) as string[],
-      created: e.createdAt?.getTime(),
-      lastModified: e.updatedAt?.getTime(),
-      alarms
-    }
-
-    if (e.place?.latitude && e.place?.longitude) {
-      ret.geo = { lat: e.place.latitude, lon: e.place.longitude }
-    }
-
-    return ret
+  const cal = ical({
+    method: ICalCalendarMethod.PUBLISH,
+    scale: 'GREGORIAN'
   })
+  cal.ttl(3600)
 
   setHeader(evt, 'Content-Type', 'text/calendar; charset=UTF-8')
-  return ics.createEvents(eventsMap, (err, value) => {
-    if (err) {
-      throw createError({ status: 401, message: String(err) })
-    }
-    return value
-  })
+  try {
+    events.forEach((e) => {
+      const start = DateTime.fromSeconds(e.start_datetime, { zone: 'UTC' })
+      const end = DateTime.fromSeconds(e?.end_datetime ?? e.start_datetime + publicSettings.open_ended_event_default_duration * 60 * 60, { zone: 'UTC' })
+
+      const address = e?.place ? `${e.place?.name} - ${e.place?.address}` : e.online_locations?.length ? e?.online_locations?.[0] : ''
+      let location: string | ICalLocation | undefined = address
+      if (e.place?.latitude && e.place?.longitude) {
+        location = {
+          title: address,
+          geo: { lat: e.place.latitude, lon: e.place.longitude }
+        }
+      }
+
+      cal.createEvent({
+        id: `${e.id}@${publicSettings.hostname}`,
+        start: start,
+        end: end,
+        summary: e.title,
+        description: {
+          html: e.description,
+          plain: htmlToText(e.description)
+        },
+        location: location,
+        url: `${publicSettings.baseurl}/event/${e.slug || e.id}`,
+        status: statusMap[e.status as EventStatus],
+        categories: e?.tags?.map(t => ({ name: t.tag })),
+        created: e.createdAt,
+        lastModified: e.updatedAt,
+        alarms
+      })
+    })
+    return cal.toString()
+  } catch(err) {
+    throw createError({ status: 401, message: String(err) })
+  }
 }

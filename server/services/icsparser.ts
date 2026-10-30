@@ -1,7 +1,7 @@
 import ical from 'ical.js'
 import { useLogger } from '../lib/logger'
 import type { EventStatus } from './db'
-import type { EventStatus as IcsEventStatus } from 'ics'
+import type { ICalEventStatus as IcsEventStatus } from 'ical-generator'
 
 const statusMap: Record<IcsEventStatus, EventStatus> = {
   CANCELLED: 'EventCancelled',

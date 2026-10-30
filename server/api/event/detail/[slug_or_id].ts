@@ -1,4 +1,5 @@
 import { defineEventHandler, getRouterParam, createError, setHeader, getQuery } from 'h3'
+import { ICalAlarmType } from 'ical-generator'
 import { getUser } from '~~/server/lib/getUser'
 
 import { mapEvent } from '~~/server/services'
@@ -46,7 +47,7 @@ import { preferCalendar, preferLDJSON } from '~~/server/lib/negotiator'
  *                 BEGIN:VCALENDAR
  *                 VERSION:2.0
  *                 CALSCALE:GREGORIAN
- *                 PRODID:adamgibbons/ics
+ *                 PRODID:-//sebbo.net//ical-generator//EN
  *                 METHOD:PUBLISH
  *                 X-PUBLISHED-TTL:PT1H
  *                 BEGIN:VEVENT
@@ -103,11 +104,13 @@ export default defineEventHandler(async (evt) => {
     return eventToAP(event)
   } else if (preferCalendar(evt) || format === 'ics') {
     setHeader(evt, 'Content-Type', 'text/calendar')
-    // last arg is alarms/reminder, ref: https://github.com/adamgibbons/ics#attributes (alarms)
+    // last arg is alarms/reminder
+    // ref: https://sebbo2002.github.io/ical-generator/develop/reference/types/ICalAlarmTriggerBeforeData.html
+    // ref: https://sebbo2002.github.io/ical-generator/develop/reference/interfaces/ICalAlarmBaseData.html
     return exportICS(evt, [event], [{
-      action: 'display',
+      type: ICalAlarmType.display,
       description: event.title,
-      trigger: { hours: 1, before: true }
+      triggerBefore: 3600
     }])
   }
   return mapEvent(event, { user })
