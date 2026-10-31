@@ -5,8 +5,26 @@ import { Event, Place } from '~~/server/services'
 import { placeToJSON } from '~~/server/services/places'
 
 /**
- * List all places with their event count, used in admin panel
- * @auth
+ * @openapi
+ * /api/places/list:
+ *   get:
+ *     summary: List places
+ *     description: List all places with visible events and their event count. Admin role is required.
+ *     responses:
+ *       200:
+ *         description: List of places.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/PlaceAPI'
+ *       401:
+ *         description: Unauthorized.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Places
  */
 export default defineEventHandler(async (evt) => {
   await requireAdmin(evt)

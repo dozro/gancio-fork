@@ -10,11 +10,41 @@ const schema = z.object({
 })
 
 /**
- * Rename a tag
- * @auth
- * @param {string} tag - Original tag
- * @param {string} newTag - New tag
- * @info rename the tag with `newTag` or merge it with an existing one, in this case all associated events will also be updated
+ * @openapi
+ * /api/tags:
+ *   put:
+ *     summary: Rename tag
+ *     description: Rename a tag, or merge it into `newTag` when that tag already exists.
+ *       Merging moves all events to the existing tag. Admin role is required.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [tag, newTag]
+ *             properties:
+ *               tag:
+ *                 type: string
+ *                 description: Tag to rename.
+ *                 example: concrt
+ *               newTag:
+ *                 type: string
+ *                 description: New tag.
+ *                 example: concert
+ *     responses:
+ *       204:
+ *         description: Tag renamed or merged.
+ *       400:
+ *         description: Validation error.
+ *       401:
+ *         description: Unauthorized.
+ *       404:
+ *         description: Tag does not exist.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Tags
  */
 export default defineEventHandler(async (evt) => {
   await requireAdmin(evt)
