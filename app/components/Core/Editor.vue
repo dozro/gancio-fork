@@ -21,6 +21,16 @@ const editor = useEditor({
     emit('update:modelValue', editor.getHTML())
   }
 })
+// Watch for changes in the modelValue prop coming from the parent and update
+// the editor content.
+watch(
+  () => toValue(props.modelValue),
+  (newValue) => {
+    if (newValue != editor.value.getHTML()) {
+      editor.value.commands.setContent(newValue)
+    }
+  },
+)
 
 const focused = ref(false)
 
