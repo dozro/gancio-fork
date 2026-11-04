@@ -46,6 +46,9 @@ export function parseIcsData(icsText: string, includePastEvents = true) {
           }
         : undefined
 
+      // Check if event has categories to include them as tags
+      const tags = event.component.getFirstProperty('categories')?.getValues()
+
       return {
         title: event.summary || '',
         description: event.description || '',
@@ -53,6 +56,7 @@ export function parseIcsData(icsText: string, includePastEvents = true) {
         status: statusMap[event?.status ?? 'CONFIRMED'],
         uid: event.uid || '',
         location: event.location || '',
+        tags: tags,
         start_datetime,
         end_datetime,
         modified: event?.lastModified?.toUnixTime() || '',
