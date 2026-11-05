@@ -199,7 +199,7 @@ const normalizedTags = computed({
             <!-- Not logged event -->
             <v-col v-if='!loggedIn' cols=12>
               <!-- eslint-disable-next-line vue/no-v-html -->
-              <p v-html="t('event.anon_description')" />
+              <p v-html="t(settings.allow_registration ? 'event.anon_description' : 'event.anon_description_without_registration')" />
             </v-col>
 
             <!-- Title -->
