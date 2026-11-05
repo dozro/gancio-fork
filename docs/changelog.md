@@ -2,50 +2,6 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [2.0.0-beta.9](https://framagit.org/les/gancio/compare/v2.0.0-beta.8...v2.0.0-beta.9) (2026-11-05)
-
-
-
-### Features
-
-* use node built-in proxy support for outgoing requests ([b0cab28](https://framagit.org/les/gancio/commit/b0cab2870e386a76cc67b704009c6ace43088b77)), closes [#764](https://framagit.org/les/gancio/issues/764)
-* the legacy `proxy` configuration and the PROXY_* environment variables are marked as deprecated (but still supported),
-use NODE_USE_ENV_PROXY=1 with HTTP_PROXY / HTTPS_PROXY / NO_PROXY in the environment instead
-(already set in the docker image and systemd unit). Requires node >= 24.5.
-* allow users to change their e-mail ([3300c66](https://framagit.org/les/gancio/commit/3300c66790e50c6fce3a31b4cc24b7dcf2e88e01))
-* lazy hydrate event cards ([46b8a0c](https://framagit.org/les/gancio/commit/46b8a0c69fa6cc372c5a9f76e938ff0b64a74211))
-* replace ics package by ical-generator package ([a1c9f15](https://framagit.org/les/gancio/commit/a1c9f1596604540317e9cfe897b26d718a4d3715))
-
-
-### Bug Fixes
-
-* add ICS event categories as event tags when parsing ICS data ([f07a66d](https://framagit.org/les/gancio/commit/f07a66d33b1daede684be0b7551cb6b15b2d0dc6))
-* add missing Content-Type when serving media ([2539293](https://framagit.org/les/gancio/commit/25392932940e38f1acb230aae763134b05e1b451))
-* **API:** type is only required for weekly events ([19d6c59](https://framagit.org/les/gancio/commit/19d6c5941310a56abed6ec47ddfd0dd7cabb7103))
-* block the own instance addresses only on non-default ports ([c3d028e](https://framagit.org/les/gancio/commit/c3d028e17992cab9cf008ecbe686b50bb4ab0a50)), closes [#764](https://framagit.org/les/gancio/issues/764)
-* cleanup ts issues and remove lodash ([f96bcb8](https://framagit.org/les/gancio/commit/f96bcb8cec8a7ca56956856bbb9a28d0f2366a8f))
-* Date is required ([08be726](https://framagit.org/les/gancio/commit/08be7261193eb819ea7fb4ab5c798a681229d97a))
-* do not fetch internal addresses from federation ([078f419](https://framagit.org/les/gancio/commit/078f4194a1fad069fe1ceb7389def39f3338b82e)), closes [#764](https://framagit.org/les/gancio/issues/764)
-* do not fetch internal addresses when importing ICS or images from URL ([4a3e592](https://framagit.org/les/gancio/commit/4a3e592ee8e89de0b910f342dd574597324cf345)), closes [#764](https://framagit.org/les/gancio/issues/764)
-* do not fetch or unblock blocked actors and instances ([908967b](https://framagit.org/les/gancio/commit/908967b3c2af8bf668b9e4d26c3d364e714f11e1)), closes [#766](https://framagit.org/les/gancio/issues/766)
-* do not forward credentials and signatures on cross-origin redirects ([d6c6f61](https://framagit.org/les/gancio/commit/d6c6f616cb80c2b520465dd37b8adf7b9a6419ec)), closes [#764](https://framagit.org/les/gancio/issues/764)
-* do not include all pages in sitemap ([46fc28f](https://framagit.org/les/gancio/commit/46fc28f097628aa5922d6c92dd354100e0222e3d))
-* do not trust actor documents from another origin ([ac17883](https://framagit.org/les/gancio/commit/ac1788327748a772e77c06de7bffc955fce74c54)), closes [#766](https://framagit.org/les/gancio/issues/766)
-* ignore incoming federation requests when federation is disabled ([7d01aad](https://framagit.org/les/gancio/commit/7d01aad5d5cb1f2ac12c9c15f43a28b4f1543d05)), closes [#761](https://framagit.org/les/gancio/issues/761) [#764](https://framagit.org/les/gancio/issues/764)
-* keep supporting the deprecated proxy configuration ([bdb61ed](https://framagit.org/les/gancio/commit/bdb61edcda41d589df30bd47c7c5ca86d1469a36)), closes [#764](https://framagit.org/les/gancio/issues/764)
-* make recurrent fields required ([9d3916a](https://framagit.org/les/gancio/commit/9d3916abca72716be7af8bdc2927a686e70b4034))
-* mock notifications in tests to avoid crashes in CI ([2775ab9](https://framagit.org/les/gancio/commit/2775ab93606bff7afa864e566cd74b4ddc3e0b01))
-* only import keys belonging to the actor ([f4ae3d0](https://framagit.org/les/gancio/commit/f4ae3d0306ca7ae00ec92d0da614a919e46e128e)), closes [#766](https://framagit.org/les/gancio/issues/766)
-* recurrent should be cleared when not needed ([8425dfe](https://framagit.org/les/gancio/commit/8425dfe55eef7c56c3b22a70c6d2ca0282bb9b67))
-* remove unused setup page, fix [#765](https://framagit.org/les/gancio/issues/765) ([03c5095](https://framagit.org/les/gancio/commit/03c50951de840b5e4003aaba068a2d66f159aadf))
-* require freq on recurrent event only ([7537d80](https://framagit.org/les/gancio/commit/7537d80c9c8d7b199379b03d3b5e124386612908))
-* SMTP testing parameter ([2466381](https://framagit.org/les/gancio/commit/2466381d2360ecb8c4eef7a34573d624f243786c))
-* **UI:** show correct message when registration is disabled ([c445bb0](https://framagit.org/les/gancio/commit/c445bb06995f5293adc8f41d0356c31ed9054ebb))
-* **UI:** sohw an error on /register page when disabled ([d531dd0](https://framagit.org/les/gancio/commit/d531dd07c3ecfaef333b9b3df0a095c7921c470a))
-* update locale live in DateInput ([f5a14b9](https://framagit.org/les/gancio/commit/f5a14b998cd0be1e1a3749194c4757f3e963c54a))
-* use Headers type and delete Host header to avoid redirect loop ([95a60ed](https://framagit.org/les/gancio/commit/95a60edd7a4283070a5155e67bb8978c5d9614a7))
-* yearly locale ([c1a6c84](https://framagit.org/les/gancio/commit/c1a6c847d9ac7f77caa25b5cf256bcf398fab9a1))
-
 ## [2.0.0-beta.8](https://framagit.org/les/gancio/compare/v2.0.0-beta.7...v2.0.0-beta.8) (2026-10-22)
 
 
