@@ -23,7 +23,7 @@ pnpm install
 You can use `yarn`, `npm`, `bun` or whatever but you are on your own.
 :::
 
-## 3. Hacking
+## 3. Start the development server
 
 ```bash
 pnpm run dev
@@ -33,6 +33,20 @@ pnpm run dev
 You can register an user from the UI, the first registered user will be an active administrator.
 :::
 
-## 4. Contributing
+## 4. Run tests and code quality tools
+
+```bash
+pnpm run test
+```
+
+```bash
+pnpm run lint
+```
+
+```bash
+pnpm run typecheck
+```
+
+## 5. Contributing
 
 If you want to contribute to the project, please take a look at [contribute](../contribute) section or check the [code](./code) section for more technical details.
