@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
   const user = await readBody(event)
 
   if (!publicSettings.allow_registration) {
-    throw createError({ status: 404, message: 'Not found' })
+    throw createError({ status: 404, message: 'Registration is disabled' })
   }
 
   const n_users = await User.count()
