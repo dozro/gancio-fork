@@ -9,6 +9,7 @@
 ## Install
 
 - [Install on Debian and derivatives](./debian)
+- [Install using Podman](./podman)
 <!--- [Install on NixOS](./nixos)
 - [Install using Docker](./docker)
 - [Install using YunoHost](https://apps.yunohost.org/app/gancio)-->
