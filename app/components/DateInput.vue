@@ -240,6 +240,7 @@ const pickDates = computed({
       <v-btn v-for="f in frequencies" :key="f.value" :value="f.value">{{ f.text }}</v-btn>
     </v-btn-toggle>
     <v-input
+      v-if="state.type === 'recurrent'"
       :model-value="state.recurrentFreq"
       :rules="[$valid.required('event.recurrent')]"
     />
