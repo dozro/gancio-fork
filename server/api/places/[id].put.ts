@@ -4,8 +4,43 @@ import { useLogger } from '~~/server/lib/logger'
 import { requireAdmin } from '~~/server/lib/auth'
 
 /**
- * Update a place or merge it with another one.
- * @auth
+ * @openapi
+ * /api/places/{id}:
+ *   put:
+ *     summary: Update place
+ *     description: Update a place, or merge it into another place when the body contains a different `id`.
+ *       Merging moves all events to the other place and removes this one. Admin role is required.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id of the place to update.
+ *         required: true
+ *         example: 1
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Place'
+ *     responses:
+ *       200:
+ *         description: Updated place.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Place'
+ *       204:
+ *         description: Place merged into the other place.
+ *       401:
+ *         description: Unauthorized.
+ *       404:
+ *         description: Place does not exist.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Places
  */
 export default defineEventHandler(async (evt) => {
   await requireAdmin(evt)

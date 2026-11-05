@@ -10,11 +10,41 @@ const schema = z.object({
 })
 
 /**
- * Get a list of places searching by name or address and ordered by event count.
- * Used in autocomplete while selecting a place during event creation.
- * @param query - The query string to search for.
- * @param limit - The maximum number of places to return. (default 10)
- * @returns A list of places.
+ * @openapi
+ * /api/places:
+ *   get:
+ *     summary: Search places
+ *     description: Search places with visible events by name or address, ordered by event count.
+ *       Used to autocomplete the place while adding an event.
+ *     parameters:
+ *       - name: query
+ *         in: query
+ *         description: Text to search in place name or address.
+ *         required: false
+ *         schema:
+ *           type: string
+ *       - name: limit
+ *         in: query
+ *         description: Maximum number of places.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
+ *     responses:
+ *       200:
+ *         description: List of places.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/PlaceAPI'
+ *       400:
+ *         description: Validation error.
+ *     tags:
+ *       - Places
  */
 export default defineEventHandler(async (event) => {
   const { query, limit } = await getValidatedQuery(event, schema.parse)

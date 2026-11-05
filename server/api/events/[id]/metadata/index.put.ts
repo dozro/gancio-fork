@@ -8,7 +8,8 @@ import { getModifiableEvent, metadataPayloadSchema, setEventMetadata } from '~~/
  * /api/events/{id}/metadata:
  *   put:
  *     summary: Set event metadata
- *     description: Create, update or remove private metadata of an event.
+ *     description: >-
+ *       Create, update or remove private metadata of an event.
  *       Specified keys are created or updated, keys with a `null` value are removed, other keys are left untouched.
  *       Keys can contain only letters, numbers and `_ . : -`, using a prefix (e.g. `myapp:uid`) is recommended to avoid collisions.
  *       Values must be strings.
