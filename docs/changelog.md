@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.10](https://framagit.org/les/gancio/compare/v2.0.0-beta.9...v2.0.0-beta.10) (2026-11-05)
+
+This release fixes a security vulnerability, we recommend upgrading as soon as possible.
+
+### Bug Fixes
+
+* postgresql json migration ([832c9c7](https://framagit.org/les/gancio/commit/832c9c715ad62b43341190bac682e1cdad4a6e5c))
+* **security:** path traversal in download and media, fix [#778](https://framagit.org/les/gancio/issues/778) ([add4534](https://framagit.org/les/gancio/commit/add4534ecada803587ee6d52832e99cc15d21d82))
+
 ## [2.0.0-beta.9](https://framagit.org/les/gancio/compare/v2.0.0-beta.8...v2.0.0-beta.9) (2026-11-05)
 
 
