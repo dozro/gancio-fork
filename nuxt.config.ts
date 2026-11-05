@@ -43,6 +43,9 @@ export default defineNuxtConfig({
   ],
   sitemap: {
     cacheMaxAgeSeconds: 3600, // 1 hour
+    excludeAppSources: true,
+
+    urls: ['/', '/about'],
 
     sources: [
       '/api/sitemap/events',
