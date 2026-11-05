@@ -1,0 +1,12 @@
+[Container]
+ContainerName=gancio
+Image=docker.io/cisti/gancio:latest
+Network=gancio.network
+Volume=gancio-data.volume:/app/data
+
+[Service]
+Restart=always
+
+[Install]
+# start on boot (requires the enabled linger)
+WantedBy=default.target

@@ -1,0 +1,16 @@
+[Container]
+ContainerName=caddy
+Image=docker.io/library/caddy:2
+Network=gancio.network
+PublishPort=80:80
+PublishPort=443:443
+PublishPort=443:443/udp
+Volume=caddy-data.volume:/data
+Volume=%h/.config/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+
+[Service]
+Restart=always
+
+[Install]
+# start on boot (requires the enabled linger)
+WantedBy=default.target
