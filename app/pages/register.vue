@@ -1,13 +1,12 @@
-<script setup>
+<script setup lang="ts">
 
-const settings = useState('settings')
+const settings = useState<Settings>('settings')
 const { t } = useI18n()
 useHead({
   title: `${settings.value.title} - ${t('common.register')}`
 })
 
 const form = ref()
-const email = ref()
 const loading = ref(false)
 const user = reactive({ email: '', password: '', description: '' })
 const valid = ref(false)
@@ -34,7 +33,10 @@ const register = async () => {
 <template>
 <v-container class="pa-0 pa-md-3">
   <v-row class="mt-md-5 ma-0" align="center" justify="center">
-    <v-col class="pa-0 pa-md-3" cols="12" md="6" lg="5" xl="4">
+    <v-col v-if="!settings.allow_registration" class="pa-0 pa-md-3" cols="12" md="6" lg="5" xl="4">
+      <v-alert :title="$t('common.error')">{{$t('register.disabled')}}</v-alert>
+    </v-col>
+    <v-col v-else class="pa-0 pa-md-3" cols="12" md="6" lg="5" xl="4">
       <v-form ref="form" v-model="valid" @submit.prevent="register">
         <v-card>
           <v-card-title>{{ $t("common.register") }}</v-card-title>
