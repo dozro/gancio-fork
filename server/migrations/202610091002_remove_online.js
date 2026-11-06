@@ -6,7 +6,7 @@ export async function up({ context: queryInterface }) {
     await queryInterface.bulkUpdate(
       'events',
       { placeId: null },
-      { where: { placeId: placeIds } }
+      { placeId: placeIds }
     )
   }
   await queryInterface.bulkDelete('places', { where: { name: 'online' } })
