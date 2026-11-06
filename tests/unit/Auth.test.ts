@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { mockH3Event, cleanDatabase } from './utils'
 import { connect } from '../../server/services'
 
-const admin = JSON.stringify({ email: 'admin', password: 'password' })
-const wrong_credentials = JSON.stringify({ email: 'admin', password: 'wrong' })
+// registration validates the e-mail format, so the login-only `admin` shortcut cannot be used here
+const admin = JSON.stringify({ email: 'admin@example.org', password: 'password' })
+const wrong_credentials = JSON.stringify({ email: 'admin@example.org', password: 'wrong' })
 
 let cookie: string | undefined
 let token: string | undefined
@@ -60,7 +61,7 @@ describe('Authentication / Authorization', async () => {
     const evt = mockH3Event({ headers: { cookie: cookie! } })
     const user = await handlerUser(evt)
     expect(evt.node.res.statusCode).toBe(200)
-    expect(user?.email).toBe('admin')
+    expect(user?.email).toBe('admin@example.org')
   })
 
   it('should not authenticate with wrong user/password', async () => {
@@ -91,7 +92,7 @@ describe('Authentication / Authorization', async () => {
     const evt = mockH3Event({ headers: { authorization: `Bearer ${token}` } })
     const user = await handlerUser(evt)
     expect(evt.node.res.statusCode).toBe(200)
-    expect(user?.email).toBe('admin')
+    expect(user?.email).toBe('admin@example.org')
     expect(user?.role).toBe('admin')
   })
 
