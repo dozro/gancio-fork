@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.11](https://framagit.org/les/gancio/compare/v2.0.0-beta.10...v2.0.0-beta.11) (2026-11-06)
+
+This release fixes a security vulnerability, we recommend upgrading as soon as possible.
+
+### Bug Fixes
+
+* **security:** validate user data on registration ([7bb62c3](https://framagit.org/les/gancio/commit/7bb62c31ea7a2e05aa1ec108da5e88c676069240))
+* postgresql migrations ([b5c0f0d](https://framagit.org/les/gancio/commit/b5c0f0dd870a3ae8fed707719ca5ba239c9707f9))
+
 ## [2.0.0-beta.10](https://framagit.org/les/gancio/compare/v2.0.0-beta.9...v2.0.0-beta.10) (2026-11-05)
 
 This release fixes a security vulnerability, we recommend upgrading as soon as possible.
