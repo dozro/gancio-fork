@@ -1,6 +1,6 @@
 {
   "name": "gancio",
-  "version": "2.0.0-beta.11",
+  "version": "2.0.0-beta.12",
   "description": "A shared agenda for local communities",
   "author": "lesion",
   "bugs": {
@@ -186,5 +186,5 @@
   "engines": {
     "node": ">=24.14.0"
   },
-  "date": "05 November 2026"
+  "date": "06 November 2026"
 }
