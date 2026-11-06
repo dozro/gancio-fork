@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.12](https://framagit.org/les/gancio/compare/v2.0.0-beta.11...v2.0.0-beta.12) (2026-11-06)
+
+
+### Bug Fixes
+
+* **test:** skip CI only failing ([2b42c67](https://framagit.org/les/gancio/commit/2b42c677e0251f6d2dd1786cec17aa2366429c3f))
+
 ## [2.0.0-beta.11](https://framagit.org/les/gancio/compare/v2.0.0-beta.10...v2.0.0-beta.11) (2026-11-06)
 
 This release fixes a security vulnerability, we recommend upgrading as soon as possible.
