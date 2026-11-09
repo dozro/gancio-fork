@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import type { ICalAlarmData, ICalLocation } from 'ical-generator'
 import ical, { ICalCalendarMethod, ICalEventStatus } from 'ical-generator'
-import { type H3Event, setHeader, createError } from 'h3'
+import { type H3Event, setHeader, createError, getQuery } from 'h3'
 import type { Event, EventStatus } from './db'
 import { htmlToText } from 'html-to-text'
 import { publicSettings } from './settings'
@@ -20,9 +20,19 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ICalAlarmData[
     EventPostponed: ICalEventStatus.TENTATIVE,
     EventRescheduled: ICalEventStatus.CONFIRMED
   }
+
+  // Add optional parameters that had been introduced by the user to base source URL
+  const opt: Record<string, string> = getQuery(evt)
+  const query = new URLSearchParams(opt).toString()
+  const source = query ? `${publicSettings.baseurl}/feed/ics?${query}` : `${publicSettings.baseurl}/feed/ics`
+
   const cal = ical({
     method: ICalCalendarMethod.PUBLISH,
-    scale: 'GREGORIAN'
+    scale: 'GREGORIAN',
+    name: publicSettings.title,
+    description: publicSettings.description,
+    source: source,
+    url: publicSettings.baseurl
   })
   cal.ttl(3600)
 
@@ -41,6 +51,10 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ICalAlarmData[
         }
       }
 
+      let media
+      if (e.media)
+        media = e.media.map((m) => `${publicSettings.baseurl}/media/${m.url}`)
+
       cal.createEvent({
         id: `${e.id}@${publicSettings.hostname}`,
         start: start,
@@ -54,6 +68,7 @@ export function exportICS(evt: H3Event, events: Event[], alarms?: ICalAlarmData[
         url: `${publicSettings.baseurl}/event/${e.slug || e.id}`,
         status: statusMap[e.status as EventStatus],
         categories: e?.tags?.map(t => ({ name: t.tag })),
+        attachments: media,
         created: e.createdAt,
         lastModified: e.updatedAt,
         alarms
