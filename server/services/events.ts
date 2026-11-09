@@ -89,9 +89,6 @@ export async function getEvents(opts?: unknown, user?: InferAttributes<User>): P
 
       ...(args.end && { start_datetime: { [args.older ? Op.gte : Op.lte]: args.end } }),
 
-      // include uncondirmed
-      ...(!args.include_unconfirmed && { is_visible: true }),
-
       ...(args.mine && user && { userId: user.id }),
 
       // include recurrent events?
