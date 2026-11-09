@@ -18,7 +18,7 @@ export default defineEventHandler(async (evt) => {
   }
 
   const event = await Event.findByPk(id, { include: [Place, Tag] })
-  if (!event) {
+  if (!event || !event.is_visible) {
     log.warn(`Event ${id} not found`)
     throw createError({ statusCode: 404 })
   }
