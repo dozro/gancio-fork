@@ -136,7 +136,7 @@ export class Announcement extends Model<
   @Attribute(DataTypes.INTEGER.UNSIGNED)
   @PrimaryKey
   @AutoIncrement
-  declare readonly id: CreationOptional<number>
+  declare id: CreationOptional<number>
 
   @CreatedAt
   declare readonly createdAt: CreationOptional<Date>
