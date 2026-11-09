@@ -1,5 +1,6 @@
 import { defineEventHandler, createError } from 'h3'
 import { Event, Message } from '~~/server/services'
+import { getUser } from '~~/server/lib/getUser'
 
 /**
  * @openapi
@@ -24,16 +25,31 @@ import { Event, Message } from '~~/server/services'
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Message'
+ *       403:
+ *         description: User is not allowed to read these messages.
  *       404:
  *         description: Event does not exist.
  *     tags:
  *       - Events
  */
 export default defineEventHandler(async (evt) => {
-  const eventId = evt.context.params?.event_id
-  const event = await Event.findByPk(eventId, { include: [Message] })
+  const eventId = Number(evt.context.params?.event_id)
+  const event = await Event.findByPk(eventId)
   if (!event) {
     throw createError({ status: 404 })
   }
-  return event.messages
+
+  const user = await getUser(evt)
+  const isAdminOrEditor = ['admin', 'editor'].includes(user?.role ?? '')
+  const isOwner = user?.id === event.userId
+  if (!isAdminOrEditor && !isOwner) {
+    throw createError({ status: 403, statusMessage: 'Forbidden' })
+  }
+
+  return Message.findAll({
+    where: {
+      eventId,
+      ...(!isAdminOrEditor && { is_author_visible: true })
+    }
+  })
 })
