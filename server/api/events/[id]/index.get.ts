@@ -1,6 +1,8 @@
 import { defineEventHandler, createError, getRouterParam } from 'h3'
 import { Event, Place, Tag } from '~~/server/services'
 import { Op, type WhereOptions } from '@sequelize/core'
+import { getUser } from '~~/server/lib/getUser'
+import { canModifyEvent, mapEvent } from '~~/server/services/events'
 
 /**
  * @openapi
@@ -30,6 +32,7 @@ import { Op, type WhereOptions } from '@sequelize/core'
  */
 export default defineEventHandler(async (evt) => {
   const slug = getRouterParam(evt, 'id')
+  const user = await getUser(evt)
   const id = Number(slug)
   const where: WhereOptions<Event> = {
     [Op.or]: [
@@ -38,9 +41,9 @@ export default defineEventHandler(async (evt) => {
     ]
   }
   const event = await Event.findOne({ where, include: [Tag, Place] })
-  if (event) {
-    return event
-  } else {
+  if (!event || (!event.is_visible && !canModifyEvent(event, user))) {
     throw createError({ status: 404, message: 'Not found' })
   }
+
+  return mapEvent(event, { user })
 })
