@@ -4,6 +4,7 @@ import { Event, publicSettings, publicSettingsLastModified } from '~~/server/ser
 import { useLogger } from '~~/server/lib/logger'
 import { getCollectionEvents } from '~~/server/services/collections'
 import { enableCors, handleCache } from '~~/server/lib/API'
+import { getUser } from '~~/server/lib/getUser'
 
 /**
  * @openapi
@@ -112,6 +113,7 @@ import { enableCors, handleCache } from '~~/server/lib/API'
  */
 export default defineEventHandler(async (event) => {
   const log = useLogger('get events')
+  const user = await getUser(event)
   enableCors(event)
   const opt = getQuery(event)
   let events
@@ -125,7 +127,7 @@ export default defineEventHandler(async (event) => {
     log.debug('get collection events', publicSettings.collection_in_home)
     events = await getCollectionEvents({ name: publicSettings.collection_in_home, ...opt })
   } else {
-    events = await getEvents(opt)
+    events = await getEvents(opt, user)
   }
 
   return mapEvents(events)

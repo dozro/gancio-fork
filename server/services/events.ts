@@ -68,8 +68,11 @@ export const eventQuerySchema = z.object({
 }))
 
 export type EventQueryType = z.infer<typeof eventQuerySchema>
-export async function getEvents(opts?: unknown, user?: User): Promise<Event[]> {
+export async function getEvents(opts?: unknown, user?: InferAttributes<User>): Promise<Event[]> {
   const args = eventQuerySchema.parse(opts)
+  const canIncludeUnconfirmed = Boolean(
+    args.include_unconfirmed && user && ['admin', 'editor'].includes(user.role)
+  )
 
   const andConditions: WhereOptions<Event> = [
     { // AND
@@ -99,7 +102,12 @@ export async function getEvents(opts?: unknown, user?: User): Promise<Event[]> {
 
       // include federated
       ...(!args.show_federated && { ap_id: null })
-    }
+    },
+    ...(!canIncludeUnconfirmed
+      ? [user
+          ? { [Op.or]: [{ is_visible: true }, { userId: user.id }] }
+          : { is_visible: true }]
+      : [])
   ]
 
   // if (!args.show_multidate) {
