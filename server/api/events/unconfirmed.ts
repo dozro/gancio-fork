@@ -2,7 +2,8 @@ import { defineEventHandler, createError } from 'h3'
 import { DateTime } from 'luxon'
 import { Place, Message, Event } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
-import { requireUser } from '~~/server/lib/auth'
+import { requireRole } from '~~/server/lib/auth'
+import { mapEvent } from '~~/server/services/events'
 
 /**
  * @openapi
@@ -35,7 +36,7 @@ import { requireUser } from '~~/server/lib/auth'
  */
 
 export default defineEventHandler(async (event) => {
-  await requireUser(event)
+  await requireRole(event, ['admin', 'editor'])
   const log = useLogger('event/unconfirmed')
   try {
     const events = await Event.findAll({
@@ -57,7 +58,10 @@ export default defineEventHandler(async (event) => {
     })
 
     const now = DateTime.local().toUnixInteger()
-    return ({ events: events.filter(e => e.start_datetime >= now), oldEvents: events.filter(e => e.start_datetime < now) })
+    return {
+      events: events.filter(e => e.start_datetime >= now).map(e => mapEvent(e)),
+      oldEvents: events.filter(e => e.start_datetime < now).map(e => mapEvent(e))
+    }
   } catch (e) {
     log.info(String(e))
     throw createError({ statusCode: 400, statusMessage: String(e) })
