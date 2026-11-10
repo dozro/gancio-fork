@@ -49,7 +49,15 @@ export function parseIcsData(icsText: string, includePastEvents = true) {
       // Check if event has categories to include them as tags
       const tags = event.component.getFirstProperty('categories')?.getValues()
 
-      return {
+      // Check if event has image attachments to include them as event media
+      const attachments = event.component.getAllProperties('attach')
+      // Loop all attachments searching an URL with an image, the first we find will be the event media
+      const imgURL = attachments.find((attach) => {
+        const value = attach.getFirstValue()
+        return value.match(/\.(jpeg|jpg|gif|png)$/) != null
+      })
+
+      const eventObj = {
         title: event.summary || '',
         description: event.description || '',
         organizer, // contains { name, email } or null
@@ -62,5 +70,10 @@ export function parseIcsData(icsText: string, includePastEvents = true) {
         modified: event?.lastModified?.toUnixTime() || '',
         is_visible: true
       }
+
+      if (imgURL)
+        eventObj['media'] = [{ url: imgURL?.getFirstValue() }]
+
+      return eventObj
     }).filter(Boolean)
 }
