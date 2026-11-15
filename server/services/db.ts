@@ -513,6 +513,10 @@ export class Place extends Model<
   @Attribute(DataTypes.DOUBLE)
   declare longitude?: CreationOptional<number | null>
 
+  @Attribute(DataTypes.BOOLEAN)
+  @Default(false)
+  declare listed: boolean
+
   @HasMany(() => Event, /* foreign key */ 'placeId')
   declare events?: NonAttribute<Event[]>
 
