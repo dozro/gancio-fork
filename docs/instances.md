@@ -29,8 +29,7 @@ aside: false
 
 You can also check federated instances on [fedilist.com](https://fedilist.com/instance?q=&ip=&software=gancio&registrations=&onion=), [fedidb.org](https://fedidb.org/software/gancio), [fediverse.observer](https://gancio.fediverse.observer/list)
 
-
-<small>Do you want your instance to appear here or to be removed? [Write us](./contact).</small>
+<small>Do you want your instance to appear here or to be removed? [Write us](./contacts).</small>
 
 <style>
   #instances {

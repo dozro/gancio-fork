@@ -179,7 +179,7 @@ export default defineConfig({
         ]
       },
       { text: 'About', link: '/about' },
-      { text: 'Contacts', link: '/contact' },
+      { text: 'Contacts', link: '/contacts' },
       { text: 'Contribute', link: '/contribute' },
       { text: 'Instances', link: '/instances' }
     ],
