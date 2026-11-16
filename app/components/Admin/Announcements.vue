@@ -113,6 +113,7 @@ async function save() {
       :headers='headers'
       :items='announcements'>
       <template v-slot:item.actions='{ item }'>
+        <t-btn size='small' :to="`/announcement/${item.id}`" :tooltip="t('common.preview')" icon='mdi-arrow-right' />
         <t-btn
           :color='item.visible ? "warning" : "success"'
           :tooltip="item.visible ? t('common.disable') : t('common.enable')"

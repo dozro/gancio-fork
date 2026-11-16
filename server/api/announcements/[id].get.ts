@@ -1,4 +1,5 @@
-import { defineEventHandler, createError } from 'h3'
+import { defineEventHandler } from 'h3'
+import { isRole } from '~~/server/lib/auth'
 import { Announcement } from '~~/server/services'
 
 /**
@@ -23,15 +24,15 @@ import { Announcement } from '~~/server/services'
  *             schema:
  *               $ref: '#/components/schemas/Announcement'
  *       404:
- *         description: Announcement not found.
+ *         description: Announcement not found or not visible.
  *     tags:
  *       - Announcements
  */
 export default defineEventHandler(async (event) => {
-  const announcement = await Announcement.findByPk(event.context.params?.id)
-  if (announcement) {
-    return announcement
+  const id = Number(event.context.params?.id)
+  if (await isRole(event, 'admin')) {
+    return Announcement.findOne({ where: { id } })
   } else {
-    throw createError({ status: 404, message: 'Not found' })
+    return Announcement.findOne({ where: { id, visible: true } })
   }
 })

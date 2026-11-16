@@ -143,7 +143,7 @@ async function toggle(page) {
       :items="pages"
     >
       <template v-slot:item.actions="{ item }">
-        <t-btn size='small' :small='true' :to="`/p/${item.slug || item.id}`" :tooltip="$t('common.preview')" icon='mdi-arrow-right' />
+        <t-btn size='small' :to="`/p/${item.slug || item.id}`" :tooltip="$t('common.preview')" icon='mdi-arrow-right' />
         <t-btn
           :color="item.visible ? 'warning' : 'success'"
           :tooltip="item.visible ? $t('common.disable') : $t('common.enable')"

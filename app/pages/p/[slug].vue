@@ -1,6 +1,8 @@
 <script setup lang="ts">
 
 const { $notify } = useNuxtApp()
+const { t } = useI18n()
+
 const settings = useState<Settings>('settings')
 
 const route = useRoute()
@@ -28,7 +30,7 @@ async function toggleVisibility() {
       body: { ...page.value, visible: true }
     })
     refresh()
-    $notify($t('common.enabled'))
+    $notify(t('common.enabled'))
   } catch (e) {
     $notify(String(e))
   }
@@ -45,7 +47,10 @@ async function toggleVisibility() {
   </v-alert>
   <v-card>
     <v-card-title class='text-h4 font-weight-bold'>{{ page?.title }}</v-card-title>
-    <v-card-text v-html='page?.content' />
+    <v-card-text>
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <div v-html='page?.content' />
+    </v-card-text>
   </v-card>
 </v-container>
 </template>
