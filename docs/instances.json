@@ -659,5 +659,23 @@
     "summary": "La Agenda Comunitaria de Córdoba Capital",
     "timezone": "America/Argentina/Buenos_Aires",
     "handler": "relay@vamosjuntes.com.ar"
+  },
+  {
+    "name": "MARCA DURO!",
+    "url": "https://marcaduro.org",
+    "logo": "https://marcaduro.org/logo.png",
+    "place": "Panama",
+    "summary": "Agenda autogestionada compartida para DIY, punk, arte, talleres, comunidad en\nPanamá",
+    "timezone": "America/Bogota",
+    "handler": "relay@marcaduro.org"
+  },
+  {
+    "name": "Andemo",
+    "url": "https://andemo.org",
+    "logo": "https://andemo.org/logo.png",
+    "place": "(Padova, Italy)",
+    "summary": "Agenda condivisa per Padova e dintorni - Shared agenda for Padua and the\nsurrounding area",
+    "timezone": "Europe/Rome",
+    "handler": null
   }
 ]
