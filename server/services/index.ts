@@ -13,8 +13,10 @@ export { notifyAdmins } from './notifier'
 
 export {
   sendEvents, mapEvent, mapEvents,
-  getEvents, getLastModified, getMaxLastModifieds,
+  getEvents,
   calculateEtag
 } from './events'
+
+export { getLastModified, getMaxLastModifieds } from '../helpers'
 
 export const pluginController = new PluginController()
