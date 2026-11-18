@@ -167,7 +167,7 @@
     "event": {
         "anon": "Anónimo",
         "anon_description": "Puedes ingresar un evento sin registrarte o iniciar sesión, pero en este caso tendrás que esperar a que alguien lo lea para confirmar que es un evento adecuado para este espacio,\ndelegando esta elección. Además, no será posible modificarlo. <br/> <br/>\nSi no te gusta, puedes <a href='/login'> iniciar sesión </a> o <a href='/register'> registrarte </a>. De lo contrario, continúa y sube tu evento, lo revisaremos lo antes posible. ",
-        "same_day": "Mismo día",
+        "same_day": "Actividades en la fecha seleccionada",
         "what_description": "Nombre evento",
         "description_description": "Descripción, puedes copiar y pegar",
         "tag_description": "Tag...",
@@ -264,7 +264,7 @@
         "recurrent_event_visible": "Eventos fijos visibles por defecto",
         "federation": "Federación / ActivityPub",
         "enable_federation": "Habilitar la federación",
-        "enable_federation_help": "Será posible seguir esta instancia desde el fediverso",
+        "enable_federation_help": "Las usuarias del fediverso podrán citar actividades de esta instancia",
         "select_instance_timezone": "Huso horario",
         "enable_resources": "Habilitar recursos",
         "enable_resources_help": "Permite añadir audio, imágenes y comentarios al evento desde el fediverso",
@@ -335,7 +335,7 @@
         "event_remove_ok": "Evento eliminado",
         "page_remove_ok": "Página eliminada",
         "smtp_use_sendmail": "Usar sendmail",
-        "wrong_domain_warning": "El parámetro baseurl configurado en config.json <b>({baseurl})</b> difiere del que estás visitando <b>({url})</b>",
+        "wrong_domain_warning": "La url base configurada <b>({baseurl})</b> difiere de la que estás visitando <b>({url})</b>",
         "new_collection": "Nueva colección",
         "collections_description": "Las colecciones son agrupaciones de eventos por etiquetas y ubicaciones. Serán desplegadas en la página de inicio",
         "domain": "Dominio",
@@ -418,7 +418,11 @@
         "enable_federation_quoting_help": "Usuaries podrán citar eventos de esta instancia desde el fediverso",
         "unblock_user": "Desbloquear usuarie",
         "merge_place_help": "Se va a combinar el lugar \"<strong>{place}</strong>\" con el lugar seleccionado. Se actualizarán los {n} eventos asociados.",
-        "hidden": "Oculto"
+        "hidden": "Oculto",
+        "smtp_from_address": "Dirección del remitente",
+        "smtp_from_address_help": "El nombre que aparecerá en en el remitente del correo electrónico enviado por el sistema",
+        "receive_confirm_notification_hint": "Envia una notificación a esta cuenta cuando se tenga que confirmar una actividad anónima o una solicitud de registro",
+        "notify": "Notifica"
     },
     "auth": {
         "not_confirmed": "Todavía no hemos confirmado este email…",
@@ -469,7 +473,7 @@
         "start": "Inicio",
         "completed_description": "<p>Puedes ingresar con el siguiente usuario:<br/><br/>Usuario: <b>{email}</b><br/>Contraseña: <b>{password}<b/></p>",
         "copy_password_dialog": "Sí, ¡tienes que copiar la contraseña!",
-        "https_warning": "¡Si estás visitando a través de HTTP, recuerda cambiar el parámetro baseurl en config.json si cambias a HTTPS!"
+        "https_warning": "¡Si estás visitando a través de HTTP, recuerda cambiar la URL base en la configuración si cambias a HTTPS!"
     },
     "activitypub": {
         "n_boosts": "{n} impulsos|{n} impulso|{n} impulsos",

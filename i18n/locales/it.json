@@ -120,7 +120,16 @@
         "pin": "Fissa",
         "contact_user": "Contatta utente",
         "trusted_sources": "Fonti federate attendibili",
-        "date": "Data"
+        "date": "Data",
+        "no_events_found": "Nessun evento trovato",
+        "dark_mode": "Modalità scura",
+        "publish": "Pubblica",
+        "convert_draft": "Converti a bozza",
+        "create_draft": "Crea come bozza",
+        "save_draft": "Salva bozza",
+        "draft": "Bozza",
+        "go_back": "Indietro",
+        "no_events_found_hint": "Seleziona date o criteri diversi"
     },
     "login": {
         "description": "Entrando puoi pubblicare nuovi eventi.",
@@ -225,7 +234,12 @@
         "recurrent_1y_days": "Il giorno {days} {months} ogni anno",
         "recurrent_1y_ordinal": "{n} {days} di {months} ogni anno",
         "each_year": "Ogni anno",
-        "online_locations_fallback_urls": "Link di fallback"
+        "online_locations_fallback_urls": "Link di fallback",
+        "cancelled": "Questo evento è stato annullato",
+        "postponed": "Posticipato",
+        "moved_onlined": "Spostato online",
+        "rescheduled": "Rirprogrammato",
+        "reannounce": "Riannuncia"
     },
     "admin": {
         "place_description": "Nel caso in cui un luogo sia errato o cambi indirizzo, puoi modificarlo.<br/>Considera che tutti gli eventi associati a questo luogo cambieranno indirizzo (anche quelli passati).",
@@ -381,7 +395,13 @@
         "receive_confirm_notification": "Ottieni l'email di conferma dell'utente/evento",
         "calendar_first_day_of_week": "Primo giorno della settimana",
         "calendar_first_day_of_week_description": "Selezionare il giorno della settimana che i calendari devono visualizzare per primo. Le selezioni predefinite sono basate sulle impostazioni del locale del client.",
-        "calendar_first_day_of_week_default": "Predefinito (locale del client)"
+        "calendar_first_day_of_week_default": "Predefinito (locale del client)",
+        "edit_user": "Modifica utente",
+        "user_update_ok": "Utente aggiornato",
+        "open_ended_event_default_duration_hint": "Durata predefinita in ore. Verrà usata internamente quando vengono cercati eventi senza un orario di fine che potrebbero ancora essere in corso.",
+        "hidden": "Nascosto",
+        "page_is_disabled": "Questa pagina non è visibile pubblicamente",
+        "notify": "Notifica"
     },
     "auth": {
         "not_confirmed": "Non ancora confermato…",

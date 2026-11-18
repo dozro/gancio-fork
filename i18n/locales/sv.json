@@ -9,7 +9,7 @@
         "address_geocoded_disclaimer": "Om du inte kan hitta <strong>gatadressen</strong> eller <strong>husnumret</strong> du söker i geokodningsresultaten, kan du manuellt lägga till dem i fältet 'Adress' utan att förlora koordinaterna. Tänk också på att <a target=\"_blank\" href=\"https://www.openstreetmap.org/\">OpenStreetMap</a>-projektet är öppet för bidrag. Om du har Android rekommenderar vi <a target=\"_blank\" href=\"https://f-droid.org/en/packages/de.westnordost.streetcomplete/\">StreetComplete</a>. ",
         "assign_to_user": "Tilldela till användare",
         "assign_to_user_description": "Du kan tilldela ett anonymt evenemang till en användare. Detta kommer tillåta den valda användaren att modifiera evenemanget.",
-        "same_day": "på samma dag",
+        "same_day": "Evenemang för valt datum",
         "what_description": "Titel",
         "description_description": "Beskrivning",
         "tag_description": "Tagg",
@@ -67,7 +67,10 @@
         "anon_description": "Du kan lägga till ett evenemang utan att registrera dig eller logga in, men du måste vänta på att någon läser det\noch bekräftar att det är ett lämpligt evenemang. Det kommer inte att vara möjligt att ändra det.<br/><br/>\nDu kan istället <a href='/login'>logga in</a> eller <a href='/register'>registrera dig</a>. Annars, gå vidare och få ett svar så snart som möjligt. ",
         "recurrent_2w_days": "En {days} varannan",
         "recurrent_2m_days": "Den {days} varannan månad",
-        "recurrent_2m_ordinal": "Varje {n} {days} i månaden varannan"
+        "recurrent_2m_ordinal": "Varje {n} {days} i månaden varannan",
+        "anon_description_without_registration": "Du kan lägga till ett evenemang men det behöver granskas för att bekräfta att det är ett lämpligt evenemang \nDet kommer inte att vara möjligt att göra ändringar efter att du skickat in.<br/><br/>\nSkicka in ditt evenemang, så granskar vi det så snart som möjligt.",
+        "recurrent_1y_days": "{months} {days} varje år",
+        "each_year": "Varje år"
     },
     "admin": {
         "enable_resources": "Aktivera resurser",
@@ -263,7 +266,12 @@
         "ical_description": "Datorer och smartphones är vanligtvis utrustade med en kalenderapp som kan importera en webkalender.",
         "list_description": "Ifall du har en hemsida och vill visa en lista av evenemang, använd följande kod",
         "filter_description": "Du kan filtrera din export här efter taggar och platser eller med en förskapad samling",
-        "email_description": "Du kan få evenemang som intresserar dig skickat via e-post."
+        "email_description": "Du kan få evenemang som intresserar dig skickat via e-post.",
+        "filter_title": "Filter",
+        "ical_title": "ics/ical",
+        "list_title": "Lista",
+        "max_height": "Maximal höjd",
+        "show_more": "Visa mer"
     },
     "register": {
         "description": "Sociala rörelser bör organisera sig och självfinansiera.<br/> \n<br/>Innan du kan publicera måste <strong>kontot godkännas</strong>; tänk på att <strong>bakom denna webbplats finns riktiga människor</strong>, så skriv ett par rader för att låta oss veta vilka evenemang du vill publicera.",
@@ -387,7 +395,20 @@
         "my_events": "Mina Evenemang",
         "contact_user": "Kontakta användare",
         "report": "Anmäl evenemang",
-        "role": "Roll"
+        "role": "Roll",
+        "enabled": "Aktiverad",
+        "go_back": "Tillbaka",
+        "trusted_sources": "Betrodda federerade källor",
+        "past_events": "Tidigare evenemang",
+        "pages": "Sidor",
+        "no_events_found": "Inga evenemang hittades",
+        "no_events_found_hint": "Välj andra datum eller kriterier",
+        "dark_mode": "Mörkt läge",
+        "publish": "Publicera",
+        "convert_draft": "Gör om till utkast",
+        "create_draft": "Skapa som utkast",
+        "save_draft": "Spara utkast",
+        "draft": "Utkast"
     },
     "login": {
         "description": "Genom att logga in kan du publicera nya evenemang.",
