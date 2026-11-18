@@ -48,10 +48,19 @@ async function toggle(parent = false) {
   }
 }
 
-const isScheduled = computed(() => event.status === 'EventScheduled')
+const { t } = useI18n()
+const getStatus = useEventStatus()
+const statusLabel = (status: EventStatus) => getStatus(status)?.label ?? t('event.status_scheduled')
+
+// tentative only until the date is confirmed: then it has been communicated to others
+const statusOptions = computed<EventStatus[]>(() => [
+  ...(event.status === 'EventTentative' ? ['EventTentative' as const] : []),
+  'EventScheduled',
+  'EventCancelled'
+])
+
 async function updateStatus(status: EventStatus) {
-  const ret = await $confirm('event.cancel_description')
-  if (!ret) return
+  if (status === 'EventCancelled' && !await $confirm('event.cancel_description')) return
   try {
     await $fetch(`/api/events/${event.id}`, { method: 'PATCH', body: { status } })
     emit('update')
@@ -86,11 +95,18 @@ async function reannounce() {
     :title="$t(`common.${event.is_visible ? (event.parentId ? 'skip' : 'hide') : 'confirm'}`)"
     @click="toggle(false)" />
 
-  <v-list-item
-    v-if="isScheduled && !isExternalEvent"
-    prepend-icon="mdi-calendar-remove"
-    :title="$t('common.cancel')"
-    @click="updateStatus('EventCancelled')" />
+  <!-- Status -->
+  <v-list-group v-if="!isExternalEvent" value="status">
+    <template #activator="{ props }">
+      <v-list-item v-bind="props" prepend-icon="mdi-list-status" :title="`${$t('event.status')}: ${statusLabel(event.status)}`" />
+    </template>
+    <v-list-item
+      v-for="status in statusOptions" :key="status"
+      :prepend-icon="status === event.status ? 'mdi-radiobox-marked' : 'mdi-radiobox-blank'"
+      :title="statusLabel(status)"
+      :disabled="status === event.status"
+      @click="updateStatus(status)" />
+  </v-list-group>
 
   <!-- Edit event -->
   <v-list-item

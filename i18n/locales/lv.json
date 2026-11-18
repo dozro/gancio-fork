@@ -218,7 +218,7 @@
     "event": {
         "tentative": "Provizorisks",
         "rescheduled": "Pārcelts",
-        "moved_onlined": "Pārcelts uz tiešsaisti",
+        "moved_online": "Pārcelts uz tiešsaisti",
         "postponed": "Atlikts",
         "cancelled": "Šis pasākums tika atcelts",
         "disable_author_confirm": "Vai esi pārliecināts, ka vēlies atspējot šī pasākuma autoru?",

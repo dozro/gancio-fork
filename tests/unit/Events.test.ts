@@ -5,6 +5,7 @@ import { DateTime } from 'luxon'
 import { eventToAP, upsertEvent } from '../../server/services/events'
 
 import { getUser } from '../../server/lib/getUser'
+import { getTranslator } from '../../server/services/locale'
 vi.mock('../../server/lib/getUser')
 const mockedGetUser = vi.mocked(getUser)
 
@@ -151,6 +152,13 @@ describe('Events', () => {
     mockedGetUser.mockResolvedValueOnce(userUser)
     response = patchHandler(mockH3Event({ params: { id: String(event_id) }, body: { status: 'EventCancelled' } }))
     await expect(response).resolves.toHaveProperty('status', 'EventCancelled')
+  })
+
+  it('should keep the status when editing an event without status', async () => {
+    mockedGetUser.mockResolvedValueOnce(userUser)
+    const body = { title: 'edited title', place_name: 'test', place_address: 'test', start_datetime: now(), end_datetime: now() + 1000 }
+    const response = await putHandler(mockH3Event({ params: { id: String(event_id) }, body }))
+    expect(response).toHaveProperty('status', 'EventCancelled')
   })
 
   it('should modify title if allowed', async () => {
@@ -302,6 +310,22 @@ describe('Events', () => {
     expect(ap.name).toBe('open ended event')
     expect(ap.displayEndTime).toBeFalsy()
     expect(ap.endTime).toBe(DateTime.fromSeconds(start_datetime + 3 * 3600, { zone: publicSettings.instance_timezone }).toISO({ suppressMilliseconds: true }))
+  })
+
+  it('should translate event statuses in ActivityPub summaries', async () => {
+    const $t = await getTranslator('en')
+    const { event } = await upsertEvent({
+      title: 'cancelled event',
+      start_datetime: now() + 1000,
+      place_name: 'test',
+      place_address: 'test',
+      status: 'EventCancelled'
+    }, adminUser)
+    const statusText = $t('event.cancelled')
+    const ap = eventToAP(event)
+
+    expect(statusText).toBe('This event has been cancelled')
+    expect(ap.summary).toContain(`<p>${statusText}</p>`)
   })
 
   it('should get started open endend events', async () => {

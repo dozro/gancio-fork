@@ -232,7 +232,7 @@
         "anon_description_without_registration": "Podes engadir un evento, pero terá que ser revisado para confirmar que é un evento axeitado.\nNon poderás editalo despois de telo enviado.<br/><br/>\nAdiante con isto, envía o evento e revisarémolo o máis axiña posible.",
         "cancelled": "Cancelouse este evento",
         "postponed": "Adiado",
-        "moved_onlined": "Pasou a en liña",
+        "moved_online": "Pasou a en liña",
         "rescheduled": "Reprogramado",
         "tentative": "Proposta",
         "reannounce": "Volver a anunciar",

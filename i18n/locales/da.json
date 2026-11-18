@@ -237,7 +237,7 @@
         "cancel_description": "Denne begivenhed vil blive offentlig vist som aflyst.",
         "cancelled": "Denne begivenhed er blevet aflyst",
         "postponed": "Udsat",
-        "moved_onlined": "Flyttet online",
+        "moved_online": "Flyttet online",
         "rescheduled": "Flyttet",
         "tentative": "Foreløbig",
         "reannounce": "Genannoncer",
