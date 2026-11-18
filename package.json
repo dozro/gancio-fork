@@ -95,6 +95,7 @@
     "@vueuse/core": "^15.0.0",
     "bcryptjs": "^3.0.3",
     "consola": "^3.4.2",
+    "defu": "^6.1.7",
     "dompurify": "^3.4.17",
     "dotenv": "^18.0.9",
     "email-templates": "^13.0.1",
@@ -147,7 +148,6 @@
     "@vue/test-utils": "^2.5.1",
     "cheerio": "^1.2.0",
     "commit-and-tag-version": "^13.2.1",
-    "defu": "^6.1.7",
     "eslint": "^10.14.0",
     "eslint-plugin-vuetify": "^2.7.3",
     "feed": "^6.0.0",
@@ -179,6 +179,7 @@
     "vitepress": "2.0.0-alpha.17",
     "vitepress-openapi": "^0.2.8",
     "vitest": "^5.1.0",
+    "vue-i18n": "^11.4.21",
     "vue-screen-utils": "^1.0.0-beta.13",
     "vuetify": "^3.12.0"
   },

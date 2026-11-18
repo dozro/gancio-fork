@@ -398,26 +398,6 @@ export async function setEventMedia(eventPayload: EventAPIType): Promise<Media |
 }
 
 /**
- * get the last modified date of items.
- * this is used to set `Last-Modified` header and to check for non modified 304 result
- */
-export function getLastModified(items: readonly { updatedAt: Date }[]) {
-  if (!items?.length) {
-    return new Date(0)
-  }
-  const lastModified = items.reduce((last: Date, item) => item.updatedAt > last ? item.updatedAt : last, new Date(0))
-  return lastModified
-}
-
-export function getMaxLastModifieds(lastModifieds: Array<Date | undefined>) {
-  return lastModifieds.reduce((max, current) => {
-    if (!max) return current
-    if (!current) return max
-    return (current > max) ? current : max
-  }, undefined)
-}
-
-/**
  * Map an Event model instance to the EventAPI type
  * @param event the Event model instance to map
  * @param options.place the Place associated with the event, if not already included in the event (optional)

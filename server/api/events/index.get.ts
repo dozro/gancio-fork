@@ -1,5 +1,6 @@
 import { defineEventHandler, getQuery } from 'h3'
-import { getEvents, getMaxLastModifieds, mapEvents } from '~~/server/services/events'
+import { getEvents, mapEvents } from '~~/server/services/events'
+import { getMaxLastModifieds } from '~~/server/helpers'
 import { Event, publicSettings, publicSettingsLastModified } from '~~/server/services'
 import { useLogger } from '~~/server/lib/logger'
 import { getCollectionEvents } from '~~/server/services/collections'
