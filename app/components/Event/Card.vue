@@ -17,13 +17,20 @@ const isPast = computed(() => {
 
 const isOnline = computed(() => !event?.place && event.online_locations?.length)
 const isCancelled = computed(() => event.status === 'EventCancelled')
+const getStatus = useEventStatus()
+const status = computed(() => getStatus(event.status))
 </script>
 
 <template>
-<article class='h-event event-card' itemscope itemtype="https://schema.org/Event">
+<article class='h-event event-card' :class="status?.faded && 'opacity-60'" itemscope itemtype="https://schema.org/Event">
   <nuxt-link :to='`/event/${event.slug || event.id}`' itemprop="url">
     <!-- <nuxt-picture/> -->
-    <CoreImg v-if='!hideThumbs' :event='event' thumb :lazy='lazy' />
+    <div v-if='!hideThumbs' class='position-relative'>
+      <CoreImg :event='event' thumb :lazy='lazy' />
+      <v-chip v-if='status' class='position-absolute bottom-0 right-0 ma-2' :color='status.color' variant='flat' size='small' label>
+        {{ status.label }}
+      </v-chip>
+    </div>
     <v-icon v-if='event.parentId' class='float-right mr-1' color='success' icon='mdi-repeat' />
     <v-icon v-if='isPast' class='float-right mr-1' color='warning' icon='mdi-timer-sand' />
     <h3 class='event-title' itemprop="name" :class="isCancelled && 'text-decoration-line-through'">{{ event.title }}</h3>

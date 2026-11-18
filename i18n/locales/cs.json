@@ -390,7 +390,7 @@
         "anon_description_without_registration": "Událost můžete přidat, ale bude muset být zkontrolována, aby bylo potvrzeno, že není nevhodná.\nPo odeslání ji nebude možné upravit.<br/><br/>\nSvou událost můžete přidat, zkontrolujeme ji co nejdříve to půjde.",
         "cancelled": "Tato událost byla zrušena",
         "postponed": "Odloženo",
-        "moved_onlined": "Přesunuto online",
+        "moved_online": "Přesunuto online",
         "rescheduled": "Přesunuto",
         "tentative": "Předběžné",
         "reannounce": "Znovu oznámit",

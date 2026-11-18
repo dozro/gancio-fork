@@ -25,8 +25,10 @@ import type { Settings } from '~~/shared/types/settings'
 import { createRecurrent } from './recurrent'
 import { notifyEvent } from './notifier'
 import type { IntermediateRepresentation } from 'linkifyjs'
+import { getTranslator } from './locale'
 
 const log = useLogger('events')
+const $t = await getTranslator()
 
 // query parameters for getEvents are coming from HTTP (string) and from internal code, this normalize everything to boolean
 export const boolish = z.preprocess((v) => {
@@ -185,7 +187,8 @@ const eventAPISchema = z.object({
     .nullable()
     .default(null),
   tags: z.array(z.string(), { error: 'tags field must be an array' }).optional(),
-  status: z.enum(EventStatusEnum).default('EventScheduled'),
+  // no default: when not specified an update keeps the current status (e.g. editing a cancelled event)
+  status: z.enum(EventStatusEnum).optional(),
   description: z.preprocess((val) => {
     const str = typeof val === 'string' ? val : val ? String(val) : ''
     try {
@@ -279,8 +282,10 @@ export async function upsertEvent(payload: unknown, user?: InferAttributes<User>
   // media could be undefined (do not modify), null (remove) or an array of media
   const media = tmpMedia && [tmpMedia]
   if (event) {
+    const { status, ...fields } = eventPayload
     event = await event.update({
-      ...eventPayload,
+      ...fields,
+      ...(status && { status }),
       placeId: place?.id ?? null,
       media
     }).catch((e) => {
@@ -289,6 +294,7 @@ export async function upsertEvent(payload: unknown, user?: InferAttributes<User>
   } else {
     event = await Event.create({
       ...eventPayload,
+      status: eventPayload.status ?? 'EventScheduled',
       placeId: place?.id,
       media
     }).catch((e) => {
@@ -490,6 +496,14 @@ export async function getMessages(eventId: number) {
   return event
 }
 
+const statusTextKeys: Partial<Record<EventStatus, string>> = {
+  EventCancelled: 'event.cancelled',
+  EventPostponed: 'event.postponed',
+  EventRescheduled: 'event.rescheduled',
+  EventMovedOnline: 'event.moved_online',
+  EventTentative: 'event.tentative'
+}
+
 export function eventToAP(event: Event) {
   // if it's a remote event return the original
   if (event.ap_object) return event.ap_object
@@ -504,7 +518,10 @@ export function eventToAP(event: Event) {
 
   // https://framagit.org/les/gancio/-/issues/304
   // https://www.w3.org/TR/activitystreams-vocabulary/#dfn-summary
-  const summary = `<p>${event.place?.name ?? ''} ${datetime}</p>${event?.description ?? ''}`
+  // platforms that does not support Event ignores `eventStatus` so the status is added to the summary
+  const statusKey = statusTextKeys[event.status as EventStatus]
+  const status = statusKey ? $t(statusKey) : undefined
+  const summary = `${status ? `<p>${status}</p>` : ''}<p>${event.place?.name ?? ''} ${datetime}</p>${event?.description ?? ''}`
 
   let attachment: APAttachment[] = []
   let location: APLocation[] = []

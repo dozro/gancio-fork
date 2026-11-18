@@ -242,7 +242,7 @@
         "cancel_description": "Este evento se marcará públicamente como cancelado.",
         "cancelled": "Este evento está cancelado",
         "postponed": "Pospuesto",
-        "moved_onlined": "Será en línea",
+        "moved_online": "Será en línea",
         "rescheduled": "Reprogramado",
         "tentative": "Provisional",
         "reannounce": "Vovler a anunciar",

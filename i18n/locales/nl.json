@@ -359,7 +359,7 @@
         "cancel_description": "Dit evenement zou voor iedereen zichtbaar zijn als geannuleerd.",
         "cancelled": "Dit evenement is geannuleerd",
         "postponed": "Uitgesteld",
-        "moved_onlined": "Naar online verplaatst",
+        "moved_online": "Naar online verplaatst",
         "rescheduled": "Verplaatst",
         "tentative": "Voorlopig",
         "reannounce": "Opnieuw aankondigen",

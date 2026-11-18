@@ -203,7 +203,7 @@
         "where_advanced_options": "Дополнительные параметры места",
         "cancelled": "Это событие отменено",
         "postponed": "Отложено",
-        "moved_onlined": "Перенесено в онлайн",
+        "moved_online": "Перенесено в онлайн",
         "online_locations": "Онлайн-площадки",
         "online_locations_help": "Ссылка на видеоконференцию или страницу регистрации (макс. 3)",
         "online_locations_fallback_urls": "Резервные ссылки",
