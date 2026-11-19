@@ -31,5 +31,13 @@
         "content_ADMIN": "En administratör kommenterade om evenemanget <strong>{{event.title}}</strong>:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Öppna moderering</a>",
         "content_ANON": "En besökare anmälde evenemanget <strong>{{event.title}}</strong>:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Öppna moderering</a>",
         "content_AUTHOR": "Skaparen av evenemanget <strong>{{event.title}}</strong>skrev:<br/><blockquote>{{message}}</blockquote><br/><br/><a href='{{{url}}}'>Öppna moderering</a>"
+    },
+    "change_email": {
+        "subject": "Bekräfta din nya e-postadress",
+        "content": "Hej, du har begärt att använda den här e-postadressen för ditt konto på {{config.title}}. <a href='{{{config.baseurl}}}/change_email/{{token}}'>Klicka här</a> för att bekräfta. Länken är giltig i en dag, ignorera detta mail om du inte har begärt det."
+    },
+    "email_changed": {
+        "subject": "Din e-postadress har ändrats",
+        "content": "Hej, e-postadressen för ditt konto på <a href='{{{config.baseurl}}}'>{{config.title}}</a> har ändrats till {{new_email}}. Om du inte har begärt detta, kontakta oss på {{config.admin_email}}."
     }
 }
