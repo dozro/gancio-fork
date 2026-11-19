@@ -102,3 +102,8 @@ ul:not(.v-pagination__list) {
 .events > .event:last-child:nth-child(n+3) {
   margin-inline-end: auto;
 }
+
+/* keep the same layout of empty paragraph incoming from tiptap editor */
+.user-content p {
+  min-height: 1.5em;
+}
