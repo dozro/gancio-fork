@@ -70,7 +70,22 @@
         "recurrent_2m_ordinal": "Varje {n} {days} i månaden varannan",
         "anon_description_without_registration": "Du kan lägga till ett evenemang men det behöver granskas för att bekräfta att det är ett lämpligt evenemang \nDet kommer inte att vara möjligt att göra ändringar efter att du skickat in.<br/><br/>\nSkicka in ditt evenemang, så granskar vi det så snart som möjligt.",
         "recurrent_1y_days": "{months} {days} varje år",
-        "each_year": "Varje år"
+        "each_year": "Varje år",
+        "recurrent_1y_ordinal": "Den {n} {days} i {months} varje år",
+        "cancel_description": "Det är evenemanget kommer att markeras publikt som inställt.",
+        "cancelled": "Detta evenemang har ställts in",
+        "postponed": "Detta evenemang har blivit uppskjutet, det nya datumet kommer annonseras",
+        "moved_online": "Detta evenemang har flyttats online",
+        "rescheduled": "Detta event har flyttats",
+        "tentative": "Detta evenemang är preliminärt och är inte bekräftat ännu",
+        "status": "Status",
+        "status_cancelled": "Inställt",
+        "status_postponed": "Uppskjutet",
+        "status_rescheduled": "Flyttat",
+        "status_moved_online": "Online",
+        "status_tentative": "Preliminärt",
+        "reannounce": "Annonsera igen",
+        "reannounce_description": "Ska vi omannonsera (boosta) detta evenemang till fediverset?"
     },
     "admin": {
         "enable_resources": "Aktivera resurser",
@@ -134,7 +149,7 @@
         "allow_anon_event": "Tillåt anonyma evenemang (måste bekräftas)?",
         "enable_report_hint": "Alla besökare kan rapportera evenemang, administratörer notifieras via mejl",
         "allow_multidate_event": "Tillåt flerdagars evenemang",
-        "enable_federation_help": "Det kommer vara möjligt att följa denna instans från fediversum",
+        "enable_federation_help": "Användare kommer kunna citera evenemang från den här instansen över fediverset",
         "add_instance": "Lägg till instans",
         "enable_resources_help": "Tillåter tillägg av audio, bilder och kommentarer till evenemanget från fediversum",
         "delete_resource": "Ta bort resurs",
@@ -207,7 +222,22 @@
         "show_download_media": "Visa \"ladda ner media\"",
         "show_download_media_hint": "Visa en \"ladda ner media\" knapp i eventsidan",
         "default_fedi_hashtags": "Standard hashtags för fediverse",
-        "default_fedi_hashtags_help": "De angivna taggarna kommer att läggas till i händelser som skickas till Fediverse"
+        "default_fedi_hashtags_help": "De angivna taggarna kommer att läggas till i händelser som skickas till Fediverse",
+        "edit_user": "Redigera användare",
+        "user_update_ok": "Användare uppdaterad",
+        "page_remove_ok": "Sida borttagen",
+        "open_ended_event_default_duration": "Intern standardlängd för evenemang",
+        "open_ended_event_default_duration_hint": "Standardlängd för evenemang i timmar. Detta används internt vid sökning efter evenemang utan slutdatum som fortfarande kan pågå.",
+        "enable_federation_quoting": "Tillåt citering av evenemang från fediverset",
+        "enable_federation_quoting_help": "Användare kommer kunna citera evenemang från den här instansen på fediverset",
+        "add_source": "Lägg till trovärdiga federerade källor",
+        "unblock_user": "Avblockera användare",
+        "announcement_is_disabled": "Denna utannonsering är inte synlig offentligt",
+        "trusted_sources_label": "Navigationsetikett för betrodda federerade källor",
+        "trusted_sources_label_default": "Andra platser",
+        "add_trusted_source": "Lägg till en betrodd federerad källa",
+        "delete_trusted_source_confirm": "Vill du verkligen ta bort denna betrodda källa?",
+        "trusted_source_removed": "Betrodd källa borttagen"
     },
     "validators": {
         "latitude": "Skriv en valid latitud (-90 < latitud < 90)",
@@ -277,7 +307,8 @@
         "description": "Sociala rörelser bör organisera sig och självfinansiera.<br/> \n<br/>Innan du kan publicera måste <strong>kontot godkännas</strong>; tänk på att <strong>bakom denna webbplats finns riktiga människor</strong>, så skriv ett par rader för att låta oss veta vilka evenemang du vill publicera.",
         "error": "Fel: ",
         "complete": "Registrering behöver bekräftas.",
-        "first_user": "Administratör skapad"
+        "first_user": "Administratör skapad",
+        "disabled": "Registrering är avaktiverat"
     },
     "common": {
         "tags": "Taggar",
@@ -408,7 +439,9 @@
         "convert_draft": "Gör om till utkast",
         "create_draft": "Skapa som utkast",
         "save_draft": "Spara utkast",
-        "draft": "Utkast"
+        "draft": "Utkast",
+        "date": "Datum",
+        "error": "Fel"
     },
     "login": {
         "description": "Genom att logga in kan du publicera nya evenemang.",
