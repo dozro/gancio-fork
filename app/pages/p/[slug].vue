@@ -49,7 +49,7 @@ async function toggleVisibility() {
     <v-card-title class='text-h4 font-weight-bold'>{{ page?.title }}</v-card-title>
     <v-card-text>
       <!-- eslint-disable-next-line vue/no-v-html -->
-      <div v-html='page?.content' />
+      <div class='user-content' v-html='page?.content' />
     </v-card-text>
   </v-card>
 </v-container>

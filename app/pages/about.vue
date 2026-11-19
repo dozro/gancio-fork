@@ -24,7 +24,8 @@ function save() {
   <v-card-text v-if='isAdmin'>
     <CoreEditor v-model='about' class='px-3 ma-0' :label="t('common.about')" height='500px' />
   </v-card-text>
-  <span v-else v-html='about' />
+  <!-- eslint-disable-next-line vue/no-v-html -->
+  <div v-else class='user-content' v-html='about' />
   <v-card-actions v-if='isAdmin'>
     <v-spacer />
     <v-btn color='primary' variant='outlined' @click='save'> {{t('common.save')}}</v-btn>

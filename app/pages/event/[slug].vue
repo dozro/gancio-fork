@@ -117,7 +117,7 @@ async function report() {
       <!-- eslint-disable vue/no-v-html -->
       <div
         v-if="event?.description"
-        class="p-description text-body-1 my-4"
+        class="user-content p-description text-body-1 my-4"
         itemprop="description"
         v-html="event?.description"
       />
@@ -277,9 +277,3 @@ async function report() {
   </client-only>
 </v-container>
 </template>
-
-<style scoped>
-.p-description :deep(p) {
-  margin-bottom: .5lh;
-}
-</style>
