@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.13](https://framagit.org/les/gancio/compare/v2.0.0-beta.12...v2.0.0-beta.13) (2026-11-20)
+
+
+### Features
+
+* add event media to ICS file ([5551647](https://framagit.org/les/gancio/commit/55516473b711591b9a5e8a834c1e62a111bad752))
+* add more calendar info to ICS file ([99f1580](https://framagit.org/les/gancio/commit/99f1580c798c7e0e9fd764d02a25552fd115fd81))
+* support event status ([df6d5bf](https://framagit.org/les/gancio/commit/df6d5bf733981452739011c6faab526bc16290d0))
+
+
+### Bug Fixes
+
+* do not return unconfirmed event to federation ([eb600c0](https://framagit.org/les/gancio/commit/eb600c01ff557828272ef65f8e0c60d8d7415162))
+* include_unconfirmed only if allowed and requested in getEvents, fix ([0c25a76](https://framagit.org/les/gancio/commit/0c25a769151e6248e6f655da16ed1176c0318039))
+* keep user's content layout as it looks in the editor ([784a374](https://framagit.org/les/gancio/commit/784a3744ff0ac453bd742544a3869c4360aac683))
+* restrict event messages to authorized users ([091b06b](https://framagit.org/les/gancio/commit/091b06ba4cf660e31900ba10536dfca6fd3dcdc5))
+* return event by id if visibled or user is allowed to ([6d903cf](https://framagit.org/les/gancio/commit/6d903cf4e955cd8b3edf76533d862e4633f87e33))
+* **security:** omit non public announcements from API ([e24d2a3](https://framagit.org/les/gancio/commit/e24d2a3b2f2429fe3bfd3404408fed78c68c22a3))
+* show unconfirmed events to admin and editor only ([0b532a8](https://framagit.org/les/gancio/commit/0b532a84b332c9c6725e050e2511444a24f34c1e))
+
 ## [2.0.0-beta.12](https://framagit.org/les/gancio/compare/v2.0.0-beta.11...v2.0.0-beta.12) (2026-11-06)
 
 
