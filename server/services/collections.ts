@@ -42,7 +42,8 @@ function filterToConditions(filter: Filter) {
   // }
 
   if (filter.tags?.length) {
-    conditions.push(sql`${col('Event.id')} IN (SELECT eventId FROM event_tags WHERE tagTag IN :tags_${filter.id})`)
+    // quoted identifiers: PostgreSQL lowercases unquoted ones
+    conditions.push(sql`${col('Event.id')} IN (SELECT ${col('eventId')} FROM ${sql.identifier('event_tags')} WHERE ${col('tagTag')} IN :tags_${filter.id})`)
     replacements[`tags_${filter.id}`] = sql.list(filter.tags)
   }
 
