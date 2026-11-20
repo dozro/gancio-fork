@@ -1,9 +1,18 @@
 import { useLogger } from '../lib/logger'
 import { secretSettings } from '../services/settings'
-import { useTaskManager } from '../services/taskManager'
+import { TaskError, useTaskManager } from '../services/taskManager'
 import { safeFetch } from '../lib/safeFetch'
 import { prepareHTTPSignature } from './httpsignature'
 import type { APActivityBase } from './types'
+
+/** the Retry-After header in seconds, it can be a number of seconds or a date */
+function parseRetryAfter(value?: string) {
+  if (!value) return
+  const seconds = Number(value)
+  if (Number.isFinite(seconds)) return seconds
+  const date = Date.parse(value)
+  return Number.isNaN(date) ? undefined : (date - Date.now()) / 1000
+}
 
 export async function signAndSend(object: Partial<APActivityBase>, inbox: string, method = 'post') {
   useTaskManager().add({
@@ -36,25 +45,30 @@ export async function _signAndSend(object: Partial<APActivityBase> | '', inbox: 
 
     const contentType = ret.headers['content-type']
     const text = ret.body.toString('utf8')
+
+    // check the status first: error responses are often not json (e.g. from a proxy) and have to be retried too
+    if (ret.status < 200 || ret.status >= 300) {
+      log.error('Error in sign and send status [%s]: %s %s', inbox, ret.status, text.slice(0, 200))
+      // retry only temporary errors, as mastodon does
+      throw new TaskError(`Status ${ret.status}`, {
+        retry: ret.status >= 500 || [401, 408, 429].includes(ret.status),
+        retryAfter: parseRetryAfter(ret.headers['retry-after'])
+      })
+    }
+
     // check if content-type is json
     if (!contentType?.includes('json')) {
-      log.info(`[FEDI] Error in sign and send, wrong content-type returned: ${contentType} - status: ${ret.status} - body: ${text}`)
+      log.info(`[FEDI] Wrong content-type returned in sign and send: ${contentType} - status: ${ret.status}`)
       return
     }
 
-    if (ret.status >= 200 && ret.status < 300) {
-      log.debug(`Signed and verified! ${ret.status} => ${contentType}`)
-      if (!text) return ''
-      try {
-        return JSON.parse(text)
-      } catch {
-        log.warn('Invalid JSON response', text)
-        return ''
-      }
-    } else {
-      const body = JSON.parse(text)
-      log.error('Error in sign and send status [%s]: %s', inbox, body)
-      throw body
+    log.debug(`Signed and verified! ${ret.status} => ${contentType}`)
+    if (!text) return ''
+    try {
+      return JSON.parse(text)
+    } catch {
+      log.warn('Invalid JSON response', text)
+      return ''
     }
   } catch (e) {
     log.error('Error in sign and send [%s]: %s', inbox, e?.response?.data?.error ?? e?.response?.statusMessage ?? '' + ' ' + String(e))

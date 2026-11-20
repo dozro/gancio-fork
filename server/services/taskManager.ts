@@ -25,6 +25,13 @@ export function useTaskManager() {
   return instance
 }
 
+/** throw it from a task to control its retries */
+export class TaskError extends Error {
+  constructor(message: string, public options: { retry?: boolean, retryAfter?: number } = {}) {
+    super(message)
+  }
+}
+
 type TaskArgs = {
   name: string
   repeat?: boolean
@@ -63,9 +70,15 @@ export class Task {
   handleError(e: unknown) {
     log.error(`TASK ERROR [${this?.name}]: ${e} ${(e && typeof e === 'object' && 'stack' in e) && e?.stack}`)
     if (!this.repeat) {
+      const options = e instanceof TaskError ? e.options : {}
+      if (options.retry === false) this.retries = []
       this.processInNTick = this.retries?.shift() ?? 0
+      // wait at least as long as asked (retryAfter is in seconds)
+      if (this.processInNTick && options.retryAfter) {
+        this.processInNTick = Math.max(this.processInNTick, Math.ceil(options.retryAfter / loopInterval))
+      }
       if (this.processInNTick) {
-        log.info(`Error in ${this.name}: retring in `, Duration.fromMillis(this.processInNTick * 1000).rescale().toHuman({ listStyle: 'long' }))
+        log.info(`Error in ${this.name}: retring in `, Duration.fromMillis(this.processInNTick * loopInterval * 1000).rescale().toHuman({ listStyle: 'long' }))
       } else {
         log.debug(`This was the last try processing ${this.name}`)
       }
