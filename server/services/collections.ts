@@ -10,9 +10,10 @@ import { boolish } from './events'
 
 export const collectionQuerySchema = z.object({
   name: z.string(),
-  start: z.coerce.number().default(DateTime.local().toUnixInteger()).optional(),
+  // defaults as functions: evaluated on each request, not once when the settings are not loaded yet
+  start: z.coerce.number().default(() => DateTime.local().toUnixInteger()),
   end: z.coerce.number().optional(),
-  show_recurrent: boolish.default(publicSettings.recurrent_event_visible),
+  show_recurrent: boolish.default(() => publicSettings.recurrent_event_visible),
   show_multidate: boolish.default(true),
   show_federated: boolish.default(false),
   limit: z.coerce.number().int().optional(),
