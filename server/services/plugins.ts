@@ -33,8 +33,8 @@ const PLUGIN_EVENTS_MAPPING: [keyof EventType, string][] = [
 // To store the associated event functions bound to the plugin
 type EventListenerRecord = [keyof EventType, Handler]
 
-type GancioPluginSettingType = 'NUMBER' | 'TEXT' | 'CHECK' | 'LIST' | 'URL'
-type GancioPluginSetting = {
+type GancioPluginSettingType = 'NUMBER' | 'TEXT' | 'CHECK' | 'LIST' | 'URL' | 'ARRAY'
+export type GancioPluginSetting = {
   type?: GancioPluginSettingType
   description?: string
   hint?: string
@@ -43,6 +43,7 @@ type GancioPluginSetting = {
   items?: string[] // for type LIST, the possible values
   min?: number // For the NUMBER type
   max?: number // For the NUMBER type
+  settings?: Record<string, GancioPluginSetting> // For the ARRAY type, the settings of each entry (not nestable)
 }
 
 export type GancioPluginManifest = {
@@ -117,7 +118,28 @@ const PLUGIN_SETTINGS_VALIDATORS_MAP: Record<GancioPluginSettingType, (setting: 
   CHECK: () => z.boolean().optional(),
   LIST: (setting) => z.literal(setting.items ?? []),
   URL: () => z.url(),
+  ARRAY: setting => z.array(createSettingsSchema(setting.settings ?? {}))
+}
 
+function createSettingSchema(setting: GancioPluginSetting) {
+  const getFieldSchema = setting.type && (setting.type in PLUGIN_SETTINGS_VALIDATORS_MAP)
+    ? PLUGIN_SETTINGS_VALIDATORS_MAP[setting.type]
+    : PLUGIN_SETTINGS_VALIDATORS_MAP.TEXT
+
+  let settingSchema = getFieldSchema(setting)
+  if (!setting.required) {
+    settingSchema = settingSchema.optional()
+  }
+  if (setting.default !== undefined) {
+    settingSchema = settingSchema.default(setting.default)
+  }
+  return settingSchema
+}
+
+function createSettingsSchema(settings: Record<string, GancioPluginSetting>) {
+  return z.object(Object.fromEntries(
+    Object.entries(settings).map(([key, setting]) => [key, createSettingSchema(setting)])
+  ))
 }
 
 export class PluginController {
@@ -281,12 +303,14 @@ export class PluginController {
 
   #validateSettings(plugin: GancioPlugin, settings?: PluginSettings): void {
     if (plugin.manifest.settings) {
-      const schema = this.#createValidationSchema(plugin.manifest.settings)
+      const schema = createSettingsSchema(plugin.manifest.settings)
+      const hasRequiredField = Object.values(plugin.manifest.settings).some(setting => setting.required)
       try {
-        schema.parse(settings || plugin.settings)
+        (hasRequiredField ? schema : schema.optional()).parse(settings || plugin.settings)
       } catch (e) {
         if (e instanceof z.ZodError) {
-          const field = String(e.issues[0]?.path[0] ?? '')
+          // e.g. "feeds.0.url" for a setting of an entry
+          const field = e.issues[0]?.path.join('.') ?? ''
           const message = `${e.issues[0]?.message} (${field})`
           throw createError({ statusCode: 400, message })
         } else {
@@ -294,32 +318,6 @@ export class PluginController {
         }
       }
     }
-  }
-
-  #createValidationSchema(settingsManifest: NonNullable<GancioPluginManifest['settings']>) {
-    const schema: Record<string, ZodType> = {}
-    let hasRequiredField = false
-
-    for (const [key, setting] of Object.entries(settingsManifest)) {
-      const getFieldSchema = setting.type && (setting.type in PLUGIN_SETTINGS_VALIDATORS_MAP)
-        ? PLUGIN_SETTINGS_VALIDATORS_MAP[setting.type]
-        : PLUGIN_SETTINGS_VALIDATORS_MAP.TEXT
-
-      let settingSchema = getFieldSchema(setting)
-      if (setting.required) {
-        hasRequiredField = true
-      } else {
-        settingSchema = settingSchema.optional()
-      }
-      if (setting.default !== undefined) {
-        settingSchema = settingSchema.default(setting.default)
-      }
-      schema[key] = settingSchema
-    }
-
-    return hasRequiredField
-      ? z.object(schema)
-      : z.object(schema).optional()
   }
 
   getSettings(plugin: GancioPlugin): PluginSettings {
