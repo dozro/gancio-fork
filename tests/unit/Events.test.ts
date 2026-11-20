@@ -390,6 +390,12 @@ describe('Events', () => {
     await expect(response).resolves.toHaveProperty('tags', ['test tag'])
   })
 
+  it('should search events by tag', async () => {
+    await upsertEvent({ title: 'tagged event', place_name: 'test', place_address: 'test', start_datetime: now() + 1000, tags: ['searchable'] }, adminUser)
+    const events = await getEvents({ query: 'searchable' })
+    expect(events.map(e => e.title)).toContain('tagged event')
+  })
+
   it('should sanitize htlm in description', async () => {
     const event = {
       title: 'test title',

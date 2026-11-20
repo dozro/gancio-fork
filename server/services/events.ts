@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import type { InferAttributes, WhereOptions } from '@sequelize/core'
-import { Op, literal, col, where, fn, sql, SQL_NULL } from '@sequelize/core'
+import { Op, col, where, fn, sql, SQL_NULL } from '@sequelize/core'
 import { useLogger } from '../lib/logger'
 import { htmlToText } from 'html-to-text'
 import { z } from 'zod'
@@ -134,7 +134,8 @@ export async function getEvents(opts?: unknown, user?: InferAttributes<User>): P
       [Op.or]: [
         where(fn('LOWER', col('title')), Op.like, '%' + args.query + '%'),
         where(fn('LOWER', col('name')), Op.like, '%' + args.query + '%'),
-        fn('EXISTS', literal(`SELECT 1 FROM event_tags WHERE event_tags.eventId=event.id AND LOWER(${col('tagTag').identifiers}) = LOWER(:query)`))
+        // quoted identifiers: PostgreSQL lowercases unquoted ones
+        sql`EXISTS (SELECT 1 FROM ${sql.identifier('event_tags')} WHERE ${col('event_tags.eventId')} = ${col('Event.id')} AND LOWER(${col('event_tags.tagTag')}) = LOWER(:query))`
       ]
     })
   }
