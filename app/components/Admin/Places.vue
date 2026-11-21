@@ -106,6 +106,11 @@ function updatePlace (p) {
             </template>
 
           </v-combobox>
+          <v-switch
+            ref='listed'
+            v-model='place.listed'
+            :label="$t('common.place_listed')"
+          />
           <v-text-field
             v-if="!newPlace"
             ref="address"
