@@ -71,6 +71,7 @@ export function placeToJSON(place?: Place) {
     id: place.id,
     address: place.address, // : addressToString(place.address),
     name: place.name,
+    listed: place.listed,
     ...(!isNaN(eventCount) && { eventCount }),
     ...(place.ap_id && { ap_id: place.ap_id }),
     ...(place.latitude && place.longitude && { latitude: place.latitude, longitude: place.longitude })
