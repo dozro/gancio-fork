@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const settings = useState<Settings>('settings')
 const { t } = useI18n()
-const { data: places } = await useFetch<PlaceAPI[]>(`/api/places/`)
+const { data: places } = await useFetch(`/api/places/`)
 
 useHead(() => {
   const title = `${settings.value.title} - ${t('common.places')}`
@@ -13,8 +13,8 @@ useHead(() => {
 </script>
 <template>
 <v-container>
-  <div v-for="place in places" :key='place.id'>
-    <template v-if='place.listed'>
+  <div v-for="place in places" :key='place?.id'>
+    <template v-if='place?.listed'>
       <header>
         <h3>
           <a
