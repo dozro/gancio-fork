@@ -16,6 +16,7 @@ const headers = [
   { value: 'name', title: t('common.name'), width: 140 },
   { value: 'address', title: t('common.address') },
   { value: 'map', title: 'Map', width: 10 },
+  { value: 'listed', title: t('common.place_listed'), width: 10 },
   { value: 'actions', title: t('common.actions'), align: 'end', width: 130 }
 ]
 
@@ -25,6 +26,7 @@ function editPlace(item: PlaceAPI) {
   newPlace.value = null
   place.name = item.name
   place.address = item.address
+  place.listed = item.listed
   place.eventCount = item.eventCount
   if (settings.value.allow_geolocation) {
     place.latitude = item.latitude
@@ -107,7 +109,6 @@ function updatePlace (p) {
 
           </v-combobox>
           <v-switch
-            ref='listed'
             v-model='place.listed'
             :label="$t('common.place_listed')"
           />
@@ -153,6 +154,9 @@ function updatePlace (p) {
     >
       <template v-slot:item.map="{ item }">
         <v-icon v-if="item.latitude && item.longitude" icon='mdi-map-marker'/>
+      </template>
+      <template v-slot:item.listed="{ item }">
+        <v-icon v-if="item.listed" icon='mdi-check'/>
       </template>
       <template v-slot:item.actions="{ item }">
         <t-btn :tooltip="$t('common.edit')" color="primary" icon='mdi-pencil' @click="editPlace(item)" />
