@@ -17,13 +17,12 @@ useHead(() => {
     <template v-if='place.listed'>
       <header>
         <h3>
-          <nuxt-link
+          <a
             class='place d-block pl-0'
-            text
-            :to="`/place/${place.id}/${encodeURIComponent(place.name)}`"
+            :href="`/place/${place.id}/${encodeURIComponent(place.name)}`"
           >
             {{ place.name }}
-          </nuxt-link>
+          </a>
         </h3>
       </header>
       <div>{{ place.address }}</div>
