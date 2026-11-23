@@ -58,6 +58,7 @@
     "postinstall": "nuxi prepare || true",
     "start": "NODE_ENV=production node .output/server/index.mjs",
     "lint": "eslint .",
+    "typecheck": "vue-tsc --noEmit",
     "test:unit": "vitest run --project unit",
     "test": "vitest run",
     "test:mariadb": "export GANCIO_DB_DIALECT=mariadb && vitest run",
@@ -181,6 +182,7 @@
     "vitest": "^5.1.0",
     "vue-i18n": "^11.4.21",
     "vue-screen-utils": "^1.0.0-beta.13",
+    "vue-tsc": "^3.3.14",
     "vuetify": "^3.12.0"
   },
   "packageManager": "pnpm@11.5.2",
