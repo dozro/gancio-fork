@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { GancioPluginManifest, GancioPluginSettingsValues } from '~~/server/services/plugins'
+import PluginSetting from './PluginSetting.vue'
 
 const props = defineProps<{
   plugin: GancioPluginManifest & { settingsValue: GancioPluginSettingsValues }
@@ -24,7 +25,8 @@ watch(isOpen, (isOpen) => {
   if (!isOpen)
     return
 
-  settingsValues.value = { ...props.plugin.settingsValue }
+  // deep copy: entries of ARRAY settings are edited in place
+  settingsValues.value = JSON.parse(JSON.stringify(props.plugin.settingsValue))
   formChanged.value = false
 }, { immediate: true })
 
@@ -74,72 +76,15 @@ async function save() {
     <v-divider class="mx-2 mx-md-4" />
     <v-card-text>
       <v-form ref="form" v-model="formValid" @change="formChanged = true">
-        <v-row v-for="(setting, name, idx) in plugin.settings" :key="name">
-          <v-divider v-if="idx > 0" class="my-1 mx-3" />
-          <v-col :cols="setting.type === 'CHECK' ? 9 : 12" sm="8">
-            <div :id="`plugin-option-${name}`" class="text-subtitle-2 font-weight-bold">
-              {{ setting.description }}
-              <template v-if="setting.required">*</template>
-            </div>
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div v-if="setting.hint" class="text-body-2 font-weight-normal mt-1" v-html="setting.hint" />
-          </v-col>
-          <v-col :cols="setting.type === 'CHECK' ? 3 : 12" sm="4">
-            <v-text-field
-              v-if="setting.type === 'TEXT'"
-              v-model="settingsValues[name]"
-              variant="outlined"
-              density="comfortable"
-              :rules="[setting.required ? $valid.required(name) : true]"
-              :clearable="!setting.required"
-              :aria-labelled-by="`plugin-option-${name}`"
-              hide-details="auto"
-            />
-
-            <v-text-field
-              v-else-if="setting.type === 'URL'"
-              v-model="settingsValues[name]"
-              type="url"
-              variant="outlined"
-              density="comfortable"
-              :rules="[$valid.url(setting.required)]"
-              :clearable="!setting.required"
-              :aria-labelled-by="`plugin-option-${name}`"
-              hide-details="auto"
-            />
-
-            <v-number-input
-              v-else-if="setting.type === 'NUMBER'" v-model="settingsValues[name]"
-              variant="outlined"
-              density="comfortable"
-              :rules="[setting.required ? (value) => value === 0 || $valid.required(name)(value) : true]"
-              :required="true"
-              :min="setting.min"
-              :max="setting.max"
-              :clearable="!setting.required"
-              :aria-labelled-by="`plugin-option-${name}`"
-              hide-details="auto"
-            />
-
-            <v-select
-              v-else-if="setting.type === 'LIST'" v-model="settingsValues[name]"
-              variant="outlined"
-              density="comfortable"
-              :rules="[setting.required ? $valid.required(name) : true]"
-              :clearable="!setting.required"
-              :items="setting.items"
-              :aria-labelled-by="`plugin-option-${name}`"
-              hide-details="auto"
-            />
-            <div v-else-if="setting.type === 'CHECK'" class="d-flex justify-end align-center h-100">
-              <v-switch
-                v-model="settingsValues[name]"
-                :aria-labelled-by="`plugin-option-${name}`"
-                hide-details="auto"
-              />
-            </div>
-          </v-col>
-        </v-row>
+        <template v-for="(setting, name, idx) in plugin.settings" :key="name">
+          <v-divider v-if="idx > 0" class="my-1" />
+          <PluginSetting
+            v-model="settingsValues[name]"
+            :name="name"
+            :setting="setting"
+            @update:model-value="formChanged = true"
+          />
+        </template>
       </v-form>
 
       <v-alert type="info" variant="tonal" rounded :icon="false" class="mt-8">

@@ -68,11 +68,22 @@ export default ({ log, db, publicSettings, services }: GancioContext): GancioPlu
         description: 'My default language',
         type: 'LIST',
         items: ['it', 'en', 'fr']
+      },
+      my_list_setting: {
+        description: 'My list of links',
+        type: 'ARRAY',
+        // the settings of each entry, any type except ARRAY
+        settings: {
+          name: { type: 'TEXT', description: 'Name', required: true },
+          url: { type: 'URL', description: 'URL' }
+        }
       }
     }
   }
 }
 ```
+
+An `ARRAY` setting is stored as an array of objects, e.g. `[{ name: 'Gancio', url: 'https://gancio.org' }]`.
 
 ![./plugin_settings.png](./plugin_settings.png)
 

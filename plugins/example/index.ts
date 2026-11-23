@@ -8,6 +8,7 @@ type ExampleSettings = PluginSettings & {
   enable_this_feature_in_my_plugin: boolean
   min_post: number
   my_default_language: string
+  array_setting?: { name: string, url?: string }[]
 }
 
 /**
@@ -53,6 +54,15 @@ export default ({ log, publicSettings, services }: GancioContext): GancioPlugin 
         description: 'URL setting',
         hint: 'The interface will validate this value is a well formed URL',
         required: true
+      },
+      array_setting: {
+        type: 'ARRAY',
+        description: 'List setting',
+        hint: 'A list of entries, each one with its own settings (any type except ARRAY)',
+        settings: {
+          name: { type: 'TEXT', description: 'Name', required: true },
+          url: { type: 'URL', description: 'URL' }
+        }
       },
     }
   },
