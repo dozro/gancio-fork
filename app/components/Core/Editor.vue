@@ -191,7 +191,7 @@ async function askLink () {
   left: 12px;
   top: 16px;
   /*font-size: 16px;*/
-  color: #666;
+  opacity: 0.6;
   transition: all 0.2s;
   pointer-events: none;
 }
@@ -199,7 +199,7 @@ async function askLink () {
 .v-editor label.float {
   top: 4px;
   font-size: 12px;
-  color: black;
+  opacity: unset;
 }
 
 /* .v-editor__content {
