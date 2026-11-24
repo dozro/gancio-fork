@@ -28,8 +28,7 @@ declare module 'vue' {
 export type AnnouncementAPI = CreationAttributes<Announcement>
 
 // front end place representation
-export type PlaceAPI = CreationAttributes<Place>
-  & { id: number }
+export type PlaceAPI = Omit<CreationAttributes<Place>, 'createdAt' | 'updatedAt'>
   & { postal_address?: PostalAddress | null }
   & { eventCount?: number }
 

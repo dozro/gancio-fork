@@ -8,17 +8,17 @@ const loading = ref(false)
 const dialog = ref(false)
 const valid = ref(false)
 const search = ref('')
-const place: PlaceAPI = reactive({ name: '' })
+const place: Partial<PlaceAPI> = reactive({ name: '' })
 
 const newPlace = ref()
 
 const headers = [
-  { value: 'name', title: t('common.name'), width: 140 },
+  { value: 'name', title: t('common.name'), width: 240 },
   { value: 'address', title: t('common.address') },
   { value: 'map', title: 'Map', width: 10 },
   { value: 'listed', title: t('common.place_listed'), width: 10 },
   { value: 'actions', title: t('common.actions'), align: 'end', width: 130 }
-]
+] as const
 
 const { data: places, refresh } = await useFetch('/api/places/list')
 
@@ -107,7 +107,7 @@ function updatePlace (p: string | PlaceAPI) {
             :rules="[$valid.required('common.name')]"
             :label="$t('common.name')"
             :placeholder="$t('common.name')"
-            :items='places.filter(p => place.id !== p.id)'
+            :items='places?.filter(p => place.id !== p.id)'
             item-title='name'
             @update:model-value="updatePlace"
           >
@@ -157,7 +157,7 @@ function updatePlace (p: string | PlaceAPI) {
     <v-data-table
       :headers="headers"
       :items="places"
-      :hide-default-footer="places.length < 5"
+      :hide-default-footer="places && places.length < 5"
       :search="search"
     >
       <template v-slot:item.map="{ item }">
