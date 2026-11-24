@@ -30,7 +30,7 @@ export default defineEventHandler(async (evt) => {
   await requireAdmin(evt)
   const places = await Place.findAll({
     order: [[fn('COUNT', col('events.placeId')), 'DESC']],
-    attributes: ['name', 'address', 'latitude', 'longitude', 'id', 'ap_id',
+    attributes: ['name', 'address', 'latitude', 'longitude', 'id', 'ap_id', 'listed',
       [fn('COUNT', col('events.placeId')), 'eventCount']],
     include: [{ model: Event, where: { is_visible: true }, required: true, attributes: [] }],
     group: ['Place.id']

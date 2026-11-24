@@ -8,16 +8,17 @@ const loading = ref(false)
 const dialog = ref(false)
 const valid = ref(false)
 const search = ref('')
-const place: PlaceAPI = reactive({ name: '' })
+const place: Partial<PlaceAPI> = reactive({ name: '' })
 
 const newPlace = ref()
 
 const headers = [
-  { value: 'name', title: t('common.name'), width: 140 },
+  { value: 'name', title: t('common.name'), width: 240 },
   { value: 'address', title: t('common.address') },
   { value: 'map', title: 'Map', width: 10 },
+  { value: 'listed', title: t('common.place_listed'), width: 10 },
   { value: 'actions', title: t('common.actions'), align: 'end', width: 130 }
-]
+] as const
 
 const { data: places, refresh } = await useFetch('/api/places/list')
 
@@ -25,6 +26,7 @@ function editPlace(item: PlaceAPI) {
   newPlace.value = null
   place.name = item.name
   place.address = item.address
+  place.listed = item.listed
   place.eventCount = item.eventCount
   if (settings.value.allow_geolocation) {
     place.latitude = item.latitude
@@ -57,7 +59,19 @@ async function savePlace() {
   dialog.value = false
 }
 
-function updatePlace (p) {
+async function toggleListed(p: PlaceAPI) {
+  try {
+    await $fetch(`/api/places/${p.id}`, {
+      method: 'PUT',
+      body: { ...p, listed: !p.listed }
+    })
+    refresh()
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
+}
+
+function updatePlace (p: string | PlaceAPI) {
   if (!p) {
     newPlace.value = null
     return
@@ -93,7 +107,7 @@ function updatePlace (p) {
             :rules="[$valid.required('common.name')]"
             :label="$t('common.name')"
             :placeholder="$t('common.name')"
-            :items='places.filter(p => place.id !== p.id)'
+            :items='places?.filter(p => place.id !== p.id)'
             item-title='name'
             @update:model-value="updatePlace"
           >
@@ -143,11 +157,19 @@ function updatePlace (p) {
     <v-data-table
       :headers="headers"
       :items="places"
-      :hide-default-footer="places.length < 5"
+      :hide-default-footer="places && places.length < 5"
       :search="search"
     >
       <template v-slot:item.map="{ item }">
         <v-icon v-if="item.latitude && item.longitude" icon='mdi-map-marker'/>
+      </template>
+      <template v-slot:item.listed="{ item }">
+        <v-switch
+          class="float-right"
+          :model-value="item.listed"
+          hide-details
+          @update:model-value="toggleListed(item)"
+        />
       </template>
       <template v-slot:item.actions="{ item }">
         <t-btn :tooltip="$t('common.edit')" color="primary" icon='mdi-pencil' @click="editPlace(item)" />

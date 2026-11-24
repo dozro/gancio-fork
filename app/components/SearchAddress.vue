@@ -8,12 +8,7 @@ defineEmits(['close', 'update:event'])
 const search = ref(place.value.address)
 const searchDebounced = refDebounced(search, 600)
 
-const { data: addressList, status, execute } = useFetch('/api/geocode', { params: { q: searchDebounced }, immediate: false, lazy: true })
-watch(searchDebounced, (q) => {
-  if (q?.length >= 2) {
-    execute()
-  }
-})
+const { data: addressList, status } = useFetch('/api/geocode', { params: { q: searchDebounced }, server: false, lazy: true })
 
 function selectAddress (v) {
   if (!v) {

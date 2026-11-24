@@ -481,7 +481,7 @@ export class Place extends Model<
   @Attribute(DataTypes.INTEGER.UNSIGNED)
   @PrimaryKey
   @AutoIncrement
-  declare readonly id: CreationOptional<number>
+  declare id: CreationOptional<number>
 
   @Attribute(DataTypes.STRING)
   @Index
@@ -505,13 +505,17 @@ export class Place extends Model<
   declare address: CreationOptional<string>
 
   @Attribute(DataTypes.JSON)
-  declare postal_address: CreationOptional<PostalAddress>
+  declare postal_address: CreationOptional<PostalAddress | null>
 
   @Attribute(DataTypes.DOUBLE)
   declare latitude?: CreationOptional<number | null>
 
   @Attribute(DataTypes.DOUBLE)
   declare longitude?: CreationOptional<number | null>
+
+  @Attribute(DataTypes.BOOLEAN)
+  @Default(false)
+  declare listed: CreationOptional<boolean>
 
   @HasMany(() => Event, /* foreign key */ 'placeId')
   declare events?: NonAttribute<Event[]>
