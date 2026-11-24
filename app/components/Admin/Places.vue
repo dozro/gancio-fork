@@ -59,7 +59,19 @@ async function savePlace() {
   dialog.value = false
 }
 
-function updatePlace (p) {
+async function toggleListed(p: PlaceAPI) {
+  try {
+    await $fetch(`/api/places/${p.id}`, {
+      method: 'PUT',
+      body: { ...p, listed: !p.listed }
+    })
+    refresh()
+  } catch (e) {
+    $notify(e, Statuses.ERROR)
+  }
+}
+
+function updatePlace (p: string | PlaceAPI) {
   if (!p) {
     newPlace.value = null
     return
@@ -108,10 +120,6 @@ function updatePlace (p) {
             </template>
 
           </v-combobox>
-          <v-switch
-            v-model='place.listed'
-            :label="$t('common.place_listed')"
-          />
           <v-text-field
             v-if="!newPlace"
             ref="address"
@@ -156,7 +164,12 @@ function updatePlace (p) {
         <v-icon v-if="item.latitude && item.longitude" icon='mdi-map-marker'/>
       </template>
       <template v-slot:item.listed="{ item }">
-        <v-icon v-if="item.listed" icon='mdi-check'/>
+        <v-switch
+          class="float-right"
+          :model-value="item.listed"
+          hide-details
+          @update:model-value="toggleListed(item)"
+        />
       </template>
       <template v-slot:item.actions="{ item }">
         <t-btn :tooltip="$t('common.edit')" color="primary" icon='mdi-pencil' @click="editPlace(item)" />
