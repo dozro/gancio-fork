@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const settings = useState<Settings>('settings')
 const { t } = useI18n()
-const { data: places } = await useFetch(`/api/places/`)
+const { data: places } = await useFetch(`/api/places/listed`)
 
 useHead(() => {
   const title = `${settings.value.title} - ${t('common.places')}`

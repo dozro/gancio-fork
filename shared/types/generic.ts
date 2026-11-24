@@ -29,6 +29,7 @@ export type AnnouncementAPI = CreationAttributes<Announcement>
 
 // front end place representation
 export type PlaceAPI = CreationAttributes<Place>
+  & { id: number }
   & { postal_address?: PostalAddress | null }
   & { eventCount?: number }
 
