@@ -13,20 +13,14 @@ useHead(() => {
 </script>
 <template>
 <v-container>
-  <div v-for="place in places" :key='place?.id'>
-    <template v-if='place?.listed'>
-      <header>
-        <h3>
-          <a
-            class='place d-block pl-0'
-            :href="`/place/${place.id}/${encodeURIComponent(place.name)}`"
-          >
-            {{ place.name }}
-          </a>
-        </h3>
-      </header>
-      <div>{{ place.address }}</div>
-    </template>
-  </div>
+  <h1>{{ t('common.places') }}</h1>
+  <v-list rounded>
+    <v-list-item
+      v-for="place in places"
+      :key='place.id'
+      :title='place.name'
+      :subtitle='place.address'
+      :to="`/place/${place.id}/${encodeURIComponent(place.name)}`" />
+  </v-list>
 </v-container>
 </template>
