@@ -1,6 +1,7 @@
 import { Op, col, where, fn, type CreationAttributes } from '@sequelize/core'
 import { useLogger } from '../lib/logger'
 import { Place, Event } from './db'
+import type { PlaceAPI } from '~~/shared/types/generic'
 const log = useLogger('federation:places')
 
 export async function findOrCreatePlace(body: CreationAttributes<Place> | { id?: number }) {
@@ -64,8 +65,7 @@ export async function cleanOrphanPlaces() {
   })
 }
 
-export function placeToJSON(place?: Place) {
-  if (!place) return undefined
+export function placeToJSON(place: Place & { eventCount?: number }): PlaceAPI {
   const eventCount = Number(place?.get('eventCount') ?? place?.eventCount)
   return {
     id: place.id,

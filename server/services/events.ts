@@ -430,6 +430,8 @@ export function mapEvent(event: Event,
     tags?: Tag[]
     user?: InferAttributes<User>
   }): EventAPI {
+  const tmpPlace = event.place ?? options?.place
+  const place = tmpPlace ? placeToJSON(tmpPlace) : undefined
   let response: EventAPI = {
     id: event.id,
     slug: event.slug,
@@ -443,7 +445,7 @@ export function mapEvent(event: Event,
     end_datetime: event.end_datetime,
     displayEndTime: event.ap_object?.displayEndTime,
 
-    place: placeToJSON(event?.place ?? options?.place),
+    place,
 
     is_mine: event.userId ? event.userId === options?.user?.id : false,
     is_anon: typeof event.userId === 'undefined' || event.userId === null,
