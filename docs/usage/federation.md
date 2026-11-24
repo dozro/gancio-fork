@@ -41,12 +41,18 @@ To follow a Gancio instance from Mobilizon you can look at their documentation [
 
 ## Following a trusted source from Gancio
 
-Gancio allows you to follow other federated platforms, such as another Gancio node, Mobilizon, WordPress, etc.
+The actor of your Gancio instance can follow other federated platforms, such as another Gancio node, Mobilizon, WordPress, etc.
 
 Following a fediverse actor lets you receive events from that source, which will appear on your home feed by default unless configured otherwise.
 (**Admin > Federation > Show federated events on the home page**)
 
 ![Follow trusted sources](follow_trusted_sources.png "Follow trusted sources")
+
+1. Go to **Admin > Federation** and click **Add trusted federated source**.
+2. Enter the web address of the instance, the url of the account or its handle (e.g. `@agenda@bcn.convoca.la`).
+3. The source appears in the list below. Sources added by handle are not followed automatically: turn on the **Following** switch.
+
+The **Follower** column shows whether the source follows your instance back.
 
 ::: tip Info
 You might wonder why it's possible to follow a Mastodon instance from Gancio. The source platform is not restricted, even if it doesn't natively support events. In the case of Mastodon, however, `boosted` events will be shown!
@@ -77,3 +83,12 @@ Gancio provides tools for managing unwanted content coming from the Fediverse in
 
 ## Disable federation
 Federation is enabled by default but you can disable it in **Admin > Federation > Turn on federation**.
+
+
+## Bridges
+
+### Bridging to Bluesky
+
+As an admin you can decide to bridge your instance into Bluesky with [Bridgy Fed](https://fed.brid.gy/), events included.
+
+To opt in, [follow](#following-a-trusted-source-from-gancio) the Bridgy Fed bot `@bsky.brid.gy@bsky.brid.gy`. It will follow your instance back, and new events will then be bridged automatically. People on Bluesky can follow your instance as `[handle].[domain].ap.brid.gy`, e.g. `@events.gancio.cisti.org.ap.brid.gy`.
